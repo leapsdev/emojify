@@ -1,36 +1,96 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Emoji Chat 🎨💬
 
-## Getting Started
+絵文字のみを使用したWeb3チャットアプリケーション。ユーザーは独自の絵文字を作成・販売でき、他のユーザーの絵文字を購入して使用することができます。
 
-First, run the development server:
+## 機能 🚀
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+### 認証機能
+- Privyを使用したWeb3認証システム([1](https://docs.privy.io/guide/react/authentication/))
+- メール、ウォレット、ソーシャルログインに対応
+
+### チャット機能
+- リアルタイムチャット
+- グループチャット対応
+- 絵文字のみでコミュニケーション
+
+### 絵文字システム
+- オリジナル絵文字の作成
+- ブロックチェーン上での絵文字NFT化
+- マーケットプレイスでの売買
+- 絵文字検索機能
+
+## 技術スタック 🛠
+
+### フロントエンド
+- [React](https://react.dev/) - UIライブラリ
+- [Next.js](https://nextjs.org/) - Reactフレームワーク
+- [shadcn/ui](https://ui.shadcn.com/) - UIコンポーネント
+- [Conform](https://conform.guide/) - フォームバリデーション
+- [Zod](https://zod.dev/) - スキーマバリデーション
+
+### バックエンド
+- [Cloudflare D1](https://developers.cloudflare.com/d1/) - エッジデータベース
+- [Drizzle ORM](https://orm.drizzle.team/) - TypeScript ORMツール
+- [Netlify](https://www.netlify.com/) - ホスティング
+
+### Web3統合
+- [Privy](https://docs.privy.io/) - Web3認証 & ウォレット管理
+
+### 開発ツール
+- [pnpm](https://pnpm.io/) - パッケージマネージャー
+- [biome](https://biomejs.dev/) - コードフォーマッター
+
+## プロジェクト構造 📁
+
+```
+src/
+├── app/                   # Next.js アプリケーションルート
+├── components/            # UIコンポーネント
+├── lib/                   # ユーティリティ関数
+├── server/               # サーバーサイドロジック
+│   ├── db/              # データベース関連
+│   └── api/             # APIエンドポイント
+└── web3/                # Web3統合
+    ├── contracts/       # スマートコントラクト
+    └── hooks/          # Web3フックス
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## セットアップ 🔧
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# リポジトリのクローン
+git clone <repository-url>
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# 依存関係のインストール
+pnpm install
 
-## Learn More
+# 開発サーバーの起動
+pnpm dev
+```
 
-To learn more about Next.js, take a look at the following resources:
+## データベーススキーマ 💾
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```typescript
+// schema.ts
+import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+export const users = sqliteTable('users', {
+  id: text('id').primaryKey(),
+  address: text('address'),
+  username: text('username'),
+});
 
-## Deploy on Vercel
+export const emojis = sqliteTable('emojis', {
+  id: text('id').primaryKey(),
+  creatorId: text('creator_id'),
+  tokenId: integer('token_id'),
+  imageUrl: text('image_url'),
+  price: integer('price'),
+});
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## 環境変数 🔐
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## ライセンス 📄
+
+MIT

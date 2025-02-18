@@ -3,7 +3,7 @@
 絵文字のみを使用したWeb3チャットアプリケーション。ユーザーは独自の絵文字を作成・販売でき、他のユーザーの絵文字を購入して使用することができます。
 
 ## 機能 🚀
-[https://github.com/leapsdev/emoji-chat/issues/2](https://github.com/leapsdev/emoji-chat/issues/2)
+[https://github.com/leapsdev/emoji-chat/issues/1](https://github.com/leapsdev/emoji-chat/issues/1)
 
 ### 認証機能
 - Privyを使用したWeb3認証システム([1](https://docs.privy.io/guide/react/authentication/))

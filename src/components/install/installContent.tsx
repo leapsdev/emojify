@@ -1,4 +1,4 @@
-export const InstallHeader = () => {
+export const InstallContent = () => {
   return (
     <>
       <div className="mb-8 text-6xl">🤪</div>

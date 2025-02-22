@@ -6,7 +6,7 @@ import { InstallButton } from "@/components/install/InstallButton"
 import { useInstallPrompt } from "@/hooks/useInstallPrompt"
 
 export const InstallPage = () => {
-  const { showInstallModal, setShowInstallModal, handleInstall } = useInstallPrompt()
+  const { showInstallModal, setShowInstallModal, handleInstall, isInstallable } = useInstallPrompt()
 
   return (
     <main className="min-h-screen bg-white p-4 relative overflow-hidden">
@@ -14,7 +14,7 @@ export const InstallPage = () => {
 
       <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center">
         <InstallHeader />
-        <InstallButton onClick={handleInstall} />
+        {isInstallable && <InstallButton onClick={handleInstall} />}
       </div>
 
       <InstallModal open={showInstallModal} onOpenChange={setShowInstallModal} />

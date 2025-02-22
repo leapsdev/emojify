@@ -3,7 +3,7 @@
 import { InstallModal } from "@/components/modal/installModal"
 import { InstallHeader } from "@/components/install/InstallHeader"
 import { InstallButton } from "@/components/install/InstallButton"
-import { useInstallPrompt } from "@/hooks/useInstallPrompt"
+import { useInstallPrompt } from "./hooks/useInstallPrompt"
 
 export const InstallPage = () => {
   const { showInstallModal, setShowInstallModal, handleInstall } = useInstallPrompt()

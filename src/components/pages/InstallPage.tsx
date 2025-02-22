@@ -1,4 +1,4 @@
-"use client"
+'use client'
 
 import { InstallModal } from "@/components/modal/installModal"
 import { InstallContent } from "@/components/install/installContent"

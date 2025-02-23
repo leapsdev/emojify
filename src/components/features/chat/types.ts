@@ -6,3 +6,10 @@ export type Message = {
   time: string
   online: boolean
 }
+
+export type ChatMessage = {
+  id: string
+  content: string
+  timestamp: string
+  sent: boolean
+}

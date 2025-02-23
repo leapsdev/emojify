@@ -1,4 +1,4 @@
-import { Message } from "./types"
+import { Message, ChatMessage } from "./types"
 
 export const INITIAL_MESSAGES: Message[] = [
   {
@@ -16,5 +16,14 @@ export const INITIAL_MESSAGES: Message[] = [
     message: "You: Hello!",
     time: "1 hours ago",
     online: true,
+  },
+]
+
+export const DUMMY_CHAT_MESSAGES: ChatMessage[] = [
+  {
+    id: "1",
+    content: "👨 🌟 ✏️",
+    timestamp: "08:42 PM",
+    sent: true,
   },
 ]

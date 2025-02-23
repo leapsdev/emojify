@@ -1,5 +1,5 @@
-import { InstallContent } from "@/components/install/installContent"
-import { InstallSection } from "@/components/install/installSection"
+import { InstallContent } from "@/components/features/install/installContent"
+import { InstallSection } from "@/components/features/install/installSection"
 
 export const InstallPage = () => {
   return (

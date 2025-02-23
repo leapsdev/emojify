@@ -1,10 +1,9 @@
-import { FC } from "react"
 import { DynamicFloatingEmojis } from "@/components/signup/FloatingEmojis"
 import Header from "@/components/signup/Header"
 import MainContent from "@/components/signup/MainContent"
 import Footer from "@/components/signup/Footer"
 
-const SignUpPage: FC = () => {
+export const SignUpPage = () => {
   return (
     <main className="min-h-screen bg-white relative overflow-hidden">
       <DynamicFloatingEmojis />
@@ -17,5 +16,3 @@ const SignUpPage: FC = () => {
     </main>
   )
 }
-
-export default SignUpPage

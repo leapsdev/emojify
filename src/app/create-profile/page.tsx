@@ -1,4 +1,4 @@
-import { CreateProfilePage } from "@/components/pages/CreateProfilePage"
+import { CreateProfilePage } from "@/components/pages/createProfilePage"
 
 export default function Page() {
   return <CreateProfilePage />

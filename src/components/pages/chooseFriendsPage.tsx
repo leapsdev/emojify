@@ -1,9 +1,9 @@
 "use client"
 
-import { Header } from "@/components/features/choose-friends/Header"
-import { SearchBar } from "@/components/features/choose-friends/SearchBar"
-import { UserSection } from "@/components/features/choose-friends/UserSection"
-import { ChatButton } from "@/components/features/choose-friends/ChatButton"
+import { Header } from "@/components/features/choose-friends/header"
+import { SearchBar } from "@/components/features/choose-friends/searchBar"
+import { UserSection } from "@/components/features/choose-friends/userSection"
+import { ChatButton } from "@/components/features/choose-friends/chatButton"
 import { useUserSelection } from "@/components/features/choose-friends/hooks/useUserSelection"
 
 export function ChooseFriendsPage() {

@@ -1,4 +1,4 @@
-import { UserItem } from "./UserItem"
+import { UserItem } from "./userItem"
 
 interface User {
   id: string

@@ -1,8 +1,8 @@
 "use client"
-import { Header } from "@/components/features/chat/Header"
-import { MessageList } from "@/components/features/chat/MessageList"
-import { NewMessageButton } from "@/components/features/chat/NewMessageButton"
-import { FooterNavigation } from "@/components/features/chat/FooterNavigation"
+import { Header } from "@/components/features/chat/header"
+import { MessageList } from "@/components/features/chat/messageList"
+import { NewMessageButton } from "@/components/features/chat/newMessageButton"
+import { FooterNavigation } from "@/components/features/chat/footerNavigation"
 import { INITIAL_MESSAGES } from "@/components/features/chat/constants"
 
 export const ChatPage = () => {

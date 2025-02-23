@@ -1,9 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { ChatRoomHeader } from "@/components/features/chat/ChatRoomHeader"
-import { ChatRoomMessages } from "@/components/features/chat/ChatRoomMessages"
-import { ChatRoomInput } from "@/components/features/chat/ChatRoomInput"
+import { ChatRoomHeader } from "@/components/features/chat/chatRoomHeader"
+import { ChatRoomMessages } from "@/components/features/chat/chatRoomMessages"
+import { ChatRoomInput } from "@/components/features/chat/chatRoomInput"
 import { DUMMY_CHAT_MESSAGES } from "@/components/features/chat/constants"
 
 type ChatRoomPageProps = {

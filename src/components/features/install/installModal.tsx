@@ -1,4 +1,4 @@
-import { Dialog, DialogContent, DialogTitle, DialogClose } from "../ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogClose } from "../../ui/dialog"
 import { Share, Plus, X } from "lucide-react"
 
 interface InstallModalProps {

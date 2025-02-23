@@ -1,7 +1,7 @@
 'use client'
 
 import { InstallButton } from "@/components/features/install/installButton"
-import { InstallModal } from "@/components/modal/installModal"
+import { InstallModal } from "@/components/features/install/installModal"
 import { useInstallPrompt } from "@/components/pages/hooks/useInstallPrompt"
 
 export const InstallSection = () => {

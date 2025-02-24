@@ -2,6 +2,7 @@
 
 import { usePrivy } from "@privy-io/react-auth"
 import { Button } from "@/components/ui/button"
+import { Wallet } from "lucide-react"
 
 export const LoginButton = () => {
   const { login, ready, authenticated } = usePrivy()
@@ -11,8 +12,9 @@ export const LoginButton = () => {
   return (
     <Button
       onClick={login}
-      className="mt-6 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow-md transition-colors"
+      className="bg-black text-white rounded-full px-8 py-6 text-lg font-bold hover:bg-gray-900 transition-colors"
     >
+      <Wallet className="mr-2 h-5 w-5" />
       ログイン
     </Button>
   )

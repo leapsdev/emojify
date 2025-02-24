@@ -7,11 +7,11 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
     <Privy
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
       config={{
-        loginMethods: ['email', 'google', 'twitter'],
+        loginMethods: ['wallet', 'email', 'google', 'twitter'],
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
-          showWalletLoginFirst: false,
+          showWalletLoginFirst: true,
         },
         embeddedWallets: {
           createOnLogin: 'all-users',

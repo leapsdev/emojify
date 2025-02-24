@@ -5,7 +5,7 @@ import { PrivyProvider as Privy } from '@privy-io/react-auth';
 export function PrivyProvider({ children }: { children: React.ReactNode }) {
   return (
     <Privy
-      appId="YOUR_PRIVY_APP_ID"
+      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID!}
       config={{
         loginMethods: ['email', 'google', 'twitter'],
         appearance: {

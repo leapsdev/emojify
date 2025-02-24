@@ -1,3 +1,5 @@
+'use client';
+
 import { InstallContent } from "@/components/features/install/installContent"
 import { InstallSection } from "@/components/features/install/installSection"
 import { usePrivy } from "@privy-io/react-auth"

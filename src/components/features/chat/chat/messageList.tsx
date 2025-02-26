@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { Message } from './types';
+import type { Message } from '../shared/types';
 
 type MessageListProps = {
   messages: Message[];

@@ -1,9 +1,9 @@
 'use client';
 
-import { ChatRoomHeader } from '@/components/features/chat/chatRoomHeader';
-import { ChatRoomInput } from '@/components/features/chat/chatRoomInput';
-import { ChatRoomMessages } from '@/components/features/chat/chatRoomMessages';
-import { DUMMY_CHAT_MESSAGES } from '@/components/features/chat/constants';
+import { ChatRoomHeader } from '@/components/features/chat/chat-room/header';
+import { ChatRoomInput } from '@/components/features/chat/chat-room/input';
+import { ChatRoomMessages } from '@/components/features/chat/chat-room/messages';
+import { DUMMY_CHAT_MESSAGES } from '@/components/features/chat/shared/constants';
 import { useState } from 'react';
 
 type ChatRoomPageProps = {

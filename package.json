@@ -6,7 +6,11 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "format": "biome format --write .",
+    "format:check": "biome format --check .",
+    "lint:biome": "biome lint .",
+    "check": "biome check --apply ."
   },
   "dependencies": {
     "@privy-io/react-auth": "^2.4.5",
@@ -20,6 +24,7 @@
     "react-dom": "^19.0.0"
   },
   "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
     "@eslint/eslintrc": "^3",
     "@types/node": "^20.17.19",
     "@types/react": "^19",

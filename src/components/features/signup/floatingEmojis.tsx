@@ -14,16 +14,16 @@ const FloatingEmojis: FC = () => {
 
   return (
     <div className="absolute inset-0">
-      {EMOJIS.map((emoji, index) => (
+      {EMOJIS.map((emoji, idx) => (
         <div
-          key={`emoji-${emoji}-${index}`}
+          key={emoji}
           className={`floating-element absolute text-4xl bg-gray-100 rounded-2xl p-4 shadow-md ${
-            index % 2 === 0 ? 'animate-float' : 'animate-float-reverse'
+            idx % 2 === 0 ? 'animate-float' : 'animate-float-reverse'
           }`}
           style={{
-            top: `${positions[index].top}%`,
-            left: `${positions[index].left}%`,
-            transform: `rotate(${positions[index].rotation}deg)`,
+            top: `${positions[idx].top}%`,
+            left: `${positions[idx].left}%`,
+            transform: `rotate(${positions[idx].rotation}deg)`,
           }}
         >
           {emoji}

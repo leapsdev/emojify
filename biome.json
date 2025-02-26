@@ -1,7 +1,15 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "files": {
-    "ignore": ["node_modules", "dist", ".next", "pnpm-lock.yaml"]
+    "include": ["src/**/*.{ts,tsx,js,jsx}"],
+    "ignore": [
+      "node_modules",
+      "dist",
+      ".next",
+      "*.config.{js,ts,mjs}",
+      "*.json",
+      "*.md"
+    ]
   },
   "formatter": {
     "enabled": true,

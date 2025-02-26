@@ -7,12 +7,7 @@ import { Search } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
-interface User {
-  id: string;
-  name: string;
-  username: string;
-  avatar: string;
-}
+import { User, SearchFriendsModalProps } from './types';
 
 const DUMMY_USERS: User[] = [
   {
@@ -70,11 +65,6 @@ const DUMMY_USERS: User[] = [
     avatar: '/placeholder.svg?height=48&width=48',
   },
 ];
-
-interface SearchFriendsModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
 
 export function SearchFriendsModal({
   open,

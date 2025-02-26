@@ -13,3 +13,20 @@ export type ChatMessage = {
   timestamp: string;
   sent: boolean;
 };
+
+export type User = {
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
+};
+
+export interface SearchFriendsModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}
+
+export interface WalletModalProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+}

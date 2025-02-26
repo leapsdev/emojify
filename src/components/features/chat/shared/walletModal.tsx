@@ -6,10 +6,7 @@ import { Input } from '@/components/ui/input';
 import { ChevronRight, Mail, X } from 'lucide-react';
 import Image from 'next/image';
 
-interface WalletModalProps {
-  open: boolean;
-  onOpenChange: (open: boolean) => void;
-}
+import { WalletModalProps } from './types';
 
 export function WalletModal({ open, onOpenChange }: WalletModalProps) {
   return (

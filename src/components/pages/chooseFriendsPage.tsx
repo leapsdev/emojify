@@ -1,10 +1,10 @@
-"use client"
+'use client';
 
-import { Header } from "@/components/features/choose-friends/header"
-import { SearchBar } from "@/components/features/choose-friends/searchBar"
-import { UserSection } from "@/components/features/choose-friends/userSection"
-import { ChatButton } from "@/components/features/choose-friends/chatButton"
-import { useUserSelection } from "@/components/features/choose-friends/hooks/useUserSelection"
+import { ChatButton } from '@/components/features/choose-friends/chatButton';
+import { Header } from '@/components/features/choose-friends/header';
+import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
+import { SearchBar } from '@/components/features/choose-friends/searchBar';
+import { UserSection } from '@/components/features/choose-friends/userSection';
 
 export function ChooseFriendsPage() {
   const {
@@ -15,16 +15,13 @@ export function ChooseFriendsPage() {
     favorites,
     friends,
     handleUserSelect,
-  } = useUserSelection()
+  } = useUserSelection();
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />
-      
-      <SearchBar 
-        value={searchQuery}
-        onChange={setSearchQuery}
-      />
+
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
       <div className="px-4 space-y-6 flex-1 overflow-auto">
         <UserSection
@@ -51,5 +48,5 @@ export function ChooseFriendsPage() {
 
       <ChatButton visible={selectedUsers.length > 0} />
     </main>
-  )
+  );
 }

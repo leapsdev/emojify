@@ -3,5 +3,5 @@ export const Header = () => {
     <div className="p-4 border-b flex items-center justify-center">
       <span className="text-2xl">💬</span>
     </div>
-  )
-}
+  );
+};

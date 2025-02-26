@@ -1,29 +1,29 @@
-import { Message, ChatMessage } from "./types"
+import type { ChatMessage, Message } from './types';
 
 export const INITIAL_MESSAGES: Message[] = [
   {
-    id: "Jossh",
-    username: "Jossh",
-    avatar: "/placeholder.svg?height=40&width=40",
-    message: "You: Hello!",
-    time: "1 hours ago",
+    id: 'Jossh',
+    username: 'Jossh',
+    avatar: '/placeholder.svg?height=40&width=40',
+    message: 'You: Hello!',
+    time: '1 hours ago',
     online: true,
   },
   {
-    id: "Jacob",
-    username: "Jacob",
-    avatar: "/placeholder.svg?height=40&width=40",
-    message: "You: Hello!",
-    time: "1 hours ago",
+    id: 'Jacob',
+    username: 'Jacob',
+    avatar: '/placeholder.svg?height=40&width=40',
+    message: 'You: Hello!',
+    time: '1 hours ago',
     online: true,
   },
-]
+];
 
 export const DUMMY_CHAT_MESSAGES: ChatMessage[] = [
   {
-    id: "1",
-    content: "👨 🌟 ✏️",
-    timestamp: "08:42 PM",
+    id: '1',
+    content: '👨 🌟 ✏️',
+    timestamp: '08:42 PM',
     sent: true,
   },
-]
+];

@@ -1,14 +1,14 @@
-"use client"
+'use client';
 
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
-import Image from "next/image"
-import { Input } from "@/components/ui/input"
-import { Button } from "@/components/ui/button"
-import { X, ChevronRight, Mail } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { ChevronRight, Mail, X } from 'lucide-react';
+import Image from 'next/image';
 
 interface WalletModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function WalletModal({ open, onOpenChange }: WalletModalProps) {
@@ -18,7 +18,7 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
         {/* ヘッダー */}
         <div className="flex justify-between items-center mb-8">
           <DialogTitle className="text-lg font-semibold">Login or sign up</DialogTitle>
-          <button className="text-gray-600" onClick={() => onOpenChange(false)}>
+          <button type="button" className="text-gray-600" onClick={() => onOpenChange(false)}>
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -30,7 +30,11 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
 
         {/* メールフォーム */}
         <div className="relative mb-6">
-          <Input type="email" placeholder="your@email.com" className="pr-20 py-5 rounded-xl border-gray-200" />
+          <Input
+            type="email"
+            placeholder="your@email.com"
+            className="pr-20 py-5 rounded-xl border-gray-200"
+          />
           <Button className="absolute right-2 top-1/2 -translate-y-1/2 rounded-lg px-4 py-1 bg-gray-100 hover:bg-gray-200 text-gray-600">
             Submit
           </Button>
@@ -89,5 +93,5 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

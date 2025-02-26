@@ -1,4 +1,4 @@
-import Link from "next/link"
+import Link from 'next/link';
 
 export const NewMessageButton = () => {
   return (
@@ -8,5 +8,5 @@ export const NewMessageButton = () => {
     >
       <span className="text-2xl">💬</span>
     </Link>
-  )
-}
+  );
+};

@@ -1,9 +1,9 @@
-import { Dialog, DialogContent, DialogTitle, DialogClose } from "../../ui/dialog"
-import { Share, Plus, X } from "lucide-react"
+import { Plus, Share, X } from 'lucide-react';
+import { Dialog, DialogClose, DialogContent, DialogTitle } from '../../ui/dialog';
 
 interface InstallModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function InstallModal({ open, onOpenChange }: InstallModalProps) {
@@ -40,5 +40,5 @@ export function InstallModal({ open, onOpenChange }: InstallModalProps) {
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

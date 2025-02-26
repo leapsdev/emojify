@@ -1,5 +1,5 @@
-import { InstallContent } from "@/components/features/install/installContent"
-import { InstallSection } from "@/components/features/install/installSection"
+import { InstallContent } from '@/components/features/install/installContent';
+import { InstallSection } from '@/components/features/install/installSection';
 
 export const InstallPage = () => {
   return (
@@ -9,5 +9,5 @@ export const InstallPage = () => {
         <InstallSection />
       </div>
     </main>
-  )
-}
+  );
+};

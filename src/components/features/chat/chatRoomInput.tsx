@@ -1,11 +1,11 @@
-import { Send, Smile } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Input } from '@/components/ui/input';
+import { Send, Smile } from 'lucide-react';
 
 type ChatRoomInputProps = {
-  message: string
-  onMessageChange: (message: string) => void
-  onSubmit: (e: React.FormEvent) => void
-}
+  message: string;
+  onMessageChange: (message: string) => void;
+  onSubmit: (e: React.FormEvent) => void;
+};
 
 export const ChatRoomInput = ({ message, onMessageChange, onSubmit }: ChatRoomInputProps) => {
   return (
@@ -23,10 +23,13 @@ export const ChatRoomInput = ({ message, onMessageChange, onSubmit }: ChatRoomIn
             <Smile className="w-6 h-6" />
           </button>
         </div>
-        <button type="submit" className="bg-blue-500 text-white p-3 rounded-full flex items-center justify-center">
+        <button
+          type="submit"
+          className="bg-blue-500 text-white p-3 rounded-full flex items-center justify-center"
+        >
           <Send className="w-6 h-6" />
         </button>
       </form>
     </div>
-  )
-}
+  );
+};

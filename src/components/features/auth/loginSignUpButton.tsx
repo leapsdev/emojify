@@ -1,13 +1,13 @@
 'use client';
 
-import { usePrivy } from "@privy-io/react-auth"
-import { Button } from "@/components/ui/button"
-import { LogIn } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { usePrivy } from '@privy-io/react-auth';
+import { LogIn } from 'lucide-react';
 
 export const LoginButton = () => {
-  const { login, ready, authenticated } = usePrivy()
+  const { login, ready, authenticated } = usePrivy();
 
-  if (!ready || authenticated) return null
+  if (!ready || authenticated) return null;
 
   return (
     <Button
@@ -17,5 +17,5 @@ export const LoginButton = () => {
       <LogIn className="mr-2 h-5 w-5" />
       Login / Signup
     </Button>
-  )
-}
+  );
+};

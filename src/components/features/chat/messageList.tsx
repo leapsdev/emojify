@@ -1,10 +1,10 @@
-import Link from "next/link"
-import Image from "next/image"
-import { Message } from "./types"
+import Image from 'next/image';
+import Link from 'next/link';
+import type { Message } from './types';
 
 type MessageListProps = {
-  messages: Message[]
-}
+  messages: Message[];
+};
 
 export const MessageList = ({ messages }: MessageListProps) => {
   return (
@@ -14,15 +14,15 @@ export const MessageList = ({ messages }: MessageListProps) => {
           <Link key={message.id} href={`/chat/${message.id}`} className="block">
             <div className="px-4 py-3 flex items-center gap-3">
               <div className="relative flex-shrink-0">
-                <Image 
-                  src={message.avatar || "/placeholder.svg"} 
-                  alt="User avatar" 
-                  width={48} 
-                  height={48} 
+                <Image
+                  src={message.avatar || '/placeholder.svg'}
+                  alt="User avatar"
+                  width={48}
+                  height={48}
                   className="rounded-full"
                 />
                 {message.online && (
-                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
+                  <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full" />
                 )}
               </div>
               <div className="flex-1 min-w-0">
@@ -37,5 +37,5 @@ export const MessageList = ({ messages }: MessageListProps) => {
         ))}
       </div>
     </div>
-  )
-}
+  );
+};

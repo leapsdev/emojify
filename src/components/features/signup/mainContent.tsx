@@ -1,4 +1,4 @@
-import { FC } from "react"
+import type { FC } from 'react';
 
 const MainContent: FC = () => {
   return (
@@ -9,7 +9,7 @@ const MainContent: FC = () => {
         <span className="text-gray-900">Emojis</span>
       </h1>
     </div>
-  )
-}
+  );
+};
 
-export default MainContent
+export default MainContent;

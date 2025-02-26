@@ -1,4 +1,4 @@
-import { Button } from "@/components/ui/button"
+import { Button } from '@/components/ui/button';
 
 export function Footer() {
   return (
@@ -7,5 +7,5 @@ export function Footer() {
         Create account
       </Button>
     </div>
-  )
+  );
 }

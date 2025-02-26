@@ -1,23 +1,29 @@
-import { UserItem } from "./userItem"
+import { UserItem } from './userItem';
 
 interface User {
-  id: string
-  displayName: string
-  userId: string
-  avatar: string
-  section: "recent" | "favorites" | "friends"
+  id: string;
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'recent' | 'favorites' | 'friends';
 }
 
 interface UserSectionProps {
-  title: string
-  users: User[]
-  selectedUsers: string[]
-  onUserSelect: (userId: string) => void
-  count?: number
+  title: string;
+  users: User[];
+  selectedUsers: string[];
+  onUserSelect: (userId: string) => void;
+  count?: number;
 }
 
-export function UserSection({ title, users, selectedUsers, onUserSelect, count }: UserSectionProps) {
-  if (users.length === 0) return null
+export function UserSection({
+  title,
+  users,
+  selectedUsers,
+  onUserSelect,
+  count,
+}: UserSectionProps) {
+  if (users.length === 0) return null;
 
   return (
     <section>
@@ -35,5 +41,5 @@ export function UserSection({ title, users, selectedUsers, onUserSelect, count }
         ))}
       </div>
     </section>
-  )
+  );
 }

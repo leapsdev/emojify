@@ -1,6 +1,6 @@
-import { FC } from "react"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import type { FC } from 'react';
 
 const Footer: FC = () => {
   return (
@@ -27,7 +27,7 @@ const Footer: FC = () => {
         </Link>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

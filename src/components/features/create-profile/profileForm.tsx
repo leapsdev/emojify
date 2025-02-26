@@ -1,5 +1,5 @@
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+import { Input } from '@/components/ui/input';
+import { Textarea } from '@/components/ui/textarea';
 
 export function ProfileForm() {
   return (
@@ -11,7 +11,11 @@ export function ProfileForm() {
           </label>
           <span className="text-gray-500">Required</span>
         </div>
-        <Input id="username" className="rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg" required />
+        <Input
+          id="username"
+          className="rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg"
+          required
+        />
       </div>
 
       <div className="space-y-2">
@@ -39,5 +43,5 @@ export function ProfileForm() {
         </div>
       </div>
     </div>
-  )
+  );
 }

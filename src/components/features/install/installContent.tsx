@@ -7,5 +7,5 @@ export const InstallContent = () => {
         Never miss a post again. Install the app for the best experience.
       </p>
     </>
-  )
-}
+  );
+};

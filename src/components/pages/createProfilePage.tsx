@@ -1,7 +1,7 @@
-import { Header } from "@/components/features/create-profile/header"
-import { ProfileImage } from "@/components/features/create-profile/profileImage"
-import { ProfileForm } from "@/components/features/create-profile/profileForm"
-import { Footer } from "@/components/features/create-profile/footer"
+import { Footer } from '@/components/features/create-profile/footer';
+import { Header } from '@/components/features/create-profile/header';
+import { ProfileForm } from '@/components/features/create-profile/profileForm';
+import { ProfileImage } from '@/components/features/create-profile/profileImage';
 
 export function CreateProfilePage() {
   return (
@@ -13,5 +13,5 @@ export function CreateProfilePage() {
       </div>
       <Footer />
     </main>
-  )
+  );
 }

@@ -1,94 +1,96 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import Image from "next/image"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { Input } from "@/components/ui/input"
-import { Checkbox } from "@/components/ui/checkbox"
-import { Search } from "lucide-react"
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
+import { Search } from 'lucide-react';
+import Image from 'next/image';
+import { useState } from 'react';
 
 interface User {
-  id: string
-  name: string
-  username: string
-  avatar: string
+  id: string;
+  name: string;
+  username: string;
+  avatar: string;
 }
 
 const DUMMY_USERS: User[] = [
   {
-    id: "1",
-    name: "Kinjo",
-    username: "illshin",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '1',
+    name: 'Kinjo',
+    username: 'illshin',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "2",
-    name: "yamapyblack",
-    username: "yamapyblack",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '2',
+    name: 'yamapyblack',
+    username: 'yamapyblack',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "3",
-    name: "Ritulya",
-    username: "babushka",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '3',
+    name: 'Ritulya',
+    username: 'babushka',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "4",
-    name: "toto 🎭🐷💜🧀💧🍭💛",
-    username: "totomal",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '4',
+    name: 'toto 🎭🐷💜🧀💧🍭💛',
+    username: 'totomal',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "5",
-    name: "tantan777 🎭",
-    username: "tantan777",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '5',
+    name: 'tantan777 🎭',
+    username: 'tantan777',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "6",
-    name: "Yuki Sato",
-    username: "yukisato.eth",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '6',
+    name: 'Yuki Sato',
+    username: 'yukisato.eth',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "7",
-    name: "DENJIN-K",
-    username: "denjin",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '7',
+    name: 'DENJIN-K',
+    username: 'denjin',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "8",
-    name: "passion 😎",
-    username: "hyde2000",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '8',
+    name: 'passion 😎',
+    username: 'hyde2000',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
   {
-    id: "9",
-    name: "0xTouYan",
-    username: "0xtouyan.eth",
-    avatar: "/placeholder.svg?height=48&width=48",
+    id: '9',
+    name: '0xTouYan',
+    username: '0xtouyan.eth',
+    avatar: '/placeholder.svg?height=48&width=48',
   },
-]
+];
 
 interface SearchFriendsModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
 }
 
 export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalProps) {
-  const [selectedUsers, setSelectedUsers] = useState<string[]>([])
-  const [searchQuery, setSearchQuery] = useState("")
+  const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
 
   const filteredUsers = DUMMY_USERS.filter(
     (user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchQuery.toLowerCase()),
-  )
+      user.username.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   const handleUserSelect = (userId: string) => {
-    setSelectedUsers((prev) => (prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]))
-  }
+    setSelectedUsers((prev) =>
+      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+    );
+  };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -115,7 +117,7 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
                 <div key={user.id} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Image
-                      src={user.avatar || "/placeholder.svg"}
+                      src={user.avatar || '/placeholder.svg'}
                       alt=""
                       width={48}
                       height={48}
@@ -138,5 +140,5 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
         </div>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

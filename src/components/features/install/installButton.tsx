@@ -1,10 +1,10 @@
-'use client'
+'use client';
 
-import { Button } from "@/components/ui/button"
-import { Download } from "lucide-react"
+import { Button } from '@/components/ui/button';
+import { Download } from 'lucide-react';
 
 interface InstallButtonProps {
-  onClick: () => void
+  onClick: () => void;
 }
 
 export const InstallButton = ({ onClick }: InstallButtonProps) => {
@@ -16,5 +16,5 @@ export const InstallButton = ({ onClick }: InstallButtonProps) => {
       <Download className="mr-2 h-5 w-5" />
       Install app
     </Button>
-  )
-}
+  );
+};

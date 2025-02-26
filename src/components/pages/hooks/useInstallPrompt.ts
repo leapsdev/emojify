@@ -1,53 +1,53 @@
-"use client"
+'use client';
 
-import { useState, useCallback, useEffect } from "react"
+import { useCallback, useEffect, useState } from 'react';
 
 export const useInstallPrompt = () => {
-  const [showInstallModal, setShowInstallModal] = useState(false)
-  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null)
-  const [isInstallable, setIsInstallable] = useState(false)
+  const [showInstallModal, setShowInstallModal] = useState(false);
+  const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
+  const [isInstallable, setIsInstallable] = useState(false);
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
-      e.preventDefault()
-      setDeferredPrompt(e as BeforeInstallPromptEvent)
-      setIsInstallable(true)
-    }
+      e.preventDefault();
+      setDeferredPrompt(e as BeforeInstallPromptEvent);
+      setIsInstallable(true);
+    };
 
-    if (typeof window !== "undefined") {
-      window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+    if (typeof window !== 'undefined') {
+      window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     }
 
     return () => {
-      if (typeof window !== "undefined") {
-        window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt)
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
       }
-    }
-  }, [])
+    };
+  }, []);
 
   const handleInstall = useCallback(async () => {
     try {
       if (deferredPrompt) {
-        await deferredPrompt.prompt()
-        const { outcome } = await deferredPrompt.userChoice
-        
-        if (outcome === "accepted") {
-          setDeferredPrompt(null)
-          setIsInstallable(false)
+        await deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+
+        if (outcome === 'accepted') {
+          setDeferredPrompt(null);
+          setIsInstallable(false);
         }
       } else {
-        setShowInstallModal(true)
+        setShowInstallModal(true);
       }
     } catch (error) {
-      console.error("インストールプロンプトでエラーが発生しました:", error)
-      setShowInstallModal(true)
+      console.error('インストールプロンプトでエラーが発生しました:', error);
+      setShowInstallModal(true);
     }
-  }, [deferredPrompt])
+  }, [deferredPrompt]);
 
   return {
     showInstallModal,
     setShowInstallModal,
     handleInstall,
-    isInstallable
-  }
-}
+    isInstallable,
+  };
+};

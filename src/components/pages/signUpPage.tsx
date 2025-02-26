@@ -1,7 +1,7 @@
-import { DynamicFloatingEmojis } from "@/components/features/signup/floatingEmojis"
-import Header from "@/components/features/signup/header"
-import MainContent from "@/components/features/signup/mainContent"
-import Footer from "@/components/features/signup/footer"
+import { DynamicFloatingEmojis } from '@/components/features/signup/floatingEmojis';
+import Footer from '@/components/features/signup/footer';
+import Header from '@/components/features/signup/header';
+import MainContent from '@/components/features/signup/mainContent';
 
 export const SignUpPage = () => {
   return (
@@ -14,5 +14,5 @@ export const SignUpPage = () => {
         <Footer />
       </div>
     </main>
-  )
-}
+  );
+};

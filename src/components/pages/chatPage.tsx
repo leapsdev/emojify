@@ -1,10 +1,10 @@
 'use client';
 
-import { INITIAL_MESSAGES } from '@/components/features/chat/shared/constants';
 import { FooterNavigation } from '@/components/features/chat/chat/footerNavigation';
 import { Header } from '@/components/features/chat/chat/header';
 import { MessageList } from '@/components/features/chat/chat/messageList';
 import { NewMessageButton } from '@/components/features/chat/chat/newMessageButton';
+import { INITIAL_MESSAGES } from '@/components/features/chat/shared/constants';
 
 export const ChatPage = () => {
   return (

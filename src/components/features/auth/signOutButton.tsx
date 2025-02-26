@@ -1,7 +1,7 @@
 'use client';
 
-import { usePrivy } from '@privy-io/react-auth';
 import { Button } from '@/components/ui/button';
+import { usePrivy } from '@privy-io/react-auth';
 import { LogOut } from 'lucide-react';
 
 export const SignOutButton = () => {

@@ -1,6 +1,6 @@
+import { SignOutButton } from '@/components/features/auth/signOutButton';
 import { InstallContent } from '@/components/features/install/installContent';
 import { InstallSection } from '@/components/features/install/installSection';
-import { SignOutButton } from '@/components/features/auth/signOutButton';
 
 export const InstallPage = () => {
   return (

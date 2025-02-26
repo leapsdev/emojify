@@ -7,7 +7,7 @@ import { Search } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 
-import { User, SearchFriendsModalProps } from './types';
+import type { SearchFriendsModalProps, User } from './types';
 
 const DUMMY_USERS: User[] = [
   {

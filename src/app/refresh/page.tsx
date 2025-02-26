@@ -1,6 +1,6 @@
+import { usePrivy } from '@privy-io/react-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
-import { usePrivy } from '@privy-io/react-auth';
 
 export default function RefreshPage() {
   const router = useRouter();

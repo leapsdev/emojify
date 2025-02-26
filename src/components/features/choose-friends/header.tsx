@@ -7,7 +7,9 @@ export function Header() {
         👈
       </Link>
       <span className="text-2xl">👫</span>
-      <button type="button" className="text-2xl">👉</button>
+      <button type="button" className="text-2xl">
+        👉
+      </button>
     </div>
   );
 }

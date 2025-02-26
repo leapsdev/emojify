@@ -10,7 +10,9 @@ export const ChatRoomHeader = ({ username }: ChatRoomHeaderProps) => {
       <Link href="/chat" className="text-2xl">
         👈
       </Link>
-      <h1 className="text-xl font-semibold flex-1 text-center mr-8">{username}</h1>
+      <h1 className="text-xl font-semibold flex-1 text-center mr-8">
+        {username}
+      </h1>
     </div>
   );
 };

@@ -17,8 +17,14 @@ export function WalletModal({ open, onOpenChange }: WalletModalProps) {
       <DialogContent className="p-6 rounded-[32px] max-w-full sm:max-w-lg mx-auto bg-white">
         {/* ヘッダー */}
         <div className="flex justify-between items-center mb-8">
-          <DialogTitle className="text-lg font-semibold">Login or sign up</DialogTitle>
-          <button type="button" className="text-gray-600" onClick={() => onOpenChange(false)}>
+          <DialogTitle className="text-lg font-semibold">
+            Login or sign up
+          </DialogTitle>
+          <button
+            type="button"
+            className="text-gray-600"
+            onClick={() => onOpenChange(false)}
+          >
             <X className="w-5 h-5" />
           </button>
         </div>

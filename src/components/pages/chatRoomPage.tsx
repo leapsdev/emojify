@@ -24,7 +24,11 @@ export const ChatRoomPage = ({ username }: ChatRoomPageProps) => {
     <main className="min-h-screen bg-white flex flex-col">
       <ChatRoomHeader username={username} />
       <ChatRoomMessages messages={DUMMY_CHAT_MESSAGES} />
-      <ChatRoomInput message={message} onMessageChange={setMessage} onSubmit={handleSubmit} />
+      <ChatRoomInput
+        message={message}
+        onMessageChange={setMessage}
+        onSubmit={handleSubmit}
+      />
     </main>
   );
 };

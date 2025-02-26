@@ -3,7 +3,20 @@
 import dynamic from 'next/dynamic';
 import type { FC } from 'react';
 
-const EMOJIS = ['😊', '😎', '🌟', '🎉', '🚀', '🌈', '🍕', '🎸', '🏆', '🌺', '🦄', '🍦'];
+const EMOJIS = [
+  '😊',
+  '😎',
+  '🌟',
+  '🎉',
+  '🚀',
+  '🌈',
+  '🍕',
+  '🎸',
+  '🏆',
+  '🌺',
+  '🦄',
+  '🍦',
+];
 
 const FloatingEmojis: FC = () => {
   const positions = EMOJIS.map(() => ({
@@ -34,6 +47,9 @@ const FloatingEmojis: FC = () => {
 };
 
 // dynamicインポートでクライアントサイドレンダリングのコンポーネントを作成
-export const DynamicFloatingEmojis = dynamic(() => Promise.resolve(FloatingEmojis), { ssr: false });
+export const DynamicFloatingEmojis = dynamic(
+  () => Promise.resolve(FloatingEmojis),
+  { ssr: false },
+);
 
 export default FloatingEmojis;

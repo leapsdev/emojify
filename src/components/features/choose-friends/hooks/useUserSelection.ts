@@ -81,16 +81,20 @@ export const useUserSelection = () => {
   const filteredUsers = USERS.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchQuery.toLowerCase())
+      user.userId.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const recentChats = filteredUsers.filter((user) => user.section === 'recent');
-  const favorites = filteredUsers.filter((user) => user.section === 'favorites');
+  const favorites = filteredUsers.filter(
+    (user) => user.section === 'favorites',
+  );
   const friends = filteredUsers.filter((user) => user.section === 'friends');
 
   const handleUserSelect = (userId: string) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId],
     );
   };
 

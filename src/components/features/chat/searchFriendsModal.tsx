@@ -76,19 +76,24 @@ interface SearchFriendsModalProps {
   onOpenChange: (open: boolean) => void;
 }
 
-export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalProps) {
+export function SearchFriendsModal({
+  open,
+  onOpenChange,
+}: SearchFriendsModalProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredUsers = DUMMY_USERS.filter(
     (user) =>
       user.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.username.toLowerCase().includes(searchQuery.toLowerCase())
+      user.username.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   const handleUserSelect = (userId: string) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId) ? prev.filter((id) => id !== userId) : [...prev, userId]
+      prev.includes(userId)
+        ? prev.filter((id) => id !== userId)
+        : [...prev, userId],
     );
   };
 
@@ -114,7 +119,10 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
           <div className="flex-1 overflow-y-auto px-4">
             <div className="space-y-4">
               {filteredUsers.map((user) => (
-                <div key={user.id} className="flex items-center justify-between">
+                <div
+                  key={user.id}
+                  className="flex items-center justify-between"
+                >
                   <div className="flex items-center gap-3">
                     <Image
                       src={user.avatar || '/placeholder.svg'}

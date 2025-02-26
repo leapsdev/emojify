@@ -1,5 +1,10 @@
 import { Plus, Share, X } from 'lucide-react';
-import { Dialog, DialogClose, DialogContent, DialogTitle } from '../../ui/dialog';
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogTitle,
+} from '../../ui/dialog';
 
 interface InstallModalProps {
   open: boolean;
@@ -21,20 +26,28 @@ export function InstallModal({ open, onOpenChange }: InstallModalProps) {
           </div>
 
           <div className="text-center space-y-1">
-            <DialogTitle className="text-xl font-black">Install Emoji Chat</DialogTitle>
-            <p className="text-gray-600 font-medium">Add the app to your home screen</p>
+            <DialogTitle className="text-xl font-black">
+              Install Emoji Chat
+            </DialogTitle>
+            <p className="text-gray-600 font-medium">
+              Add the app to your home screen
+            </p>
           </div>
 
           <div className="bg-gray-50 rounded-2xl p-4 space-y-4">
             <div className="flex items-center gap-3">
               <Share className="w-6 h-6" />
               <p className="font-medium">
-                Tap the <span className="inline-flex items-center">share icon</span> in your browser
+                Tap the{' '}
+                <span className="inline-flex items-center">share icon</span> in
+                your browser
               </p>
             </div>
             <div className="flex items-center gap-3">
               <Plus className="w-6 h-6" />
-              <p className="font-medium">Select &quot;Add to Home Screen&quot;</p>
+              <p className="font-medium">
+                Select &quot;Add to Home Screen&quot;
+              </p>
             </div>
           </div>
         </div>

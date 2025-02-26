@@ -7,7 +7,11 @@ type ChatRoomInputProps = {
   onSubmit: (e: React.FormEvent) => void;
 };
 
-export const ChatRoomInput = ({ message, onMessageChange, onSubmit }: ChatRoomInputProps) => {
+export const ChatRoomInput = ({
+  message,
+  onMessageChange,
+  onSubmit,
+}: ChatRoomInputProps) => {
   return (
     <div className="p-4">
       <form onSubmit={onSubmit} className="flex items-center gap-2">
@@ -19,7 +23,10 @@ export const ChatRoomInput = ({ message, onMessageChange, onSubmit }: ChatRoomIn
             onChange={(e) => onMessageChange(e.target.value)}
             className="w-full bg-gray-100 border-none rounded-full py-6 pl-4 pr-12"
           />
-          <button type="button" className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">
+          <button
+            type="button"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
+          >
             <Smile className="w-6 h-6" />
           </button>
         </div>

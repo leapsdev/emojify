@@ -1,43 +1,44 @@
 {
-  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "$schema": "https://biomejs.dev/schemas/1.4.0/schema.json",
+  "vcs": {
+    "enabled": true,
+    "clientKind": "git",
+    "useIgnoreFile": true
+  },
   "files": {
-    "include": ["src/**/*.{ts,tsx,js,jsx}"],
-    "ignore": [
-      "node_modules",
-      "dist",
-      ".next",
-      "*.config.{js,ts,mjs}",
-      "*.json",
-      "*.md"
-    ]
+    "ignore": ["node_modules", "dist", ".next", "public", "pnpm-lock.yaml"]
   },
   "formatter": {
     "enabled": true,
     "indentStyle": "space",
     "indentWidth": 2,
-    "lineWidth": 100
+    "lineWidth": 80,
+    "lineEnding": "lf",
+    "formatWithErrors": true
   },
   "javascript": {
     "formatter": {
-      "quoteStyle": "single",
-      "trailingCommas": "es5",
-      "semicolons": "always"
+      "quoteStyle": "single"
     }
   },
   "linter": {
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": {
-        "noUnusedVariables": "error"
-      },
       "suspicious": {
-        "noConsoleLog": "warn"
+        "noExplicitAny": "warn",
+        "noArrayIndexKey": "off"
       },
       "style": {
-        "useConst": "error",
-        "noNonNullAssertion": "warn"
+        "noNonNullAssertion": "warn",
+        "useNodejsImportProtocol": "error"
+      },
+      "complexity": {
+        "noForEach": "off"
       }
     }
+  },
+  "organizeImports": {
+    "enabled": true
   }
 }

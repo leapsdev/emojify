@@ -8,6 +8,11 @@ const privy = new PrivyClient(
 );
 
 export async function middleware(request: NextRequest) {
+  // ルートパスは認証不要
+  if (request.nextUrl.pathname === '/') {
+    return NextResponse.next();
+  }
+
   const authToken = request.cookies.get('privy-token')?.value;
 
   if (!authToken) {

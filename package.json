@@ -10,7 +10,8 @@
     "format": "biome format --write .",
     "format:check": "biome format --check .",
     "lint:biome": "biome lint .",
-    "check": "biome check --apply ."
+    "check": "biome check --apply .",
+    "check:ci": "biome check ./src"
   },
   "dependencies": {
     "@privy-io/react-auth": "^2.4.5",

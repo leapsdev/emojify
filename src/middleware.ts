@@ -8,11 +8,6 @@ const privy = new PrivyClient(
 );
 
 export async function middleware(request: NextRequest) {
-  // ルートパスは認証不要
-  if (request.nextUrl.pathname === '/') {
-    return NextResponse.next();
-  }
-
   const authToken = request.cookies.get('privy-token')?.value;
 
   if (!authToken) {
@@ -28,6 +23,10 @@ export async function middleware(request: NextRequest) {
   }
 }
 
+// Next.jsのミドルウェア設定
+// ルートパス(/)以外のすべてのパスで認証を要求
 export const config = {
-  matcher: '/:path*',
+  matcher: [
+    '/((?!api|_next|favicon.ico|$).*)'
+  ]
 };

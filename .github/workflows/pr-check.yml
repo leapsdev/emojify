@@ -9,6 +9,8 @@ jobs:
   check:
     name: Lint & Build Check
     runs-on: ubuntu-latest
+    env:
+      NEXT_PUBLIC_PRIVY_APP_ID: ${{ secrets.NEXT_PUBLIC_PRIVY_APP_ID }}
 
     steps:
       - name: Checkout code

@@ -1,15 +1,13 @@
-import { defineConfig } from 'drizzle-kit';
+import type { Config } from "drizzle-kit";
 
-export default defineConfig({
-  schema: './src/db/schema.ts',
-  out: './drizzle',
-  dialect: 'sqlite',
-  driver: 'd1-http',
+export default {
+  schema: "./src/db/schema.ts",
+  out: "./drizzle",
+  dialect: "sqlite",
+  driver: "d1-http",
   dbCredentials: {
-    databaseId: 'd566e42c-0039-46a5-b465-69d445500e82',
-    accountId: '', // D1データベース作成時に使用したCloudflareアカウントID
-    token: '', // Cloudflare API Token
+    databaseId: "YOUR_DATABASE_ID", // これは後でwrangler.tomlから取得します
+    accountId: "YOUR_ACCOUNT_ID",   // これは後でwrangler.tomlから取得します
+    token: "YOUR_API_TOKEN",        // これは後で環境変数から取得します
   },
-  verbose: true,
-  strict: true,
-});
+} satisfies Config;

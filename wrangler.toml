@@ -1,0 +1,8 @@
+name = "emoji-chat"
+compatibility_date = "2024-02-28"
+
+# D1データベースの設定
+[[d1_databases]]
+binding = "DB" # Workers/Pagesでバインドする際の変数名
+database_name = "emoji_chat_db"
+database_id = "d566e42c-0039-46a5-b465-69d445500e82" # 実際のD1データベースIDを設定

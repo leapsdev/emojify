@@ -2,8 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { usePrivy } from '@privy-io/react-auth';
-import { useRouter } from 'next/navigation';
 import { LogOut } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export const SignOutButton = () => {
   const { logout, ready, authenticated } = usePrivy();

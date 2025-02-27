@@ -32,11 +32,13 @@ function RefreshContent() {
 
 export default function RefreshPage() {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen">
-        <p className="text-gray-600">読み込み中...</p>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-screen">
+          <p className="text-gray-600">読み込み中...</p>
+        </div>
+      }
+    >
       <RefreshContent />
     </Suspense>
   );

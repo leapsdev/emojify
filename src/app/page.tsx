@@ -1,5 +1,5 @@
-import { InstallPage } from '@/components/pages/installPage';
+import { GetStartedPage } from '@/components/pages/getStartedPage';
 
 export default function Page() {
-  return <InstallPage />;
+  return <GetStartedPage />;
 }

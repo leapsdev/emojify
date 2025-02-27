@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // 認証が不要なページの配列
-const UNAUTHENTICATED_PAGES = ['/'];
+const UNAUTHENTICATED_PAGES = ['/', '/signup'];
 
 export const config = {
   matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',

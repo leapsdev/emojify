@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 
-export const LoginButton = () => {
+export const SignInSignUpButton = () => {
   const { login, ready, authenticated } = usePrivy();
 
   if (!ready || authenticated) return null;

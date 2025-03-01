@@ -6,7 +6,7 @@ if (!process.env.CLOUDFLARE_D1_TOKEN) {
 
 export default {
   schema: './src/db/schema.ts',
-  out: './drizzle',
+  out: './src/db/drizzle',
   dialect: 'sqlite',
   driver: 'd1-http',
   dbCredentials: {

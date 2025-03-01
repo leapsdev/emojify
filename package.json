@@ -17,7 +17,7 @@
     "db:migrate": "wrangler d1 migrations apply emoji_chat_db --remote",
     "db:check": "wrangler d1 execute emoji_chat_db --command=\"SELECT name FROM sqlite_master WHERE type='table';\" --remote",
     "db:push:remote": "drizzle-kit push --dialect sqlite --schema src/db/schema.ts --driver d1-http --dbCredentials '{\"accountId\":\"$CLOUDFLARE_ACCOUNT_ID\",\"databaseId\":\"d566e42c-0039-46a5-b465-69d445500e82\",\"token\":\"$CLOUDFLARE_API_TOKEN\"}'",
-    "db:push-to-migrate": "drizzle-kit generate:sqlite --schema src/db/schema.ts --out drizzle/migrations"
+    "db:push-to-migrate": "drizzle-kit generate:sqlite --schema src/db/schema.ts --out src/db/drizzle/migrations"
   },
   "dependencies": {
     "@privy-io/react-auth": "^2.4.5",

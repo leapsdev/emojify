@@ -17,6 +17,7 @@
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply emoji_chat_db --remote",
     "db:create": "wrangler d1 create emoji_chat_db",
+    "db:setup": "pnpm run db:create && pnpm run db:generate && pnpm run db:migrate && pnpm run db:check",
     "db:check": "wrangler d1 execute emoji_chat_db --command=\"SELECT name FROM sqlite_master WHERE type='table';\" --remote"
   },
   "dependencies": {

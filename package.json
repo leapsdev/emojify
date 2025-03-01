@@ -15,7 +15,8 @@
     "studio": "drizzle-kit studio",
     "db:generate": "drizzle-kit generate",
     "db:migrate": "wrangler d1 migrations apply emoji_chat_db --remote",
-    "db:check": "wrangler d1 execute emoji_chat_db --command=\"SELECT name FROM sqlite_master WHERE type='table';\" --remote"
+    "db:check": "wrangler d1 execute emoji_chat_db --command=\"SELECT name FROM sqlite_master WHERE type='table';\" --remote",
+    "db:reset": "wrangler d1 migrations reset emoji_chat_db --remote && pnpm db:generate && pnpm db:migrate"
   },
   "dependencies": {
     "@privy-io/react-auth": "^2.4.5",

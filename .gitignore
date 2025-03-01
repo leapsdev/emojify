@@ -39,3 +39,10 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# wrangler
+.wrangler
+/wrangler
+*.sqlite
+*.sqlite3
+*.db

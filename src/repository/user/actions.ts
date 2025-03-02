@@ -67,7 +67,7 @@ export async function getProfile(): Promise<DBUser | null> {
  * プロフィールを更新する
  */
 export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
-  const currentUserId = await getCurrentUserId();
+  const currentUser = await getCurrentUser();
 
   const result = db
     .update(users)
@@ -75,7 +75,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(users.id, currentUserId))
+    .where(eq(users.id, currentUser.id))
     .returning()
     .get();
 
@@ -87,16 +87,16 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
  * プロフィールを削除する
  */
 export async function deleteProfile(): Promise<void> {
-  const currentUserId = await getCurrentUserId();
+  const currentUser = await getCurrentUser();
 
-  db.delete(users).where(eq(users.id, currentUserId)).run();
+  db.delete(users).where(eq(users.id, currentUser.id)).run();
 }
 
 /**
  * ユーザーを検索する
  */
 export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
-  await getCurrentUserId(); // 認証チェック
+  await getCurrentUser(); // 認証チェック
 
   const { query, limit = 10, offset = 0 } = input;
 

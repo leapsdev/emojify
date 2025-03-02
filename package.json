@@ -22,6 +22,8 @@
     "db:check": "wrangler d1 execute emoji_chat_db --command=\"SELECT name FROM sqlite_master WHERE type='table';\" --remote"
   },
   "dependencies": {
+    "@conform-to/react": "^1.2.2",
+    "@conform-to/zod": "^1.2.2",
     "@privy-io/react-auth": "^2.4.5",
     "@privy-io/server-auth": "^1.18.11",
     "@radix-ui/react-checkbox": "^1.1.4",
@@ -32,7 +34,8 @@
     "class-variance-authority": "^0.7.1",
     "next": "15.1.7",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "zod": "^3.24.2"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",

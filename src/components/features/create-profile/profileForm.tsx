@@ -15,13 +15,12 @@ const initialState: ProfileFormState = null;
 export function ProfileForm() {
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
-    initialState,
-    "/create-profile"
+    initialState
   );
 
   const [form, fields] = useForm({
     id: 'profile-form',
-    shouldValidate: 'onBlur',
+    shouldValidate: 'onInput',
     lastResult: state,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: profileFormSchema });

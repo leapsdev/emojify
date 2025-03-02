@@ -1,11 +1,15 @@
 'use server';
 
-import { eq, like } from 'drizzle-orm';
-import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import { getPrivyId } from '@/lib/auth';
 import { db } from '@/db';
+import { getPrivyId } from '@/lib/auth';
+import { eq, like } from 'drizzle-orm';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { users } from './schema';
-import { CreateProfileInput, SearchUsersInput, UpdateProfileInput } from './types';
+import type {
+  CreateProfileInput,
+  SearchUsersInput,
+  UpdateProfileInput,
+} from './types';
 
 export type DBUser = InferSelectModel<typeof users>;
 export type NewUser = InferInsertModel<typeof users>;
@@ -25,16 +29,20 @@ const getCurrentUser = async () => {
  */
 export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
   const currentUser = await getCurrentUser();
-  
+
   const now = new Date();
-  const result =  db.insert(users).values({
-    id: currentUser.id,
-    username: data.username ?? null,
-    profileImageUrl: data.profileImageUrl ?? null,
-    address: data.address ?? null,
-    createdAt: now,
-    updatedAt: now,
-  }).returning().get();
+  const result = db
+    .insert(users)
+    .values({
+      id: currentUser.id,
+      username: data.username ?? null,
+      profileImageUrl: data.profileImageUrl ?? null,
+      address: data.address ?? null,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning()
+    .get();
 
   if (!result) throw new Error('プロフィールの作成に失敗しました');
   return result;
@@ -46,7 +54,9 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
 export async function getProfile(): Promise<DBUser | null> {
   const currentUser = await getCurrentUser();
 
-  const result = db.select().from(users)
+  const result = db
+    .select()
+    .from(users)
     .where(eq(users.id, currentUser.id))
     .get();
 
@@ -59,7 +69,8 @@ export async function getProfile(): Promise<DBUser | null> {
 export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
   const currentUser = await getCurrentUser();
 
-  const result = db.update(users)
+  const result = db
+    .update(users)
     .set({
       ...data,
       updatedAt: new Date(),
@@ -78,9 +89,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
 export async function deleteProfile(): Promise<void> {
   const currentUser = await getCurrentUser();
 
-  db.delete(users)
-    .where(eq(users.id, currentUser.id))
-    .run();
+  db.delete(users).where(eq(users.id, currentUser.id)).run();
 }
 
 /**
@@ -91,7 +100,8 @@ export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
 
   const { query, limit = 10, offset = 0 } = input;
 
-  const results = db.select()
+  const results = db
+    .select()
     .from(users)
     .where(like(users.username, `%${query}%`))
     .limit(limit)

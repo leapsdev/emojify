@@ -18,23 +18,23 @@ export type NewUser = InferInsertModel<typeof users>;
  * 現在のユーザーを取得する
  * @throws {Error} 未認証の場合
  */
-const getCurrentUser = async () => {
+const getCurrentUserId = async () => {
   const userId = await getPrivyId();
   if (!userId) throw new Error('認証が必要です');
-  return { id: userId };
+  return userId;
 };
 
 /**
  * プロフィールを作成する
  */
 export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
-  const currentUser = await getCurrentUser();
+  const currentUserId = await getCurrentUserId();
 
   const now = new Date();
   const result = db
     .insert(users)
     .values({
-      id: currentUser.id,
+      id: currentUserId,
       username: data.username ?? null,
       profileImageUrl: data.profileImageUrl ?? null,
       address: data.address ?? null,
@@ -52,12 +52,12 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
  * 現在のユーザーのプロフィールを取得する
  */
 export async function getProfile(): Promise<DBUser | null> {
-  const currentUser = await getCurrentUser();
+  const currentUserId = await getCurrentUserId();
 
   const result = db
     .select()
     .from(users)
-    .where(eq(users.id, currentUser.id))
+    .where(eq(users.id, currentUserId))
     .get();
 
   return result ?? null;
@@ -67,7 +67,7 @@ export async function getProfile(): Promise<DBUser | null> {
  * プロフィールを更新する
  */
 export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
-  const currentUser = await getCurrentUser();
+  const currentUserId = await getCurrentUserId();
 
   const result = db
     .update(users)
@@ -75,7 +75,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(users.id, currentUser.id))
+    .where(eq(users.id, currentUserId))
     .returning()
     .get();
 
@@ -87,16 +87,16 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
  * プロフィールを削除する
  */
 export async function deleteProfile(): Promise<void> {
-  const currentUser = await getCurrentUser();
+  const currentUserId = await getCurrentUserId();
 
-  db.delete(users).where(eq(users.id, currentUser.id)).run();
+  db.delete(users).where(eq(users.id, currentUserId)).run();
 }
 
 /**
  * ユーザーを検索する
  */
 export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
-  await getCurrentUser(); // 認証チェック
+  await getCurrentUserId(); // 認証チェック
 
   const { query, limit = 10, offset = 0 } = input;
 

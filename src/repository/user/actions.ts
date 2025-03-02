@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/db';
+import { getDb } from '@/db';
 import { getPrivyId } from '@/lib/auth';
 import { eq, like } from 'drizzle-orm';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
@@ -31,7 +31,7 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
   const currentUserId = await getCurrentUserId();
 
   const now = new Date();
-  const result = db
+  const result = getDb()
     .insert(users)
     .values({
       id: currentUserId,
@@ -54,13 +54,24 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
 export async function getProfile(): Promise<DBUser | null> {
   const currentUserId = await getCurrentUserId();
 
-  const result = db
-    .select()
-    .from(users)
-    .where(eq(users.id, currentUserId))
-    .get();
+  try {
+    // awaitを使用して非同期処理を待機
+    const result = await getDb()
+      .select()
+      .from(users)
+      .where(eq(users.id, currentUserId))
+      .get();
 
-  return result ?? null;
+    // 明示的に null を返す
+    if (!result) {
+      return null;
+    }
+
+    return result;
+  } catch (error) {
+    console.error('プロフィール取得エラー:', error);
+    return null;
+  }
 }
 
 /**
@@ -69,7 +80,7 @@ export async function getProfile(): Promise<DBUser | null> {
 export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
   const currentUserId = await getCurrentUserId();
 
-  const result = db
+  const result = getDb()
     .update(users)
     .set({
       ...data,
@@ -89,7 +100,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
 export async function deleteProfile(): Promise<void> {
   const currentUserId = await getCurrentUserId();
 
-  db.delete(users).where(eq(users.id, currentUserId)).run();
+  getDb().delete(users).where(eq(users.id, currentUserId)).run();
 }
 
 /**
@@ -100,7 +111,7 @@ export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
 
   const { query, limit = 10, offset = 0 } = input;
 
-  const results = db
+  const results = getDb()
     .select()
     .from(users)
     .where(like(users.username, `%${query}%`))

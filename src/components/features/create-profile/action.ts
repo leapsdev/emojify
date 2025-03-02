@@ -1,8 +1,8 @@
 'use server';
 
-import { parseWithZod } from '@conform-to/zod';
 import { createProfile } from '@/repository/user/actions';
 import { profileFormSchema } from '@/repository/user/schema';
+import { parseWithZod } from '@conform-to/zod';
 
 export type ProfileFormState = {
   message: string;
@@ -11,24 +11,25 @@ export type ProfileFormState = {
 
 export async function handleProfileFormAction(
   state: ProfileFormState,
-  formData?: FormData
+  formData?: FormData,
 ): Promise<ProfileFormState> {
   if (!formData) return null;
   const submission = parseWithZod(formData, {
     schema: profileFormSchema,
   });
 
-  if (submission.status === "error") {
+  if (submission.status === 'error') {
     if (!submission.error) {
       return {
         message: 'バリデーションエラーが発生しました',
         status: 'error' as const,
       };
     }
-    
-    const firstError = Object.entries(submission.error)
-      .find(([, errors]) => errors && errors.length > 0);
-    
+
+    const firstError = Object.entries(submission.error).find(
+      ([, errors]) => errors && errors.length > 0,
+    );
+
     return {
       message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
       status: 'error' as const,
@@ -36,10 +37,7 @@ export async function handleProfileFormAction(
   }
 
   const profileData = Object.fromEntries(
-    Object.entries(submission.payload).map(([key, value]) => [
-      key,
-      value
-    ])
+    Object.entries(submission.payload).map(([key, value]) => [key, value]),
   ) as Parameters<typeof createProfile>[0];
 
   try {

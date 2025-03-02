@@ -1,21 +1,21 @@
 'use client';
 
-import { useForm } from '@conform-to/react';
-import { parseWithZod } from '@conform-to/zod';
-import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { profileFormSchema } from '@/repository/user/schema';
+import { useForm } from '@conform-to/react';
+import { parseWithZod } from '@conform-to/zod';
+import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
-import { type ProfileFormState } from './action';
+import type { ProfileFormState } from './action';
 
 const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
-    initialState
+    initialState,
   );
 
   const [form, fields] = useForm({
@@ -28,11 +28,18 @@ export function ProfileForm() {
   });
 
   return (
-    <form className="space-y-6" id={form.id} onSubmit={form.onSubmit} action={formAction}>
+    <form
+      className="space-y-6"
+      id={form.id}
+      onSubmit={form.onSubmit}
+      action={formAction}
+    >
       {state?.message && (
         <div
           className={`p-4 rounded-lg ${
-            state.status === 'error' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'
+            state.status === 'error'
+              ? 'bg-red-100 text-red-700'
+              : 'bg-green-100 text-green-700'
           }`}
         >
           {state.message}

@@ -1,114 +1,123 @@
 'use server';
 
+import { getDb } from '@/db';
+import { getPrivyId } from '@/lib/auth';
 import { eq, like } from 'drizzle-orm';
-import { db } from '@/db';
+import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { users } from './schema';
-import { CreateProfileInput, SearchUsersInput, UpdateProfileInput, User } from './types';
-import { auth } from '@/lib/auth';
+import type {
+  CreateProfileInput,
+  SearchUsersInput,
+  UpdateProfileInput,
+} from './types';
+
+export type DBUser = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
 
 /**
  * 現在のユーザーを取得する
  * @throws {Error} 未認証の場合
  */
-const getCurrentUser = async () => {
-  const user = await auth.getCurrentUser();
-  if (!user) throw new Error('認証が必要です');
-  return user;
+const getCurrentUserId = async () => {
+  const userId = await getPrivyId();
+  if (!userId) throw new Error('認証が必要です');
+  return userId;
 };
 
 /**
  * プロフィールを作成する
  */
-export async function createProfile(data: CreateProfileInput): Promise<User> {
-  const currentUser = await getCurrentUser();
-  
-  const now = new Date();
-  const newUser = await db.insert(users).values({
-    id: currentUser.id,
-    username: data.username ?? null,
-    profileImageUrl: data.profileImageUrl ?? null,
-    address: data.address ?? null,
-    createdAt: now,
-    updatedAt: now,
-  }).returning().get();
+export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
+  const currentUserId = await getCurrentUserId();
 
-  return {
-    ...newUser,
-    createdAt: new Date(newUser.createdAt),
-    updatedAt: new Date(newUser.updatedAt),
-  };
+  const now = new Date();
+  const result = getDb()
+    .insert(users)
+    .values({
+      id: currentUserId,
+      username: data.username ?? null,
+      profileImageUrl: data.profileImageUrl ?? null,
+      address: data.address ?? null,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .returning()
+    .get();
+
+  if (!result) throw new Error('プロフィールの作成に失敗しました');
+  return result;
 }
 
 /**
  * 現在のユーザーのプロフィールを取得する
  */
-export async function getProfile(): Promise<User | null> {
-  const currentUser = await getCurrentUser();
+export async function getProfile(): Promise<DBUser | null> {
+  const currentUserId = await getCurrentUserId();
 
-  const user = await db.select().from(users)
-    .where(eq(users.id, currentUser.id))
-    .get();
+  try {
+    // awaitを使用して非同期処理を待機
+    const result = await getDb()
+      .select()
+      .from(users)
+      .where(eq(users.id, currentUserId))
+      .get();
 
-  if (!user) return null;
+    // 明示的に null を返す
+    if (!result) {
+      return null;
+    }
 
-  return {
-    ...user,
-    createdAt: new Date(user.createdAt),
-    updatedAt: new Date(user.updatedAt),
-  };
+    return result;
+  } catch (error) {
+    console.error('プロフィール取得エラー:', error);
+    return null;
+  }
 }
 
 /**
  * プロフィールを更新する
  */
-export async function updateProfile(data: UpdateProfileInput): Promise<User> {
-  const currentUser = await getCurrentUser();
+export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
+  const currentUserId = await getCurrentUserId();
 
-  const updatedUser = await db.update(users)
+  const result = getDb()
+    .update(users)
     .set({
       ...data,
       updatedAt: new Date(),
     })
-    .where(eq(users.id, currentUser.id))
+    .where(eq(users.id, currentUserId))
     .returning()
     .get();
 
-  return {
-    ...updatedUser,
-    createdAt: new Date(updatedUser.createdAt),
-    updatedAt: new Date(updatedUser.updatedAt),
-  };
+  if (!result) throw new Error('プロフィールの更新に失敗しました');
+  return result;
 }
 
 /**
  * プロフィールを削除する
  */
 export async function deleteProfile(): Promise<void> {
-  const currentUser = await getCurrentUser();
+  const currentUserId = await getCurrentUserId();
 
-  await db.delete(users)
-    .where(eq(users.id, currentUser.id))
-    .run();
+  getDb().delete(users).where(eq(users.id, currentUserId)).run();
 }
 
 /**
  * ユーザーを検索する
  */
-export async function searchUsers(input: SearchUsersInput): Promise<User[]> {
-  await getCurrentUser(); // 認証チェック
+export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
+  await getCurrentUserId(); // 認証チェック
 
   const { query, limit = 10, offset = 0 } = input;
 
-  const searchResults = await db.select()
+  const results = getDb()
+    .select()
     .from(users)
     .where(like(users.username, `%${query}%`))
     .limit(limit)
     .offset(offset)
     .all();
 
-  return searchResults.map(user => ({
-    ...user,
-    createdAt: new Date(user.createdAt),
-    updatedAt: new Date(user.updatedAt),
-  }));
+  return results;
 }

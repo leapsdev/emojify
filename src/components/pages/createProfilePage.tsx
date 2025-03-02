@@ -1,4 +1,3 @@
-import { Footer } from '@/components/features/create-profile/footer';
 import { Header } from '@/components/features/create-profile/header';
 import { ProfileForm } from '@/components/features/create-profile/profileForm';
 import { ProfileImage } from '@/components/features/create-profile/profileImage';
@@ -11,7 +10,6 @@ export function CreateProfilePage() {
         <ProfileImage />
         <ProfileForm />
       </div>
-      <Footer />
     </main>
   );
 }

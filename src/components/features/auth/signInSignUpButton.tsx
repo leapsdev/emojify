@@ -1,11 +1,25 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { usePrivy } from '@privy-io/react-auth';
+import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 export const SignInSignUpButton = () => {
-  const { login, ready, authenticated } = usePrivy();
+  const { ready, authenticated } = usePrivy();
+  const router = useRouter();
+
+  const { login } = useLogin({
+    onComplete: (params) => {
+      console.log(params);
+      if (params.isNewUser) {
+        router.push('/create-profile');
+      } else {
+        // TODO: 実装が完了したらリダイレクトを切り替える
+        router.push('/create-profile');
+      }
+    },
+  });
 
   if (!ready || authenticated) return null;
 

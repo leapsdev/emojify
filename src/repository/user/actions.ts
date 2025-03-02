@@ -1,29 +1,33 @@
 'use server';
 
 import { eq, like } from 'drizzle-orm';
+import { InferInsertModel, InferSelectModel } from 'drizzle-orm';
+import { getPrivyId } from '@/lib/auth';
 import { db } from '@/db';
 import { users } from './schema';
-import { CreateProfileInput, SearchUsersInput, UpdateProfileInput, User } from './types';
-import { auth } from '@/lib/auth';
+import { CreateProfileInput, SearchUsersInput, UpdateProfileInput } from './types';
+
+export type DBUser = InferSelectModel<typeof users>;
+export type NewUser = InferInsertModel<typeof users>;
 
 /**
  * 現在のユーザーを取得する
  * @throws {Error} 未認証の場合
  */
 const getCurrentUser = async () => {
-  const user = await auth.getCurrentUser();
-  if (!user) throw new Error('認証が必要です');
-  return user;
+  const userId = await getPrivyId();
+  if (!userId) throw new Error('認証が必要です');
+  return { id: userId };
 };
 
 /**
  * プロフィールを作成する
  */
-export async function createProfile(data: CreateProfileInput): Promise<User> {
+export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
   const currentUser = await getCurrentUser();
   
   const now = new Date();
-  const newUser = await db.insert(users).values({
+  const result =  db.insert(users).values({
     id: currentUser.id,
     username: data.username ?? null,
     profileImageUrl: data.profileImageUrl ?? null,
@@ -32,39 +36,30 @@ export async function createProfile(data: CreateProfileInput): Promise<User> {
     updatedAt: now,
   }).returning().get();
 
-  return {
-    ...newUser,
-    createdAt: new Date(newUser.createdAt),
-    updatedAt: new Date(newUser.updatedAt),
-  };
+  if (!result) throw new Error('プロフィールの作成に失敗しました');
+  return result;
 }
 
 /**
  * 現在のユーザーのプロフィールを取得する
  */
-export async function getProfile(): Promise<User | null> {
+export async function getProfile(): Promise<DBUser | null> {
   const currentUser = await getCurrentUser();
 
-  const user = await db.select().from(users)
+  const result = db.select().from(users)
     .where(eq(users.id, currentUser.id))
     .get();
 
-  if (!user) return null;
-
-  return {
-    ...user,
-    createdAt: new Date(user.createdAt),
-    updatedAt: new Date(user.updatedAt),
-  };
+  return result ?? null;
 }
 
 /**
  * プロフィールを更新する
  */
-export async function updateProfile(data: UpdateProfileInput): Promise<User> {
+export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
   const currentUser = await getCurrentUser();
 
-  const updatedUser = await db.update(users)
+  const result = db.update(users)
     .set({
       ...data,
       updatedAt: new Date(),
@@ -73,11 +68,8 @@ export async function updateProfile(data: UpdateProfileInput): Promise<User> {
     .returning()
     .get();
 
-  return {
-    ...updatedUser,
-    createdAt: new Date(updatedUser.createdAt),
-    updatedAt: new Date(updatedUser.updatedAt),
-  };
+  if (!result) throw new Error('プロフィールの更新に失敗しました');
+  return result;
 }
 
 /**
@@ -86,7 +78,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<User> {
 export async function deleteProfile(): Promise<void> {
   const currentUser = await getCurrentUser();
 
-  await db.delete(users)
+  db.delete(users)
     .where(eq(users.id, currentUser.id))
     .run();
 }
@@ -94,21 +86,17 @@ export async function deleteProfile(): Promise<void> {
 /**
  * ユーザーを検索する
  */
-export async function searchUsers(input: SearchUsersInput): Promise<User[]> {
+export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
   await getCurrentUser(); // 認証チェック
 
   const { query, limit = 10, offset = 0 } = input;
 
-  const searchResults = await db.select()
+  const results = db.select()
     .from(users)
     .where(like(users.username, `%${query}%`))
     .limit(limit)
     .offset(offset)
     .all();
 
-  return searchResults.map(user => ({
-    ...user,
-    createdAt: new Date(user.createdAt),
-    updatedAt: new Date(user.updatedAt),
-  }));
+  return results;
 }

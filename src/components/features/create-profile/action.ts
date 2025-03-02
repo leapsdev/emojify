@@ -35,15 +35,15 @@ export async function handleProfileFormAction(
     };
   }
 
-  const formValues = Object.fromEntries(
+  const profileData = Object.fromEntries(
     Object.entries(submission.payload).map(([key, value]) => [
       key,
-      'value' in (value as { value: unknown }) ? (value as { value: unknown }).value : value
+      value
     ])
   ) as Parameters<typeof createProfile>[0];
 
   try {
-    await createProfile(formValues);
+    await createProfile(profileData);
     return {
       message: 'プロフィールを作成しました',
       status: 'success' as const,

@@ -88,7 +88,6 @@ export function ProfileForm() {
             className={`rounded-2xl border-gray-200 bg-gray-50 min-h-[150px] p-4 text-lg resize-none ${
               fields.bio.errors ? 'border-red-500' : ''
             }`}
-            maxLength={300}
           />
           {fields.bio.errors && (
             <p className="text-red-500 text-sm">{fields.bio.errors}</p>

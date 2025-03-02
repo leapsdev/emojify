@@ -1,0 +1,57 @@
+'use server';
+
+import { parseWithZod } from '@conform-to/zod';
+import { createProfile } from '@/repository/user/actions';
+import { profileFormSchema } from '@/repository/user/schema';
+
+export type ProfileFormState = {
+  message: string;
+  status: 'error' | 'success';
+} | null;
+
+export async function handleProfileFormAction(
+  state: ProfileFormState,
+  formData?: FormData
+): Promise<ProfileFormState> {
+  if (!formData) return null;
+  const submission = parseWithZod(formData, {
+    schema: profileFormSchema,
+  });
+
+  if (submission.status === "error") {
+    if (!submission.error) {
+      return {
+        message: 'バリデーションエラーが発生しました',
+        status: 'error' as const,
+      };
+    }
+    
+    const firstError = Object.entries(submission.error)
+      .find(([, errors]) => errors && errors.length > 0);
+    
+    return {
+      message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
+      status: 'error' as const,
+    };
+  }
+
+  const formValues = Object.fromEntries(
+    Object.entries(submission.payload).map(([key, value]) => [
+      key,
+      'value' in (value as { value: unknown }) ? (value as { value: unknown }).value : value
+    ])
+  ) as Parameters<typeof createProfile>[0];
+
+  try {
+    await createProfile(formValues);
+    return {
+      message: 'プロフィールを作成しました',
+      status: 'success' as const,
+    };
+  } catch (error) {
+    return {
+      message: error instanceof Error ? error.message : 'エラーが発生しました',
+      status: 'error' as const,
+    };
+  }
+}

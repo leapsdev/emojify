@@ -6,69 +6,18 @@ import { useActionState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { createProfile } from '@/repository/user/actions';
 import { profileFormSchema } from '@/repository/user/schema';
-import type { z } from 'zod';
+import { handleProfileFormAction } from './action';
+import { type ProfileFormState } from './action';
 
-type FormState = {
-  message: string;
-  status: 'error' | 'success';
-} | null;
-
-const initialState: FormState = null;
+const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
-  const [state, formAction, isPending] = useActionState<FormState>(async (): Promise<FormState> => {
-    try {
-      const formElement = document.getElementById('profile-form');
-      if (!formElement) {
-        return {
-          message: 'フォームの初期化に失敗しました',
-          status: 'error',
-        };
-      }
-
-      const submission = parseWithZod(new FormData(formElement as HTMLFormElement), {
-        schema: profileFormSchema,
-      });
-
-      if (submission.status === "error") {
-        if (!submission.error) {
-          return {
-            message: 'バリデーションエラーが発生しました',
-            status: 'error',
-          };
-        }
-        
-        const firstError = Object.entries(submission.error)
-          .find(([, errors]) => errors && errors.length > 0);
-        
-        return {
-          message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
-          status: 'error',
-        };
-      }
-
-      const formData = Object.fromEntries(
-        Object.entries(submission.payload).map(([key, value]) => [
-          key,
-          'value' in (value as { value: unknown }) ? (value as { value: unknown }).value : value
-        ])
-      ) as z.infer<typeof profileFormSchema>;
-
-      await createProfile(formData);
-      return {
-        message: 'プロフィールを作成しました',
-        status: 'success',
-      };
-    } catch (error) {
-      return {
-        message: error instanceof Error ? error.message : 'エラーが発生しました',
-        status: 'error',
-      };
-    }
-  }, initialState);
-
+  const [state, formAction, isPending] = useActionState(
+    handleProfileFormAction,
+    initialState,
+    "/create-profile"
+  );
 
   const [form, fields] = useForm({
     id: 'profile-form',

@@ -18,10 +18,17 @@ export type NewUser = InferInsertModel<typeof users>;
  * 現在のユーザーを取得する
  * @throws {Error} 未認証の場合
  */
-const getCurrentUser = async () => {
+const getCurrentUser = async (): Promise<DBUser | null> => {
   const userId = await getPrivyId();
   if (!userId) throw new Error('認証が必要です');
-  return { id: userId };
+
+  const result = db
+    .select()
+    .from(users)
+    .where(eq(users.id, userId))
+    .get();
+
+  return result ?? null;
 };
 
 /**

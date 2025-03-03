@@ -1,14 +1,10 @@
-import type { Config } from 'drizzle-kit';
+import { defineConfig } from "drizzle-kit";
 
-if (!process.env.DATABASE_URL) {
-  throw new Error('DATABASE_URL環境変数が設定されていません');
-}
-
-export default {
-  schema: './src/db/schema.ts',
-  out: './src/db/drizzle',
-  driver: 'pg',
+export default defineConfig({
+  schema: "./src/db/schema.ts",
+  out: "./migrations",
+  dialect: "postgresql",
   dbCredentials: {
-    connectionString: process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL!,
   },
-} satisfies Config;
+});

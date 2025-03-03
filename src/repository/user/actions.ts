@@ -31,7 +31,7 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
   const currentUserId = await getCurrentUserId();
 
   const now = new Date();
-  const result = getDb()
+  const result = await getDb()
     .insert(users)
     .values({
       id: currentUserId,
@@ -41,11 +41,10 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
       createdAt: now,
       updatedAt: now,
     })
-    .returning()
-    .get();
+    .returning();
 
-  if (!result) throw new Error('プロフィールの作成に失敗しました');
-  return result;
+  if (!result[0]) throw new Error('プロフィールの作成に失敗しました');
+  return result[0];
 }
 
 /**
@@ -55,19 +54,12 @@ export async function getProfile(): Promise<DBUser | null> {
   const currentUserId = await getCurrentUserId();
 
   try {
-    // awaitを使用して非同期処理を待機
     const result = await getDb()
       .select()
       .from(users)
-      .where(eq(users.id, currentUserId))
-      .get();
+      .where(eq(users.id, currentUserId));
 
-    // 明示的に null を返す
-    if (!result) {
-      return null;
-    }
-
-    return result;
+    return result[0] ?? null;
   } catch (error) {
     console.error('プロフィール取得エラー:', error);
     return null;
@@ -80,18 +72,17 @@ export async function getProfile(): Promise<DBUser | null> {
 export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
   const currentUserId = await getCurrentUserId();
 
-  const result = getDb()
+  const result = await getDb()
     .update(users)
     .set({
       ...data,
       updatedAt: new Date(),
     })
     .where(eq(users.id, currentUserId))
-    .returning()
-    .get();
+    .returning();
 
-  if (!result) throw new Error('プロフィールの更新に失敗しました');
-  return result;
+  if (!result[0]) throw new Error('プロフィールの更新に失敗しました');
+  return result[0];
 }
 
 /**
@@ -100,7 +91,7 @@ export async function updateProfile(data: UpdateProfileInput): Promise<DBUser> {
 export async function deleteProfile(): Promise<void> {
   const currentUserId = await getCurrentUserId();
 
-  getDb().delete(users).where(eq(users.id, currentUserId)).run();
+  await getDb().delete(users).where(eq(users.id, currentUserId));
 }
 
 /**
@@ -111,13 +102,12 @@ export async function searchUsers(input: SearchUsersInput): Promise<DBUser[]> {
 
   const { query, limit = 10, offset = 0 } = input;
 
-  const results = getDb()
+  const results = await getDb()
     .select()
     .from(users)
     .where(like(users.username, `%${query}%`))
     .limit(limit)
-    .offset(offset)
-    .all();
+    .offset(offset);
 
   return results;
 }

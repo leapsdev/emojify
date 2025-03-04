@@ -1,9 +1,0 @@
-name = "emoji-chat"
-compatibility_date = "2024-02-28"
-
-# D1データベースの設定
-[[d1_databases]]
-binding = "DB" # Workers/Pagesでバインドする際の変数名
-database_name = "emoji_chat_db"
-database_id = "46b84265-304f-4af3-a305-72e3d8654b03"
-migrations_dir = "src/db/drizzle"

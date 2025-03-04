@@ -1,11 +1,11 @@
-import { integer, sqliteTable, text } from 'drizzle-orm/sqlite-core';
+import { pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 // ユーザーテーブル
-export const users = sqliteTable('users', {
+export const users = pgTable('users', {
   id: text('id').primaryKey(), // PrivyのユーザーID
   address: text('address'), // ウォレットアドレス
   username: text('username'),
   profileImageUrl: text('profile_image_url'),
-  createdAt: integer('created_at', { mode: 'timestamp' }).notNull(),
-  updatedAt: integer('updated_at', { mode: 'timestamp' }).notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
+  updatedAt: timestamp('updated_at').notNull().defaultNow(),
 });

@@ -47,6 +47,9 @@ importers:
       next:
         specifier: 15.1.7
         version: 15.1.7(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
+      pg-pool:
+        specifier: ^3.7.1
+        version: 3.7.1(pg@8.13.3)
       react:
         specifier: ^19.0.0
         version: 19.0.0

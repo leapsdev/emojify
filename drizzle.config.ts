@@ -5,6 +5,10 @@ export default defineConfig({
   out: './src/db/drizzle',
   dialect: 'postgresql',
   dbCredentials: {
-    url: process.env.DATABASE_URL || '',
+    // 本番環境以外はローカルのPostgreSQLに接続
+    url:
+      process.env.NODE_ENV === 'production'
+        ? (process.env.DATABASE_URL as string)
+        : (process.env.DATABASE_DEV_URL as string),
   },
 });

@@ -4,7 +4,8 @@ import { drizzle as drizzleNode } from 'drizzle-orm/node-postgres';
 import { Pool } from 'pg';
 import * as schema from './schema';
 
-let _db: ReturnType<typeof drizzle> | ReturnType<typeof drizzleNode> | null = null;
+let _db: ReturnType<typeof drizzle> | ReturnType<typeof drizzleNode> | null =
+  null;
 
 export function getDb() {
   if (!_db) {

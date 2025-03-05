@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Generate Icons</title>
+</head>
+<body>
+    <canvas id="canvas192" width="192" height="192"></canvas>
+    <canvas id="canvas512" width="512" height="512"></canvas>
+    <script>
+        function drawIcon(canvas, size, emoji) {
+            const ctx = canvas.getContext('2d');
+            
+            // 黒背景
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, size, size);
+            
+            // 絵文字
+            ctx.font = `${size * 0.6}px Arial`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillStyle = '#ffffff';
+            ctx.fillText(emoji, size/2, size/2);
+
+            // ダウンロード
+            const link = document.createElement('a');
+            link.download = `icon-${size}x${size}.png`;
+            link.href = canvas.toDataURL();
+            link.click();
+        }
+
+        // アイコンを生成
+        drawIcon(document.getElementById('canvas192'), 192, '🤪');
+        drawIcon(document.getElementById('canvas512'), 512, '🤪');
+    </script>
+</body>
+</html>

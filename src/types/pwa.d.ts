@@ -1,14 +1,18 @@
-declare interface BeforeInstallPromptEvent extends Event {
-  readonly platforms: string[];
-  readonly userChoice: Promise<{
+interface BeforeInstallPromptEvent extends Event {
+  /**
+   * プロンプトを表示するメソッド
+   */
+  prompt(): Promise<void>;
+
+  /**
+   * ユーザーの選択結果
+   */
+  userChoice: Promise<{
     outcome: 'accepted' | 'dismissed';
     platform: string;
   }>;
-  prompt(): Promise<void>;
 }
 
-declare global {
-  interface WindowEventMap {
-    beforeinstallprompt: BeforeInstallPromptEvent;
-  }
+interface WindowEventMap {
+  beforeinstallprompt: BeforeInstallPromptEvent;
 }

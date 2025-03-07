@@ -30,6 +30,19 @@ const nextConfig = {
           {
             key: 'Service-Worker-Allowed',
             value: '/'
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8'
+          }
+        ]
+      },
+      {
+        source: '/manifest.json',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/manifest+json; charset=utf-8'
           }
         ]
       }

@@ -6,17 +6,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { useActionState } from 'react';
+import { useFormState, useFormStatus } from 'react-dom';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
 
 const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
-  const [state, formAction, isPending] = useActionState(
-    handleProfileFormAction,
-    initialState,
-  );
+  const [state, formAction] = useFormState(handleProfileFormAction, initialState);
+  const { pending: isPending } = useFormStatus();
 
   const [form, fields] = useForm({
     id: 'profile-form',

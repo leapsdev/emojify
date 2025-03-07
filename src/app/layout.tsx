@@ -9,6 +9,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  manifest: '/manifest.json',
   title: 'Emoji-Chat',
   description: 'Emoji-Chat',
 };

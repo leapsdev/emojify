@@ -1,15 +1,20 @@
 /** @type {import('next').NextConfig} */
-import withPWA from '@ducanh2912/next-pwa';
 
-const withPWA = nextPWA({
+// eslint-disable-next-line @typescript-eslint/no-require-imports
+const withPWA = require('@ducanh2912/next-pwa').default({
   dest: 'public',
-  cacheOnFrontEnd: true,
+  cacheOnFrontEndNav: true,
   aggressiveFrontEndNavCaching: true,
   reloadOnOnline: true,
   swcMinify: true,
   disable: false,
+  register: true,
+  scope: '/',
+  sw: 'sw.js',
   workboxOptions: {
     disableDevLogs: true,
+    skipWaiting: true,
+    clientsClaim: true
   },
 });
 
@@ -17,6 +22,19 @@ const nextConfig = {
   devIndicators: {
     appIsrStatus: false,
   },
+  headers: async () => {
+    return [
+      {
+        source: '/sw.js',
+        headers: [
+          {
+            key: 'Service-Worker-Allowed',
+            value: '/'
+          }
+        ]
+      }
+    ];
+  }
 };
 
 module.exports = withPWA(nextConfig);

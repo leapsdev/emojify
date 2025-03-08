@@ -4,11 +4,22 @@ import type { NextRequest } from 'next/server';
 // 認証が不要なページの配列
 const UNAUTHENTICATED_PAGES = ['/', '/signup'];
 
+// 静的ファイルを検出する正規表現
+const PUBLIC_FILE = /\.(.*)$/;
+
 export const config = {
-  matcher: '/((?!api|_next|static|favicon.ico|manifest.json|icons/|workbox-|worker-|sw.js).*)',
+  matcher: [
+    // 認証が必要なページのみをマッチ
+    '/((?!api|_next|static|favicon.ico|manifest.json|sw.js|workbox-).*)',
+  ],
 };
 
 export async function middleware(req: NextRequest) {
+  // 静的ファイルへのリクエストはスキップ
+  if (PUBLIC_FILE.test(req.nextUrl.pathname)) {
+    return NextResponse.next();
+  }
+
   const cookieAuthToken = req.cookies.get('privy-token');
   const cookieSession = req.cookies.get('privy-session');
 

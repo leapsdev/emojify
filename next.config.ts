@@ -1,5 +1,9 @@
 import type { NextConfig } from 'next';
 
-const nextConfig = {} satisfies NextConfig;
+const nextConfig = {
+  devIndicators: {
+    position: 'bottom-right',
+  },
+} satisfies NextConfig;
 
 export default nextConfig;

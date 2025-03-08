@@ -16,14 +16,19 @@ export const InstallButton = () => {
 
     window.addEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
     return () => {
-      window.removeEventListener('beforeinstallprompt', handleBeforeInstallPrompt);
+      window.removeEventListener(
+        'beforeinstallprompt',
+        handleBeforeInstallPrompt,
+      );
     };
   }, []);
 
   const handleInstall = useCallback(async () => {
     try {
       await deferredPrompt?.prompt();
-      const { outcome } = await deferredPrompt?.userChoice ?? { outcome: 'dismissed' };
+      const { outcome } = (await deferredPrompt?.userChoice) ?? {
+        outcome: 'dismissed',
+      };
       if (outcome === 'accepted') {
         setDeferredPrompt(null);
       }

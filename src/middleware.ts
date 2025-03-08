@@ -5,7 +5,11 @@ import type { NextRequest } from 'next/server';
 const UNAUTHENTICATED_PAGES = ['/', '/signup'];
 
 export const config = {
-  matcher: '/((?!api|_next/static|_next/image|favicon.ico).*)',
+  matcher: [
+    // 認証が必要なページのみをマッチ
+    // 静的ファイル、API、システムファイルは除外
+    '/((?!api|_next|static|favicon.ico|manifest.json|icons/|workbox-|worker-|sw.js).*)',
+  ],
 };
 
 export async function middleware(req: NextRequest) {

@@ -1,9 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig = {
-  devIndicators: {
-    appIsrStatus: false,
-  },
+  devIndicators: false,
 } satisfies NextConfig;
 
 export default nextConfig;

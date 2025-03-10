@@ -11,17 +11,17 @@ const withPWA = withPWAInit({
       urlPattern: '/',
       handler: 'StaleWhileRevalidate',
       options: {
-        cacheName: 'start-url'
-      }
+        cacheName: 'start-url',
+      },
     },
     {
       urlPattern: /.*/i,
       handler: 'NetworkOnly',
       options: {
-        cacheName: 'dev'
-      }
-    }
-  ]
+        cacheName: 'dev',
+      },
+    },
+  ],
 });
 
 const nextConfig: NextConfig = {

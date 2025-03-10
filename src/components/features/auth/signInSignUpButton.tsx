@@ -10,15 +10,8 @@ export const SignInSignUpButton = () => {
   const router = useRouter();
 
   const { login } = useLogin({
-    onComplete: (params) => {
-      console.log(params);
-      if (params.isNewUser) {
-        router.push('/create-profile');
-      } else {
-        // TODO: 実装が完了したらリダイレクトを切り替える
-        router.push('/create-profile');
-      }
-    },
+    onComplete: (params) =>
+      params.isNewUser ? router.push('/create-profile') : router.push('/chat'),
   });
 
   if (!ready || authenticated) return null;

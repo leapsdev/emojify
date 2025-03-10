@@ -21,10 +21,9 @@ export const SignOutButton = () => {
   return (
     <Button
       onClick={handleLogout}
-      className="bg-black text-white rounded-full px-8 py-6 text-lg font-bold hover:bg-gray-900 transition-colors"
+      className="bg-black text-white rounded-full w-12 h-12 flex items-center justify-center hover:bg-gray-900 transition-colors"
     >
-      <LogOut className="mr-2 h-5 w-5" />
-      Sign Out
+      <LogOut className="h-5 w-5" />
     </Button>
   );
 };

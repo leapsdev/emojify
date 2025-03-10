@@ -3,6 +3,7 @@
 import { createProfile } from '@/repository/user/actions';
 import { profileFormSchema } from '@/repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
+import { redirect } from 'next/navigation';
 
 export type ProfileFormState = {
   message: string;
@@ -42,14 +43,12 @@ export async function handleProfileFormAction(
 
   try {
     await createProfile(profileData);
-    return {
-      message: 'プロフィールを作成しました',
-      status: 'success' as const,
-    };
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'エラーが発生しました',
       status: 'error' as const,
     };
   }
+
+  redirect('/chat');
 }

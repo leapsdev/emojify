@@ -1,9 +1,9 @@
 'use client';
 
 import { SignInSignUpButton } from '@/components/features/auth/signInSignUpButton';
+import { useInstallPrompt } from '@/components/features/signInSignUp/hooks/useInstallPrompt';
 import { InstallButton } from '@/components/features/signInSignUp/installButton';
 import { InstallModal } from '@/components/features/signInSignUp/installModal';
-import { useInstallPrompt } from '@/components/features/signInSignUp/hooks/useInstallPrompt';
 
 export const InstallSection = () => {
   const { showInstallModal, setShowInstallModal, handleInstall } =

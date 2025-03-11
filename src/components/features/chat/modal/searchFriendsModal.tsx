@@ -2,107 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { MessageCircle, UserPlus } from "lucide-react"
 import { type User } from "@/components/features/chat/shared/types"
-
-// モーダルのヘッダーコンポーネント
-const ModalHeader = ({ onSkip }: { onSkip: () => void }) => {
-  return (
-    <>
-      {/* ドラッグハンドル */}
-      <div className="flex justify-center pt-4 pb-6">
-        <div className="w-12 h-1.5 bg-gray-200 rounded-full"></div>
-      </div>
-
-      {/* ヘッダー部分 */}
-      <div className="flex items-center justify-center relative px-4 pb-4">
-        <div className="text-2xl absolute left-1/2 -translate-x-1/2">👦👧</div>
-        <button onClick={onSkip} className="text-2xl absolute right-6" aria-label="Skip">
-          👉
-        </button>
-      </div>
-    </>
-  )
-}
-
-// ユーザーアイテムコンポーネント
-const UserItem = ({ user, selected, onSelect, onChatStart }: UserItemProps) => {
-  return (
-    <div className="flex items-center justify-between">
-      <div className="flex items-center gap-3">
-        <div className="relative">
-          <img src={user.avatar || "/placeholder.svg"} alt="" className="w-12 h-12 rounded-full" />
-          <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 border-2 border-white rounded-full"></div>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-semibold text-base text-gray-900">{user.name}</span>
-          <span className="text-sm text-gray-500">{user.username}</span>
-        </div>
-      </div>
-      <div className="flex gap-2">
-        {selected ? (
-          <button
-            onClick={onChatStart}
-            className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center"
-            aria-label="Chat with this user"
-          >
-            <MessageCircle className="w-5 h-5 text-white" />
-          </button>
-        ) : (
-          <button
-            onClick={onSelect}
-            className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center"
-            aria-label="Add friend"
-          >
-            <UserPlus className="w-5 h-5 text-white" />
-          </button>
-        )}
-      </div>
-    </div>
-  )
-}
-
-// ユーザーリストコンポーネント
-const UserList = ({
-  users,
-  selectedUsers,
-  onUserSelect,
-  onChatStart,
-}: {
-  users: User[]
-  selectedUsers: string[]
-  onUserSelect: (userId: string) => void
-  onChatStart: (userId: string) => void
-}) => {
-  return (
-    <div className="px-4 overflow-y-auto flex-1">
-      <div className="space-y-4 py-4">
-        {users.map((user) => (
-          <UserItem
-            key={user.id}
-            user={user}
-            selected={selectedUsers.includes(user.id)}
-            onSelect={() => onUserSelect(user.id)}
-            onChatStart={() => onChatStart(user.id)}
-          />
-        ))}
-      </div>
-    </div>
-  )
-}
-
-// メインのモーダルコンポーネント
-interface SearchFriendsModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-}
-
-interface UserItemProps {
-  user: User
-  selected: boolean
-  onSelect: () => void
-  onChatStart: () => void
-}
+import { ModalHeader } from "./components/modalHeader"
+import { UserList } from "./components/userList"
 
 const SUGGESTED_USERS: User[] = [
   {
@@ -160,6 +62,11 @@ const SUGGESTED_USERS: User[] = [
     avatar: "/placeholder.svg?height=48&width=48",
   },
 ]
+
+interface SearchFriendsModalProps {
+  open: boolean
+  onOpenChange: (open: boolean) => void
+}
 
 export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalProps) {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])

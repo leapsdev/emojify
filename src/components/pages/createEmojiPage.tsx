@@ -30,7 +30,7 @@ export function CreateEmojiPage() {
             variant="ghost"
             className="text-gray-600 hover:text-gray-900"
           >
-            ← Back to Chat
+            ← Back
           </Button>
         </div>
 

@@ -21,7 +21,7 @@ export const FooterNavigation = () => {
           >
             <span className="text-2xl">🔍</span>
           </button>
-          <Link href="/new" className="text-gray-400">
+          <Link href="/create-emoji" className="text-gray-400">
             <span className="text-2xl">🤪</span>
           </Link>
           <Link href="/notifications" className="text-gray-400">

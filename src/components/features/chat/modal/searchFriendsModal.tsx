@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { X } from "lucide-react"
 import { type User } from "@/components/features/chat/shared/types"
-import { ModalHeader } from "./components/modalHeader"
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { UserList } from "./components/userList"
 
 const SUGGESTED_USERS: User[] = [
@@ -80,29 +81,38 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
     router.push(`/chat/${userId}`)
   }
 
-  const handleSkip = () => {
-    onOpenChange(false)
-    router.push("/chat")
-  }
-
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center" onClick={() => onOpenChange(false)}>
-      <div
-        className="w-full max-w-md bg-white rounded-lg overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex flex-col max-h-[90vh]">
-          <ModalHeader onSkip={handleSkip} />
-          <UserList
-            users={SUGGESTED_USERS}
-            selectedUsers={selectedUsers}
-            onUserSelect={handleUserSelect}
-            onChatStart={handleChatStart}
-          />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="!rounded-[24px] fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] p-0 w-[min(90vw,32rem)] bg-white">
+        <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-2 transition-colors">
+          <X className="w-4 h-4" />
+        </DialogClose>
+        
+        <div className="p-6 space-y-6">
+          {/* ドラッグハンドル */}
+          <div className="flex justify-center">
+            <div className="w-12 h-1.5 bg-gray-200 rounded-full"></div>
+          </div>
+
+          {/* ヘッダー部分 */}
+          <div className="text-center space-y-1">
+            <DialogTitle className="text-xl font-black">
+              Search Friends
+            </DialogTitle>
+            <div className="text-2xl">👦👧</div>
+          </div>
+
+          {/* ユーザーリスト */}
+          <div className="max-h-[60vh] overflow-y-auto">
+            <UserList
+              users={SUGGESTED_USERS}
+              selectedUsers={selectedUsers}
+              onUserSelect={handleUserSelect}
+              onChatStart={handleChatStart}
+            />
+          </div>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   )
 }

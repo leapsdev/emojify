@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
+import { X } from "lucide-react"
 import { type User } from "@/components/features/chat/shared/types"
-import { ModalHeader } from "./components/modalHeader"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { UserList } from "./components/userList"
 
 const SUGGESTED_USERS: User[] = [
@@ -80,21 +81,30 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
     router.push(`/chat/${userId}`)
   }
 
-  const handleSkip = () => {
-    onOpenChange(false)
-    router.push("/chat")
-  }
-
-  if (!open) return null
-
   return (
-    <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center" onClick={() => onOpenChange(false)}>
-      <div
-        className="w-full max-w-md bg-white rounded-lg overflow-hidden"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex flex-col max-h-[90vh]">
-          <ModalHeader onSkip={handleSkip} />
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="p-6 rounded-[32px] max-w-full sm:max-w-lg mx-auto bg-white">
+        {/* ヘッダー */}
+        <div className="flex justify-between items-center mb-8">
+          <DialogTitle className="text-lg font-semibold">
+            Search Friends
+          </DialogTitle>
+          <button
+            type="button"
+            className="text-gray-600"
+            onClick={() => onOpenChange(false)}
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* アイコン */}
+        <div className="text-center mb-8">
+          <div className="text-6xl mb-2">👥</div>
+        </div>
+
+        {/* ユーザーリスト */}
+        <div className="max-h-[60vh] overflow-y-auto">
           <UserList
             users={SUGGESTED_USERS}
             selectedUsers={selectedUsers}
@@ -102,7 +112,15 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
             onChatStart={handleChatStart}
           />
         </div>
-      </div>
-    </div>
+
+        {/* フッター */}
+        <div className="mt-6 text-center">
+          <p className="text-sm text-gray-500 flex items-center justify-center gap-2">
+            Let&apos;s find new friends!
+            <span className="text-4xl">🤝</span>
+          </p>
+        </div>
+      </DialogContent>
+    </Dialog>
   )
 }

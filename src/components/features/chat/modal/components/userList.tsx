@@ -1,11 +1,11 @@
-import { type User } from "@/components/features/chat/shared/types"
-import { UserItem } from "./userItem"
+import type { User } from '@/components/features/chat/shared/types';
+import { UserItem } from './userItem';
 
 interface UserListProps {
-  users: User[]
-  selectedUsers: string[]
-  onUserSelect: (userId: string) => void
-  onChatStart: (userId: string) => void
+  users: User[];
+  selectedUsers: string[];
+  onUserSelect: (userId: string) => void;
+  onChatStart: (userId: string) => void;
 }
 
 export function UserList({
@@ -28,5 +28,5 @@ export function UserList({
         ))}
       </div>
     </div>
-  )
+  );
 }

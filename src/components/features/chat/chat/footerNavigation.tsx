@@ -1,11 +1,11 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import Link from "next/link"
-import { SearchFriendsModal } from "../modal/searchFriendsModal"
+import Link from 'next/link';
+import { useState } from 'react';
+import { SearchFriendsModal } from '../modal/searchFriendsModal';
 
 export const FooterNavigation = () => {
-  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   return (
     <>
@@ -14,7 +14,11 @@ export const FooterNavigation = () => {
           <Link href="/chat" className="text-blue-600">
             <span className="text-2xl">💬</span>
           </Link>
-          <button onClick={() => setIsSearchModalOpen(true)} className="text-gray-400">
+          <button
+            type="button"
+            onClick={() => setIsSearchModalOpen(true)}
+            className="text-gray-400"
+          >
             <span className="text-2xl">🔍</span>
           </button>
           <Link href="/new" className="text-gray-400">
@@ -29,10 +33,10 @@ export const FooterNavigation = () => {
         </div>
       </div>
 
-      <SearchFriendsModal 
-        open={isSearchModalOpen} 
-        onOpenChange={setIsSearchModalOpen} 
+      <SearchFriendsModal
+        open={isSearchModalOpen}
+        onOpenChange={setIsSearchModalOpen}
       />
     </>
-  )
-}
+  );
+};

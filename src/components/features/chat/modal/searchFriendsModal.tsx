@@ -2,9 +2,8 @@
 
 import { useState } from "react"
 import { useRouter } from "next/navigation"
-import { X } from "lucide-react"
 import { type User } from "@/components/features/chat/shared/types"
-import { Dialog, DialogClose, DialogContent, DialogTitle } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { UserList } from "./components/userList"
 
 const SUGGESTED_USERS: User[] = [
@@ -81,13 +80,14 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
     router.push(`/chat/${userId}`)
   }
 
+  const handleSkip = () => {
+    onOpenChange(false)
+    router.push("/chat")
+  }
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!rounded-[24px] fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] p-0 w-[min(90vw,32rem)] bg-white">
-        <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-2 transition-colors">
-          <X className="w-4 h-4" />
-        </DialogClose>
-        
         <div className="p-6 space-y-6">
           {/* ドラッグハンドル */}
           <div className="flex justify-center">
@@ -95,11 +95,16 @@ export function SearchFriendsModal({ open, onOpenChange }: SearchFriendsModalPro
           </div>
 
           {/* ヘッダー部分 */}
-          <div className="text-center space-y-1">
-            <DialogTitle className="text-xl font-black">
-              Search Friends
-            </DialogTitle>
-            <div className="text-2xl">👦👧</div>
+          <div className="relative">
+            <div className="text-center space-y-1">
+              <DialogTitle className="text-xl font-black">
+                Search Friends
+              </DialogTitle>
+              <div className="text-2xl">👦👧</div>
+            </div>
+            <button onClick={handleSkip} className="text-2xl absolute right-0 top-1/2 -translate-y-1/2" aria-label="Skip">
+              👉
+            </button>
           </div>
 
           {/* ユーザーリスト */}

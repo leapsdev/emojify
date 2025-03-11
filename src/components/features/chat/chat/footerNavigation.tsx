@@ -1,25 +1,38 @@
-import Link from 'next/link';
+"use client"
+
+import { useState } from "react"
+import Link from "next/link"
+import { SearchFriendsModal } from "../modal/searchFriendsModal"
 
 export const FooterNavigation = () => {
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false)
+
   return (
-    <div className="border-t py-3 px-6">
-      <div className="flex justify-between items-center">
-        <Link href="/chat" className="text-blue-600">
-          <span className="text-2xl">💬</span>
-        </Link>
-        <Link href="/search" className="text-gray-400">
-          <span className="text-2xl">🔍</span>
-        </Link>
-        <Link href="/new" className="text-gray-400">
-          <span className="text-2xl">🤪</span>
-        </Link>
-        <Link href="/notifications" className="text-gray-400">
-          <span className="text-2xl">🔔</span>
-        </Link>
-        <Link href="/profile" className="text-gray-400">
-          <span className="text-2xl">🙎‍♂️</span>
-        </Link>
+    <>
+      <div className="border-t py-3 px-6">
+        <div className="flex justify-between items-center">
+          <Link href="/chat" className="text-blue-600">
+            <span className="text-2xl">💬</span>
+          </Link>
+          <button onClick={() => setIsSearchModalOpen(true)} className="text-gray-400">
+            <span className="text-2xl">🔍</span>
+          </button>
+          <Link href="/new" className="text-gray-400">
+            <span className="text-2xl">🤪</span>
+          </Link>
+          <Link href="/notifications" className="text-gray-400">
+            <span className="text-2xl">🔔</span>
+          </Link>
+          <Link href="/profile" className="text-gray-400">
+            <span className="text-2xl">🙎‍♂️</span>
+          </Link>
+        </div>
       </div>
-    </div>
-  );
-};
+
+      <SearchFriendsModal 
+        open={isSearchModalOpen} 
+        onOpenChange={setIsSearchModalOpen} 
+      />
+    </>
+  )
+}

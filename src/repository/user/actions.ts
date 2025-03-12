@@ -1,7 +1,7 @@
 'use server';
 
 import { getDb } from '@/db';
-import { getPrivyId } from '@/lib/auth';
+import { getPrivyId, getPrivyEmail } from '@/lib/auth';
 import { eq, like } from 'drizzle-orm';
 import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
 import { users } from './schema';
@@ -29,6 +29,7 @@ const getCurrentUserId = async () => {
  */
 export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
   const currentUserId = await getCurrentUserId();
+  const email = await getPrivyEmail();
 
   const now = new Date();
   const result = await getDb()
@@ -37,7 +38,7 @@ export async function createProfile(data: CreateProfileInput): Promise<DBUser> {
       id: currentUserId,
       username: data.username ?? null,
       profileImageUrl: data.profileImageUrl ?? null,
-      address: data.address ?? null,
+      address: email ?? null,
       createdAt: now,
       updatedAt: now,
     })

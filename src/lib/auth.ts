@@ -33,3 +33,33 @@ export async function getPrivyId(): Promise<string | null> {
     return null;
   }
 }
+
+/**
+ * ユーザーのメールアドレスを取得する
+ * @returns メールアドレス
+ * @throws {Error} 認証エラー時
+ */
+export async function getPrivyEmail(): Promise<string | null> {
+  try {
+    // Cookieからトークンを取得
+    const requestCookies = await cookies();
+    const privyToken = requestCookies.get('privy-token')?.value;
+
+    if (!privyToken) {
+      return null;
+    }
+
+    // トークンの検証とユーザー情報の取得
+    const verifiedUser = await privy.verifyAuthToken(privyToken);
+    if (!verifiedUser) return null;
+
+    const user = await privy.getUser(verifiedUser.userId);
+    const emailAccounts = user?.linkedAccounts?.filter(account => account.type === 'email');
+
+    if (!emailAccounts || emailAccounts.length === 0) return null;
+    return emailAccounts[0].address;
+  } catch (error) {
+    console.error('Privy認証エラー:', error);
+    return null;
+  }
+}

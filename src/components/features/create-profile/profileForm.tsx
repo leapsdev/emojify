@@ -67,23 +67,6 @@ export function ProfileForm() {
       </div>
 
       <div className="space-y-2">
-        <label htmlFor={fields.displayName.id} className="text-lg font-medium">
-          Display name
-        </label>
-        <Input
-          id={fields.displayName.id}
-          name={fields.displayName.name}
-          placeholder="Your name"
-          className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
-            fields.displayName.errors ? 'border-red-500' : ''
-          }`}
-        />
-        {fields.displayName.errors && (
-          <p className="text-red-500 text-sm">{fields.displayName.errors}</p>
-        )}
-      </div>
-
-      <div className="space-y-2">
         <label htmlFor={fields.bio.id} className="text-lg font-medium">
           Bio
         </label>

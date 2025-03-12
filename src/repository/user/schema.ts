@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { users } from '../../db/schema';
 
 export const profileFormSchema = z.object({
+  email: z.string().email().optional(),
   username: z
     .string({
       required_error: 'ユーザー名は必須です',

@@ -11,6 +11,7 @@ export type CreateProfileInput = {
   username?: string;
   profileImageUrl?: string;
   address?: string;
+  email?: string;
 };
 
 export type UpdateProfileInput = CreateProfileInput;

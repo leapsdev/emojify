@@ -9,10 +9,12 @@ import { parseWithZod } from '@conform-to/zod';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
+import { usePrivy } from '@privy-io/react-auth';
 
 const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
+  const { user } = usePrivy();
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
@@ -34,6 +36,12 @@ export function ProfileForm() {
       onSubmit={form.onSubmit}
       action={formAction}
     >
+      <input
+        type="hidden"
+        name={fields.email.name}
+        value={user?.email?.address ?? ''}
+      />
+
       {state?.message && (
         <div
           className={`p-4 rounded-lg ${

@@ -1,11 +1,7 @@
 'use client';
 
 import type { User } from '@/components/features/chat/shared/types';
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-} from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { UserList } from './components/userList';

@@ -1,4 +1,4 @@
-import { Plus, Share, X } from 'lucide-react';
+import { Plus, Share } from 'lucide-react';
 import {
   Dialog,
   DialogClose,
@@ -15,9 +15,7 @@ export function InstallModal({ open, onOpenChange }: InstallModalProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="!rounded-[24px] fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] p-0 w-[min(90vw,32rem)] bg-white">
-        <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-2 transition-colors">
-          <X className="w-4 h-4" />
-        </DialogClose>
+        <DialogClose className="absolute right-4 top-4 rounded-full hover:bg-gray-100 p-2 transition-colors" />
         <div className="p-6 space-y-6">
           <div className="flex justify-center">
             <div className="w-16 h-16 bg-black rounded-2xl flex items-center justify-center">

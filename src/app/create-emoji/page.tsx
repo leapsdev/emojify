@@ -1,7 +1,7 @@
-"use client"
+'use client';
 
-import { CreateEmojiPage } from "@/components/pages/createEmojiPage"
+import { CreateEmojiPage } from '@/components/pages/createEmojiPage';
 
 export default function Page() {
-  return <CreateEmojiPage />
+  return <CreateEmojiPage />;
 }

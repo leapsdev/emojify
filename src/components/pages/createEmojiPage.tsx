@@ -1,24 +1,24 @@
-"use client"
+'use client';
 
-import { useState } from "react"
-import { ImageIcon } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { useRouter } from "next/navigation"
+import { Button } from '@/components/ui/button';
+import { ImageIcon } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useState } from 'react';
 
 export function CreateEmojiPage() {
-  const [selectedFile, setSelectedFile] = useState<File | null>(null)
-  const router = useRouter()
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const router = useRouter();
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
+    const file = e.target.files?.[0];
     if (file) {
-      setSelectedFile(file)
+      setSelectedFile(file);
     }
-  }
+  };
 
   const handleBackToChat = () => {
-    router.push("/chat")
-  }
+    router.push('/chat');
+  };
 
   return (
     <main className="min-h-screen bg-white p-4">
@@ -68,5 +68,5 @@ export function CreateEmojiPage() {
         </Button>
       </div>
     </main>
-  )
+  );
 }

@@ -1,8 +1,8 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { checkUserExists } from '@/components/features/auth/action';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export function RedirectIfUserExists() {
   const router = useRouter();
@@ -19,4 +19,4 @@ export function RedirectIfUserExists() {
   }, [router]);
 
   return null;
-} 
+}

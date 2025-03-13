@@ -1,6 +1,6 @@
 import { adminDbRef } from '@/lib/firebase/admin';
-import type { ProfileForm, User } from './schema';
 import { getCurrentTimestamp } from '@/utils/date';
+import type { ProfileForm, User } from './schema';
 
 const USERS_PATH = 'users';
 

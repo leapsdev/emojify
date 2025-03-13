@@ -61,5 +61,5 @@ export async function handleProfileFormAction(
     };
   }
 
-  redirect('/chat');
+  redirect('/choose-friends');
 }

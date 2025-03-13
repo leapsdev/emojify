@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
-import { UserCheck } from '@/components/features/auth/UserCheck';
+import { CheckUserExists } from '@/components/features/auth/userCheck';
 import { PrivyProvider } from '@/components/providers/privy-provider';
 
 const geistSans = Geist({
@@ -35,7 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          <UserCheck />
+          <CheckUserExists />
           {children}
         </PrivyProvider>
       </body>

@@ -3,25 +3,26 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { checkUser } from './action';
+import { checkUserExists } from './action';
 
-export const UserCheck = () => {
+export const CheckUserExists = () => {
   const { authenticated, user } = usePrivy();
   const router = useRouter();
   const pathname = usePathname();
 
   useEffect(() => {
-    // ルートパスでは実行しない
     if (pathname === '/') return;
+    if (pathname === '/create-profile') return;
 
     // 認証済みユーザーのみ処理
     if (!authenticated || !user) return;
 
     // データベースにユーザーが存在するか確認するだけ
-    checkUser().then((redirectTo) => {
-      if (redirectTo) {
-        router.push(redirectTo);
+    checkUserExists().then((exists) => {
+      if (!exists) {
+        router.push('/create-profile');
       }
+      return;
     });
   }, [authenticated, user, router, pathname]);
 

@@ -3,11 +3,9 @@
 import { getPrivyId } from '@/lib/auth';
 import { isIdExists } from '@/repository/user/actions';
 
-export type AuthRedirectPath = '/create-profile' | null;
-
-export async function checkUser(): Promise<AuthRedirectPath | undefined> {
+export async function checkUserExists(): Promise<boolean> {
   const id = await getPrivyId();
-  if (!id) return;
+  if (!id) return false;
   const exists = await isIdExists(id);
-  return exists ? null : '/create-profile';
+  return exists;
 }

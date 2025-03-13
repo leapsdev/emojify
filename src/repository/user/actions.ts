@@ -4,7 +4,7 @@ import type { ProfileForm, User } from './schema';
 const USERS_PATH = 'users';
 
 export async function createProfile(data: ProfileForm) {
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
   const newUserRef = adminDbRef(USERS_PATH).push();
 
   const user: User = {
@@ -29,7 +29,7 @@ export async function updateProfile(
   userId: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
-  const timestamp = new Date().toISOString();
+  const timestamp = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
   const updates = {
     ...data,
     updatedAt: timestamp,

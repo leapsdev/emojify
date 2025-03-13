@@ -13,8 +13,8 @@ export const userSchema = z.object({
   email: z.string().email(),
   username: z.string(),
   bio: z.string().nullable().optional(),
-  createdAt: z.string().datetime(),
-  updatedAt: z.string().datetime(),
+  createdAt: z.string(),
+  updatedAt: z.string(),
 });
 
 export type User = z.infer<typeof userSchema>;

@@ -1,3 +1,5 @@
+'use server';
+
 import { adminDbRef } from '@/lib/firebase/admin';
 import { getCurrentTimestamp } from '@/utils/date';
 import type { ProfileForm, User } from './schema';
@@ -6,11 +8,10 @@ const USERS_PATH = 'users';
 
 export async function createUser(data: ProfileForm, privyId: string) {
   const timestamp = getCurrentTimestamp();
-  const newUserRef = adminDbRef(USERS_PATH).push();
+  const userRef = adminDbRef(`${USERS_PATH}/${privyId}`);
 
   const user: User = {
-    id: newUserRef.key || '',
-    privyId,
+    id: privyId,
     email: data.email,
     username: data.username,
     bio: data.bio ?? null,
@@ -18,7 +19,7 @@ export async function createUser(data: ProfileForm, privyId: string) {
     updatedAt: timestamp,
   };
 
-  await newUserRef.set(user);
+  await userRef.set(user);
   return user;
 }
 
@@ -52,17 +53,8 @@ export async function getAllUsers() {
 }
 
 export async function getUserByPrivyId(privyId: string) {
-  const snapshot = await adminDbRef(USERS_PATH)
-    .orderByChild('privyId')
-    .equalTo(privyId)
-    .once('value');
-
-  const users = snapshot.val();
-  if (!users) return null;
-
-  // privyIdは一意なので、最初のユーザーを返す
-  const userId = Object.keys(users)[0];
-  return users[userId] as User;
+  const snapshot = await adminDbRef(`${USERS_PATH}/${privyId}`).get();
+  return snapshot.val() as User | null;
 }
 
 export async function isPrivyIdExists(privyId: string): Promise<boolean> {

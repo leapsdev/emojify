@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { checkUserExists } from './action';
 
-export const CheckUserExists = () => {
+export const RedirectIfUserExists = () => {
   const { authenticated, user } = usePrivy();
   const router = useRouter();
   const pathname = usePathname();

@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
-import { CheckUserExists } from '@/components/features/auth/userCheck';
 import { PrivyProvider } from '@/components/providers/privy-provider';
+import { RedirectIfUserExists } from '@/components/features/auth/redirectIfUserExists';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,7 +35,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          <CheckUserExists />
+          <RedirectIfUserExists />
           {children}
         </PrivyProvider>
       </body>

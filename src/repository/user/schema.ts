@@ -10,7 +10,6 @@ export type ProfileForm = z.infer<typeof profileFormSchema>;
 
 export const userSchema = z.object({
   id: z.string(),
-  privyId: z.string(),
   email: z.string().email(),
   username: z.string(),
   bio: z.string().nullable().optional(),

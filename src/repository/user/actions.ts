@@ -52,12 +52,12 @@ export async function getAllUsers() {
   return Object.values(users);
 }
 
-export async function getUserByPrivyId(privyId: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${privyId}`).get();
+export async function getUserById(id: string) {
+  const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
   return snapshot.val() as User | null;
 }
 
-export async function isPrivyIdExists(privyId: string): Promise<boolean> {
-  const user = await getUserByPrivyId(privyId);
+export async function isIdExists(id: string): Promise<boolean> {
+  const user = await getUserById(id);
   return user !== null;
 }

@@ -1,4 +1,4 @@
-import { ref, set, get, push, remove, update } from 'firebase/database';
+import { get, push, ref, remove, set, update } from 'firebase/database';
 import { db } from './client';
 
 /**
@@ -21,7 +21,10 @@ export const getData = async <T>(path: string): Promise<T | null> => {
 /**
  * 新しいデータをプッシュ（一意のキーを生成）
  */
-export const pushData = async <T>(path: string, data: T): Promise<string | null> => {
+export const pushData = async <T>(
+  path: string,
+  data: T,
+): Promise<string | null> => {
   const reference = ref(db, path);
   const newRef = push(reference);
   await set(newRef, data);
@@ -31,7 +34,10 @@ export const pushData = async <T>(path: string, data: T): Promise<string | null>
 /**
  * データを更新（部分的な更新）
  */
-export const updateData = async <T extends Record<string, unknown>>(path: string, updates: Partial<T>): Promise<void> => {
+export const updateData = async <T extends Record<string, unknown>>(
+  path: string,
+  updates: Partial<T>,
+): Promise<void> => {
   const reference = ref(db, path);
   await update(reference, updates);
 };

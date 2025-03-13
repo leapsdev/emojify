@@ -1,7 +1,7 @@
 'use server';
 
 import { createProfile } from '@/repository/user/actions';
-import { profileFormSchema, type ProfileForm } from '@/repository/user/schema';
+import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 
@@ -40,7 +40,7 @@ export async function handleProfileFormAction(
   const profileData: ProfileForm = {
     email: String(submission.payload.email),
     username: String(submission.payload.username),
-    bio: submission.payload.bio ? String(submission.payload.bio) : undefined
+    bio: submission.payload.bio ? String(submission.payload.bio) : undefined,
   };
 
   try {

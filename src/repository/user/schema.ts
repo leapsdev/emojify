@@ -14,7 +14,7 @@ export const userSchema = z.object({
   username: z.string(),
   bio: z.string().optional(),
   createdAt: z.number(),
-  updatedAt: z.number()
+  updatedAt: z.number(),
 });
 
 export type User = z.infer<typeof userSchema>;

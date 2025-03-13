@@ -1,21 +1,21 @@
 import { adminDbRef } from '@/lib/firebase/admin';
-import type { User, ProfileForm } from './schema';
+import type { ProfileForm, User } from './schema';
 
 const USERS_PATH = 'users';
 
 export async function createProfile(data: ProfileForm) {
   const timestamp = Date.now();
   const newUserRef = adminDbRef(USERS_PATH).push();
-  
+
   const user: User = {
-    id: newUserRef.key!,
+    id: newUserRef.key || '',
     email: data.email,
     username: data.username,
     bio: data.bio,
     createdAt: timestamp,
-    updatedAt: timestamp
+    updatedAt: timestamp,
   };
-  
+
   await newUserRef.set(user);
   return user;
 }
@@ -26,15 +26,15 @@ export async function getProfile(userId: string) {
 }
 
 export async function updateProfile(
-  userId: string, 
-  data: Partial<Omit<User, 'id' | 'createdAt'>>
+  userId: string,
+  data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = Date.now();
   const updates = {
     ...data,
-    updatedAt: timestamp
+    updatedAt: timestamp,
   };
-  
+
   await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
   return updates;
 }

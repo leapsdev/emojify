@@ -6,10 +6,10 @@ import { Textarea } from '@/components/ui/textarea';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
+import { usePrivy } from '@privy-io/react-auth';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
-import { usePrivy } from '@privy-io/react-auth';
 
 const initialState: ProfileFormState = null;
 

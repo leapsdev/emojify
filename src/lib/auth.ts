@@ -54,7 +54,9 @@ export async function getPrivyEmail(): Promise<string | null> {
     if (!verifiedUser) return null;
 
     const user = await privy.getUser(verifiedUser.userId);
-    const emailAccounts = user?.linkedAccounts?.filter(account => account.type === 'email');
+    const emailAccounts = user?.linkedAccounts?.filter(
+      (account) => account.type === 'email',
+    );
 
     if (!emailAccounts || emailAccounts.length === 0) return null;
     return emailAccounts[0].address;

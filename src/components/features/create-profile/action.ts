@@ -1,7 +1,7 @@
 'use server';
 
 import { createProfile } from '@/repository/user/actions';
-import { profileFormSchema } from '@/repository/user/schema';
+import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 
@@ -37,9 +37,11 @@ export async function handleProfileFormAction(
     };
   }
 
-  const profileData = Object.fromEntries(
-    Object.entries(submission.payload).map(([key, value]) => [key, value]),
-  ) as Parameters<typeof createProfile>[0];
+  const profileData: ProfileForm = {
+    email: String(submission.payload.email),
+    username: String(submission.payload.username),
+    bio: submission.payload.bio ? String(submission.payload.bio) : undefined,
+  };
 
   try {
     await createProfile(profileData);

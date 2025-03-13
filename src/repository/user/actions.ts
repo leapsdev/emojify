@@ -4,7 +4,7 @@ import type { ProfileForm, User } from './schema';
 
 const USERS_PATH = 'users';
 
-export async function createProfile(data: ProfileForm, privyId: string) {
+export async function createUser(data: ProfileForm, privyId: string) {
   const timestamp = getCurrentTimestamp();
   const newUserRef = adminDbRef(USERS_PATH).push();
 
@@ -22,12 +22,12 @@ export async function createProfile(data: ProfileForm, privyId: string) {
   return user;
 }
 
-export async function getProfile(userId: string) {
+export async function getUser(userId: string) {
   const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
   return snapshot.val() as User | null;
 }
 
-export async function updateProfile(
+export async function updateUser(
   userId: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
@@ -41,17 +41,17 @@ export async function updateProfile(
   return updates;
 }
 
-export async function deleteProfile(userId: string) {
+export async function deleteUser(userId: string) {
   await adminDbRef(`${USERS_PATH}/${userId}`).remove();
 }
 
-export async function getAllProfiles() {
+export async function getAllUsers() {
   const snapshot = await adminDbRef(USERS_PATH).get();
   const users: Record<string, User> = snapshot.val() || {};
   return Object.values(users);
 }
 
-export async function getProfileByPrivyId(privyId: string) {
+export async function getUserByPrivyId(privyId: string) {
   const snapshot = await adminDbRef(USERS_PATH)
     .orderByChild('privyId')
     .equalTo(privyId)
@@ -66,6 +66,6 @@ export async function getProfileByPrivyId(privyId: string) {
 }
 
 export async function isPrivyIdExists(privyId: string): Promise<boolean> {
-  const user = await getProfileByPrivyId(privyId);
+  const user = await getUserByPrivyId(privyId);
   return user !== null;
 }

@@ -1,7 +1,7 @@
 'use server';
 
 import { getPrivyId } from '@/lib/auth';
-import { createProfile } from '@/repository/user/actions';
+import { createUser } from '@/repository/user/actions';
 import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
@@ -53,7 +53,7 @@ export async function handleProfileFormAction(
       };
     }
 
-    await createProfile(profileData, privyId);
+    await createUser(profileData, privyId);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'エラーが発生しました',

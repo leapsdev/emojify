@@ -64,3 +64,8 @@ export async function getProfileByPrivyId(privyId: string) {
   const userId = Object.keys(users)[0];
   return users[userId] as User;
 }
+
+export async function isPrivyIdExists(privyId: string): Promise<boolean> {
+  const user = await getProfileByPrivyId(privyId);
+  return user !== null;
+}

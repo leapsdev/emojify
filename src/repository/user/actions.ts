@@ -56,10 +56,10 @@ export async function getProfileByPrivyId(privyId: string) {
     .orderByChild('privyId')
     .equalTo(privyId)
     .once('value');
-  
+
   const users = snapshot.val();
   if (!users) return null;
-  
+
   // privyIdは一意なので、最初のユーザーを返す
   const userId = Object.keys(users)[0];
   return users[userId] as User;

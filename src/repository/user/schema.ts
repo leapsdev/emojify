@@ -12,7 +12,7 @@ export const userSchema = z.object({
   id: z.string(),
   email: z.string().email(),
   username: z.string(),
-  bio: z.string().optional(),
+  bio: z.string().nullable(),
   createdAt: z.number(),
   updatedAt: z.number(),
 });

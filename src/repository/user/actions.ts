@@ -11,7 +11,7 @@ export async function createProfile(data: ProfileForm) {
     id: newUserRef.key || '',
     email: data.email,
     username: data.username,
-    bio: data.bio,
+    bio: data.bio ?? null,
     createdAt: timestamp,
     updatedAt: timestamp,
   };

@@ -3,7 +3,7 @@ import type { NextConfig } from 'next';
 
 const withPWA = withPWAInit({
   dest: 'public',
-  disable: true,
+  disable: false,
   register: true,
   // @ts-expect-error - runtimeCachingの型エラーを無視
   runtimeCaching: [

@@ -25,7 +25,7 @@ function RefreshContent() {
 
   return (
     <div className="flex items-center justify-center min-h-screen">
-      <p className="text-gray-600">認証状態を確認中...</p>
+      <p className="text-gray-600">authenticating...</p>
     </div>
   );
 }
@@ -35,7 +35,7 @@ export default function RefreshPage() {
     <Suspense
       fallback={
         <div className="flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">読み込み中...</p>
+          <p className="text-gray-600">loading...</p>
         </div>
       }
     >

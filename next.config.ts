@@ -22,6 +22,10 @@ const withPWA = withPWAInit({
       },
     },
   ],
+  workboxOptions: {
+    // ログを無効化
+    disableDevLogs: true,
+  },
 });
 
 const nextConfig: NextConfig = {

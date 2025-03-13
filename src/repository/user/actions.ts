@@ -1,10 +1,11 @@
 import { adminDbRef } from '@/lib/firebase/admin';
 import type { ProfileForm, User } from './schema';
+import { getCurrentTimestamp } from '@/utils/date';
 
 const USERS_PATH = 'users';
 
 export async function createProfile(data: ProfileForm) {
-  const timestamp = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+  const timestamp = getCurrentTimestamp();
   const newUserRef = adminDbRef(USERS_PATH).push();
 
   const user: User = {
@@ -29,7 +30,7 @@ export async function updateProfile(
   userId: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
-  const timestamp = new Date().toLocaleString("ja-JP", { timeZone: "Asia/Tokyo" });
+  const timestamp = getCurrentTimestamp();
   const updates = {
     ...data,
     updatedAt: timestamp,

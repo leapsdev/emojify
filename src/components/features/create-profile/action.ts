@@ -1,7 +1,7 @@
 'use server';
 
-import { createProfile } from '@/repository/user/actions';
-import { profileFormSchema, type ProfileForm } from '@/repository/user/schema';
+import { createProfile } from '../../../repository/user/actions';
+import { profileFormSchema, type ProfileForm } from '../../../repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 

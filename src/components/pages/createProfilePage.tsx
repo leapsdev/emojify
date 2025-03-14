@@ -1,6 +1,6 @@
+import { AuthRedirect } from '@/components/features/auth/authRedirect';
 import { ProfileForm } from '@/components/features/create-profile/profileForm';
 import { ProfileImage } from '@/components/features/create-profile/profileImage';
-import { AuthRedirect } from '@/components/features/auth/authRedirect';
 
 export function CreateProfilePage() {
   return (

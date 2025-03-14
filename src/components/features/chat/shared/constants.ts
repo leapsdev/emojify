@@ -1,6 +1,4 @@
-import type { ChatMessage, Message } from './types';
-
-export const INITIAL_MESSAGES: Message[] = [
+export const INITIAL_MESSAGES = [
   {
     id: 'Jossh',
     username: 'Jossh',
@@ -19,7 +17,7 @@ export const INITIAL_MESSAGES: Message[] = [
   },
 ];
 
-export const DUMMY_CHAT_MESSAGES: ChatMessage[] = [
+export const DUMMY_CHAT_MESSAGES = [
   {
     id: '1',
     content: '👨 🌟 ✏️',

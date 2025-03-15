@@ -1,3 +1,4 @@
+import 'server-only';
 import { ref, set, get, push, update } from 'firebase/database';
 import { db } from '@/lib/firebase/client';
 import type { Message, ChatRoom } from '@/types/database';

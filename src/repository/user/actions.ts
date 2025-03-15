@@ -1,5 +1,4 @@
-'use server';
-
+import 'server-only';
 import { adminDbRef } from '@/lib/firebase/admin';
 import { getCurrentTimestamp } from '@/utils/date';
 import type { ProfileForm, User } from './schema';

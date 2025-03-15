@@ -1,5 +1,5 @@
 import 'server-only';
-import { ref, set, get, push, update } from 'firebase/database';
+import { ref, set, get, push, update, off, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase/client';
 import type { Message, ChatRoom } from '@/types/database';
 import { DB_PATHS, DB_INDEXES } from '@/types/database';
@@ -78,15 +78,69 @@ export async function sendMessage(roomId: string, senderId: string, content: str
 }
 
 /**
- * ルームのメッセージを取得
+ * ルームのメッセージをリアルタイムで購読
+ * @param roomId ルームID
+ * @param onMessage メッセージを受信したときのコールバック
+ * @returns 購読解除用の関数
+ */
+export function subscribeToRoomMessages(
+  roomId: string,
+  onMessage: (messages: Message[]) => void
+): () => void {
+  const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
+  const messages: Message[] = [];
+
+  // 初期データと更新の監視
+  onValue(messagesRef, async (indexSnapshot) => {
+    const messageIds = Object.keys(indexSnapshot.val() || {});
+    
+    // 全メッセージを取得
+    const messageSnapshots = await Promise.all(
+      messageIds.map(messageId => 
+        get(ref(db, `${DB_PATHS.messages}/${messageId}`))
+      )
+    );
+
+    // メッセージを配列に変換
+    messages.length = 0; // 配列をクリア
+    messageSnapshots.forEach(snapshot => {
+      const message = snapshot.val() as Message;
+      if (message) {
+        messages.push(message);
+      }
+    });
+
+    // タイムスタンプでソート
+    messages.sort((a, b) => a.createdAt - b.createdAt);
+    
+    // コールバックを呼び出し
+    onMessage(messages);
+  });
+
+  // クリーンアップ用の関数を返す
+  return () => {
+    off(messagesRef);
+  };
+}
+
+/**
+ * 一度だけメッセージを取得（レガシー互換用）
  */
 export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const snapshot = await get(ref(db, `${DB_PATHS.messages}`));
-  const messages = snapshot.val() as Record<string, Message> || {};
+  const indexSnapshot = await get(ref(db, `${DB_INDEXES.roomMessages}/${roomId}`));
+  const messageIds = Object.keys(indexSnapshot.val() || {});
   
-  return Object.values(messages)
-    .filter((message) => message.roomId === roomId)
-    .sort((a, b) => a.createdAt - b.createdAt);
+  const messageSnapshots = await Promise.all(
+    messageIds.map(messageId => 
+      get(ref(db, `${DB_PATHS.messages}/${messageId}`))
+    )
+  );
+
+  const messages = messageSnapshots
+    .map(snapshot => snapshot.val() as Message)
+    .filter(message => message !== null);
+
+  return messages.sort((a, b) => a.createdAt - b.createdAt);
 }
 
 /**

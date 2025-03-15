@@ -1,6 +1,6 @@
 /**
  * Firebaseリアルタイムデータベースのデータ構造定義
- * 
+ *
  * データベース構造:
  * /users/[userId] - ユーザー情報
  * /chatRooms/[roomId] - チャットルーム情報

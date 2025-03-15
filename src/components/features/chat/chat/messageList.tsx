@@ -1,14 +1,18 @@
 import Image from 'next/image';
 import Link from 'next/link';
 
-export const MessageList = ({ messages }: { messages: {
-  id: string;
-  username: string;
-  avatar: string;
-  message: string;
-  time: string;
-  online: boolean;
-}[] }) => {
+export const MessageList = ({
+  messages,
+}: {
+  messages: {
+    id: string;
+    username: string;
+    avatar: string;
+    message: string;
+    time: string;
+    online: boolean;
+  }[];
+}) => {
   return (
     <div className="flex-1 overflow-auto">
       <div className="divide-y">

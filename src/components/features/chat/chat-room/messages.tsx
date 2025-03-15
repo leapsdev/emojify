@@ -1,9 +1,13 @@
-export const ChatRoomMessages = ({ messages }: { messages: {
-  id: string;
-  content: string;
-  timestamp: string;
-  sent: boolean;
-}[] }) => {
+export const ChatRoomMessages = ({
+  messages,
+}: {
+  messages: {
+    id: string;
+    content: string;
+    timestamp: string;
+    sent: boolean;
+  }[];
+}) => {
   return (
     <div className="flex-1 overflow-auto p-4 space-y-4">
       {/* 日付セパレーター */}

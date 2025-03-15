@@ -66,7 +66,10 @@ export async function isIdExists(id: string): Promise<boolean> {
  * @param userId ユーザーID
  * @param friendId フレンドのID
  */
-export async function addFriend(userId: string, friendId: string): Promise<void> {
+export async function addFriend(
+  userId: string,
+  friendId: string,
+): Promise<void> {
   const timestamp = getCurrentTimestamp();
 
   // バリデーション
@@ -99,7 +102,10 @@ export async function addFriend(userId: string, friendId: string): Promise<void>
  * @param userId ユーザーID
  * @param friendId フレンドのID
  */
-export async function removeFriend(userId: string, friendId: string): Promise<void> {
+export async function removeFriend(
+  userId: string,
+  friendId: string,
+): Promise<void> {
   const timestamp = getCurrentTimestamp();
 
   // バリデーション
@@ -143,9 +149,10 @@ export async function getUserFriends(userId: string): Promise<User[]> {
 
   const friendIds = Object.keys(user.friends);
   const friends = await Promise.all(
-    friendIds.map((friendId) => getUserById(friendId))
+    friendIds.map((friendId) => getUserById(friendId)),
   );
 
-  return friends.filter((friend): friend is User => friend !== null)
+  return friends
+    .filter((friend): friend is User => friend !== null)
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }

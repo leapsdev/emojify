@@ -15,6 +15,9 @@ export const userSchema = z.object({
   bio: z.string().nullable().optional(),
   createdAt: z.number(),
   updatedAt: z.number(),
+  friends: z.record(z.object({
+    createdAt: z.number(),
+  })).optional(),
 });
 
 export type User = z.infer<typeof userSchema>;

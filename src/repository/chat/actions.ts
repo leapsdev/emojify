@@ -1,19 +1,22 @@
 import 'server-only';
-import { ref, set, get, push, update, off, onValue } from 'firebase/database';
 import { db } from '@/lib/firebase/client';
-import type { Message, ChatRoom } from '@/types/database';
-import { DB_PATHS, DB_INDEXES } from '@/types/database';
+import type { ChatRoom, Message } from '@/types/database';
+import { DB_INDEXES, DB_PATHS } from '@/types/database';
+import { get, off, onValue, push, ref, set, update } from 'firebase/database';
 
 /**
  * 新しいチャットルームを作成
  */
 export async function createChatRoom(members: string[]): Promise<string> {
   const newRoomRef = push(ref(db, DB_PATHS.chatRooms));
-  const roomId = newRoomRef.key!;
-  
+  const roomId = newRoomRef.key;
+  if (!roomId) {
+    throw new Error('Failed to generate room ID');
+  }
+
   const membersRecord: Record<string, { joinedAt: number }> = {};
   const now = Date.now();
-  
+
   members.forEach((memberId) => {
     membersRecord[memberId] = { joinedAt: now };
   });
@@ -40,9 +43,16 @@ export async function createChatRoom(members: string[]): Promise<string> {
 /**
  * メッセージを送信
  */
-export async function sendMessage(roomId: string, senderId: string, content: string): Promise<string> {
+export async function sendMessage(
+  roomId: string,
+  senderId: string,
+  content: string,
+): Promise<string> {
   const newMessageRef = push(ref(db, DB_PATHS.messages));
-  const messageId = newMessageRef.key!;
+  const messageId = newMessageRef.key;
+  if (!messageId) {
+    throw new Error('Failed to generate message ID');
+  }
   const now = Date.now();
 
   const message: Message = {
@@ -69,10 +79,7 @@ export async function sendMessage(roomId: string, senderId: string, content: str
   await update(ref(db, `${DB_PATHS.chatRooms}/${roomId}`), roomUpdate);
 
   // メッセージインデックスを更新
-  await set(
-    ref(db, `${DB_INDEXES.roomMessages}/${roomId}/${messageId}`),
-    true
-  );
+  await set(ref(db, `${DB_INDEXES.roomMessages}/${roomId}/${messageId}`), true);
 
   return messageId;
 }
@@ -85,7 +92,7 @@ export async function sendMessage(roomId: string, senderId: string, content: str
  */
 export function subscribeToRoomMessages(
   roomId: string,
-  onMessage: (messages: Message[]) => void
+  onMessage: (messages: Message[]) => void,
 ): () => void {
   const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
   const messages: Message[] = [];
@@ -93,17 +100,17 @@ export function subscribeToRoomMessages(
   // 初期データと更新の監視
   onValue(messagesRef, async (indexSnapshot) => {
     const messageIds = Object.keys(indexSnapshot.val() || {});
-    
+
     // 全メッセージを取得
     const messageSnapshots = await Promise.all(
-      messageIds.map(messageId => 
-        get(ref(db, `${DB_PATHS.messages}/${messageId}`))
-      )
+      messageIds.map((messageId) =>
+        get(ref(db, `${DB_PATHS.messages}/${messageId}`)),
+      ),
     );
 
     // メッセージを配列に変換
     messages.length = 0; // 配列をクリア
-    messageSnapshots.forEach(snapshot => {
+    messageSnapshots.forEach((snapshot) => {
       const message = snapshot.val() as Message;
       if (message) {
         messages.push(message);
@@ -112,7 +119,7 @@ export function subscribeToRoomMessages(
 
     // タイムスタンプでソート
     messages.sort((a, b) => a.createdAt - b.createdAt);
-    
+
     // コールバックを呼び出し
     onMessage(messages);
   });
@@ -127,18 +134,20 @@ export function subscribeToRoomMessages(
  * 一度だけメッセージを取得（レガシー互換用）
  */
 export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const indexSnapshot = await get(ref(db, `${DB_INDEXES.roomMessages}/${roomId}`));
+  const indexSnapshot = await get(
+    ref(db, `${DB_INDEXES.roomMessages}/${roomId}`),
+  );
   const messageIds = Object.keys(indexSnapshot.val() || {});
-  
+
   const messageSnapshots = await Promise.all(
-    messageIds.map(messageId => 
-      get(ref(db, `${DB_PATHS.messages}/${messageId}`))
-    )
+    messageIds.map((messageId) =>
+      get(ref(db, `${DB_PATHS.messages}/${messageId}`)),
+    ),
   );
 
   const messages = messageSnapshots
-    .map(snapshot => snapshot.val() as Message)
-    .filter(message => message !== null);
+    .map((snapshot) => snapshot.val() as Message)
+    .filter((message) => message !== null);
 
   return messages.sort((a, b) => a.createdAt - b.createdAt);
 }
@@ -148,16 +157,14 @@ export async function getRoomMessages(roomId: string): Promise<Message[]> {
  */
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
   const userRoomsSnapshot = await get(
-    ref(db, `${DB_INDEXES.userRooms}/${userId}`)
+    ref(db, `${DB_INDEXES.userRooms}/${userId}`),
   );
   const userRooms = userRoomsSnapshot.val() || {};
   const roomIds = Object.keys(userRooms);
 
   const rooms: ChatRoom[] = [];
   for (const roomId of roomIds) {
-    const roomSnapshot = await get(
-      ref(db, `${DB_PATHS.chatRooms}/${roomId}`)
-    );
+    const roomSnapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
     const room = roomSnapshot.val() as ChatRoom;
     if (room) {
       rooms.push(room);
@@ -175,7 +182,7 @@ export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
  */
 export function subscribeToUserRooms(
   userId: string,
-  onRooms: (rooms: ChatRoom[]) => void
+  onRooms: (rooms: ChatRoom[]) => void,
 ): () => void {
   const userRoomsRef = ref(db, `${DB_INDEXES.userRooms}/${userId}`);
   const rooms: ChatRoom[] = [];
@@ -187,14 +194,12 @@ export function subscribeToUserRooms(
 
     // 各ルームの詳細を取得
     const roomSnapshots = await Promise.all(
-      roomIds.map(roomId => 
-        get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`))
-      )
+      roomIds.map((roomId) => get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`))),
     );
 
     // 配列を更新
     rooms.length = 0;
-    roomSnapshots.forEach(snapshot => {
+    roomSnapshots.forEach((snapshot) => {
       const room = snapshot.val() as ChatRoom;
       if (room) {
         rooms.push(room);
@@ -203,7 +208,7 @@ export function subscribeToUserRooms(
 
     // 更新日時でソート
     rooms.sort((a, b) => b.updatedAt - a.updatedAt);
-    
+
     // コールバックを呼び出し
     onRooms(rooms);
   });
@@ -215,7 +220,10 @@ export function subscribeToUserRooms(
 /**
  * チャットルームにメンバーを追加
  */
-export async function addRoomMember(roomId: string, userId: string): Promise<void> {
+export async function addRoomMember(
+  roomId: string,
+  userId: string,
+): Promise<void> {
   const updates: Record<string, { joinedAt: number } | boolean> = {};
   const now = Date.now();
 
@@ -223,7 +231,7 @@ export async function addRoomMember(roomId: string, userId: string): Promise<voi
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`] = {
     joinedAt: now,
   };
-  
+
   // ユーザーのルームインデックスを更新
   updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = true;
 
@@ -233,12 +241,15 @@ export async function addRoomMember(roomId: string, userId: string): Promise<voi
 /**
  * チャットルームからメンバーを削除
  */
-export async function removeRoomMember(roomId: string, userId: string): Promise<void> {
+export async function removeRoomMember(
+  roomId: string,
+  userId: string,
+): Promise<void> {
   const updates: Record<string, null> = {};
-  
+
   // ルームのメンバーリストから削除
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`] = null;
-  
+
   // ユーザーのルームインデックスから削除
   updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = null;
 
@@ -252,11 +263,11 @@ export async function deleteChatRoom(roomId: string): Promise<void> {
   // ルームのメンバー一覧を取得
   const roomSnapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
   const room = roomSnapshot.val() as ChatRoom;
-  
+
   if (!room) return;
 
   const updates: Record<string, null> = {};
-  
+
   // 各メンバーのインデックスからルームを削除
   Object.keys(room.members).forEach((memberId) => {
     updates[`${DB_INDEXES.userRooms}/${memberId}/${roomId}`] = null;

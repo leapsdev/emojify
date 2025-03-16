@@ -1,15 +1,9 @@
 import Image from 'next/image';
 
-interface User {
-  id: string;
-  displayName: string;
-  userId: string;
-  avatar: string;
-  section: 'recent' | 'favorites' | 'friends';
-}
+import { DisplayUser } from '@/types/display';
 
 interface UserItemProps {
-  user: User;
+  user: DisplayUser;
   selected: boolean;
   onSelect: () => void;
 }

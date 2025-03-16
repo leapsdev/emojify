@@ -1,16 +1,10 @@
 import { UserItem } from './userItem';
 
-interface User {
-  id: string;
-  displayName: string;
-  userId: string;
-  avatar: string;
-  section: 'recent' | 'favorites' | 'friends';
-}
+import { DisplayUser } from '@/types/display';
 
 interface UserSectionProps {
   title: string;
-  users: User[];
+  users: DisplayUser[];
   selectedUsers: string[];
   onUserSelect: (userId: string) => void;
   count?: number;

@@ -14,6 +14,7 @@ export function ChooseFriendsPage() {
     friends,
     others,
     handleUserSelect,
+    handleAddFriend,
   } = useUserSelection();
 
   return (
@@ -35,6 +36,7 @@ export function ChooseFriendsPage() {
           users={others}
           selectedUsers={selectedUsers}
           onUserSelect={handleUserSelect}
+          onAddFriend={handleAddFriend}
         />
       </div>
 

@@ -54,9 +54,6 @@ export function UserItem({ user, selected, onSelect, onAddFriend }: UserItemProp
             }}
             className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors border-blue-300 hover:border-blue-400`}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-blue-400">
-              <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
-            </svg>
           </button>
         )}
       </div>

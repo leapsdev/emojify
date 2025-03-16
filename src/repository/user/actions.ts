@@ -1,5 +1,4 @@
-'use server';
-
+import 'server-only';
 import { adminDbRef } from '@/lib/firebase/admin';
 import { getCurrentTimestamp } from '@/utils/date';
 import type { ProfileForm, User } from './schema';
@@ -60,4 +59,100 @@ export async function getUserById(id: string) {
 export async function isIdExists(id: string): Promise<boolean> {
   const user = await getUserById(id);
   return user !== null;
+}
+
+/**
+ * フレンドを追加
+ * @param userId ユーザーID
+ * @param friendId フレンドのID
+ */
+export async function addFriend(
+  userId: string,
+  friendId: string,
+): Promise<void> {
+  const timestamp = getCurrentTimestamp();
+
+  // バリデーション
+  const [user, friend] = await Promise.all([
+    getUserById(userId),
+    getUserById(friendId),
+  ]);
+
+  if (!user || !friend) {
+    throw new Error('User not found');
+  }
+
+  if (user.friends?.[friendId]) {
+    throw new Error('Already friends');
+  }
+
+  // 双方向のフレンド関係を更新
+  const updates = {
+    [`${USERS_PATH}/${userId}/friends/${friendId}`]: { createdAt: timestamp },
+    [`${USERS_PATH}/${friendId}/friends/${userId}`]: { createdAt: timestamp },
+    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+  };
+
+  await adminDbRef('/').update(updates);
+}
+
+/**
+ * フレンドを削除
+ * @param userId ユーザーID
+ * @param friendId フレンドのID
+ */
+export async function removeFriend(
+  userId: string,
+  friendId: string,
+): Promise<void> {
+  const timestamp = getCurrentTimestamp();
+
+  // バリデーション
+  const [user, friend] = await Promise.all([
+    getUserById(userId),
+    getUserById(friendId),
+  ]);
+
+  if (!user || !friend) {
+    throw new Error('User not found');
+  }
+
+  if (!user.friends?.[friendId]) {
+    throw new Error('Not friends');
+  }
+
+  // 双方向のフレンド関係を削除
+  const updates = {
+    [`${USERS_PATH}/${userId}/friends/${friendId}`]: null,
+    [`${USERS_PATH}/${friendId}/friends/${userId}`]: null,
+    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+  };
+
+  await adminDbRef('/').update(updates);
+}
+
+/**
+ * ユーザーのフレンド一覧を取得
+ * @param userId ユーザーID
+ */
+export async function getUserFriends(userId: string): Promise<User[]> {
+  const user = await getUserById(userId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (!user.friends) {
+    return [];
+  }
+
+  const friendIds = Object.keys(user.friends);
+  const friends = await Promise.all(
+    friendIds.map((friendId) => getUserById(friendId)),
+  );
+
+  return friends
+    .filter((friend): friend is User => friend !== null)
+    .sort((a, b) => b.updatedAt - a.updatedAt);
 }

@@ -1,94 +1,46 @@
+import type { User } from '@/types/database';
+import type { DisplayUser } from '@/types/display';
 import { useState } from 'react';
 
-interface User {
-  id: string;
-  displayName: string;
-  userId: string;
-  avatar: string;
-  section: 'recent' | 'favorites' | 'friends';
+interface UseUserSelectionProps {
+  initialFriends: User[];
+  initialOthers: User[];
 }
 
-const USERS: User[] = [
-  {
-    id: '1',
-    displayName: 'Kinjo',
-    userId: 'illshin',
+function convertToDisplayUser(
+  user: User,
+  section: 'friend' | 'other',
+): DisplayUser {
+  return {
+    id: user.id,
+    username: user.username,
+    displayName: user.username,
+    userId: user.id,
     avatar: '/placeholder.svg?height=48&width=48',
-    section: 'recent',
-  },
-  {
-    id: '2',
-    displayName: 'yamapyblack',
-    userId: 'yamapyblack',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '3',
-    displayName: 'Ritulya',
-    userId: 'babushka',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '4',
-    displayName: 'toto 🎭🐷💜🧀💧🍭💛',
-    userId: 'totomal',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '5',
-    displayName: 'tantan777 🎭',
-    userId: 'tantan777',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '6',
-    displayName: 'Yuki Sato',
-    userId: 'yukisato.eth',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '7',
-    displayName: 'DENJIN-K',
-    userId: 'denjin',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '8',
-    displayName: 'passion 😎',
-    userId: 'hyde2000',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-  {
-    id: '9',
-    displayName: '0xTouYan',
-    userId: '0xtouyan.eth',
-    avatar: '/placeholder.svg?height=48&width=48',
-    section: 'friends',
-  },
-];
+    section,
+  };
+}
 
-export const useUserSelection = () => {
+export const useUserSelection = ({
+  initialFriends,
+  initialOthers,
+}: UseUserSelectionProps) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const filteredUsers = USERS.filter(
+  const users = [
+    ...initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
+    ...initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+  ];
+
+  const filteredUsers = users.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.userId.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
-  const recentChats = filteredUsers.filter((user) => user.section === 'recent');
-  const favorites = filteredUsers.filter(
-    (user) => user.section === 'favorites',
-  );
-  const friends = filteredUsers.filter((user) => user.section === 'friends');
+  const friends = filteredUsers.filter((user) => user.section === 'friend');
+  const others = filteredUsers.filter((user) => user.section === 'other');
 
   const handleUserSelect = (userId: string) => {
     setSelectedUsers((prev) =>
@@ -102,9 +54,8 @@ export const useUserSelection = () => {
     selectedUsers,
     searchQuery,
     setSearchQuery,
-    recentChats,
-    favorites,
     friends,
+    others,
     handleUserSelect,
   };
 };

@@ -1,18 +1,13 @@
 import { UserItem } from './userItem';
 
-interface User {
-  id: string;
-  displayName: string;
-  userId: string;
-  avatar: string;
-  section: 'recent' | 'favorites' | 'friends';
-}
+import type { DisplayUser } from '@/types/display';
 
 interface UserSectionProps {
   title: string;
-  users: User[];
+  users: DisplayUser[];
   selectedUsers: string[];
   onUserSelect: (userId: string) => void;
+  onAddFriend?: (userId: string) => void;
   count?: number;
 }
 
@@ -21,6 +16,7 @@ export function UserSection({
   users,
   selectedUsers,
   onUserSelect,
+  onAddFriend,
   count,
 }: UserSectionProps) {
   if (users.length === 0) return null;
@@ -37,6 +33,7 @@ export function UserSection({
             user={user}
             selected={selectedUsers.includes(user.id)}
             onSelect={() => onUserSelect(user.id)}
+            onAddFriend={() => onAddFriend?.(user.id)}
           />
         ))}
       </div>

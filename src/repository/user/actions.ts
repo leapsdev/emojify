@@ -1,7 +1,8 @@
 import 'server-only';
 import { adminDbRef } from '@/lib/firebase/admin';
+import type { User } from '@/types/database';
 import { getCurrentTimestamp } from '@/utils/date';
-import type { ProfileForm, User } from './schema';
+import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
@@ -136,6 +137,7 @@ export async function removeFriend(
 /**
  * ユーザーのフレンド一覧を取得
  * @param userId ユーザーID
+ * @returns フレンド一覧
  */
 export async function getUserFriends(userId: string): Promise<User[]> {
   const user = await getUserById(userId);
@@ -155,4 +157,50 @@ export async function getUserFriends(userId: string): Promise<User[]> {
   return friends
     .filter((friend): friend is User => friend !== null)
     .sort((a, b) => b.updatedAt - a.updatedAt);
+}
+
+/**
+ * 自分以外のユーザー一覧を取得
+ * @param currentUserId 現在のユーザーID
+ * @returns 自分以外のユーザー一覧
+ */
+export async function getOtherUsers(currentUserId: string): Promise<User[]> {
+  const allUsers = await getAllUsers();
+  return allUsers.filter((user) => user.id !== currentUserId);
+}
+
+/**
+ * 友達状態を含むユーザー一覧を取得
+ * @param currentUserId 現在のユーザーID
+ * @returns フレンドとその他のユーザー一覧
+ */
+export async function getUsersWithFriendship(currentUserId: string): Promise<{
+  friends: User[];
+  others: User[];
+}> {
+  const [currentUser, otherUsers] = await Promise.all([
+    getUserById(currentUserId),
+    getOtherUsers(currentUserId),
+  ]);
+
+  if (!currentUser) {
+    throw new Error('Current user not found');
+  }
+
+  const friends: User[] = [];
+  const others: User[] = [];
+
+  // 友達かどうかで振り分け
+  otherUsers.forEach((user) => {
+    if (currentUser.friends?.[user.id]) {
+      friends.push(user);
+    } else {
+      others.push(user);
+    }
+  });
+
+  return {
+    friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
+    others: others.sort((a, b) => b.updatedAt - a.updatedAt),
+  };
 }

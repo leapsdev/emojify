@@ -2,6 +2,8 @@ import { getUsersWithFriendshipAction } from '@/components/features/choose-frien
 import { ClientChooseFriendsPage } from '@/components/pages/chooseFriendsPage';
 import { getPrivyId } from '@/lib/auth';
 
+export const dynamic = 'force-dynamic';
+
 export default async function ChooseFriendsPage() {
   const userId = await getPrivyId();
   if (!userId) {

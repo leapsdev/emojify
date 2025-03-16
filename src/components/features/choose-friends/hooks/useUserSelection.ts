@@ -55,8 +55,9 @@ export const useUserSelection = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [users, setUsers] = useState<DisplayUser[]>(USERS);
 
-  const filteredUsers = USERS.filter(
+  const filteredUsers = users.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       user.userId.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -83,12 +84,15 @@ export const useUserSelection = () => {
     try {
       const result = await addFriendAction(userId, friendId);
       if (result.success) {
-        // UIの状態を更新
-        const updatedUser = USERS.find((u) => u.id === friendId);
-        if (updatedUser) {
-          updatedUser.section = 'friend';
-          toast.success('友達に追加しました');
-        }
+        // 新しい配列を作成して状態を更新
+        setUsers(prevUsers =>
+          prevUsers.map(user =>
+            user.id === friendId
+              ? { ...user, section: 'friend' }
+              : user
+          )
+        );
+        toast.success('友達に追加しました');
       } else {
         toast.error(result.error || '友達の追加に失敗しました');
       }

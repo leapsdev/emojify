@@ -1,6 +1,6 @@
 import { UserItem } from './userItem';
 
-import { DisplayUser } from '@/types/display';
+import type { DisplayUser } from '@/types/display';
 
 interface UserSectionProps {
   title: string;

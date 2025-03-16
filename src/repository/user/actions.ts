@@ -1,7 +1,7 @@
 import 'server-only';
 import { adminDbRef } from '@/lib/firebase/admin';
-import { getCurrentTimestamp } from '@/utils/date';
 import type { User } from '@/types/database';
+import { getCurrentTimestamp } from '@/utils/date';
 import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
@@ -166,7 +166,7 @@ export async function getUserFriends(userId: string): Promise<User[]> {
  */
 export async function getOtherUsers(currentUserId: string): Promise<User[]> {
   const allUsers = await getAllUsers();
-  return allUsers.filter(user => user.id !== currentUserId);
+  return allUsers.filter((user) => user.id !== currentUserId);
 }
 
 /**
@@ -180,7 +180,7 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
 }> {
   const [currentUser, otherUsers] = await Promise.all([
     getUserById(currentUserId),
-    getOtherUsers(currentUserId)
+    getOtherUsers(currentUserId),
   ]);
 
   if (!currentUser) {
@@ -191,7 +191,7 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
   const others: User[] = [];
 
   // 友達かどうかで振り分け
-  otherUsers.forEach(user => {
+  otherUsers.forEach((user) => {
     if (currentUser.friends?.[user.id]) {
       friends.push(user);
     } else {
@@ -201,6 +201,6 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
 
   return {
     friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
-    others: others.sort((a, b) => b.updatedAt - a.updatedAt)
+    others: others.sort((a, b) => b.updatedAt - a.updatedAt),
   };
 }

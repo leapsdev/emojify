@@ -1,4 +1,4 @@
-import { User } from './database';
+import type { User } from './database';
 
 export interface DisplayUser extends Pick<User, 'id' | 'username'> {
   displayName: string; // usernameと同じ値を使用

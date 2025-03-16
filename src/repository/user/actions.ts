@@ -1,7 +1,8 @@
 import 'server-only';
 import { adminDbRef } from '@/lib/firebase/admin';
 import { getCurrentTimestamp } from '@/utils/date';
-import type { ProfileForm, User } from './schema';
+import type { User } from '@/types/database';
+import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 

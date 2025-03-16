@@ -11,9 +11,8 @@ export function ChooseFriendsPage() {
     selectedUsers,
     searchQuery,
     setSearchQuery,
-    recentChats,
-    favorites,
     friends,
+    others,
     handleUserSelect,
   } = useUserSelection();
 
@@ -25,22 +24,15 @@ export function ChooseFriendsPage() {
 
       <div className="px-4 space-y-6 flex-1 overflow-auto">
         <UserSection
-          title="Recent chats"
-          users={recentChats}
-          selectedUsers={selectedUsers}
-          onUserSelect={handleUserSelect}
-        />
-
-        <UserSection
-          title="Favorites"
-          users={favorites}
-          selectedUsers={selectedUsers}
-          onUserSelect={handleUserSelect}
-        />
-
-        <UserSection
           title="Friends"
           users={friends}
+          selectedUsers={selectedUsers}
+          onUserSelect={handleUserSelect}
+        />
+
+        <UserSection
+          title="Others"
+          users={others}
           selectedUsers={selectedUsers}
           onUserSelect={handleUserSelect}
         />

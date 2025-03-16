@@ -1,5 +1,8 @@
 import { useState } from 'react';
+import { toast } from 'sonner';
 
+import { addFriendAction } from '../actions';
+import { usePrivyId } from '@/hooks/usePrivyId';
 import { DisplayUser } from '@/types/display';
 import { User } from '@/types/database';
 
@@ -48,6 +51,8 @@ const USERS: DisplayUser[] = TEST_USERS.map(user => ({
 }));
 
 export const useUserSelection = () => {
+  const userId = usePrivyId();
+  const [isLoading, setIsLoading] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -68,6 +73,33 @@ export const useUserSelection = () => {
     );
   };
 
+  const handleAddFriend = async (friendId: string) => {
+    if (!userId) {
+      toast.error('ユーザーIDが取得できません');
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const result = await addFriendAction(userId, friendId);
+      if (result.success) {
+        // UIの状態を更新
+        const updatedUser = USERS.find((u) => u.id === friendId);
+        if (updatedUser) {
+          updatedUser.section = 'friend';
+          toast.success('友達に追加しました');
+        }
+      } else {
+        toast.error(result.error || '友達の追加に失敗しました');
+      }
+    } catch (error) {
+      toast.error('エラーが発生しました');
+      console.error(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return {
     selectedUsers,
     searchQuery,
@@ -75,5 +107,7 @@ export const useUserSelection = () => {
     friends,
     others,
     handleUserSelect,
+    handleAddFriend,
+    isLoading,
   };
 };

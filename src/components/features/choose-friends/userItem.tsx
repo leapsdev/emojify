@@ -26,28 +26,39 @@ export function UserItem({ user, selected, onSelect, onAddFriend }: UserItemProp
         </div>
       </div>
       <div className="flex items-center gap-2">
-        {user.section === 'other' && (
+        {user.section === 'friend' ? (
+          <button
+            type="button"
+            role="checkbox"
+            aria-checked={selected}
+            tabIndex={0}
+            onClick={onSelect}
+            onKeyDown={(e) => e.key === 'Enter' && onSelect()}
+            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors ${
+              selected 
+                ? 'bg-blue-500 border-blue-500 text-white' 
+                : 'border-blue-300 hover:border-blue-400'
+            }`}
+          >
+            {selected && (
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <path fillRule="evenodd" d="M19.916 4.626a.75.75 0 01.208 1.04l-9 13.5a.75.75 0 01-1.154.114l-6-6a.75.75 0 011.06-1.06l5.353 5.353 8.493-12.739a.75.75 0 011.04-.208z" clipRule="evenodd" />
+              </svg>
+            )}
+          </button>
+        ) : (
           <button
             onClick={(e) => {
               e.stopPropagation();
               onAddFriend?.();
             }}
-            className="px-2 py-1 text-sm text-blue-500 border border-blue-500 rounded hover:bg-blue-50"
+            className={`w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors border-blue-300 hover:border-blue-400`}
           >
-            友達追加
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4 text-blue-400">
+              <path fillRule="evenodd" d="M12 3.75a.75.75 0 01.75.75v6.75h6.75a.75.75 0 010 1.5h-6.75v6.75a.75.75 0 01-1.5 0v-6.75H4.5a.75.75 0 010-1.5h6.75V4.5a.75.75 0 01.75-.75z" clipRule="evenodd" />
+            </svg>
           </button>
         )}
-        <button
-          type="button"
-          role="checkbox"
-          aria-checked={selected}
-          tabIndex={0}
-          onClick={onSelect}
-          onKeyDown={(e) => e.key === 'Enter' && onSelect()}
-          className={`w-6 h-6 rounded-full border-2 ${
-            selected ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
-          }`}
-        />
       </div>
     </div>
   );

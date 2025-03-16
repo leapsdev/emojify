@@ -7,6 +7,7 @@ interface UserSectionProps {
   users: DisplayUser[];
   selectedUsers: string[];
   onUserSelect: (userId: string) => void;
+  onAddFriend?: (userId: string) => void;
   count?: number;
 }
 
@@ -15,6 +16,7 @@ export function UserSection({
   users,
   selectedUsers,
   onUserSelect,
+  onAddFriend,
   count,
 }: UserSectionProps) {
   if (users.length === 0) return null;
@@ -31,6 +33,7 @@ export function UserSection({
             user={user}
             selected={selectedUsers.includes(user.id)}
             onSelect={() => onUserSelect(user.id)}
+            onAddFriend={() => onAddFriend?.(user.id)}
           />
         ))}
       </div>

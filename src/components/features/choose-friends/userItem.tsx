@@ -6,9 +6,10 @@ interface UserItemProps {
   user: DisplayUser;
   selected: boolean;
   onSelect: () => void;
+  onAddFriend?: () => void;
 }
 
-export function UserItem({ user, selected, onSelect }: UserItemProps) {
+export function UserItem({ user, selected, onSelect, onAddFriend }: UserItemProps) {
   return (
     <div className="flex items-center justify-between">
       <div className="flex items-center gap-3">
@@ -24,14 +25,30 @@ export function UserItem({ user, selected, onSelect }: UserItemProps) {
           <span className="text-sm text-gray-500">{user.userId}</span>
         </div>
       </div>
-      <div
-        role="checkbox"
-        aria-checked={selected}
-        tabIndex={0}
-        onClick={onSelect}
-        onKeyDown={(e) => e.key === 'Enter' && onSelect()}
-        className={`w-6 h-6 rounded-full border-2 ${selected ? 'bg-blue-500 border-blue-500' : 'border-gray-300'}`}
-      />
+      <div className="flex items-center gap-2">
+        {user.section === 'other' && (
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              onAddFriend?.();
+            }}
+            className="px-2 py-1 text-sm text-blue-500 border border-blue-500 rounded hover:bg-blue-50"
+          >
+            友達追加
+          </button>
+        )}
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={selected}
+          tabIndex={0}
+          onClick={onSelect}
+          onKeyDown={(e) => e.key === 'Enter' && onSelect()}
+          className={`w-6 h-6 rounded-full border-2 ${
+            selected ? 'bg-blue-500 border-blue-500' : 'border-gray-300'
+          }`}
+        />
+      </div>
     </div>
   );
 }

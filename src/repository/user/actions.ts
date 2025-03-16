@@ -137,10 +137,6 @@ export async function removeFriend(
 /**
  * ユーザーのフレンド一覧を取得
  * @param userId ユーザーID
- */
-/**
- * ユーザーのフレンド一覧を取得
- * @param userId ユーザーID
  * @returns フレンド一覧
  */
 export async function getUserFriends(userId: string): Promise<User[]> {

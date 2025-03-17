@@ -6,7 +6,7 @@ export const ProfileEditHeader = () => {
       <Link href="/profile" className="text-2xl absolute left-4">
         👈
       </Link>
-      <h1 className="text-xl font-semibold">プロフィール編集</h1>
+      <span className="text-2xl">✏️</span>
     </div>
   );
 };

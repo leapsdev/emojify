@@ -1,19 +1,19 @@
-import { ProfilePage } from '@/components/pages/profilePage';
+import { ProfileEditPage } from '@/components/pages/profileEditPage';
 export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';
 import { redirect } from 'next/navigation';
 
 export default async function Page() {
-  const privyId = await getPrivyId();
-  if (!privyId) {
+  const userId = await getPrivyId();
+  if (!userId) {
     redirect('/');
   }
 
-  const userData = await getUser(privyId);
-  if (!userData) {
+  const user = await getUser(userId);
+  if (!user) {
     redirect('/');
   }
 
-  return <ProfilePage user={userData} />;
+  return <ProfileEditPage initialUser={user} />;
 }

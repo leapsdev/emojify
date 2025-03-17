@@ -1,7 +1,7 @@
 'use server';
 
 import { getPrivyId } from '@/lib/auth';
-import { createUser } from '@/repository/user/actions';
+import { updateUser } from '@/repository/user/actions';
 import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
@@ -53,7 +53,7 @@ export async function handleProfileFormAction(
       };
     }
 
-    await createUser(profileData, privyId);
+    await updateUser(privyId, profileData);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'エラーが発生しました',
@@ -61,5 +61,5 @@ export async function handleProfileFormAction(
     };
   }
 
-  redirect('/choose-friends');
+  redirect('/chat');
 }

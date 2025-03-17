@@ -2,12 +2,14 @@
 
 import { Button } from '@/components/ui/button';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface UserProfileProps {
   username: string;
   walletAddress: string;
   bio: string;
   avatar: string;
+  userId: string;
 }
 
 export const UserProfile = ({
@@ -15,6 +17,7 @@ export const UserProfile = ({
   walletAddress,
   bio,
   avatar,
+  userId,
 }: UserProfileProps) => {
   return (
     <div className="px-4 pt-4">
@@ -36,12 +39,14 @@ export const UserProfile = ({
                 {walletAddress}
               </p>
             </div>
-            <Button
-              variant="outline"
-              className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black"
-            >
-              Edit Profile
-            </Button>
+            <Link href={`/profile/${userId}/edit`}>
+              <Button
+                variant="outline"
+                className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black"
+              >
+                Edit Profile
+              </Button>
+            </Link>
           </div>
         </div>
 

@@ -1,3 +1,4 @@
+import { getUser } from '@/repository/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 
@@ -53,13 +54,8 @@ export async function getPrivyEmail(): Promise<string | null> {
     const verifiedUser = await privy.verifyAuthToken(privyToken);
     if (!verifiedUser) return null;
 
-    const user = await privy.getUser(verifiedUser.userId);
-    const emailAccounts = user?.linkedAccounts?.filter(
-      (account) => account.type === 'email',
-    );
-
-    if (!emailAccounts || emailAccounts.length === 0) return null;
-    return emailAccounts[0].address;
+    const user = await getUser(verifiedUser.userId);
+    return user?.email ?? null;
   } catch (error) {
     console.error('Privy認証エラー:', error);
     return null;

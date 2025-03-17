@@ -1,6 +1,6 @@
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';
-import { ProfilePage } from '@/components/pages/profilePage';
+import { ProfileEditPage } from '@/components/pages/profileEditPage';
 import { redirect } from 'next/navigation';
 
 export default async function Page() {
@@ -14,5 +14,5 @@ export default async function Page() {
     redirect('/');
   }
 
-  return <ProfilePage user={userData} />;
+  return <ProfileEditPage initialUser={userData} />;
 }

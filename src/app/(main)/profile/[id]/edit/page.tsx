@@ -4,15 +4,15 @@ import { ProfileEditPage } from '@/components/pages/profileEditPage';
 import { redirect } from 'next/navigation';
 
 export default async function Page() {
-  const privyId = await getPrivyId();
-  if (!privyId) {
+  const userId = await getPrivyId();
+  if (!userId) {
     redirect('/');
   }
 
-  const userData = await getUser(privyId);
-  if (!userData) {
+  const user = await getUser(userId);
+  if (!user) {
     redirect('/');
   }
 
-  return <ProfileEditPage initialUser={userData} />;
+  return <ProfileEditPage initialUser={user} />;
 }

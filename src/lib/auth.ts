@@ -1,7 +1,9 @@
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 import { getUser } from '@/repository/user/actions';
-import type { LinkedAccount } from '@/repository/user/schema';
+import type { LinkedAccount } from '@/types/database';
+
+
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
   throw new Error('Privy環境変数が設定されていません');
 }

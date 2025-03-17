@@ -23,15 +23,11 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
     initialState,
   );
 
-  console.log('ProfileEditForm received user:', user);
-
   const defaultValues = {
     username: user.username,
     bio: user.bio || '',
     email: user.email || '',
   };
-  
-  console.log('Setting default values:', defaultValues);
 
   const [form, fields] = useForm({
     id: 'profile-edit-form',

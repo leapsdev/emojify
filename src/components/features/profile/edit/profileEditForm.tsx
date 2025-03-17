@@ -23,15 +23,21 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
     initialState,
   );
 
+  console.log('ProfileEditForm received user:', user);
+
+  const defaultValues = {
+    username: user.username,
+    bio: user.bio || '',
+    email: user.email || '',
+  };
+  
+  console.log('Setting default values:', defaultValues);
+
   const [form, fields] = useForm({
     id: 'profile-edit-form',
     shouldValidate: 'onInput',
     lastResult: state,
-    defaultValue: {
-      username: user.username,
-      bio: user.bio || '',
-      email: user.email || '',
-    },
+    defaultValue: defaultValues,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: profileFormSchema });
     },
@@ -69,6 +75,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
         <Input
           id={fields.username.id}
           name={fields.username.name}
+          defaultValue={user.username}
           className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
             fields.username.errors ? 'border-red-500' : ''
           }`}
@@ -87,6 +94,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
           <Textarea
             id={fields.bio.id}
             name={fields.bio.name}
+            defaultValue={user.bio || ''}
             placeholder="Tell us about you..."
             className={`rounded-2xl border-gray-200 bg-gray-50 min-h-[150px] p-4 text-lg resize-none ${
               fields.bio.errors ? 'border-red-500' : ''

@@ -25,8 +25,7 @@ export async function createUser(data: ProfileForm, privyId: string) {
 }
 
 export async function getUser(userId: string) {
-  const cleanId = userId.replace('did:privy:', '');
-  const snapshot = await adminDbRef(`${USERS_PATH}/${cleanId}`).get();
+  const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
   return snapshot.val() as User | null;
 }
 
@@ -35,19 +34,17 @@ export async function updateUser(
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
-  const cleanId = userId.replace('did:privy:', '');
   const updates = {
     ...data,
     updatedAt: timestamp,
   };
 
-  await adminDbRef(`${USERS_PATH}/${cleanId}`).update(updates);
+  await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
   return updates;
 }
 
 export async function deleteUser(userId: string) {
-  const cleanId = userId.replace('did:privy:', '');
-  await adminDbRef(`${USERS_PATH}/${cleanId}`).remove();
+  await adminDbRef(`${USERS_PATH}/${userId}`).remove();
 }
 
 export async function getAllUsers() {
@@ -57,8 +54,7 @@ export async function getAllUsers() {
 }
 
 export async function getUserById(id: string) {
-  const cleanId = id.replace('did:privy:', '');
-  const snapshot = await adminDbRef(`${USERS_PATH}/${cleanId}`).get();
+  const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
   return snapshot.val() as User | null;
 }
 
@@ -77,13 +73,11 @@ export async function addFriend(
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
-  const cleanUserId = userId.replace('did:privy:', '');
-  const cleanFriendId = friendId.replace('did:privy:', '');
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(cleanUserId),
-    getUserById(cleanFriendId),
+    getUserById(userId),
+    getUserById(friendId),
   ]);
 
   if (!user || !friend) {
@@ -96,10 +90,10 @@ export async function addFriend(
 
   // 双方向のフレンド関係を更新
   const updates = {
-    [`${USERS_PATH}/${cleanUserId}/friends/${cleanFriendId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${cleanFriendId}/friends/${cleanUserId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${cleanUserId}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${cleanFriendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${userId}/friends/${friendId}`]: { createdAt: timestamp },
+    [`${USERS_PATH}/${friendId}/friends/${userId}`]: { createdAt: timestamp },
+    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);
@@ -115,13 +109,11 @@ export async function removeFriend(
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
-  const cleanUserId = userId.replace('did:privy:', '');
-  const cleanFriendId = friendId.replace('did:privy:', '');
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(cleanUserId),
-    getUserById(cleanFriendId),
+    getUserById(userId),
+    getUserById(friendId),
   ]);
 
   if (!user || !friend) {
@@ -134,10 +126,10 @@ export async function removeFriend(
 
   // 双方向のフレンド関係を削除
   const updates = {
-    [`${USERS_PATH}/${cleanUserId}/friends/${cleanFriendId}`]: null,
-    [`${USERS_PATH}/${cleanFriendId}/friends/${cleanUserId}`]: null,
-    [`${USERS_PATH}/${cleanUserId}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${cleanFriendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${userId}/friends/${friendId}`]: null,
+    [`${USERS_PATH}/${friendId}/friends/${userId}`]: null,
+    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);

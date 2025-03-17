@@ -3,7 +3,6 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { ProfileImage } from './profileImage';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
@@ -45,8 +44,6 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       onSubmit={form.onSubmit}
       action={formAction}
     >
-      <ProfileImage imageUrl="/placeholder.svg" />
-      
       <input type="hidden" name="userId" value={user.id} />
       <input type="hidden" name={fields.email.name} value={user.email || ''} />
 

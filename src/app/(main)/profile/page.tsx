@@ -1,4 +1,5 @@
 import { ProfilePage } from '@/components/pages/profilePage';
+export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';
 import { redirect } from 'next/navigation';

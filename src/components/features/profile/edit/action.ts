@@ -1,44 +1,68 @@
 'use server';
 
 import { updateUser } from '@/repository/user/actions';
-import { profileFormSchema } from '@/repository/user/schema';
+import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
+import { parseWithZod } from '@conform-to/zod';
+import { redirect } from 'next/navigation';
 
-export type ProfileFormState =
-  | {
-      status: 'success' | 'error';
-      message: string;
-    }
-  | null;
+export type ProfileFormState = {
+  message: string;
+  status: 'error' | 'success';
+} | null;
 
 export async function handleProfileFormAction(
-  _prevState: ProfileFormState,
-  formData: FormData,
+  state: ProfileFormState,
+  formData?: FormData,
 ): Promise<ProfileFormState> {
-  const parsed = profileFormSchema.safeParse({
-    email: formData.get('email'),
-    username: formData.get('username'),
-    bio: formData.get('bio'),
+  if (!formData) return null;
+  const submission = parseWithZod(formData, {
+    schema: profileFormSchema,
   });
 
-  if (!parsed.success) {
+  if (submission.status === 'error') {
+    if (!submission.error) {
+      return {
+        message: 'バリデーションエラーが発生しました',
+        status: 'error' as const,
+      };
+    }
+
+    const firstError = Object.entries(submission.error).find(
+      ([, errors]) => errors && errors.length > 0,
+    );
+
     return {
-      status: 'error',
-      message: 'Invalid form data',
+      message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
+      status: 'error' as const,
     };
   }
 
+  const profileData: ProfileForm = {
+    email: String(submission.payload.email),
+    username: String(submission.payload.username),
+    bio: submission.payload.bio ? String(submission.payload.bio) : undefined,
+  };
+
   try {
     const userId = formData.get('userId') as string;
-    await updateUser(userId, parsed.data);
+    if (!userId) {
+      return {
+        message: 'ユーザーIDの取得に失敗しました',
+        status: 'error' as const,
+      };
+    }
 
+    await updateUser(userId, profileData);
     return {
       status: 'success',
       message: 'プロフィールを更新しました',
     };
-  } catch {
+  } catch (error) {
     return {
-      status: 'error',
-      message: 'プロフィールの更新に失敗しました',
+      message: error instanceof Error ? error.message : 'プロフィールの更新に失敗しました',
+      status: 'error' as const,
     };
   }
+
+  redirect('/chat');
 }

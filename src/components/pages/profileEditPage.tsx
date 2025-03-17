@@ -14,7 +14,7 @@ export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
     <div className="min-h-screen bg-white flex flex-col">
       <ProfileEditHeader />
       <main className="min-h-screen bg-white flex flex-col max-w-2xl mx-auto w-full px-4 py-8">
-        <ProfileImage imageUrl="/placeholder.svg" />
+        <ProfileImage />
         <ProfileEditForm user={initialUser} />
       </main>
     </div>

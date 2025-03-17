@@ -1,0 +1,64 @@
+'use server';
+
+import { getPrivyId } from '@/lib/auth';
+import { updateUser } from '@/repository/user/actions';
+import { profileFormSchema, type ProfileForm } from '@/repository/user/schema';
+import { parseWithZod } from '@conform-to/zod';
+import { redirect } from 'next/navigation';
+
+export type ProfileEditFormState = {
+  message: string;
+  status: 'error' | 'success';
+} | null;
+
+export async function handleProfileEditAction(
+  state: ProfileEditFormState,
+  formData?: FormData,
+): Promise<ProfileEditFormState> {
+  if (!formData) return null;
+  const submission = parseWithZod(formData, {
+    schema: profileFormSchema,
+  });
+
+  if (submission.status === 'error') {
+    if (!submission.error) {
+      return {
+        message: 'バリデーションエラーが発生しました',
+        status: 'error' as const,
+      };
+    }
+
+    const firstError = Object.entries(submission.error).find(
+      ([, errors]) => errors && errors.length > 0,
+    );
+
+    return {
+      message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
+      status: 'error' as const,
+    };
+  }
+
+  const profileData: Partial<ProfileForm> = {
+    username: String(submission.payload.username),
+    bio: submission.payload.bio ? String(submission.payload.bio) : null,
+  };
+
+  try {
+    const privyId = await getPrivyId();
+    if (!privyId) {
+      return {
+        message: '認証情報の取得に失敗しました',
+        status: 'error' as const,
+      };
+    }
+
+    await updateUser(privyId, profileData);
+  } catch (error) {
+    return {
+      message: error instanceof Error ? error.message : 'エラーが発生しました',
+      status: 'error' as const,
+    };
+  }
+
+  redirect('/profile');
+}

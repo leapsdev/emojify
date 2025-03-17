@@ -1,5 +1,4 @@
 import { getUser } from '@/repository/user/actions';
-import type { LinkedAccount } from '@/types/database';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 
@@ -56,12 +55,7 @@ export async function getPrivyEmail(): Promise<string | null> {
     if (!verifiedUser) return null;
 
     const user = await getUser(verifiedUser.userId);
-    const emailAccounts = user?.linkedAccounts?.filter(
-      (account: LinkedAccount) => account.type === 'email',
-    );
-
-    if (!emailAccounts || emailAccounts.length === 0) return null;
-    return emailAccounts[0].address;
+    return user?.email ?? null;
   } catch (error) {
     console.error('Privy認証エラー:', error);
     return null;

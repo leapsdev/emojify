@@ -14,20 +14,6 @@
  * - ユーザーの基本情報を管理
  * - フレンドリストはオプショナル
  */
-/**
- * リンクされたアカウントの型定義
- */
-export interface LinkedAccount {
-  type: string;
-  address: string;
-}
-
-/**
- * ユーザー情報の型定義
- * - ユーザーの基本情報を管理
- * - フレンドリストはオプショナル
- * - リンクされたアカウントはオプショナル
- */
 export interface User {
   id: string;
   email: string;
@@ -36,7 +22,6 @@ export interface User {
   createdAt: number;
   updatedAt: number;
   friends?: Record<string, { createdAt: number }>;
-  linkedAccounts?: LinkedAccount[];
 }
 
 /**

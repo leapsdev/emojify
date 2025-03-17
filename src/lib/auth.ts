@@ -1,6 +1,7 @@
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
-
+import { getUser } from '@/repository/user/actions';
+import type { LinkedAccount } from '@/repository/user/schema';
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
   throw new Error('Privy環境変数が設定されていません');
 }
@@ -53,9 +54,9 @@ export async function getPrivyEmail(): Promise<string | null> {
     const verifiedUser = await privy.verifyAuthToken(privyToken);
     if (!verifiedUser) return null;
 
-    const user = await privy.getUser(verifiedUser.userId);
+    const user = await getUser(verifiedUser.userId);
     const emailAccounts = user?.linkedAccounts?.filter(
-      (account) => account.type === 'email',
+      (account: LinkedAccount) => account.type === 'email',
     );
 
     if (!emailAccounts || emailAccounts.length === 0) return null;

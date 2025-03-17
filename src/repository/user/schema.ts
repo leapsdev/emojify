@@ -8,6 +8,13 @@ export const profileFormSchema = z.object({
 
 export type ProfileForm = z.infer<typeof profileFormSchema>;
 
+export const linkedAccountSchema = z.object({
+  type: z.string(),
+  address: z.string(),
+});
+
+export type LinkedAccount = z.infer<typeof linkedAccountSchema>;
+
 export const userSchema = z.object({
   id: z.string(),
   email: z.string().email(),
@@ -22,6 +29,7 @@ export const userSchema = z.object({
       }),
     )
     .optional(),
+  linkedAccounts: z.array(linkedAccountSchema).optional(),
 });
 
 export type User = z.infer<typeof userSchema>;

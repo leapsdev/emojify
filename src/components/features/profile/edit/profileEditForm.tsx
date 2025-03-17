@@ -6,22 +6,20 @@ import { Textarea } from '@/components/ui/textarea';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { usePrivy } from '@privy-io/react-auth';
 import { useActionState } from 'react';
-import { handleProfileEditAction } from './action';
-import type { ProfileEditFormState } from './action';
+import { handleProfileFormAction } from './action';
+import type { ProfileFormState } from './action';
 import type { User } from '@/types/database';
-
-const initialState: ProfileEditFormState = null;
 
 interface ProfileEditFormProps {
   user: User;
 }
 
+const initialState: ProfileFormState = null;
+
 export function ProfileEditForm({ user }: ProfileEditFormProps) {
-  const { user: privyUser } = usePrivy();
   const [state, formAction, isPending] = useActionState(
-    handleProfileEditAction,
+    handleProfileFormAction,
     initialState,
   );
 
@@ -30,9 +28,9 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
     shouldValidate: 'onInput',
     lastResult: state,
     defaultValue: {
-      email: user.email,
       username: user.username,
       bio: user.bio || '',
+      email: user.email || '',
     },
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: profileFormSchema });
@@ -46,11 +44,8 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       onSubmit={form.onSubmit}
       action={formAction}
     >
-      <input
-        type="hidden"
-        name={fields.email.name}
-        value={privyUser?.email?.address ?? ''}
-      />
+      <input type="hidden" name="userId" value={user.id} />
+      <input type="hidden" name={fields.email.name} value={user.email || ''} />
 
       {state?.message && (
         <div
@@ -69,7 +64,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
           <label htmlFor={fields.username.id} className="text-lg font-medium">
             Username
           </label>
-          <span className="text-gray-500">必須</span>
+          <span className="text-gray-500">Required</span>
         </div>
         <Input
           id={fields.username.id}
@@ -92,7 +87,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
           <Textarea
             id={fields.bio.id}
             name={fields.bio.name}
-            placeholder="自己紹介を書いてください..."
+            placeholder="Tell us about you..."
             className={`rounded-2xl border-gray-200 bg-gray-50 min-h-[150px] p-4 text-lg resize-none ${
               fields.bio.errors ? 'border-red-500' : ''
             }`}

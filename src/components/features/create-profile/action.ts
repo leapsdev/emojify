@@ -12,7 +12,7 @@ export type ProfileFormState = {
 } | null;
 
 export async function handleProfileFormAction(
-  state: ProfileFormState,
+  _state: ProfileFormState,
   formData?: FormData,
 ): Promise<ProfileFormState> {
   if (!formData) return null;

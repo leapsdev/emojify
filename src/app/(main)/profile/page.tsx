@@ -1,6 +1,6 @@
+import { ProfilePage } from '@/components/pages/profilePage';
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';
-import { ProfilePage } from '@/components/pages/profilePage';
 import { redirect } from 'next/navigation';
 
 export default async function Page() {

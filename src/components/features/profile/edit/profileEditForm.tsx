@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { profileFormSchema } from '@/repository/user/schema';
+import type { User } from '@/types/database';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
-import type { User } from '@/types/database';
 
 interface ProfileEditFormProps {
   user: User;

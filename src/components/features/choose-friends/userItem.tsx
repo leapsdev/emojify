@@ -28,9 +28,7 @@ export function UserItem({
           <span className="font-semibold text-base truncate">
             {user.displayName}
           </span>
-          <span className="text-sm text-gray-500 truncate">
-            {user.userId}
-          </span>
+          <span className="text-sm text-gray-500 truncate">{user.userId}</span>
         </div>
       </div>
       <div className="flex items-center flex-shrink-0">

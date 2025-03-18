@@ -1,14 +1,15 @@
 import 'server-only';
+import { adminDb } from '@/lib/firebase/admin';
 import { db } from '@/lib/firebase/client';
 import type { ChatRoom, Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
-import { get, off, onValue, push, ref, set, update } from 'firebase/database';
+import { get, off, onValue, ref } from 'firebase/database';
 
 /**
  * 新しいチャットルームを作成
  */
 export async function createChatRoom(members: string[]): Promise<string> {
-  const newRoomRef = push(ref(db, DB_PATHS.chatRooms));
+  const newRoomRef = adminDb.ref(DB_PATHS.chatRooms).push();
   const roomId = newRoomRef.key;
   if (!roomId) {
     throw new Error('Failed to generate room ID');
@@ -28,7 +29,7 @@ export async function createChatRoom(members: string[]): Promise<string> {
     updatedAt: now,
   };
 
-  await set(newRoomRef, newRoom);
+  await newRoomRef.set(newRoom);
 
   // ユーザーのルームインデックスを更新
   const updates: Record<string, boolean> = {};
@@ -36,7 +37,7 @@ export async function createChatRoom(members: string[]): Promise<string> {
     updates[`${DB_INDEXES.userRooms}/${memberId}/${roomId}`] = true;
   });
 
-  await update(ref(db), updates);
+  await adminDb.ref().update(updates);
   return roomId;
 }
 
@@ -48,7 +49,7 @@ export async function sendMessage(
   senderId: string,
   content: string,
 ): Promise<string> {
-  const newMessageRef = push(ref(db, DB_PATHS.messages));
+  const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
   const messageId = newMessageRef.key;
   if (!messageId) {
     throw new Error('Failed to generate message ID');
@@ -64,7 +65,7 @@ export async function sendMessage(
     sent: true,
   };
 
-  await set(newMessageRef, message);
+  await newMessageRef.set(message);
 
   // ルームの最終メッセージを更新
   const roomUpdate: Partial<ChatRoom> = {
@@ -76,10 +77,12 @@ export async function sendMessage(
     updatedAt: now,
   };
 
-  await update(ref(db, `${DB_PATHS.chatRooms}/${roomId}`), roomUpdate);
+  await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).update(roomUpdate);
 
   // メッセージインデックスを更新
-  await set(ref(db, `${DB_INDEXES.roomMessages}/${roomId}/${messageId}`), true);
+  await adminDb
+    .ref(`${DB_INDEXES.roomMessages}/${roomId}/${messageId}`)
+    .set(true);
 
   return messageId;
 }
@@ -134,14 +137,14 @@ export function subscribeToRoomMessages(
  * 一度だけメッセージを取得（レガシー互換用）
  */
 export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const indexSnapshot = await get(
-    ref(db, `${DB_INDEXES.roomMessages}/${roomId}`),
-  );
+  const indexSnapshot = await adminDb
+    .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
+    .get();
   const messageIds = Object.keys(indexSnapshot.val() || {});
 
   const messageSnapshots = await Promise.all(
     messageIds.map((messageId) =>
-      get(ref(db, `${DB_PATHS.messages}/${messageId}`)),
+      adminDb.ref(`${DB_PATHS.messages}/${messageId}`).get(),
     ),
   );
 
@@ -156,15 +159,17 @@ export async function getRoomMessages(roomId: string): Promise<Message[]> {
  * ユーザーのチャットルーム一覧を取得
  */
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
-  const userRoomsSnapshot = await get(
-    ref(db, `${DB_INDEXES.userRooms}/${userId}`),
-  );
+  const userRoomsSnapshot = await adminDb
+    .ref(`${DB_INDEXES.userRooms}/${userId}`)
+    .get();
   const userRooms = userRoomsSnapshot.val() || {};
   const roomIds = Object.keys(userRooms);
 
   const rooms: ChatRoom[] = [];
   for (const roomId of roomIds) {
-    const roomSnapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
+    const roomSnapshot = await adminDb
+      .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+      .get();
     const room = roomSnapshot.val() as ChatRoom;
     if (room) {
       rooms.push(room);
@@ -235,7 +240,7 @@ export async function addRoomMember(
   // ユーザーのルームインデックスを更新
   updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = true;
 
-  await update(ref(db), updates);
+  await adminDb.ref().update(updates);
 }
 
 /**
@@ -253,7 +258,7 @@ export async function removeRoomMember(
   // ユーザーのルームインデックスから削除
   updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = null;
 
-  await update(ref(db), updates);
+  await adminDb.ref().update(updates);
 }
 
 /**
@@ -261,7 +266,9 @@ export async function removeRoomMember(
  */
 export async function deleteChatRoom(roomId: string): Promise<void> {
   // ルームのメンバー一覧を取得
-  const roomSnapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
+  const roomSnapshot = await adminDb
+    .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+    .get();
   const room = roomSnapshot.val() as ChatRoom;
 
   if (!room) return;
@@ -279,5 +286,5 @@ export async function deleteChatRoom(roomId: string): Promise<void> {
   // ルームのメッセージインデックスを削除
   updates[`${DB_INDEXES.roomMessages}/${roomId}`] = null;
 
-  await update(ref(db), updates);
+  await adminDb.ref().update(updates);
 }

@@ -1,5 +1,6 @@
 'use server';
 
+import { createChatRoom } from '@/repository/chat/actions';
 import { addFriend, getUsersWithFriendship } from '@/repository/user/actions';
 import type { User } from '@/types/database';
 import { revalidatePath } from 'next/cache';
@@ -18,6 +19,29 @@ export async function addFriendAction(
     await addFriend(userId, friendId);
     revalidatePath('/choose-friends');
     return { success: true };
+  } catch (error) {
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : '不明なエラーが発生しました',
+    };
+  }
+}
+
+/**
+ * チャットルームを作成するサーバーアクション
+ */
+export async function createChatRoomAction(members: string[]): Promise<{
+  success: boolean;
+  roomId?: string;
+  error?: string;
+}> {
+  try {
+    const roomId = await createChatRoom(members);
+    return {
+      success: true,
+      roomId,
+    };
   } catch (error) {
     return {
       success: false,

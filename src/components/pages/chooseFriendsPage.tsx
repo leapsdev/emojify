@@ -1,6 +1,9 @@
 'use client';
 
-import { addFriendAction } from '@/components/features/choose-friends/actions';
+import {
+  addFriendAction,
+  createChatRoomAction,
+} from '@/components/features/choose-friends/actions';
 import { ChatButton } from '@/components/features/choose-friends/chatButton';
 import { Header } from '@/components/features/choose-friends/header';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
@@ -8,6 +11,7 @@ import { SearchBar } from '@/components/features/choose-friends/searchBar';
 import { UserSection } from '@/components/features/choose-friends/userSection';
 import { usePrivyId } from '@/hooks/usePrivyId';
 import type { User } from '@/types/database';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface ClientChooseFriendsPageProps {
@@ -20,6 +24,7 @@ export function ClientChooseFriendsPage({
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
   const userId = usePrivyId();
+  const router = useRouter();
 
   const {
     selectedUsers,
@@ -49,6 +54,29 @@ export function ClientChooseFriendsPage({
     }
   };
 
+  const handleCreateChatRoom = async () => {
+    try {
+      if (!userId) {
+        toast.error('ユーザーIDが取得できません');
+        return;
+      }
+      // 現在のユーザーも含めてチャットルームを作成
+      const result = await createChatRoomAction([userId, ...selectedUsers]);
+      if (result.success && result.roomId) {
+        toast.success('チャットルームを作成しました');
+        // トーストが表示される時間を確保するため、少し遅延させる
+        setTimeout(() => {
+          router.push(`/chat/${result.roomId}`);
+        }, 1000);
+      } else {
+        toast.error(result.error || 'チャットルームの作成に失敗しました');
+      }
+    } catch (error) {
+      toast.error('チャットルームの作成に失敗しました');
+      console.error(error);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />
@@ -71,7 +99,10 @@ export function ClientChooseFriendsPage({
         />
       </div>
 
-      <ChatButton visible={selectedUsers.length > 0} />
+      <ChatButton
+        visible={selectedUsers.length > 0}
+        onClick={handleCreateChatRoom}
+      />
     </main>
   );
 }

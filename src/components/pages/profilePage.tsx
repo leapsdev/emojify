@@ -18,7 +18,6 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
           <UserProfile
             username={user.username}
             bio={user.bio || ''}
-            walletAddress={user.id}
             avatar="/placeholder.svg?height=80&width=80"
             userId={user.id}
           />

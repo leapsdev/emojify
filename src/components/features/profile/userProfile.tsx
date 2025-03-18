@@ -6,7 +6,6 @@ import Link from 'next/link';
 
 interface UserProfileProps {
   username: string;
-  walletAddress: string;
   bio: string;
   avatar: string;
   userId: string;
@@ -14,7 +13,6 @@ interface UserProfileProps {
 
 export const UserProfile = ({
   username,
-  walletAddress,
   bio,
   avatar,
   userId,
@@ -36,7 +34,7 @@ export const UserProfile = ({
             <div className="pt-3 min-w-0">
               <h2 className="text-2xl font-black truncate">{username}</h2>
               <p className="text-[13px] text-gray-600 font-bold truncate">
-                {walletAddress}
+                {userId}
               </p>
             </div>
             <Link href={`/profile/${userId}/edit`}>

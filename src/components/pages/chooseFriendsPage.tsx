@@ -1,7 +1,9 @@
 'use client';
 
-import { addFriendAction, createChatRoomAction } from '@/components/features/choose-friends/actions';
-import { useRouter } from 'next/navigation';
+import {
+  addFriendAction,
+  createChatRoomAction,
+} from '@/components/features/choose-friends/actions';
 import { ChatButton } from '@/components/features/choose-friends/chatButton';
 import { Header } from '@/components/features/choose-friends/header';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
@@ -9,6 +11,7 @@ import { SearchBar } from '@/components/features/choose-friends/searchBar';
 import { UserSection } from '@/components/features/choose-friends/userSection';
 import { usePrivyId } from '@/hooks/usePrivyId';
 import type { User } from '@/types/database';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 interface ClientChooseFriendsPageProps {
@@ -61,7 +64,10 @@ export function ClientChooseFriendsPage({
       const result = await createChatRoomAction([userId, ...selectedUsers]);
       if (result.success && result.roomId) {
         toast.success('チャットルームを作成しました');
-        router.push(`/chat/${result.roomId}`);
+        // トーストが表示される時間を確保するため、少し遅延させる
+        setTimeout(() => {
+          router.push(`/chat/${result.roomId}`);
+        }, 1000);
       } else {
         toast.error(result.error || 'チャットルームの作成に失敗しました');
       }
@@ -69,8 +75,8 @@ export function ClientChooseFriendsPage({
       toast.error('チャットルームの作成に失敗しました');
       console.error(error);
     }
-  }
-  
+  };
+
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />

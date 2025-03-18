@@ -45,7 +45,8 @@ export async function createChatRoomAction(members: string[]): Promise<{
   } catch (error) {
     return {
       success: false,
-      error: error instanceof Error ? error.message : '不明なエラーが発生しました',
+      error:
+        error instanceof Error ? error.message : '不明なエラーが発生しました',
     };
   }
 }

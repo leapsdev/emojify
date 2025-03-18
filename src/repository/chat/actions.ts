@@ -80,7 +80,9 @@ export async function sendMessage(
   await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).update(roomUpdate);
 
   // メッセージインデックスを更新
-  await adminDb.ref(`${DB_INDEXES.roomMessages}/${roomId}/${messageId}`).set(true);
+  await adminDb
+    .ref(`${DB_INDEXES.roomMessages}/${roomId}/${messageId}`)
+    .set(true);
 
   return messageId;
 }
@@ -135,7 +137,9 @@ export function subscribeToRoomMessages(
  * 一度だけメッセージを取得（レガシー互換用）
  */
 export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const indexSnapshot = await adminDb.ref(`${DB_INDEXES.roomMessages}/${roomId}`).get();
+  const indexSnapshot = await adminDb
+    .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
+    .get();
   const messageIds = Object.keys(indexSnapshot.val() || {});
 
   const messageSnapshots = await Promise.all(
@@ -155,13 +159,17 @@ export async function getRoomMessages(roomId: string): Promise<Message[]> {
  * ユーザーのチャットルーム一覧を取得
  */
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
-  const userRoomsSnapshot = await adminDb.ref(`${DB_INDEXES.userRooms}/${userId}`).get();
+  const userRoomsSnapshot = await adminDb
+    .ref(`${DB_INDEXES.userRooms}/${userId}`)
+    .get();
   const userRooms = userRoomsSnapshot.val() || {};
   const roomIds = Object.keys(userRooms);
 
   const rooms: ChatRoom[] = [];
   for (const roomId of roomIds) {
-    const roomSnapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+    const roomSnapshot = await adminDb
+      .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+      .get();
     const room = roomSnapshot.val() as ChatRoom;
     if (room) {
       rooms.push(room);
@@ -258,7 +266,9 @@ export async function removeRoomMember(
  */
 export async function deleteChatRoom(roomId: string): Promise<void> {
   // ルームのメンバー一覧を取得
-  const roomSnapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+  const roomSnapshot = await adminDb
+    .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+    .get();
   const room = roomSnapshot.val() as ChatRoom;
 
   if (!room) return;

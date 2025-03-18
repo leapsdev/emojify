@@ -4,7 +4,11 @@ interface ChatButtonProps {
   onClick?: () => void;
 }
 
-export function ChatButton({ visible, disabled = false, onClick }: ChatButtonProps) {
+export function ChatButton({
+  visible,
+  disabled = false,
+  onClick,
+}: ChatButtonProps) {
   if (!visible) return null;
 
   return (

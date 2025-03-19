@@ -3,7 +3,7 @@
 import { FooterNavigation } from '@/components/features/chat/chat/footerNavigation';
 import { Header } from '@/components/features/chat/chat/header';
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
-import { NewMessageButton } from '@/components/features/chat/chat/newMessageButton';
+import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
 import { INITIAL_MESSAGES } from '@/components/features/chat/shared/constants';
 
 export const ChatRoomListPage = () => {
@@ -11,7 +11,7 @@ export const ChatRoomListPage = () => {
     <main className="min-h-screen bg-white flex flex-col">
       <Header />
       <ChatRoomList messages={INITIAL_MESSAGES} />
-      <NewMessageButton />
+      <NewChatButton />
       <FooterNavigation />
     </main>
   );

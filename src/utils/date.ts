@@ -20,3 +20,28 @@ export function formatTimestampToJST(timestamp: number): string {
 export function getCurrentTimestamp(): number {
   return Date.now();
 }
+
+/**
+ * タイムスタンプを相対時間に変換
+ * @param timestamp UNIXタイムスタンプ
+ * @returns 相対時間の文字列（例：3分前、1時間前）
+ */
+export function formatRelativeTime(timestamp: number): string {
+  const now = Date.now();
+  const diff = now - timestamp;
+  const minutes = Math.floor(diff / (1000 * 60));
+  const hours = Math.floor(diff / (1000 * 60 * 60));
+  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+  if (minutes < 1) {
+    return 'たった今';
+  } else if (minutes < 60) {
+    return `${minutes}分前`;
+  } else if (hours < 24) {
+    return `${hours}時間前`;
+  } else if (days < 7) {
+    return `${days}日前`;
+  } else {
+    return formatTimestampToJST(timestamp);
+  }
+}

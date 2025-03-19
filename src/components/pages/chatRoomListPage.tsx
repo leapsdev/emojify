@@ -4,13 +4,17 @@ import { FooterNavigation } from '@/components/features/chat/chat/footerNavigati
 import { Header } from '@/components/features/chat/chat/header';
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
 import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
-import { INITIAL_MESSAGES } from '@/components/features/chat/shared/constants';
+import type { ChatRoom } from '@/types/database';
 
-export const ChatRoomListPage = () => {
+type ChatRoomListPageProps = {
+  initialRooms: ChatRoom[];
+};
+
+export const ChatRoomListPage = ({ initialRooms }: ChatRoomListPageProps) => {
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />
-      <ChatRoomList messages={INITIAL_MESSAGES} />
+      <ChatRoomList rooms={initialRooms} />
       <NewChatButton />
       <FooterNavigation />
     </main>

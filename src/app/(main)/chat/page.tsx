@@ -1,5 +1,5 @@
-import { ChatPage } from '@/components/pages/chatPage';
+import { ChatRoomListPage } from '@/components/pages/chatRoomListPage';
 
 export default function Page() {
-  return <ChatPage />;
+  return <ChatRoomListPage />;
 }

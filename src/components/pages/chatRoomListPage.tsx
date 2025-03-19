@@ -6,7 +6,7 @@ import { MessageList } from '@/components/features/chat/chat/messageList';
 import { NewMessageButton } from '@/components/features/chat/chat/newMessageButton';
 import { INITIAL_MESSAGES } from '@/components/features/chat/shared/constants';
 
-export const ChatPage = () => {
+export const ChatRoomListPage = () => {
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />

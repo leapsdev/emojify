@@ -15,21 +15,24 @@ export async function createChatRoom(members: string[]): Promise<string> {
     throw new Error('Failed to generate room ID');
   }
 
-  const membersRecord: Record<string, { joinedAt: number; username: string }> = {};
+  const membersRecord: Record<string, { joinedAt: number; username: string }> =
+    {};
   const now = Date.now();
 
   // メンバーのユーザー情報を取得
   const memberUsers = await Promise.all(
-    members.map(memberId => adminDb.ref(`${DB_PATHS.users}/${memberId}`).get())
+    members.map((memberId) =>
+      adminDb.ref(`${DB_PATHS.users}/${memberId}`).get(),
+    ),
   );
 
   memberUsers.forEach((snapshot, index) => {
     const user = snapshot.val();
     if (!user) throw new Error(`User not found: ${members[index]}`);
-    
-    membersRecord[members[index]] = { 
+
+    membersRecord[members[index]] = {
       joinedAt: now,
-      username: user.username 
+      username: user.username,
     };
   });
 
@@ -240,7 +243,10 @@ export async function addRoomMember(
   roomId: string,
   userId: string,
 ): Promise<void> {
-  const updates: Record<string, { joinedAt: number; username: string } | boolean> = {};
+  const updates: Record<
+    string,
+    { joinedAt: number; username: string } | boolean
+  > = {};
   const now = Date.now();
 
   // ルームのメンバーリストを更新
@@ -251,7 +257,7 @@ export async function addRoomMember(
 
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`] = {
     joinedAt: now,
-    username: user.username
+    username: user.username,
   };
 
   // ユーザーのルームインデックスを更新

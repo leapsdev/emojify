@@ -35,13 +35,15 @@ export function formatRelativeTime(timestamp: number): string {
 
   if (minutes < 1) {
     return 'たった今';
-  } else if (minutes < 60) {
-    return `${minutes}分前`;
-  } else if (hours < 24) {
-    return `${hours}時間前`;
-  } else if (days < 7) {
-    return `${days}日前`;
-  } else {
-    return formatTimestampToJST(timestamp);
   }
+  if (minutes < 60) {
+    return `${minutes}分前`;
+  }
+  if (hours < 24) {
+    return `${hours}時間前`;
+  }
+  if (days < 7) {
+    return `${days}日前`;
+  }
+  return formatTimestampToJST(timestamp);
 }

@@ -43,10 +43,13 @@ export interface Message {
  */
 export interface ChatRoom {
   id: string;
-  members: Record<string, { 
-    joinedAt: number;
-    username: string;
-  }>;
+  members: Record<
+    string,
+    {
+      joinedAt: number;
+      username: string;
+    }
+  >;
   lastMessage?: {
     content: string;
     senderId: string;

@@ -1,6 +1,6 @@
 import Link from 'next/link';
 
-export const NewMessageButton = () => {
+export const NewChatButton = () => {
   return (
     <Link
       href="/choose-friends"

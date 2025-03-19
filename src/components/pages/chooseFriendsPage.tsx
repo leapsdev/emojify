@@ -46,7 +46,7 @@ export function ClientChooseFriendsPage({
       if (result.success) {
         toast.success('友達に追加しました');
       } else {
-        toast.error(result.error || '友達の追加に失敗しました');
+        router.refresh();
       }
     } catch (error) {
       toast.error('エラーが発生しました');

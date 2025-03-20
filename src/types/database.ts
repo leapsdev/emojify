@@ -66,6 +66,7 @@ export const DB_PATHS = {
   users: '/users',
   chatRooms: '/chatRooms',
   messages: '/messages',
+  userRooms: '/user-rooms',
 } as const;
 
 /**

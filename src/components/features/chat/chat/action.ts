@@ -1,54 +1,49 @@
-import type { ChatRoom } from '@/types/database';
 import { db } from '@/lib/firebase/client';
-import { ref, onValue, get, off } from 'firebase/database';
-import { DB_INDEXES, DB_PATHS } from '@/types/database';
+import type { ChatRoom } from '@/types/database';
+import { DB_PATHS } from '@/types/database';
+import { get, off, onValue, ref } from 'firebase/database';
 
 export function subscribeToUserRoomsAction(
   userId: string,
-  onRooms: (rooms: ChatRoom[]) => void
+  onRooms: (rooms: ChatRoom[]) => void,
 ) {
   return subscribeToUserRooms(userId, onRooms);
 }
 
 /**
  * ユーザーのチャットルーム一覧をリアルタイムで購読
- * @param userId ユーザーID
- * @param onRooms ルーム一覧が更新されたときのコールバック
- * @returns 購読解除用の関数
  */
 export function subscribeToUserRooms(
   userId: string,
   onRooms: (rooms: ChatRoom[]) => void,
 ): () => void {
-  const userRoomsRef = ref(db, `${DB_INDEXES.userRooms}/${userId}`);
-  const rooms: ChatRoom[] = [];
+  if (!userId) return () => {};
 
-  // リアルタイム監視を設定
-  onValue(userRoomsRef, async (indexSnapshot) => {
-    const userRooms = indexSnapshot.val() || {};
-    const roomIds = Object.keys(userRooms);
+  const userRoomsRef = ref(db, `${DB_PATHS.userRooms}/${userId}`);
 
-    // 各ルームの詳細を取得
-    const roomSnapshots = await Promise.all(
-      roomIds.map((roomId) => get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`))),
-    );
-
-    // 配列を更新
-    rooms.length = 0;
-    roomSnapshots.forEach((snapshot) => {
-      const room = snapshot.val() as ChatRoom;
-      if (room) {
-        rooms.push(room);
+  onValue(
+    userRoomsRef,
+    async (indexSnapshot) => {
+      const snapshotVal = indexSnapshot.val();
+      if (!snapshotVal) {
+        onRooms([]);
+        return;
       }
-    });
 
-    // 更新日時でソート
-    rooms.sort((a, b) => b.updatedAt - a.updatedAt);
+      const roomIds = Object.keys(snapshotVal);
+      const roomPromises = roomIds.map(async (roomId) => {
+        const snapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
+        return snapshot.val();
+      });
 
-    // コールバックを呼び出し
-    onRooms(rooms);
-  });
+      const rooms = (await Promise.all(roomPromises))
+        .filter((room): room is ChatRoom => room !== null)
+        .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
 
-  // クリーンアップ関数を返す
+      onRooms(rooms);
+    },
+    () => onRooms([]),
+  );
+
   return () => off(userRoomsRef);
 }

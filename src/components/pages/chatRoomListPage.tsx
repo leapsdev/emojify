@@ -20,8 +20,19 @@ export function ChatRoomListPage({ initialRooms }: ChatRoomListPageProps) {
   useEffect(() => {
     if (!userId) return;
 
-    const unsubscribe = subscribeToUserRoomsAction(userId, setRooms);
-    return () => unsubscribe();
+    let unsubscribe: (() => void) | undefined;
+    
+    const setupSubscription = async () => {
+      unsubscribe = await subscribeToUserRoomsAction(userId, setRooms);
+    };
+
+    setupSubscription();
+    
+    return () => {
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    };
   }, [userId]);
 
   return (

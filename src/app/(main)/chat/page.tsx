@@ -16,5 +16,5 @@ export default async function Page() {
     redirect('/');
   }
 
-  return <ChatRoomListPage initialRooms={rooms} />;
+  return <ChatRoomListPage userId={userId} initialRooms={rooms} />;
 }

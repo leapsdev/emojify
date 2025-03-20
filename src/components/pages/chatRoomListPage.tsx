@@ -18,12 +18,13 @@ export function ChatRoomListPage({ initialRooms }: ChatRoomListPageProps) {
   const userId = usePrivyId();
 
   useEffect(() => {
+    console.log('userId', userId);
     if (!userId) return;
 
     let unsubscribe: (() => void) | undefined;
     
-    const setupSubscription = async () => {
-      unsubscribe = await subscribeToUserRoomsAction(userId, setRooms);
+    const setupSubscription =  () => {
+      unsubscribe = subscribeToUserRoomsAction(userId, setRooms);
     };
 
     setupSubscription();

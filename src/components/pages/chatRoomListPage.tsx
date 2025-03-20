@@ -6,16 +6,15 @@ import { Header } from '@/components/features/chat/chat/header';
 import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
 import { subscribeToUserRoomsAction } from '@/components/features/chat/chat/action';
 import type { ChatRoom } from '@/types/database';
-import { usePrivyId } from '@/hooks/usePrivyId';
 import { useEffect, useState } from 'react';
 
 type ChatRoomListPageProps = {
+  userId: string;
   initialRooms: ChatRoom[];
 };
 
-export function ChatRoomListPage({ initialRooms }: ChatRoomListPageProps) {
+export function ChatRoomListPage({ userId, initialRooms }: ChatRoomListPageProps) {
   const [rooms, setRooms] = useState<ChatRoom[]>(initialRooms);
-  const userId = usePrivyId();
 
   useEffect(() => {
     console.log('userId', userId);

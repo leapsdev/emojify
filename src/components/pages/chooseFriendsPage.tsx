@@ -9,7 +9,7 @@ import { Header } from '@/components/features/choose-friends/header';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 import { SearchBar } from '@/components/features/choose-friends/searchBar';
 import { UserSection } from '@/components/features/choose-friends/userSection';
-import { usePrivyId } from '@/hooks/usePrivyId';
+import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -33,7 +33,11 @@ export function ClientChooseFriendsPage({
     friends,
     others,
     handleUserSelect,
-  } = useUserSelection({ initialFriends, initialOthers });
+  } = useUserSelection({
+    currentUserId: userId ?? '',
+    initialFriends,
+    initialOthers,
+  });
 
   const handleAddFriend = async (friendId: string) => {
     if (!userId) {

@@ -1,10 +1,12 @@
+import { subscribeToUsersAction } from '@/components/features/choose-friends/actions';
 import type { User } from '@/types/database';
 import type { DisplayUser } from '@/types/display';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 interface UseUserSelectionProps {
-  initialFriends: User[];
-  initialOthers: User[];
+  currentUserId: string;
+  initialFriends?: User[];
+  initialOthers?: User[];
 }
 
 function convertToDisplayUser(
@@ -22,16 +24,36 @@ function convertToDisplayUser(
 }
 
 export const useUserSelection = ({
-  initialFriends,
-  initialOthers,
+  currentUserId,
+  initialFriends = [],
+  initialOthers = [],
 }: UseUserSelectionProps) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const users = [
+  const [users, setUsers] = useState<DisplayUser[]>([
     ...initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
     ...initialOthers.map((user) => convertToDisplayUser(user, 'other')),
-  ];
+  ]);
+
+  useEffect(() => {
+    if (!currentUserId) return;
+
+    const unsubscribe = subscribeToUsersAction(
+      currentUserId,
+      ({ friends, others }) => {
+        const newUsers = [
+          ...friends.map((user) => convertToDisplayUser(user, 'friend')),
+          ...others.map((user) => convertToDisplayUser(user, 'other')),
+        ];
+        setUsers(newUsers);
+      },
+    );
+
+    return () => {
+      unsubscribe();
+    };
+  }, [currentUserId]);
 
   const filteredUsers = users.filter(
     (user) =>

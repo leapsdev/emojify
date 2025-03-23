@@ -6,7 +6,7 @@ export function Header() {
       <Link href="/chat" className="text-2xl absolute left-4">
         👈
       </Link>
-      <span className="text-2xl">👫</span>
+      <span className="text-2xl">👦👧</span>
     </div>
   );
 }

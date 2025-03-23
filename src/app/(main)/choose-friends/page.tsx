@@ -1,19 +1,16 @@
-import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
 import { ClientChooseFriendsPage } from '@/components/pages/chooseFriendsPage';
 import { getPrivyId } from '@/lib/auth';
+import { getUsersWithFriendship } from '@/repository/user/actions';
 
 export const dynamic = 'force-dynamic';
 
 export default async function ChooseFriendsPage() {
   const userId = await getPrivyId();
   if (!userId) {
-    return;
+    return null;
   }
 
-  const result = await getUsersWithFriendshipAction(userId);
-  const { friends = [], others = [] } = result.success
-    ? result
-    : { friends: [], others: [] };
+  const { friends, others } = await getUsersWithFriendship(userId);
   return (
     <ClientChooseFriendsPage initialFriends={friends} initialOthers={others} />
   );

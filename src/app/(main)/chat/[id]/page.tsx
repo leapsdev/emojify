@@ -3,14 +3,15 @@ import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
 
-type PageProps = {
-  params: { id: string };
-  searchParams?: { [key: string]: string | string[] | undefined };
+type Props = {
+  params: Promise<{
+    id: string;
+  }>;
 };
 
-// searchParamsは現在使用していないが、Next.jsの型定義上必要
-export default async function Page({ params }: PageProps) {
-  const { id: roomId } = params;
+export default async function Page({ params }: Props) {
+  const resolvedParams = await params;
+  const { id: roomId } = resolvedParams;
 
   const userId = await getUserId();
   if (!userId) throw new Error('Authentication required');

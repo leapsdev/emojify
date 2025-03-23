@@ -7,7 +7,9 @@ import { DB_INDEXES, DB_PATHS } from '@/types/database';
 /**
  * チャットルームの情報を取得
  */
-export async function getChatRoomAction(roomId: string): Promise<ChatRoom | null> {
+export async function getChatRoomAction(
+  roomId: string,
+): Promise<ChatRoom | null> {
   try {
     const snapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
     return snapshot.val();

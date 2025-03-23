@@ -1,9 +1,9 @@
 'use client';
 
-import { subscribeToRoomMessagesAction } from './action';
-import { formatDateToYYYYMMDD } from '@/utils/date';
 import type { Message } from '@/types/database';
+import { formatDateToYYYYMMDD } from '@/utils/date';
 import { useEffect, useState } from 'react';
+import { subscribeToRoomMessagesAction } from './action';
 
 type MessageListProps = {
   roomId: string;
@@ -41,7 +41,7 @@ export function MessageList({ roomId, currentUserId }: MessageListProps) {
       acc[date].push(message);
       return acc;
     },
-    {}
+    {},
   );
 
   return (
@@ -79,7 +79,9 @@ export function MessageList({ roomId, currentUserId }: MessageListProps) {
                         minute: '2-digit',
                       })}
                     </span>
-                    {message.sent && isSentByCurrentUser && <span>送信済み</span>}
+                    {message.sent && isSentByCurrentUser && (
+                      <span>送信済み</span>
+                    )}
                   </div>
                 </div>
               );

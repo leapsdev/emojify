@@ -1,6 +1,6 @@
 import { ChatRoomPage } from '@/components/pages/chatRoomPage';
-import { getChatRoomAction } from '@/repository/chat/actions';
 import { getUserId } from '@/lib/auth';
+import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
 
 type Props = {
@@ -21,7 +21,7 @@ export default async function Page({ params }: Props) {
   if (!room) notFound();
 
   // 相手のユーザー情報を取得
-  const otherMemberId = Object.keys(room.members).find(id => id !== userId);
+  const otherMemberId = Object.keys(room.members).find((id) => id !== userId);
   if (!otherMemberId) notFound();
 
   const otherMember = room.members[otherMemberId];

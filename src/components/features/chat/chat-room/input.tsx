@@ -20,7 +20,11 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isLoading) return;
 
-    console.log('Sending message with:', { roomId, userId, message: trimmedMessage });
+    console.log('Sending message with:', {
+      roomId,
+      userId,
+      message: trimmedMessage,
+    });
 
     try {
       setIsLoading(true);
@@ -38,11 +42,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
   return (
     <div className="p-4">
       <form onSubmit={handleSubmit} className="flex flex-col gap-2">
-        {error && (
-          <div className="text-sm text-red-500 px-2">
-            {error}
-          </div>
-        )}
+        {error && <div className="text-sm text-red-500 px-2">{error}</div>}
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
             <Input

@@ -1,4 +1,11 @@
 /**
+ * 現在のタイムスタンプを取得
+ */
+export function getCurrentTimestamp(): number {
+  return Date.now();
+}
+
+/**
  * 日付を YYYY/MM/DD 形式にフォーマット
  */
 export function formatDateToYYYYMMDD(timestamp: number): string {

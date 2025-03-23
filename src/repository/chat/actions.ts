@@ -5,6 +5,19 @@ import type { ChatRoom, Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 
 /**
+ * チャットルームの情報を取得
+ */
+export async function getChatRoomAction(roomId: string): Promise<ChatRoom | null> {
+  try {
+    const snapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+    return snapshot.val();
+  } catch (error) {
+    console.error('Failed to get chat room:', error);
+    return null;
+  }
+}
+
+/**
  * 新しいチャットルームを作成
  */
 export async function createChatRoom(members: string[]): Promise<string> {
@@ -62,6 +75,25 @@ export async function sendMessage(
   senderId: string,
   content: string,
 ): Promise<string> {
+  // パラメータのバリデーション
+  if (!roomId) throw new Error('Room ID is required');
+  if (!senderId) throw new Error('Sender ID is required');
+  if (!content) throw new Error('Message content is required');
+
+  // ユーザーの存在確認
+  const userSnapshot = await adminDb.ref(`${DB_PATHS.users}/${senderId}`).get();
+  if (!userSnapshot.exists()) {
+    throw new Error(`User not found: ${senderId}`);
+  }
+
+  // ルームの存在確認
+  const roomSnapshot = await adminDb
+    .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+    .get();
+  if (!roomSnapshot.exists()) {
+    throw new Error(`Room not found: ${roomId}`);
+  }
+
   const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
   const messageId = newMessageRef.key;
   if (!messageId) {

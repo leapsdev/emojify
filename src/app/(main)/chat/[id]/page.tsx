@@ -1,7 +1,37 @@
 import { ChatRoomPage } from '@/components/pages/chatRoomPage';
-import { use } from 'react';
+import { getChatRoomAction } from '@/repository/chat/actions';
+import { getUserId } from '@/lib/auth';
+import { notFound } from 'next/navigation';
 
-export default function Page({ params }: { params: Promise<{ id: string }> }) {
-  const resolvedParams = use(params);
-  return <ChatRoomPage username={resolvedParams.id} />;
+type Props = {
+  params: {
+    id: string;
+  };
+};
+
+export default async function Page({ params }: Props) {
+  // params自体を先にawaitする
+  const { id: roomId } = await Promise.resolve(params);
+
+  const userId = await getUserId();
+  if (!userId) throw new Error('Authentication required');
+
+  // チャットルームの情報を取得
+  const room = await getChatRoomAction(roomId);
+  if (!room) notFound();
+
+  // 相手のユーザー情報を取得
+  const otherMemberId = Object.keys(room.members).find(id => id !== userId);
+  if (!otherMemberId) notFound();
+
+  const otherMember = room.members[otherMemberId];
+  if (!otherMember) notFound();
+
+  return (
+    <ChatRoomPage
+      username={otherMember.username}
+      roomId={roomId}
+      userId={userId}
+    />
+  );
 }

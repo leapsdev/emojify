@@ -5,6 +5,8 @@ import { useEffect, useState } from 'react';
 
 interface UseUserSelectionProps {
   currentUserId: string;
+  initialFriends?: User[];
+  initialOthers?: User[];
 }
 
 function convertToDisplayUser(
@@ -21,11 +23,18 @@ function convertToDisplayUser(
   };
 }
 
-export const useUserSelection = ({ currentUserId }: UseUserSelectionProps) => {
+export const useUserSelection = ({
+  currentUserId,
+  initialFriends = [],
+  initialOthers = [],
+}: UseUserSelectionProps) => {
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  const [users, setUsers] = useState<DisplayUser[]>([]);
+  const [users, setUsers] = useState<DisplayUser[]>([
+    ...initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
+    ...initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+  ]);
 
   useEffect(() => {
     if (!currentUserId) return;

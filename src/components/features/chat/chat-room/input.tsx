@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Send, Smile } from 'lucide-react';
 import { useState } from 'react';
-import { sendMessage } from '@/repository/chat/actions';
+import { sendMessageAction } from './action';
 
 type ChatRoomInputProps = {
   roomId: string;
@@ -20,7 +20,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
 
     try {
       setIsLoading(true);
-      await sendMessage(roomId, userId, message.trim());
+      await sendMessageAction(roomId, userId, message.trim());
       setMessage('');
     } catch (error) {
       console.error('Failed to send message:', error);

@@ -1,13 +1,30 @@
+'use client';
+
 import { db } from '@/lib/firebase/client';
+import { sendMessage } from '@/repository/chat/actions';
 import type { Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 import { get, off, onValue, ref } from 'firebase/database';
 
+/**
+ * メッセージを送信
+ */
+export async function sendMessageAction(
+  roomId: string,
+  userId: string,
+  content: string,
+): Promise<string> {
+  return sendMessage(roomId, userId, content);
+}
+
+/**
+ * チャットルームのメッセージをリアルタイムで購読
+ */
 export function subscribeToRoomMessagesAction(
   roomId: string,
-  onMessages: (messages: Message[]) => void,
+  onMessage: (messages: Message[]) => void,
 ) {
-  return subscribeToRoomMessages(roomId, onMessages);
+  return subscribeToRoomMessages(roomId, onMessage);
 }
 
 /**

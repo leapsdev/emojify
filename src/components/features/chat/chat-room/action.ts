@@ -1,13 +1,19 @@
-import { adminDb } from '@/lib/firebase/admin';
 import { db } from '@/lib/firebase/client';
 import type { Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 import { get, off, onValue, ref } from 'firebase/database';
 
+export function subscribeToRoomMessagesAction(
+  roomId: string,
+  onMessages: (messages: Message[]) => void,
+) {
+  return subscribeToRoomMessages(roomId, onMessages);
+}
+
 /**
  * チャットルームのメッセージをリアルタイムで購読
  */
-export function subscribeToRoomMessages(
+function subscribeToRoomMessages(
   roomId: string,
   onMessage: (messages: Message[]) => void,
 ): () => void {
@@ -49,50 +55,4 @@ export function subscribeToRoomMessages(
   return () => {
     off(messagesRef);
   };
-}
-
-/**
- * メッセージを送信
- */
-export async function sendMessage(
-  roomId: string,
-  senderId: string,
-  content: string,
-): Promise<string> {
-  'use server';
-  
-  const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
-  const messageId = newMessageRef.key;
-  if (!messageId) {
-    throw new Error('Failed to generate message ID');
-  }
-  const now = Date.now();
-
-  const message: Message = {
-    id: messageId,
-    content,
-    senderId,
-    roomId,
-    createdAt: now,
-    sent: true,
-  };
-
-  await newMessageRef.set(message);
-
-  // ルームの最終メッセージを更新
-  const roomUpdate = {
-    lastMessage: {
-      content,
-      senderId,
-      createdAt: now,
-    },
-    updatedAt: now,
-  };
-
-  await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).update(roomUpdate);
-
-  // メッセージインデックスを更新
-  await adminDb.ref(`${DB_INDEXES.roomMessages}/${roomId}/${messageId}`).set(true);
-
-  return messageId;
 }

@@ -3,7 +3,7 @@
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import type { Message } from '@/types/database';
 import { useEffect, useState } from 'react';
-import { subscribeToRoomMessages } from './client-action';
+import { subscribeToRoomMessagesAction } from './action';
 
 type MessageListProps = {
   roomId: string;
@@ -16,7 +16,7 @@ export function MessageList({ roomId, currentUserId }: MessageListProps) {
   useEffect(() => {
     if (!roomId) return;
 
-    const unsubscribe = subscribeToRoomMessages(roomId, setMessages);
+    const unsubscribe = subscribeToRoomMessagesAction(roomId, setMessages);
 
     return () => {
       unsubscribe();

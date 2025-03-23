@@ -1,49 +1,37 @@
 /**
- * タイムスタンプを日本時間の文字列に変換
- * @param timestamp UNIXタイムスタンプ
- * @returns 日本時間の文字列（例：2025/03/13 12:38）
+ * 日付を YYYY/MM/DD 形式にフォーマット
  */
-export function formatTimestampToJST(timestamp: number): string {
-  return new Date(timestamp).toLocaleString('ja-JP', {
-    timeZone: 'Asia/Tokyo',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  });
+export function formatDateToYYYYMMDD(timestamp: number): string {
+  const date = new Date(timestamp);
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}/${month}/${day}`;
 }
 
 /**
- * 現在のUNIXタイムスタンプを取得
- */
-export function getCurrentTimestamp(): number {
-  return Date.now();
-}
-
-/**
- * タイムスタンプを相対時間に変換
- * @param timestamp UNIXタイムスタンプ
- * @returns 相対時間の文字列（例：3分前、1時間前）
+ * 日付を相対表示にフォーマット（例：今日、昨日、3日前）
  */
 export function formatRelativeTime(timestamp: number): string {
-  const now = Date.now();
-  const diff = now - timestamp;
-  const minutes = Math.floor(diff / (1000 * 60));
-  const hours = Math.floor(diff / (1000 * 60 * 60));
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+  const now = new Date();
+  const date = new Date(timestamp);
+  
+  // 同じ年かどうかをチェック
+  if (now.getFullYear() !== date.getFullYear()) {
+    return formatDateToYYYYMMDD(timestamp);
+  }
 
-  if (minutes < 1) {
-    return 'たった今';
+  const diffTime = now.getTime() - date.getTime();
+  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+  if (diffDays === 0) {
+    return '今日';
+  } else if (diffDays === 1) {
+    return '昨日';
+  } else if (diffDays < 7) {
+    return `${diffDays}日前`;
   }
-  if (minutes < 60) {
-    return `${minutes}分前`;
-  }
-  if (hours < 24) {
-    return `${hours}時間前`;
-  }
-  if (days < 7) {
-    return `${days}日前`;
-  }
-  return formatTimestampToJST(timestamp);
+
+  // 1週間以上前は日付を表示
+  return formatDateToYYYYMMDD(timestamp);
 }

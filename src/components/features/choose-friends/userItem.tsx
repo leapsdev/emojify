@@ -2,7 +2,6 @@ import type { DisplayUser } from '@/types/display';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 
-
 interface UserItemProps {
   user: DisplayUser;
   selected: boolean;

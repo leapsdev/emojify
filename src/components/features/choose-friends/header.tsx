@@ -1,6 +1,5 @@
 import Link from 'next/link';
 
-
 export function Header() {
   return (
     <div className="relative flex items-center justify-center p-4 border-b">

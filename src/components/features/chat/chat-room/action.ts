@@ -4,7 +4,7 @@ import { db } from '@/lib/firebase/client';
 import { sendMessage } from '@/repository/chat/actions';
 import type { Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
-import { get, off, onValue, ref } from 'firebase/database';
+import { off, onValue, ref } from 'firebase/database';
 
 /**
  * メッセージを送信
@@ -35,41 +35,46 @@ function subscribeToRoomMessages(
   onMessage: (messages: Message[]) => void,
 ): () => void {
   const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
-  const messages: Message[] = [];
+  let messageRefs: ReturnType<typeof ref>[] = [];
+  const currentMessages: Message[] = [];
 
-  // 初期データと更新の監視
-  onValue(
-    messagesRef,
-    async (indexSnapshot) => {
-      const messageIds = Object.keys(indexSnapshot.val() || {});
+  // メッセージインデックスの監視
+  const indexUnsubscribe = onValue(messagesRef, (indexSnapshot) => {
+    const messageIds = Object.keys(indexSnapshot.val() || {});
 
-      // 全メッセージを取得
-      const messageSnapshots = await Promise.all(
-        messageIds.map((messageId) =>
-          get(ref(db, `${DB_PATHS.messages}/${messageId}`)),
-        ),
-      );
+    // 既存のリスナーをクリーンアップ
+    messageRefs.forEach((ref) => off(ref));
+    messageRefs = [];
 
-      // メッセージを配列に変換
-      messages.length = 0; // 配列をクリア
-      messageSnapshots.forEach((snapshot) => {
+    // 新しいメッセージの監視をセットアップ
+    messageIds.forEach((messageId) => {
+      const messageRef = ref(db, `${DB_PATHS.messages}/${messageId}`);
+      messageRefs.push(messageRef);
+
+      onValue(messageRef, (snapshot) => {
         const message = snapshot.val() as Message;
         if (message) {
-          messages.push(message);
+          // 既存のメッセージを更新するか、新しいメッセージを追加
+          const index = currentMessages.findIndex((m) => m.id === message.id);
+          if (index !== -1) {
+            currentMessages[index] = message;
+          } else {
+            currentMessages.push(message);
+          }
+
+          // タイムスタンプでソート
+          currentMessages.sort((a, b) => a.createdAt - b.createdAt);
+
+          // コールバックを呼び出し
+          onMessage([...currentMessages]); // 新しい配列を作成して状態を更新
         }
       });
-
-      // タイムスタンプでソート
-      messages.sort((a, b) => a.createdAt - b.createdAt);
-
-      // コールバックを呼び出し
-      onMessage(messages);
-    },
-    () => onMessage([]),
-  );
+    });
+  });
 
   // クリーンアップ用の関数を返す
   return () => {
-    off(messagesRef);
+    indexUnsubscribe();
+    messageRefs.forEach((ref) => off(ref));
   };
 }

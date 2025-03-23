@@ -3,11 +3,12 @@ import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
 
-export default async function Page({
-  params,
-}: {
+type Props = {
   params: { id: string };
-}) {
+  searchParams: { [key: string]: string | string[] | undefined };
+};
+
+export default async function Page({ params }: Props) {
   const { id: roomId } = params;
 
   const userId = await getUserId();

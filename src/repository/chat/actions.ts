@@ -1,9 +1,23 @@
-import 'server-only';
+'use server';
+
 import { adminDb } from '@/lib/firebase/admin';
-import { db } from '@/lib/firebase/client';
 import type { ChatRoom, Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
-import { get, off, onValue, ref } from 'firebase/database';
+
+/**
+ * チャットルームの情報を取得
+ */
+export async function getChatRoomAction(
+  roomId: string,
+): Promise<ChatRoom | null> {
+  try {
+    const snapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+    return snapshot.val();
+  } catch (error) {
+    console.error('Failed to get chat room:', error);
+    return null;
+  }
+}
 
 /**
  * 新しいチャットルームを作成
@@ -63,6 +77,25 @@ export async function sendMessage(
   senderId: string,
   content: string,
 ): Promise<string> {
+  // パラメータのバリデーション
+  if (!roomId) throw new Error('Room ID is required');
+  if (!senderId) throw new Error('Sender ID is required');
+  if (!content) throw new Error('Message content is required');
+
+  // ユーザーの存在確認
+  const userSnapshot = await adminDb.ref(`${DB_PATHS.users}/${senderId}`).get();
+  if (!userSnapshot.exists()) {
+    throw new Error(`User not found: ${senderId}`);
+  }
+
+  // ルームの存在確認
+  const roomSnapshot = await adminDb
+    .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+    .get();
+  if (!roomSnapshot.exists()) {
+    throw new Error(`Room not found: ${roomId}`);
+  }
+
   const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
   const messageId = newMessageRef.key;
   if (!messageId) {
@@ -99,74 +132,6 @@ export async function sendMessage(
     .set(true);
 
   return messageId;
-}
-
-/**
- * ルームのメッセージをリアルタイムで購読
- * @param roomId ルームID
- * @param onMessage メッセージを受信したときのコールバック
- * @returns 購読解除用の関数
- */
-export function subscribeToRoomMessages(
-  roomId: string,
-  onMessage: (messages: Message[]) => void,
-): () => void {
-  const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
-  const messages: Message[] = [];
-
-  // 初期データと更新の監視
-  onValue(messagesRef, async (indexSnapshot) => {
-    const messageIds = Object.keys(indexSnapshot.val() || {});
-
-    // 全メッセージを取得
-    const messageSnapshots = await Promise.all(
-      messageIds.map((messageId) =>
-        get(ref(db, `${DB_PATHS.messages}/${messageId}`)),
-      ),
-    );
-
-    // メッセージを配列に変換
-    messages.length = 0; // 配列をクリア
-    messageSnapshots.forEach((snapshot) => {
-      const message = snapshot.val() as Message;
-      if (message) {
-        messages.push(message);
-      }
-    });
-
-    // タイムスタンプでソート
-    messages.sort((a, b) => a.createdAt - b.createdAt);
-
-    // コールバックを呼び出し
-    onMessage(messages);
-  });
-
-  // クリーンアップ用の関数を返す
-  return () => {
-    off(messagesRef);
-  };
-}
-
-/**
- * 一度だけメッセージを取得（レガシー互換用）
- */
-export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const indexSnapshot = await adminDb
-    .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
-    .get();
-  const messageIds = Object.keys(indexSnapshot.val() || {});
-
-  const messageSnapshots = await Promise.all(
-    messageIds.map((messageId) =>
-      adminDb.ref(`${DB_PATHS.messages}/${messageId}`).get(),
-    ),
-  );
-
-  const messages = messageSnapshots
-    .map((snapshot) => snapshot.val() as Message)
-    .filter((message) => message !== null);
-
-  return messages.sort((a, b) => a.createdAt - b.createdAt);
 }
 
 /**

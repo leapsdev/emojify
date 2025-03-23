@@ -36,6 +36,11 @@ export async function getPrivyId(): Promise<string | null> {
 }
 
 /**
+ * ユーザーIDを取得する（エイリアス）
+ */
+export const getUserId = getPrivyId;
+
+/**
  * ユーザーのメールアドレスを取得する
  * @returns メールアドレス
  * @throws {Error} 認証エラー時

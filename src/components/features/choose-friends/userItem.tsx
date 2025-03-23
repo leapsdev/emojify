@@ -1,5 +1,7 @@
 import type { DisplayUser } from '@/types/display';
+import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
+
 
 interface UserItemProps {
   user: DisplayUser;
@@ -33,24 +35,16 @@ export function UserItem({
       </div>
       <div className="flex items-center flex-shrink-0">
         {user.section === 'friend' ? (
-          <div className="relative">
-            <input
-              type="checkbox"
-              checked={selected}
-              onChange={onSelect}
-              className="w-6 h-6 rounded-full border-2 appearance-none cursor-pointer transition-colors border-blue-300 hover:border-blue-400 checked:bg-blue-500 checked:border-blue-500"
-            />
-            {selected && (
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="w-4 h-4 absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white pointer-events-none"
-                aria-labelledby="checkbox-title"
-                role="img"
-              />
-            )}
-          </div>
+          <button
+            type="button"
+            onClick={onSelect}
+            className={`w-10 h-10 rounded-full ${
+              selected ? 'bg-blue-500' : 'bg-gray-200'
+            } flex items-center justify-center`}
+            aria-label="Chat with this user"
+          >
+            <MessageCircle className="w-5 h-5 text-white" />
+          </button>
         ) : (
           <button
             type="button"
@@ -58,8 +52,11 @@ export function UserItem({
               e.stopPropagation();
               onAddFriend?.();
             }}
-            className="w-6 h-6 rounded-full border-2 flex items-center justify-center transition-colors border-blue-300 hover:border-blue-400"
-          />
+            className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
+            aria-label="Add friend"
+          >
+            <UserPlus className="w-5 h-5 text-white" />
+          </button>
         )}
       </div>
     </div>

@@ -3,13 +3,12 @@ import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
 
-type Props = {
+interface PageProps {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-};
+}
 
-export default async function Page({ params }: Props) {
-  const { id: roomId } = params;
+export default async function Page(props: PageProps) {
+  const { id: roomId } = props.params;
 
   const userId = await getUserId();
   if (!userId) throw new Error('Authentication required');

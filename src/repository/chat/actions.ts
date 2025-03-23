@@ -101,28 +101,6 @@ export async function sendMessage(
 }
 
 /**
- * 一度だけメッセージを取得（レガシー互換用）
- */
-export async function getRoomMessages(roomId: string): Promise<Message[]> {
-  const indexSnapshot = await adminDb
-    .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
-    .get();
-  const messageIds = Object.keys(indexSnapshot.val() || {});
-
-  const messageSnapshots = await Promise.all(
-    messageIds.map((messageId) =>
-      adminDb.ref(`${DB_PATHS.messages}/${messageId}`).get(),
-    ),
-  );
-
-  const messages = messageSnapshots
-    .map((snapshot) => snapshot.val() as Message)
-    .filter((message) => message !== null);
-
-  return messages.sort((a, b) => a.createdAt - b.createdAt);
-}
-
-/**
  * ユーザーのチャットルーム一覧を取得
  */
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {

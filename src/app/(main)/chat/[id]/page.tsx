@@ -3,15 +3,12 @@ import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
 
-type Props = {
-  params: {
-    id: string;
-  };
-};
-
-export default async function Page({ params }: Props) {
-  // params自体を先にawaitする
-  const { id: roomId } = await Promise.resolve(params);
+export default async function Page({
+  params,
+}: {
+  params: { id: string };
+}) {
+  const { id: roomId } = params;
 
   const userId = await getUserId();
   if (!userId) throw new Error('Authentication required');

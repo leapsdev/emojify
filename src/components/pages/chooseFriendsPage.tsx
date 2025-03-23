@@ -10,19 +10,10 @@ import { useUserSelection } from '@/components/features/choose-friends/hooks/use
 import { SearchBar } from '@/components/features/choose-friends/searchBar';
 import { UserSection } from '@/components/features/choose-friends/userSection';
 import { usePrivyId } from '@/lib/usePrivy';
-import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
-interface ClientChooseFriendsPageProps {
-  initialFriends?: User[];
-  initialOthers?: User[];
-}
-
-export function ClientChooseFriendsPage({
-  initialFriends = [],
-  initialOthers = [],
-}: ClientChooseFriendsPageProps) {
+export function ClientChooseFriendsPage() {
   const userId = usePrivyId();
   const router = useRouter();
 
@@ -33,7 +24,7 @@ export function ClientChooseFriendsPage({
     friends,
     others,
     handleUserSelect,
-  } = useUserSelection({ initialFriends, initialOthers });
+  } = useUserSelection({ currentUserId: userId ?? '' });
 
   const handleAddFriend = async (friendId: string) => {
     if (!userId) {

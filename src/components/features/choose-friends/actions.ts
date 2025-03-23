@@ -1,78 +1,84 @@
-'use server';
+'use client';
 
+import { db } from '@/lib/firebase/client';
 import { createChatRoom } from '@/repository/chat/actions';
-import { addFriend, getUsersWithFriendship } from '@/repository/user/actions';
+import { addFriend } from '@/repository/user/actions';
 import type { User } from '@/types/database';
-import { revalidatePath } from 'next/cache';
+import { off, onValue, ref } from 'firebase/database';
+
+const USERS_PATH = 'users';
 
 /**
- * 友達を追加するサーバーアクション
+ * フレンドを追加
  */
-export async function addFriendAction(
-  userId: string,
-  friendId: string,
-): Promise<{
-  success: boolean;
-  error?: string;
-}> {
+export async function addFriendAction(userId: string, friendId: string) {
   try {
     await addFriend(userId, friendId);
-    revalidatePath('/choose-friends');
     return { success: true };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : '不明なエラーが発生しました',
-    };
+    console.error('Failed to add friend:', error);
+    return { success: false, error: 'Failed to add friend' };
   }
 }
 
 /**
- * チャットルームを作成するサーバーアクション
+ * チャットルームを作成
  */
-export async function createChatRoomAction(members: string[]): Promise<{
-  success: boolean;
-  roomId?: string;
-  error?: string;
-}> {
+export async function createChatRoomAction(members: string[]) {
   try {
     const roomId = await createChatRoom(members);
-    return {
-      success: true,
-      roomId,
-    };
+    return { success: true, roomId };
   } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : '不明なエラーが発生しました',
-    };
+    console.error('Failed to create chat room:', error);
+    return { success: false, error: 'Failed to create chat room' };
   }
 }
 
 /**
- * ユーザー一覧を取得するサーバーアクション
- * - 友達とその他のユーザーを分けて返す
+ * ユーザー一覧をリアルタイムで購読
  */
-export async function getUsersWithFriendshipAction(userId: string): Promise<{
-  success: boolean;
-  friends?: User[];
-  others?: User[];
-  error?: string;
-}> {
-  try {
-    const { friends, others } = await getUsersWithFriendship(userId);
-    return {
-      success: true,
-      friends,
-      others,
-    };
-  } catch (error) {
-    return {
-      success: false,
-      error:
-        error instanceof Error ? error.message : '不明なエラーが発生しました',
-    };
-  }
+export function subscribeToUsersAction(
+  currentUserId: string,
+  onUsers: (data: { friends: User[]; others: User[] }) => void,
+): () => void {
+  const usersRef = ref(db, USERS_PATH);
+
+  const unsubscribe = onValue(usersRef, (snapshot) => {
+    const users = snapshot.val() as Record<string, User> | null;
+    if (!users) {
+      onUsers({ friends: [], others: [] });
+      return;
+    }
+
+    const currentUser = users[currentUserId];
+    if (!currentUser) {
+      onUsers({ friends: [], others: [] });
+      return;
+    }
+
+    const friends: User[] = [];
+    const others: User[] = [];
+
+    // 自分以外のユーザーを友達かどうかで振り分け
+    Object.values(users).forEach((user) => {
+      if (user.id === currentUserId) return;
+
+      if (currentUser.friends?.[user.id]) {
+        friends.push(user);
+      } else {
+        others.push(user);
+      }
+    });
+
+    // 更新日時でソート
+    onUsers({
+      friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
+      others: others.sort((a, b) => b.updatedAt - a.updatedAt),
+    });
+  });
+
+  return () => {
+    off(usersRef);
+    unsubscribe();
+  };
 }

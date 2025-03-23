@@ -5,10 +5,11 @@ import { notFound } from 'next/navigation';
 
 type PageProps = {
   params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
+  searchParams?: { [key: string]: string | string[] | undefined };
 };
 
-export default async function Page({ params, searchParams }: PageProps) {
+// searchParamsは現在使用していないが、Next.jsの型定義上必要
+export default async function Page({ params }: PageProps) {
   const { id: roomId } = params;
 
   const userId = await getUserId();

@@ -22,7 +22,7 @@ export function formatDateToYYYYMMDD(timestamp: number): string {
 export function formatRelativeTime(timestamp: number): string {
   const now = new Date();
   const date = new Date(timestamp);
-  
+
   // 同じ年かどうかをチェック
   if (now.getFullYear() !== date.getFullYear()) {
     return formatDateToYYYYMMDD(timestamp);
@@ -33,9 +33,11 @@ export function formatRelativeTime(timestamp: number): string {
 
   if (diffDays === 0) {
     return '今日';
-  } else if (diffDays === 1) {
+  }
+  if (diffDays === 1) {
     return '昨日';
-  } else if (diffDays < 7) {
+  }
+  if (diffDays < 7) {
     return `${diffDays}日前`;
   }
 

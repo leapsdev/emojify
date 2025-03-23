@@ -1,14 +1,28 @@
 'use client';
 
+import { subscribeToRoomMessagesAction } from './action';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import type { Message } from '@/types/database';
+import { useEffect, useState } from 'react';
 
 type MessageListProps = {
-  messages: Message[];
+  roomId: string;
   currentUserId: string;
 };
 
-export function MessageList({ messages, currentUserId }: MessageListProps) {
+export function MessageList({ roomId, currentUserId }: MessageListProps) {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(() => {
+    if (!roomId) return;
+
+    const unsubscribe = subscribeToRoomMessagesAction(roomId, setMessages);
+
+    return () => {
+      unsubscribe();
+    };
+  }, [roomId]);
+
   if (!messages.length) {
     return (
       <div className="flex-1 overflow-auto p-4 flex items-center justify-center">

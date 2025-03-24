@@ -12,7 +12,9 @@ export async function getChatRoomAction(
 ): Promise<{ room: ChatRoom | null; messages: Message[] }> {
   try {
     // チャットルーム情報を取得
-    const roomSnapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+    const roomSnapshot = await adminDb
+      .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+      .get();
     const room = roomSnapshot.val();
     if (!room) return { room: null, messages: [] };
 

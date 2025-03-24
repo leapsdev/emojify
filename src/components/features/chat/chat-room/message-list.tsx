@@ -3,15 +3,20 @@
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import { useEffect, useState } from 'react';
-import { subscribeToRoomMessagesAction } from './action';
+import { subscribeToRoomMessagesAction } from './actions';
 
 type MessageListProps = {
   roomId: string;
   currentUserId: string;
+  initialMessages: Message[];
 };
 
-export function MessageList({ roomId, currentUserId }: MessageListProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+export function MessageList({
+  roomId,
+  currentUserId,
+  initialMessages,
+}: MessageListProps) {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
 
   useEffect(() => {
     if (!roomId) return;

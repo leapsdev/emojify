@@ -2,8 +2,7 @@
 
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
-import { useEffect, useState } from 'react';
-import { subscribeToRoomMessagesAction } from './actions';
+import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
   roomId: string;
@@ -16,17 +15,7 @@ export function MessageList({
   currentUserId,
   initialMessages,
 }: MessageListProps) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-
-  useEffect(() => {
-    if (!roomId) return;
-
-    const unsubscribe = subscribeToRoomMessagesAction(roomId, setMessages);
-
-    return () => {
-      unsubscribe();
-    };
-  }, [roomId]);
+  const messages = useRoomMessages(roomId, initialMessages);
 
   if (!messages.length) {
     return (

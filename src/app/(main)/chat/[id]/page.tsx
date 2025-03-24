@@ -16,8 +16,8 @@ export default async function Page({ params }: Props) {
   const userId = await getUserId();
   if (!userId) throw new Error('Authentication required');
 
-  // チャットルームの情報を取得
-  const room = await getChatRoomAction(roomId);
+  // チャットルームの情報とメッセージを取得
+  const { room, messages } = await getChatRoomAction(roomId);
   if (!room) notFound();
 
   // 相手のユーザー情報を取得
@@ -32,6 +32,7 @@ export default async function Page({ params }: Props) {
       username={otherMember.username}
       roomId={roomId}
       userId={userId}
+      initialMessages={messages}
     />
   );
 }

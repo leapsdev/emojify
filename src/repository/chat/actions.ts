@@ -5,17 +5,37 @@ import type { ChatRoom, Message } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 
 /**
- * チャットルームの情報を取得
+ * チャットルームの情報とメッセージを取得
  */
 export async function getChatRoomAction(
   roomId: string,
-): Promise<ChatRoom | null> {
+): Promise<{ room: ChatRoom | null; messages: Message[] }> {
   try {
-    const snapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
-    return snapshot.val();
+    // チャットルーム情報を取得
+    const roomSnapshot = await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).get();
+    const room = roomSnapshot.val();
+    if (!room) return { room: null, messages: [] };
+
+    // メッセージ一覧を取得
+    const messagesIndexSnapshot = await adminDb
+      .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
+      .get();
+    const messageIds = Object.keys(messagesIndexSnapshot.val() || {});
+
+    const messagePromises = messageIds.map((messageId) =>
+      adminDb.ref(`${DB_PATHS.messages}/${messageId}`).get(),
+    );
+
+    const messageSnapshots = await Promise.all(messagePromises);
+    const messages = messageSnapshots
+      .map((snapshot) => snapshot.val())
+      .filter((message): message is Message => message !== null)
+      .sort((a, b) => a.createdAt - b.createdAt);
+
+    return { room, messages };
   } catch (error) {
     console.error('Failed to get chat room:', error);
-    return null;
+    return { room: null, messages: [] };
   }
 }
 

@@ -3,7 +3,7 @@
 import { Input } from '@/components/ui/input';
 import { Send, Smile } from 'lucide-react';
 import { useState } from 'react';
-import { sendMessageAction } from './action';
+import { sendMessageAction } from './actions';
 
 type ChatRoomInputProps = {
   roomId: string;

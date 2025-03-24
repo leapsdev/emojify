@@ -5,13 +5,18 @@ import { FooterNavigation } from '@/components/features/chat/chat/footerNavigati
 import { Header } from '@/components/features/chat/chat/header';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
 import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
+import type { ChatRoom } from '@/types/database';
 
 type ChatRoomListPageProps = {
   userId: string;
+  initialRooms: ChatRoom[];
 };
 
-export function ChatRoomListPage({ userId }: ChatRoomListPageProps) {
-  const rooms = useUserRooms(userId);
+export function ChatRoomListPage({
+  userId,
+  initialRooms,
+}: ChatRoomListPageProps) {
+  const rooms = useUserRooms(userId, initialRooms);
 
   return (
     <main className="min-h-screen bg-white flex flex-col">

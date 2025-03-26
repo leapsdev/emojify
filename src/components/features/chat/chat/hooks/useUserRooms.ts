@@ -3,28 +3,25 @@
 import { db } from '@/lib/firebase/client';
 import type { ChatRoom } from '@/types/database';
 import { DB_PATHS } from '@/types/database';
-import { onValue, ref } from 'firebase/database';
+import {
+  type DataSnapshot,
+  type DatabaseReference,
+  get,
+  onValue,
+  ref,
+} from 'firebase/database';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 /**
  * ユーザーのチャットルーム一覧をリアルタイムで購読するhook
  */
 export function useUserRooms(userId: string, initialRooms: ChatRoom[]) {
-  // ルーム一覧をrefで管理
+  // ルーム一覧の状態を管理
   const roomsRef = useRef<ChatRoom[]>(initialRooms);
-  const roomRefsRef = useRef<ReturnType<typeof ref>[]>([]);
 
   // 現在のルーム一覧を返す
   const getSnapshot = useCallback(() => {
     return roomsRef.current;
-  }, []);
-
-  // ルームを更新して通知
-  const updateRoom = useCallback((room: ChatRoom) => {
-    roomsRef.current = [
-      ...roomsRef.current.filter((r) => r.id !== room.id),
-      room,
-    ].sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
   }, []);
 
   // ルーム一覧の変更を監視
@@ -36,47 +33,47 @@ export function useUserRooms(userId: string, initialRooms: ChatRoom[]) {
         return () => {};
       }
 
+      // ユーザーのルーム一覧を監視
       const userRoomsRef = ref(db, `${DB_PATHS.userRooms}/${userId}`);
+      const unsubscribe = onValue(userRoomsRef, async (snapshot) => {
+        try {
+          const snapshotVal = snapshot.val();
+          if (!snapshotVal) {
+            roomsRef.current = [];
+          } else {
+            // ルームIDの一覧を取得
+            const roomIds = Object.keys(snapshotVal);
 
-      const unsubscribe = onValue(userRoomsRef, async (indexSnapshot) => {
-        const snapshotVal = indexSnapshot.val();
-        if (!snapshotVal) {
-          roomsRef.current = [];
+            // 各ルームの情報を取得
+            const roomPromises = roomIds.map((roomId) => {
+              const roomRef: DatabaseReference = ref(
+                db,
+                `${DB_PATHS.chatRooms}/${roomId}`,
+              );
+              return get(roomRef);
+            });
+            const roomSnapshots: DataSnapshot[] =
+              await Promise.all(roomPromises);
+
+            // ルーム一覧を更新
+            roomsRef.current = roomSnapshots
+              .map((snapshot) => snapshot.val())
+              .filter((room): room is ChatRoom => room !== null)
+              .sort((a, b) => (b.updatedAt ?? 0) - (a.updatedAt ?? 0));
+          }
           callback();
-          return;
+        } catch (error) {
+          console.error('Failed to fetch rooms:', error);
         }
-
-        // 既存のリスナーをクリーンアップ
-        roomRefsRef.current.forEach((roomRef) => {
-          onValue(roomRef, () => {});
-        });
-        roomRefsRef.current = [];
-
-        // チャットルームの変更を監視
-        Object.keys(snapshotVal).forEach((roomId) => {
-          const roomRef = ref(db, `${DB_PATHS.chatRooms}/${roomId}`);
-          roomRefsRef.current.push(roomRef);
-
-          onValue(roomRef, (snapshot) => {
-            const room = snapshot.val() as ChatRoom;
-            if (room) {
-              updateRoom(room);
-              callback();
-            }
-          });
-        });
       });
 
+      // クリーンアップ
       return () => {
-        roomRefsRef.current.forEach((roomRef) => {
-          onValue(roomRef, () => {});
-        });
-        roomRefsRef.current = [];
         unsubscribe();
         roomsRef.current = initialRooms;
       };
     },
-    [userId, initialRooms, updateRoom],
+    [userId, initialRooms],
   );
 
   // サーバーレンダリング時は初期ルーム一覧を返す

@@ -1,12 +1,7 @@
-'use client';
+'use server';
 
-import { db } from '@/lib/firebase/client';
 import { createChatRoom } from '@/repository/chat/actions';
-import { addFriend } from '@/repository/user/actions';
-import type { User } from '@/types/database';
-import { off, onValue, ref } from 'firebase/database';
-
-const USERS_PATH = 'users';
+import { addFriend, getUsersWithFriendship } from '@/repository/user/actions';
 
 /**
  * フレンドを追加
@@ -35,50 +30,13 @@ export async function createChatRoomAction(members: string[]) {
 }
 
 /**
- * ユーザー一覧をリアルタイムで購読
+ * ユーザー一覧を取得
  */
-export function subscribeToUsersAction(
-  currentUserId: string,
-  onUsers: (data: { friends: User[]; others: User[] }) => void,
-): () => void {
-  const usersRef = ref(db, USERS_PATH);
-
-  const unsubscribe = onValue(usersRef, (snapshot) => {
-    const users = snapshot.val() as Record<string, User> | null;
-    if (!users) {
-      onUsers({ friends: [], others: [] });
-      return;
-    }
-
-    const currentUser = users[currentUserId];
-    if (!currentUser) {
-      onUsers({ friends: [], others: [] });
-      return;
-    }
-
-    const friends: User[] = [];
-    const others: User[] = [];
-
-    // 自分以外のユーザーを友達かどうかで振り分け
-    Object.values(users).forEach((user) => {
-      if (user.id === currentUserId) return;
-
-      if (currentUser.friends?.[user.id]) {
-        friends.push(user);
-      } else {
-        others.push(user);
-      }
-    });
-
-    // 更新日時でソート
-    onUsers({
-      friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
-      others: others.sort((a, b) => b.updatedAt - a.updatedAt),
-    });
-  });
-
-  return () => {
-    off(usersRef);
-    unsubscribe();
-  };
+export async function getUsersWithFriendshipAction(currentUserId: string) {
+  try {
+    return await getUsersWithFriendship(currentUserId);
+  } catch (error) {
+    console.error('Failed to get users:', error);
+    return { friends: [], others: [] };
+  }
 }

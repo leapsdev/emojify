@@ -1,64 +1,50 @@
 'use client';
 
 import { db } from '@/lib/firebase/client';
+import { getChatRoomAction } from '@/repository/chat/actions';
 import type { Message } from '@/types/database';
-import { DB_INDEXES, DB_PATHS } from '@/types/database';
-import { off, onValue, ref } from 'firebase/database';
-import { useEffect, useState } from 'react';
+import { DB_INDEXES } from '@/types/database';
+import { onValue, ref } from 'firebase/database';
+import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 export function useRoomMessages(
   roomId: string,
   initialMessages: Message[] = [],
 ) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const messagesRef = useRef<Message[]>(initialMessages);
 
-  useEffect(() => {
-    if (!roomId) return;
+  const getSnapshot = useCallback(() => {
+    return messagesRef.current;
+  }, []);
 
-    const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
-    let messageRefs: ReturnType<typeof ref>[] = [];
-    const currentMessages: Message[] = [...initialMessages];
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      const dbRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
 
-    // メッセージインデックスの監視
-    const indexUnsubscribe = onValue(messagesRef, (indexSnapshot) => {
-      const messageIds = Object.keys(indexSnapshot.val() || {});
-
-      // 既存のリスナーをクリーンアップ
-      messageRefs.forEach((ref) => off(ref));
-      messageRefs = [];
-
-      // 新しいメッセージの監視をセットアップ
-      messageIds.forEach((messageId) => {
-        const messageRef = ref(db, `${DB_PATHS.messages}/${messageId}`);
-        messageRefs.push(messageRef);
-
-        onValue(messageRef, (snapshot) => {
-          const message = snapshot.val() as Message;
-          if (message) {
-            // 既存のメッセージを更新するか、新しいメッセージを追加
-            const index = currentMessages.findIndex((m) => m.id === message.id);
-            if (index !== -1) {
-              currentMessages[index] = message;
-            } else {
-              currentMessages.push(message);
-            }
-
-            // タイムスタンプでソート
-            currentMessages.sort((a, b) => a.createdAt - b.createdAt);
-
-            // 状態を更新
-            setMessages([...currentMessages]);
-          }
-        });
+      const unsubscribe = onValue(dbRef, async () => {
+        try {
+          const { messages } = await getChatRoomAction(roomId);
+          messagesRef.current = [...messages].sort(
+            (a, b) => a.createdAt - b.createdAt,
+          );
+          callback();
+        } catch (error) {
+          console.error('Failed to fetch messages:', error);
+        }
       });
-    });
 
-    // クリーンアップ
-    return () => {
-      indexUnsubscribe();
-      messageRefs.forEach((ref) => off(ref));
-    };
-  }, [roomId, initialMessages]);
+      return () => {
+        unsubscribe();
+        messagesRef.current = initialMessages;
+      };
+    },
+    [roomId, initialMessages],
+  );
 
-  return messages;
+  // サーバーレンダリング時は初期メッセージを返す
+  const getServerSnapshot = useCallback(() => {
+    return initialMessages;
+  }, [initialMessages]);
+
+  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 }

@@ -2,63 +2,74 @@
 
 import { db } from '@/lib/firebase/client';
 import type { Message } from '@/types/database';
-import { DB_INDEXES, DB_PATHS } from '@/types/database';
-import { off, onValue, ref } from 'firebase/database';
-import { useEffect, useState } from 'react';
+import { DB_INDEXES } from '@/types/database';
+import { onValue, ref } from 'firebase/database';
+import { useCallback, useSyncExternalStore } from 'react';
+import { getChatRoomAction } from '@/repository/chat/actions';
+
+// メッセージストアの型定義
+interface MessageStore {
+  messages: Message[];
+  loading: boolean;
+  error: Error | null;
+}
+
+// 初期ストア状態の作成
+const createInitialStore = (initialMessages: Message[] = []): MessageStore => ({
+  messages: initialMessages,
+  loading: false,
+  error: null,
+});
+
+// 各ルーム用のストアを保持するマップ
+const storeMap = new Map<string, MessageStore>();
 
 export function useRoomMessages(
   roomId: string,
   initialMessages: Message[] = [],
 ) {
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
-
-  useEffect(() => {
-    if (!roomId) return;
-
-    const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
-    let messageRefs: ReturnType<typeof ref>[] = [];
-    const currentMessages: Message[] = [...initialMessages];
-
-    // メッセージインデックスの監視
-    const indexUnsubscribe = onValue(messagesRef, (indexSnapshot) => {
-      const messageIds = Object.keys(indexSnapshot.val() || {});
-
-      // 既存のリスナーをクリーンアップ
-      messageRefs.forEach((ref) => off(ref));
-      messageRefs = [];
-
-      // 新しいメッセージの監視をセットアップ
-      messageIds.forEach((messageId) => {
-        const messageRef = ref(db, `${DB_PATHS.messages}/${messageId}`);
-        messageRefs.push(messageRef);
-
-        onValue(messageRef, (snapshot) => {
-          const message = snapshot.val() as Message;
-          if (message) {
-            // 既存のメッセージを更新するか、新しいメッセージを追加
-            const index = currentMessages.findIndex((m) => m.id === message.id);
-            if (index !== -1) {
-              currentMessages[index] = message;
-            } else {
-              currentMessages.push(message);
-            }
-
-            // タイムスタンプでソート
-            currentMessages.sort((a, b) => a.createdAt - b.createdAt);
-
-            // 状態を更新
-            setMessages([...currentMessages]);
-          }
-        });
-      });
-    });
-
-    // クリーンアップ
-    return () => {
-      indexUnsubscribe();
-      messageRefs.forEach((ref) => off(ref));
-    };
+  // getSnapshot関数
+  const getSnapshot = useCallback(() => {
+    return storeMap.get(roomId)?.messages ?? initialMessages;
   }, [roomId, initialMessages]);
 
-  return messages;
+  // subscribe関数
+  const subscribe = useCallback(
+    (callback: () => void) => {
+      // 初期ストア状態をセット
+      if (!storeMap.has(roomId)) {
+        storeMap.set(roomId, createInitialStore(initialMessages));
+      }
+
+      const messagesRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
+      const unsubscribe = onValue(messagesRef, async () => {
+        try {
+          const { messages } = await getChatRoomAction(roomId);
+          // メッセージをタイムスタンプでソート
+          const sortedMessages = [...messages].sort((a, b) => a.createdAt - b.createdAt);
+          storeMap.set(roomId, {
+            messages: sortedMessages,
+            loading: false,
+            error: null,
+          });
+          callback();
+        } catch (error) {
+          storeMap.set(roomId, {
+            ...storeMap.get(roomId)!,
+            error: error as Error,
+            loading: false,
+          });
+          callback();
+        }
+      });
+
+      return () => {
+        unsubscribe();
+        storeMap.delete(roomId);
+      };
+    },
+    [roomId, initialMessages],
+  );
+
+  return useSyncExternalStore(subscribe, getSnapshot);
 }

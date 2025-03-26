@@ -1,12 +1,11 @@
 'use client';
 
-import { subscribeToUserRoomsAction } from '@/components/features/chat/chat/action';
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
 import { FooterNavigation } from '@/components/features/chat/chat/footerNavigation';
 import { Header } from '@/components/features/chat/chat/header';
+import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
 import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
 import type { ChatRoom } from '@/types/database';
-import { useEffect, useState } from 'react';
 
 type ChatRoomListPageProps = {
   userId: string;
@@ -17,26 +16,7 @@ export function ChatRoomListPage({
   userId,
   initialRooms,
 }: ChatRoomListPageProps) {
-  const [rooms, setRooms] = useState<ChatRoom[]>(initialRooms);
-
-  useEffect(() => {
-    console.log('userId', userId);
-    if (!userId) return;
-
-    let unsubscribe: (() => void) | undefined;
-
-    const setupSubscription = () => {
-      unsubscribe = subscribeToUserRoomsAction(userId, setRooms);
-    };
-
-    setupSubscription();
-
-    return () => {
-      if (unsubscribe) {
-        unsubscribe();
-      }
-    };
-  }, [userId]);
+  const rooms = useUserRooms(userId, initialRooms);
 
   return (
     <main className="min-h-screen bg-white flex flex-col">

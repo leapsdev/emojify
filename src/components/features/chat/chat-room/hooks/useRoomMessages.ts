@@ -11,19 +11,16 @@ export function useRoomMessages(
   roomId: string,
   initialMessages: Message[] = [],
 ) {
-  // メッセージをrefで管理
   const messagesRef = useRef<Message[]>(initialMessages);
 
-  // メッセージの取得と並び替え
   const getSnapshot = useCallback(() => {
     return messagesRef.current;
   }, []);
 
-  // メッセージの購読
   const subscribe = useCallback(
     (callback: () => void) => {
       const dbRef = ref(db, `${DB_INDEXES.roomMessages}/${roomId}`);
-      
+
       const unsubscribe = onValue(dbRef, async () => {
         try {
           const { messages } = await getChatRoomAction(roomId);

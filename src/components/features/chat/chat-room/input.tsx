@@ -1,9 +1,9 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
+import { Send } from 'lucide-react';
 import { useState } from 'react';
 import { sendMessageAction } from './actions';
-import { Send } from 'lucide-react';
 
 type ChatRoomInputProps = {
   roomId: string;

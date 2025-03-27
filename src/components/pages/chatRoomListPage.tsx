@@ -1,7 +1,7 @@
 'use client';
 
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
-import { FooterNavigation } from '@/components/features/chat/chat/footerNavigation';
+import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
 import { Header } from '@/components/features/chat/chat/header';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
 import { NewChatButton } from '@/components/features/chat/chat/newChatButton';

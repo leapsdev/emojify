@@ -17,7 +17,7 @@ export function formatDateToYYYYMMDD(timestamp: number): string {
 }
 
 /**
- * 日付を相対表示にフォーマット（例：今日、昨日、3日前）
+ * Format date to relative time (e.g., just now, 5 minutes ago, yesterday)
  */
 export function formatRelativeTime(timestamp: number): string {
   const now = new Date();
@@ -28,19 +28,27 @@ export function formatRelativeTime(timestamp: number): string {
     return formatDateToYYYYMMDD(timestamp);
   }
 
-  const diffTime = now.getTime() - date.getTime();
-  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+  const diffMs = now.getTime() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (1000 * 60));
+  const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+  const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
 
-  if (diffDays === 0) {
-    return '今日';
+  if (diffMinutes < 1) {
+    return 'just now';
+  }
+  if (diffMinutes < 60) {
+    return diffMinutes === 1 ? '1 minute ago' : `${diffMinutes} minutes ago`;
+  }
+  if (diffHours < 24) {
+    return diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
   }
   if (diffDays === 1) {
-    return '昨日';
+    return 'yesterday';
   }
   if (diffDays < 7) {
-    return `${diffDays}日前`;
+    return `${diffDays} days ago`;
   }
 
-  // 1週間以上前は日付を表示
+  // Show date for older than a week
   return formatDateToYYYYMMDD(timestamp);
 }

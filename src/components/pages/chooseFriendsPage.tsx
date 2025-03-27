@@ -41,19 +41,19 @@ export function ClientChooseFriendsPage({
 
   const handleAddFriend = async (friendId: string) => {
     if (!userId) {
-      toast.error('ユーザーIDが取得できません');
+      toast.error('Failed to get user ID');
       return;
     }
 
     try {
       const result = await addFriendAction(userId, friendId);
       if (result.success) {
-        toast.success('友達に追加しました');
+        toast.success('Friend added');
       } else {
         router.refresh();
       }
     } catch (error) {
-      toast.error('エラーが発生しました');
+      toast.error('An error occurred');
       console.error(error);
     }
   };
@@ -61,22 +61,22 @@ export function ClientChooseFriendsPage({
   const handleCreateChatRoom = async () => {
     try {
       if (!userId) {
-        toast.error('ユーザーIDが取得できません');
+        toast.error('Failed to get user ID');
         return;
       }
       // 現在のユーザーも含めてチャットルームを作成
       const result = await createChatRoomAction([userId, ...selectedUsers]);
       if (result.success && result.roomId) {
-        toast.success('チャットルームを作成しました');
+        toast.success('Chat room created');
         // トーストが表示される時間を確保するため、少し遅延させる
         setTimeout(() => {
           router.push(`/chat/${result.roomId}`);
         }, 1000);
       } else {
-        toast.error(result.error || 'チャットルームの作成に失敗しました');
+        toast.error(result.error || 'Failed to create chat room');
       }
     } catch (error) {
-      toast.error('チャットルームの作成に失敗しました');
+      toast.error('Failed to create chat room');
       console.error(error);
     }
   };

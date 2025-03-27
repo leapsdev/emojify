@@ -43,7 +43,7 @@ export const useInstallPrompt = () => {
         setShowInstallModal(true);
       }
     } catch (error) {
-      console.error('インストールプロンプトでエラーが発生しました:', error);
+      console.error('An error occurred in the installation prompt:', error);
       setShowInstallModal(true);
     }
   }, [deferredPrompt]);

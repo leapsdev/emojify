@@ -1,20 +1,38 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 
 export const FooterNavigation = () => {
   const [isVisible, setIsVisible] = useState(true);
-  const [lastScrollY, setLastScrollY] = useState(0);
+
+  const debounce = <T extends (...args: unknown[]) => void>(
+    func: T,
+    wait: number
+  ) => {
+    let timeout: NodeJS.Timeout;
+    return (...args: Parameters<T>) => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => func(...args), wait);
+    };
+  };
+
+  const handleScrollEnd = useCallback(() => {
+    setIsVisible(true);
+  }, []);
+
+  const debouncedScrollEnd = useCallback(
+    debounce(handleScrollEnd, 150),
+    [handleScrollEnd]
+  );
 
   useEffect(() => {
     const handleScroll = () => {
-      const currentScrollY = window.scrollY;
-      setIsVisible(currentScrollY <= lastScrollY);
-      setLastScrollY(currentScrollY);
+      setIsVisible(false);
+      debouncedScrollEnd();
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [lastScrollY]);
+  }, [debouncedScrollEnd]);
 
   return (
     <div className={`fixed bottom-0 w-full border-t py-3 px-6 bg-white transition-transform duration-300 ${

@@ -1,5 +1,10 @@
-'use client';
-
+import { SignOutButton } from '@/components/features/auth/signOutButton';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import { MoreVertical } from 'lucide-react';
 import Link from 'next/link';
 
@@ -10,9 +15,19 @@ export const ProfileHeader = () => {
         👈
       </Link>
       <div className="w-6" /> {/* スペーサー */}
-      <button type="button" className="text-black">
-        <MoreVertical className="w-6 h-6" />
-      </button>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <MoreVertical className="w-6 h-6" />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="rounded-xl min-w-[120px] bg-white dark:bg-gray-800"
+        >
+          <DropdownMenuItem asChild className="rounded-lg">
+            <SignOutButton />
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 };

@@ -12,7 +12,7 @@ export const FooterNavigation = () => {
     
     const newTimeout = setTimeout(() => {
       setIsVisible(true);
-    }, 150);
+    }, 250);
     
     setTimeoutId(newTimeout);
   }, [timeoutId]);

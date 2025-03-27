@@ -26,7 +26,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
   const defaultValues = {
     username: user.username,
     bio: user.bio || '',
-    email: user.email || '',
+    email: user.email || undefined,
   };
 
   const [form, fields] = useForm({
@@ -47,7 +47,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       action={formAction}
     >
       <input type="hidden" name="userId" value={user.id} />
-      <input type="hidden" name={fields.email.name} value={user.email || ''} />
+      <input type="hidden" name={fields.email.name} value={user.email || undefined} />
 
       {state?.message && (
         <div

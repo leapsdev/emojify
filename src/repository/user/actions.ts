@@ -13,11 +13,11 @@ export async function createUser(data: ProfileForm, privyId: string) {
 
   const user: User = {
     id: privyId,
-    email: data.email,
     username: data.username,
     bio: data.bio ?? null,
     createdAt: timestamp,
     updatedAt: timestamp,
+    email: data.email,
   };
 
   await userRef.set(user);

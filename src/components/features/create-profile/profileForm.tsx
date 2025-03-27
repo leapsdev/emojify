@@ -39,7 +39,7 @@ export function ProfileForm() {
       <input
         type="hidden"
         name={fields.email.name}
-        value={user?.email?.address ?? ''}
+        value={user?.email?.address || undefined}
       />
 
       {state?.message && (

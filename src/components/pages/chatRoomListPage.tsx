@@ -21,7 +21,7 @@ export function ChatRoomListPage({
   return (
     <main className="min-h-screen bg-white flex flex-col">
       <Header />
-      <ChatRoomList rooms={rooms} />
+      <ChatRoomList rooms={rooms} currentUserId={userId} />
       <NewChatButton />
       <FooterNavigation />
     </main>

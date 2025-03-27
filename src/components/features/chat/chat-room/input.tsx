@@ -1,9 +1,9 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import { Send, Smile } from 'lucide-react';
 import { useState } from 'react';
 import { sendMessageAction } from './actions';
+import { Send } from 'lucide-react';
 
 type ChatRoomInputProps = {
   roomId: string;
@@ -57,9 +57,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
               type="button"
               className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
               disabled={isLoading}
-            >
-              <Smile className="w-6 h-6" />
-            </button>
+            />
           </div>
           <button
             type="submit"

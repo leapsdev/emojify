@@ -112,7 +112,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
           className="w-full bg-black text-white rounded-full py-6 text-lg font-bold hover:bg-gray-900"
           disabled={isPending}
         >
-          {isPending ? '更新中...' : 'プロフィールを更新'}
+          {isPending ? 'Updating...' : 'Update Profile'}
         </Button>
       </div>
     </form>

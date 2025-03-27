@@ -41,7 +41,9 @@ export async function handleProfileFormAction(
   const profileData: ProfileForm = {
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
-    email: submission.payload.email ? String(submission.payload.email) : undefined,
+    email: submission.payload.email
+      ? String(submission.payload.email)
+      : undefined,
   };
 
   try {

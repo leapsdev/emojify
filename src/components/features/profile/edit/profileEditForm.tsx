@@ -47,7 +47,11 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       action={formAction}
     >
       <input type="hidden" name="userId" value={user.id} />
-      <input type="hidden" name={fields.email.name} value={user.email || undefined} />
+      <input
+        type="hidden"
+        name={fields.email.name}
+        value={user.email || undefined}
+      />
 
       {state?.message && (
         <div

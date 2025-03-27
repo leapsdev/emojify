@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
-export const FooterNavigation = () => {
+export const NewChatButton = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
 
@@ -9,11 +9,11 @@ export const FooterNavigation = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     const newTimeout = setTimeout(() => {
       setIsVisible(true);
-    }, 250);
-    
+    }, 500);
+
     setTimeoutId(newTimeout);
   }, [timeoutId]);
 
@@ -28,22 +28,13 @@ export const FooterNavigation = () => {
   }, [debouncedScrollEnd]);
 
   return (
-    <div
-      className={`fixed bottom-0 w-full border-t py-3 px-6 bg-white transition-transform duration-300 ${
-        isVisible ? 'translate-y-0' : 'translate-y-full'
+    <Link
+      href="/choose-friends"
+      className={`fixed right-4 bottom-20 bg-blue-500 text-white p-4 rounded-full shadow-lg flex items-center justify-center transition-opacity duration-300 ${
+        isVisible ? 'opacity-100' : 'opacity-0'
       }`}
     >
-      <div className="flex justify-between items-center">
-        <Link href="/search-emoji" className="text-gray-400">
-          <span className="text-2xl">🔍</span>
-        </Link>
-        <Link href="/create-emoji" className="text-gray-400">
-          <span className="text-2xl">🤪</span>
-        </Link>
-        <Link href="/profile" className="text-gray-400">
-          <span className="text-2xl">🙎‍♂️</span>
-        </Link>
-      </div>
-    </div>
+      <span className="text-2xl">💬</span>
+    </Link>
   );
 };

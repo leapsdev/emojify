@@ -9,11 +9,11 @@ export const FooterNavigation = () => {
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
-    
+
     const newTimeout = setTimeout(() => {
       setIsVisible(true);
-    }, 250);
-    
+    }, 500);
+
     setTimeoutId(newTimeout);
   }, [timeoutId]);
 
@@ -46,4 +46,4 @@ export const FooterNavigation = () => {
       </div>
     </div>
   );
-}
+};

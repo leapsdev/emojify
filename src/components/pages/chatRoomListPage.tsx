@@ -1,10 +1,10 @@
 'use client';
 
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
-import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
 import { Header } from '@/components/features/chat/chat/header';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
-import { NewChatButton } from '@/components/features/chat/chat/newChatButton';
+import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
+import { NewChatButton } from '@/components/shared/navigation/newChatButton';
 import type { ChatRoom } from '@/types/database';
 
 type ChatRoomListPageProps = {

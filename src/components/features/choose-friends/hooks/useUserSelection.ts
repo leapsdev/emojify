@@ -5,7 +5,7 @@ import { db } from '@/lib/firebase/client';
 import type { User } from '@/types/database';
 import type { DisplayUser } from '@/types/display';
 import { onValue, ref } from 'firebase/database';
-import { useCallback, useRef, useState, useSyncExternalStore } from 'react';
+import { useCallback, useRef, useState, useSyncExternalStore, useMemo } from 'react';
 
 interface UseUserSelectionProps {
   currentUserId: string;
@@ -58,10 +58,14 @@ export const useUserSelection = ({
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // ユーザーリストを参照で管理
-  const userListRef = useRef<UserList>(
-    createUserList(initialFriends, initialOthers),
+  // 初期ユーザーリストをメモ化
+  const initialUserList = useMemo(
+    () => createUserList(initialFriends, initialOthers),
+    [initialFriends, initialOthers]
   );
+
+  // ユーザーリストを参照で管理
+  const userListRef = useRef<UserList>(initialUserList);
 
   // ユーザーリストの購読
   const subscribe = useCallback(
@@ -96,10 +100,10 @@ export const useUserSelection = ({
 
       return () => {
         unsubscribe();
-        userListRef.current = createUserList(initialFriends, initialOthers);
+        userListRef.current = initialUserList;
       };
     },
-    [currentUserId, initialFriends, initialOthers],
+    [currentUserId, initialUserList],
   );
 
   // 現在のユーザーリストを返す
@@ -109,8 +113,8 @@ export const useUserSelection = ({
 
   // サーバーレンダリング時は初期値を返す
   const getServerSnapshot = useCallback(() => {
-    return createUserList(initialFriends, initialOthers).users;
-  }, [initialFriends, initialOthers]);
+    return initialUserList.users;
+  }, [initialUserList]);
 
   // ユーザーリストを購読
   const users = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);

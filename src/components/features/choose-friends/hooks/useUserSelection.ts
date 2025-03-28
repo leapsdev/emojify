@@ -5,7 +5,13 @@ import { db } from '@/lib/firebase/client';
 import type { User } from '@/types/database';
 import type { DisplayUser } from '@/types/display';
 import { onValue, ref } from 'firebase/database';
-import { useCallback, useRef, useState, useSyncExternalStore, useMemo } from 'react';
+import {
+  useCallback,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from 'react';
 
 interface UseUserSelectionProps {
   currentUserId: string;
@@ -61,7 +67,7 @@ export const useUserSelection = ({
   // 初期ユーザーリストをメモ化
   const initialUserList = useMemo(
     () => createUserList(initialFriends, initialOthers),
-    [initialFriends, initialOthers]
+    [initialFriends, initialOthers],
   );
 
   // ユーザーリストを参照で管理

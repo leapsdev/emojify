@@ -27,12 +27,12 @@ export const AuthRedirect = ({ mode }: Props) => {
 
       // 認証関連のページの場合
       if (mode === 'auth') {
-        if (pathname === '/' || pathname === '/create-profile') return;
+        if (pathname === '/' || pathname === '/profile/create') return;
         if (!authenticated || !user) return;
 
         const exists = await checkUserExists();
         if (!exists) {
-          router.push('/create-profile');
+          router.push('/profile/create');
         }
       }
     };

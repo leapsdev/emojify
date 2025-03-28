@@ -12,7 +12,7 @@ export const SignInSignUpButton = () => {
 
   const { login } = useLogin({
     onComplete: (params) =>
-      params.isNewUser ? router.push('/create-profile') : router.push('/chat'),
+      params.isNewUser ? router.push('/profile/create') : router.push('/chat'),
   });
 
   useEffect(() => {

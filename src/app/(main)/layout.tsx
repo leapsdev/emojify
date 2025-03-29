@@ -10,7 +10,7 @@ export default function MainLayout({
   return (
     <main>
       <AuthRedirect mode="auth" />
-      <div className="min-h-screen flex flex-col bg-white">{children}</div>
+      {children}
     </main>
   );
 }

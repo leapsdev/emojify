@@ -1,3 +1,5 @@
+'use client';
+
 import { SignOutButton } from '@/components/features/auth/signOutButton';
 import {
   DropdownMenu,

@@ -1,4 +1,4 @@
-import { LinkButton } from '@/components/ui/linkButton';
+import { Header } from '@/components/shared/layout/header';
 
 type ChatRoomHeaderProps = {
   username: string;
@@ -6,11 +6,13 @@ type ChatRoomHeaderProps = {
 
 export const ChatRoomHeader = ({ username }: ChatRoomHeaderProps) => {
   return (
-    <div className="flex items-center gap-4 p-4 border-b">
-      <LinkButton href="/chat" content="👈" />
-      <h1 className="text-xl font-semibold flex-1 text-center mr-8">
-        {username}
-      </h1>
-    </div>
+    <Header
+      backHref="/chat"
+      centerContent={
+        <h1 className="text-xl font-semibold">
+          {username}
+        </h1>
+      }
+    />
   );
 };

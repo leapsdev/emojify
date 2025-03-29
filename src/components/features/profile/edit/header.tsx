@@ -1,11 +1,9 @@
-import Link from 'next/link';
+import { Header } from '@/components/shared/layout/header';
 
 export const ProfileEditHeader = () => {
   return (
-    <div className="flex items-center gap-4 p-4 border-b">
-      <Link href="/profile" className="text-2xl">
-        👈
-      </Link>
-    </div>
+    <Header
+      backHref="/profile"
+    />
   );
 };

@@ -1,10 +1,12 @@
+import { Header as SharedHeader } from '@/components/shared/layout/header';
 import type { FC } from 'react';
 
 const Header: FC = () => {
   return (
-    <div className="flex justify-center mb-12 pt-8">
-      <div className="text-7xl">🤪</div>
-    </div>
+    <SharedHeader
+      className="mb-12 border-0"
+      centerContent={<div className="text-7xl">🤪</div>}
+    />
   );
 };
 

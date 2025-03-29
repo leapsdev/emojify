@@ -1,5 +1,6 @@
 'use client';
 
+import { Header } from '@/components/shared/layout/header';
 import { Button } from '@/components/ui/button';
 import { ImageIcon } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -21,23 +22,13 @@ export function CreateEmojiPage() {
   };
 
   return (
-    <main className="min-h-screen bg-white p-4">
-      <div className="max-w-md mx-auto">
-        {/* 戻るボタン */}
-        <div className="mb-6">
-          <Button
-            onClick={handleBackToChat}
-            variant="ghost"
-            className="text-gray-600 hover:text-gray-900"
-          >
-            ← Back
-          </Button>
-        </div>
-
-        {/* 絵文字タイトル */}
-        <div className="flex justify-center mb-6">
-          <div className="text-4xl">🤪</div>
-        </div>
+    <main className="min-h-screen bg-white">
+      <Header
+        onBack={handleBackToChat}
+        centerContent={<div className="text-4xl">🤪</div>}
+        className="mb-6"
+      />
+      <div className="max-w-md mx-auto px-4">
 
         {/* 画像プレースホルダーエリア */}
         <div className="w-full h-0 pb-[100%] relative bg-gray-100 rounded-xl mb-6">

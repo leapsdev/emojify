@@ -1,15 +1,11 @@
 'use client';
 
-import { Header } from '@/components/shared/layout/header';
 import { Button } from '@/components/ui/button';
 import { ImageIcon } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 
 export function CreateEmojiPage() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const router = useRouter();
-
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -17,17 +13,8 @@ export function CreateEmojiPage() {
     }
   };
 
-  const handleBackToChat = () => {
-    router.push('/chat');
-  };
-
   return (
     <main className="min-h-screen bg-white">
-      <Header
-        onBack={handleBackToChat}
-        centerContent={<div className="text-4xl">🤪</div>}
-        className="mb-6"
-      />
       <div className="max-w-md mx-auto px-4">
         {/* 画像プレースホルダーエリア */}
         <div className="w-full h-0 pb-[100%] relative bg-gray-100 rounded-xl mb-6">

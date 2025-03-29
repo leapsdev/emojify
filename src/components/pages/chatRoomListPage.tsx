@@ -1,7 +1,6 @@
 'use client';
 
 import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
-import { Header } from '@/components/features/chat/chat/header';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
 import type { ChatRoom } from '@/types/database';
 
@@ -18,7 +17,6 @@ export function ChatRoomListPage({
 
   return (
     <main className="min-h-screen bg-white flex flex-col">
-      <Header />
       <ChatRoomList rooms={rooms} currentUserId={userId} />
     </main>
   );

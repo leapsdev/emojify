@@ -1,5 +1,5 @@
-import { Header } from '@/components/shared/layout/header';
 import { SignOutButton } from '@/components/features/auth/signOutButton';
+import { Header } from '@/components/shared/layout/header';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,10 +25,5 @@ export const ProfileHeader = () => {
     </DropdownMenu>
   );
 
-  return (
-    <Header
-      backHref="/chat"
-      rightContent={menuButton}
-    />
-  );
+  return <Header backHref="/chat" rightContent={menuButton} />;
 };

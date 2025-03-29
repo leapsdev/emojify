@@ -1,5 +1,5 @@
-import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import Link from 'next/link';
 
 type LinkButtonProps = {
   href: string;
@@ -9,6 +9,8 @@ type LinkButtonProps = {
 
 export const LinkButton = ({ href, content, className }: LinkButtonProps) => {
   return (
-    <Link href={href} className={cn('text-2xl', className)}>{content}</Link>
+    <Link href={href} className={cn('text-2xl', className)}>
+      {content}
+    </Link>
   );
 };

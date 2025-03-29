@@ -29,7 +29,6 @@ export function CreateEmojiPage() {
         className="mb-6"
       />
       <div className="max-w-md mx-auto px-4">
-
         {/* 画像プレースホルダーエリア */}
         <div className="w-full h-0 pb-[100%] relative bg-gray-100 rounded-xl mb-6">
           <div className="absolute inset-0 flex flex-col items-center justify-center">

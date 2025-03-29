@@ -59,7 +59,6 @@ export function ProfileForm() {
           <label htmlFor={fields.username.id} className="text-lg font-medium">
             Username
           </label>
-          <span className="text-gray-500">Required</span>
         </div>
         <Input
           id={fields.username.id}

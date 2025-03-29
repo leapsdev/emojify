@@ -1,4 +1,5 @@
 import { ChatRoomPage } from '@/components/pages/chatRoomPage';
+import { Header } from '@/components/shared/layout/header';
 import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';
@@ -28,11 +29,18 @@ export default async function Page({ params }: Props) {
   if (!otherMember) notFound();
 
   return (
-    <ChatRoomPage
-      username={otherMember.username}
-      roomId={roomId}
-      userId={userId}
-      initialMessages={messages}
-    />
+    <>
+      <Header
+        backHref="/chat"
+        centerContent={
+          <h1 className="text-xl font-semibold">{otherMember.username}</h1>
+        }
+      />
+      <ChatRoomPage
+        roomId={roomId}
+        userId={userId}
+        initialMessages={messages}
+      />
+    </>
   );
 }

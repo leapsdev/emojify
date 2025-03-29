@@ -3,7 +3,6 @@ import { MessageList } from '@/components/features/chat/chat-room/message-list';
 import type { Message } from '@/types/database';
 
 type ChatRoomPageProps = {
-  
   roomId: string;
   userId: string;
   initialMessages: Message[];

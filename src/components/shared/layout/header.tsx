@@ -1,12 +1,45 @@
 import { cn } from '@/lib/utils';
 import { LinkButton } from '@/components/ui/linkButton';
 
+/**
+ * 共通ヘッダーコンポーネント
+ * 
+ * @example
+ * // 戻るボタンと中央タイトル
+ * <Header
+ *   backHref="/chat"
+ *   centerContent={<h1 className="text-xl font-semibold">Title</h1>}
+ * />
+ * 
+ * // 中央アイコンのみ
+ * <Header
+ *   centerContent={<span className="text-2xl">💬</span>}
+ * />
+ * 
+ * // 戻るボタンと右側のメニュー
+ * <Header
+ *   backHref="/chat"
+ *   rightContent={<MenuButton />}
+ * />
+ * 
+ * // useRouterを使用した戻るボタン
+ * <Header
+ *   onBack={() => router.push('/chat')}
+ *   centerContent={<span>Title</span>}
+ * />
+ */
 type HeaderProps = {
+  /** 左側に表示するコンテンツ。指定がない場合、backHrefまたはonBackが指定されていれば戻るボタンが表示されます */
   leftContent?: React.ReactNode;
+  /** 中央に表示するコンテンツ */
   centerContent?: React.ReactNode;
+  /** 右側に表示するコンテンツ */
   rightContent?: React.ReactNode;
+  /** 戻るボタンのリンク先。next/linkを使用したナビゲーション */
   backHref?: string;
+  /** 戻るボタンのクリックハンドラ。useRouterを使用したナビゲーション */
   onBack?: () => void;
+  /** 追加のスタイルクラス */
   className?: string;
 };
 

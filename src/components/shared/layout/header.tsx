@@ -31,19 +31,19 @@ export const Header = ({
   );
 
   return (
-    <div className={cn("relative flex items-center p-4 border-b", className)}>
+    <div className={cn("relative flex items-center h-14 p-4 border-b", className)}>
       {/* 左エリア - 絶対位置で配置 */}
-      <div className="absolute left-4">
+      <div className="absolute left-4 h-full flex items-center">
         {leftContent || backButton}
       </div>
 
       {/* 中央エリア - flex-1で拡大、中央揃え */}
-      <div className="flex-1 flex justify-center">
+      <div className="flex-1 flex justify-center items-center h-full">
         {centerContent}
       </div>
 
       {/* 右エリア - 絶対位置で配置 */}
-      <div className="absolute right-4">
+      <div className="absolute right-4 h-full flex items-center">
         {rightContent}
       </div>
     </div>

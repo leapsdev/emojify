@@ -1,6 +1,6 @@
 'use client';
 
-import { ProfileHeader } from '@/components/features/profile/profileHeader';
+import { Header } from '@/components/shared/layout/header';
 import { ProfileTabs } from '@/components/features/profile/profileTabs';
 import { UserProfile } from '@/components/features/profile/userProfile';
 import type { User } from '@/types/database';
@@ -12,7 +12,7 @@ interface ProfilePageProps {
 export const ProfilePage = ({ user }: ProfilePageProps) => {
   return (
     <main className="min-h-screen bg-white flex flex-col font-nunito overflow-hidden max-w-full">
-      <ProfileHeader />
+      <Header centerContent={<span className="text-xl">👤</span>} />
       <div className="overflow-y-auto overflow-x-hidden flex-1">
         <div className="max-w-full">
           <UserProfile

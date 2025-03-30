@@ -8,7 +8,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main>
+    <main className="pt-14">
       <AuthRedirect mode="auth" />
       {children}
     </main>

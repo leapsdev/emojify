@@ -14,9 +14,8 @@ export function ChatRoomListPage({
   initialRooms,
 }: ChatRoomListPageProps) {
   const rooms = useUserRooms(userId, initialRooms);
-
   return (
-    <main className="min-h-screen bg-white flex flex-col">
+    <main>
       <ChatRoomList rooms={rooms} currentUserId={userId} />
     </main>
   );

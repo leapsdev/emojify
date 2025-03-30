@@ -14,7 +14,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
   return (
     <>
       <Header backHref="/chat" rightContent={<ProfileMenu />} />
-      <main className="min-h-screen bg-white flex flex-col font-nunito overflow-hidden max-w-full">
+      <main className="flex flex-col font-nunito overflow-hidden max-w-full">
         <div className="overflow-y-auto overflow-x-hidden flex-1">
           <div className="max-w-full">
             <UserProfile

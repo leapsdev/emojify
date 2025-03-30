@@ -14,13 +14,17 @@ export function ChatRoomPage({
   initialMessages,
 }: ChatRoomPageProps) {
   return (
-    <main className="min-h-screen bg-white flex flex-col">
-      <MessageList
-        roomId={roomId}
-        currentUserId={userId}
-        initialMessages={initialMessages}
-      />
-      <ChatRoomInput roomId={roomId} userId={userId} />
+    <main className="flex flex-col relative">
+      <div className="overflow-y-auto pb-24">
+        <MessageList
+          roomId={roomId}
+          currentUserId={userId}
+          initialMessages={initialMessages}
+        />
+      </div>
+      <div className="fixed bottom-0 left-0 right-0 bg-white border-t">
+        <ChatRoomInput roomId={roomId} userId={userId} />
+      </div>
     </main>
   );
 }

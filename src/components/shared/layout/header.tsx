@@ -66,7 +66,7 @@ export const Header = ({
       className={cn(
         'fixed top-0 left-0 right-0 z-50 bg-white',
         'flex items-center h-14 p-4 border-b',
-        className
+        className,
       )}
     >
       {/* 左エリア - 絶対位置で配置 */}

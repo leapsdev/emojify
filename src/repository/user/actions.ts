@@ -184,9 +184,7 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
     getOtherUsers(currentUserId),
   ]);
 
-  if (!currentUser) {
-    throw new Error('Current user not found');
-  }
+  if (!currentUser) return { friends: [], others: [] };
 
   const friends: User[] = [];
   const others: User[] = [];

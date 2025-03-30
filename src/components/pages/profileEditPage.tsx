@@ -10,11 +10,9 @@ interface ProfileEditPageProps {
 
 export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
   return (
-    <div className="min-h-screen bg-white flex flex-col">
-      <main className="min-h-screen bg-white flex flex-col max-w-2xl mx-auto w-full px-4 py-8">
-        <ProfileImage />
-        <ProfileEditForm user={initialUser} />
-      </main>
-    </div>
+    <main className="flex flex-col max-w-2xl mx-auto w-full px-4 py-8">
+      <ProfileImage />
+      <ProfileEditForm user={initialUser} />
+    </main>
   );
 }

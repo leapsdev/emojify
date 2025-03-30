@@ -8,7 +8,7 @@ export default function MainLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <main className="h-screen pt-14 overflow-y-auto overflow-x-hidden">
+    <main className="pt-14">
       <AuthRedirect mode="auth" />
       {children}
     </main>

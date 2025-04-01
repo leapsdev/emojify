@@ -34,7 +34,7 @@ export const FooterNavigation = () => {
       }`}
     >
       <div className="flex justify-between items-center">
-        <Link href="/search-emoji" className="text-gray-400">
+        <Link href="/explore" className="text-gray-400">
           <span className="text-2xl">🔍</span>
         </Link>
         <Link href="/create-emoji" className="text-gray-400">

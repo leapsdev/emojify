@@ -50,7 +50,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
               placeholder="メッセージを入力..."
               value={message}
               onChange={(e) => setMessage(e.target.value)}
-              className="w-full bg-gray-100 border-none rounded-full py-6 pl-4 pr-12"
+              className="w-full bg-gray-100 border-none rounded-full py-6 pl-4 pr-12 text-base"
               disabled={isLoading}
             />
             <button

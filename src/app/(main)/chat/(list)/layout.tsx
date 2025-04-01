@@ -2,7 +2,7 @@
 
 import { Header } from '@/components/shared/layout/header';
 import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
-import { NewChatButton } from '@/components/shared/navigation/newChatButton';
+import { NewChatButton } from '@/components/ui/newChatButton';
 
 export default function ChatLayout({
   children,

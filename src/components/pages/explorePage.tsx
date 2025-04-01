@@ -1,5 +1,9 @@
-import { EmojiGallery } from '../features/explore/components/emojiGallery';
+import { EmojiList } from '../features/explore/components/emojiList';
 
 export function ExplorePage() {
-  return <EmojiGallery />;
+  return (
+    <div className="flex flex-col">
+      <EmojiList />
+    </div>
+  );
 }

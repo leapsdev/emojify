@@ -1,4 +1,4 @@
-export interface GalleryItem {
+export interface EmojiItemData {
   id: string;
   image: string;
   creator: {

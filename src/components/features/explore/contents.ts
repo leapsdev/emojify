@@ -1,6 +1,6 @@
-import { GalleryItem } from './types';
+import type { EmojiItemData } from './types';
 
-export const GALLERY_ITEMS: GalleryItem[] = [
+export const EMOJI_ITEMS: EmojiItemData[] = [
   {
     id: '1',
     image: '/placeholder.svg?height=300&width=300&text=🌸',

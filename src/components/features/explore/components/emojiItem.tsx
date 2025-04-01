@@ -1,20 +1,17 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import type { GalleryItem } from '../types';
-import { CreatorAvatar } from './creatorAvatar';
+import type { EmojiItemData } from '../types';
 
-interface GalleryItemProps {
-  item: GalleryItem;
+interface EmojiItemProps {
+  item: EmojiItemData;
   index: number;
 }
 
-export function GalleryItem({ item, index }: GalleryItemProps) {
+export function EmojiItem({ item, index }: EmojiItemProps) {
   return (
     <Link
       href={
-        index % 2 === 0
-          ? `/emoji-mint/${item.id}`
-          : `/emoji-mint-v2/${item.id}`
+        index % 2 === 0 ? `/emoji-mint/${item.id}` : `/emoji-mint-v2/${item.id}`
       }
       className="block"
     >
@@ -26,7 +23,6 @@ export function GalleryItem({ item, index }: GalleryItemProps) {
           height={300}
           className="w-full h-full object-cover"
         />
-        <CreatorAvatar avatarUrl={item.creator.avatar} />
       </div>
     </Link>
   );

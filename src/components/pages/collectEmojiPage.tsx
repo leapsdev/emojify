@@ -2,32 +2,30 @@ import { Button } from '@/components/ui/button';
 import { Plus } from 'lucide-react';
 import Image from 'next/image';
 
-
 const EMOJI_DATA = {
-  id: "1",
-  image: "/placeholder.svg?height=600&width=400&text=🎨",
+  id: '1',
+  image: '/placeholder.svg?height=600&width=400&text=🎨',
   creator: {
-    id: "kitasavi",
-    username: "kitaisaivi15",
-    avatar: "/placeholder.svg?height=40&width=40",
-    timeAgo: "2d",
+    id: 'kitasavi',
+    username: 'kitaisaivi15',
+    avatar: '/placeholder.svg?height=40&width=40',
+    timeAgo: '2d',
   },
   details: {
-    firstCollector: "Jesse.eth",
-    firstCollectorAvatar: "/placeholder.svg?height=32&width=32",
-    token: "ERC-1155",
-    network: "Base",
+    firstCollector: 'Jesse.eth',
+    firstCollectorAvatar: '/placeholder.svg?height=32&width=32',
+    token: 'ERC-1155',
+    network: 'Base',
   },
-}
+};
 
 export function CollectEmojiPage() {
   return (
     <main className="min-h-screen bg-white flex flex-col font-nunito">
-
       {/* メイン画像 */}
       <div className="flex items-center justify-center px-4 pt-4 pb-3">
         <Image
-          src={EMOJI_DATA.image || "/placeholder.svg"}
+          src={EMOJI_DATA.image || '/placeholder.svg'}
           alt="Emoji Art"
           width={400}
           height={600}
@@ -40,7 +38,7 @@ export function CollectEmojiPage() {
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-3">
             <Image
-              src={EMOJI_DATA.creator.avatar || "/placeholder.svg"}
+              src={EMOJI_DATA.creator.avatar || '/placeholder.svg'}
               alt={EMOJI_DATA.creator.username}
               width={40}
               height={40}
@@ -52,7 +50,9 @@ export function CollectEmojiPage() {
         </div>
 
         {/* ユーザー名 */}
-        <h1 className="text-4xl font-bold mb-6">{EMOJI_DATA.creator.username}</h1>
+        <h1 className="text-4xl font-bold mb-6">
+          {EMOJI_DATA.creator.username}
+        </h1>
 
         {/* 詳細情報 */}
         <div className="mt-4">
@@ -64,13 +64,18 @@ export function CollectEmojiPage() {
               <span className="text-gray-700 text-lg">First Collector</span>
               <div className="flex items-center gap-2">
                 <Image
-                  src={EMOJI_DATA.details.firstCollectorAvatar || "/placeholder.svg"}
+                  src={
+                    EMOJI_DATA.details.firstCollectorAvatar ||
+                    '/placeholder.svg'
+                  }
                   alt="First Collector"
                   width={32}
                   height={32}
                   className="w-6 h-6 rounded-full"
                 />
-                <span className="font-medium">{EMOJI_DATA.details.firstCollector}</span>
+                <span className="font-medium">
+                  {EMOJI_DATA.details.firstCollector}
+                </span>
               </div>
             </div>
 

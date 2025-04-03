@@ -9,6 +9,7 @@ interface UserProfileProps {
   bio: string;
   avatar: string;
   userId: string;
+  isOwnProfile?: boolean;
 }
 
 export const UserProfile = ({
@@ -16,6 +17,7 @@ export const UserProfile = ({
   bio,
   avatar,
   userId,
+  isOwnProfile = true,
 }: UserProfileProps) => {
   return (
     <div className="px-4 pt-4">
@@ -37,14 +39,18 @@ export const UserProfile = ({
                 {userId}
               </p>
             </div>
-            <Link href="/profile/edit">
-              <Button
-                variant="outline"
-                className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
+            {isOwnProfile ? (
+              <Link href="/profile/edit">
+                <Button
+                  variant="outline"
+                  className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
               >
                 Edit Profile
-              </Button>
-            </Link>
+                </Button>
+              </Link>
+            ) : (
+              <></>
+            )}
           </div>
         </div>
 

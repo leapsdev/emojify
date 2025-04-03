@@ -23,6 +23,7 @@ export const ProfilePage = ({ user, isOwnProfile = true }: ProfilePageProps) => 
               bio={user.bio || ''}
               avatar="/icons/icon-192x192.png"
               userId={user.id}
+              isOwnProfile={isOwnProfile}
             />
             <ProfileTabs
               createdEmojis={Array(6)

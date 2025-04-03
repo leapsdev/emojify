@@ -19,7 +19,7 @@ export function UserItem({
     <div className="flex items-center justify-between gap-2 min-w-0">
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <Image
-          src={user.avatar || '/placeholder.svg'}
+          src={'/icons/icon-192x192.png'}
           alt=""
           width={48}
           height={48}

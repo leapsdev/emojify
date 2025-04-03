@@ -17,7 +17,7 @@ export const ChatRoomList = ({
           <div className="px-4 py-3 flex items-center gap-3">
             <div className="relative flex-shrink-0">
               <Image
-                src="/placeholder.svg"
+                src="/icons/icon-192x192.png"
                 alt="Room avatar"
                 width={48}
                 height={48}

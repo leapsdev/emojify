@@ -9,7 +9,10 @@ interface ProfilePageProps {
   isOwnProfile?: boolean;
 }
 
-export const ProfilePage = ({ user, isOwnProfile = true }: ProfilePageProps) => {
+export const ProfilePage = ({
+  user,
+  isOwnProfile = true,
+}: ProfilePageProps) => {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   return (

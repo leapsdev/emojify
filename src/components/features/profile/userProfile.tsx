@@ -44,8 +44,8 @@ export const UserProfile = ({
                 <Button
                   variant="outline"
                   className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
-              >
-                Edit Profile
+                >
+                  Edit Profile
                 </Button>
               </Link>
             ) : (

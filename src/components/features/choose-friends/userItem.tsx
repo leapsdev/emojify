@@ -1,6 +1,7 @@
 import type { DisplayUser } from '@/types/display';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 interface UserItemProps {
   user: DisplayUser;
@@ -18,13 +19,15 @@ export function UserItem({
   return (
     <div className="flex items-center justify-between gap-2 min-w-0">
       <div className="flex items-center gap-3 min-w-0 flex-1">
-        <Image
-          src={'/icons/icon-192x192.png'}
-          alt=""
-          width={48}
-          height={48}
-          className="w-12 h-12 rounded-full flex-shrink-0"
-        />
+        <Link href={`/choose-friends/${user.id}`} className="flex-shrink-0">
+          <Image
+            src={'/icons/icon-192x192.png'}
+            alt=""
+            width={48}
+            height={48}
+            className="w-12 h-12 rounded-full flex-shrink-0"
+          />
+        </Link>
         <div className="flex flex-col min-w-0">
           <span className="font-semibold text-base truncate">
             {user.displayName}

@@ -1,19 +1,21 @@
 import { ProfilePage } from '@/components/pages/profilePage';
 export const dynamic = 'force-dynamic';
-import { getPrivyId } from '@/lib/auth';
-import { getUser } from '@/repository/user/actions';
+import { getUserById } from '@/repository/user/actions';
 import { redirect } from 'next/navigation';
 
-export default async function Page() {
-  const privyId = await getPrivyId();
-  if (!privyId) {
-    redirect('/');
+interface PageProps {
+  params: {
+    id: string;
+  };
+}
+
+export default async function Page({ params }: PageProps) {
+  const decodedParams = await params;
+  const targetUserId = decodeURIComponent(decodedParams.id);
+  const targetUser = await getUserById(targetUserId);
+  if (!targetUser) {
+    redirect('/choose-friends');
   }
 
-  const userData = await getUser(privyId);
-  if (!userData) {
-    redirect('/');
-  }
-
-  return <ProfilePage user={userData} />;
+  return <ProfilePage user={targetUser} isOwnProfile={false} />;
 }

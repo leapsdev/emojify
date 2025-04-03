@@ -1,5 +1,3 @@
-'use client';
-
 import { ProfileMenu } from '@/components/features/choose-friends/profileMenu';
 import { ProfileTabs } from '@/components/features/profile/profileTabs';
 import { UserProfile } from '@/components/features/profile/userProfile';
@@ -20,7 +18,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
             <UserProfile
               username={user.username}
               bio={user.bio || ''}
-              avatar="/placeholder.svg?height=80&width=80"
+              avatar="/icons/icon-192x192.png"
               userId={user.id}
             />
             <ProfileTabs
@@ -31,7 +29,7 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
                   image:
                     'https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Group%208-FHRPq70yEc1h0CLeatZkOSPMsLbNFx.png',
                   creator: {
-                    avatar: '/placeholder.svg?height=24&width=24',
+                    avatar: '/icons/icon-192x192.png',
                   },
                 }))}
               collectedEmojis={[]}

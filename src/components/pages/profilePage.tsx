@@ -7,11 +7,13 @@ import type { User } from '@/types/database';
 interface ProfilePageProps {
   user: User;
   isOwnProfile?: boolean;
+  currentUserId?: string;
 }
 
 export const ProfilePage = ({
   user,
   isOwnProfile = true,
+  currentUserId,
 }: ProfilePageProps) => {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
@@ -27,6 +29,7 @@ export const ProfilePage = ({
               avatar="/icons/icon-192x192.png"
               userId={user.id}
               isOwnProfile={isOwnProfile}
+              currentUserId={currentUserId}
             />
             <ProfileTabs
               createdEmojis={Array(6)

@@ -30,9 +30,11 @@ export default async function Page({ params }: PageProps) {
     redirect('/choose-friends');
   }
 
-  // フレンドかどうかのチェック
-  const isFriend = Boolean(currentUser?.friends?.[targetUserId]);
-  console.log(isFriend);
-
-  return <ProfilePage user={targetUser} isOwnProfile={false} />;
+  return (
+    <ProfilePage 
+      user={targetUser} 
+      isOwnProfile={false} 
+      currentUserId={currentUserId} 
+    />
+  );
 }

@@ -21,10 +21,7 @@ export default async function Page({ params }: PageProps) {
   }
 
   // 表示対象のユーザーとログインユーザーの取得
-  const [targetUser, currentUser] = await Promise.all([
-    getUserById(targetUserId),
-    getUserById(currentUserId),
-  ]);
+  const targetUser = await getUserById(targetUserId);
 
   if (!targetUser) {
     redirect('/choose-friends');

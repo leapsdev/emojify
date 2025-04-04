@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { addFriend, removeFriend } from '@/repository/user/actions';
 import { useIsFriend } from './hooks/useIsFriend';
 
 interface UserProfileProps {

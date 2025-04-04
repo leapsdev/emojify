@@ -34,9 +34,9 @@ export default async function Page({ params }: PageProps) {
   const initialIsFriend = Boolean(currentUser?.friends?.[targetUserId]);
 
   return (
-    <ProfilePage 
-      user={targetUser} 
-      isOwnProfile={false} 
+    <ProfilePage
+      user={targetUser}
+      isOwnProfile={false}
       currentUserId={currentUserId}
       initialIsFriend={initialIsFriend}
     />

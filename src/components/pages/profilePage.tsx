@@ -6,12 +6,22 @@ import type { User } from '@/types/database';
 
 interface ProfilePageProps {
   user: User;
+  isOwnProfile?: boolean;
+  currentUserId?: string;
+  initialIsFriend?: boolean;
 }
 
-export const ProfilePage = ({ user }: ProfilePageProps) => {
+export const ProfilePage = ({
+  user,
+  isOwnProfile = true,
+  currentUserId,
+  initialIsFriend = false,
+}: ProfilePageProps) => {
+  const backHref = isOwnProfile ? '/chat' : '/choose-friends';
+  const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   return (
     <>
-      <Header backHref="/chat" rightContent={<ProfileMenu />} />
+      <Header backHref={backHref} rightContent={rightContent} />
       <main className="flex flex-col font-nunito overflow-hidden max-w-full">
         <div className="overflow-y-auto overflow-x-hidden flex-1">
           <div className="max-w-full">
@@ -20,6 +30,9 @@ export const ProfilePage = ({ user }: ProfilePageProps) => {
               bio={user.bio || ''}
               avatar="/icons/icon-192x192.png"
               userId={user.id}
+              isOwnProfile={isOwnProfile}
+              currentUserId={currentUserId}
+              initialIsFriend={initialIsFriend}
             />
             <ProfileTabs
               createdEmojis={Array(6)

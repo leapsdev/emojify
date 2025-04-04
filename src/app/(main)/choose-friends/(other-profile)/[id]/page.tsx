@@ -1,19 +1,44 @@
 import { ProfilePage } from '@/components/pages/profilePage';
 export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
-import { getUser } from '@/repository/user/actions';
+import { getUserById } from '@/repository/user/actions';
 import { redirect } from 'next/navigation';
 
-export default async function Page() {
-  const privyId = await getPrivyId();
-  if (!privyId) {
+interface PageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export default async function Page({ params }: PageProps) {
+  const decodedParams = await params;
+  const targetUserId = decodeURIComponent(decodedParams.id);
+
+  // 現在のユーザーの取得
+  const currentUserId = await getPrivyId();
+  if (!currentUserId) {
     redirect('/');
   }
 
-  const userData = await getUser(privyId);
-  if (!userData) {
-    redirect('/');
+  // 表示対象のユーザーとログインユーザーの取得
+  const [targetUser, currentUser] = await Promise.all([
+    getUserById(targetUserId),
+    getUserById(currentUserId),
+  ]);
+
+  if (!targetUser) {
+    redirect('/choose-friends');
   }
 
-  return <ProfilePage user={userData} />;
+  // フレンド状態の初期値を取得
+  const initialIsFriend = Boolean(currentUser?.friends?.[targetUserId]);
+
+  return (
+    <ProfilePage
+      user={targetUser}
+      isOwnProfile={false}
+      currentUserId={currentUserId}
+      initialIsFriend={initialIsFriend}
+    />
+  );
 }

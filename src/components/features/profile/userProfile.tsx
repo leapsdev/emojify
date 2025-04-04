@@ -1,9 +1,9 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
 interface UserProfileProps {
   username: string;
   bio: string;
@@ -49,7 +49,15 @@ export const UserProfile = ({
                 </Button>
               </Link>
             ) : (
-              <></>
+              <>
+                <Button
+                  className={
+                    'h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-blue-500 hover:bg-blue-600 text-white'
+                  }
+                >
+                  <UserPlus className="w-6 h-6" strokeWidth={2} />
+                </Button>
+              </>
             )}
           </div>
         </div>

@@ -8,12 +8,14 @@ interface ProfilePageProps {
   user: User;
   isOwnProfile?: boolean;
   currentUserId?: string;
+  initialIsFriend?: boolean;
 }
 
 export const ProfilePage = ({
   user,
   isOwnProfile = true,
   currentUserId,
+  initialIsFriend = false,
 }: ProfilePageProps) => {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
@@ -30,6 +32,7 @@ export const ProfilePage = ({
               userId={user.id}
               isOwnProfile={isOwnProfile}
               currentUserId={currentUserId}
+              initialIsFriend={initialIsFriend}
             />
             <ProfileTabs
               createdEmojis={Array(6)

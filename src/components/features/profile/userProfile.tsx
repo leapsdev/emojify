@@ -14,6 +14,7 @@ interface UserProfileProps {
   userId: string;
   isOwnProfile?: boolean;
   currentUserId?: string;
+  initialIsFriend?: boolean;
 }
 
 export const UserProfile = ({
@@ -23,8 +24,9 @@ export const UserProfile = ({
   userId,
   isOwnProfile = true,
   currentUserId,
+  initialIsFriend = false,
 }: UserProfileProps) => {
-  const isFriend = useIsFriend(currentUserId || '', userId);
+  const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 
   const handleAddFriend = async () => {
     if (!currentUserId) return;

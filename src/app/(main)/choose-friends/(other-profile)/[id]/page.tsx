@@ -21,17 +21,24 @@ export default async function Page({ params }: PageProps) {
   }
 
   // 表示対象のユーザーとログインユーザーの取得
-  const targetUser = await getUserById(targetUserId);
+  const [targetUser, currentUser] = await Promise.all([
+    getUserById(targetUserId),
+    getUserById(currentUserId),
+  ]);
 
   if (!targetUser) {
     redirect('/choose-friends');
   }
 
+  // フレンド状態の初期値を取得
+  const initialIsFriend = Boolean(currentUser?.friends?.[targetUserId]);
+
   return (
     <ProfilePage 
       user={targetUser} 
       isOwnProfile={false} 
-      currentUserId={currentUserId} 
+      currentUserId={currentUserId}
+      initialIsFriend={initialIsFriend}
     />
   );
 }

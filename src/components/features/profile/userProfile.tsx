@@ -71,7 +71,7 @@ export const UserProfile = ({
               <>
                 {isFriend ? (
                   <Button
-                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-red-500 hover:bg-red-600 text-white"
+                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-gray-400 hover:bg-gray-500 text-white"
                     onClick={handleRemoveFriend}
                   >
                     <UserMinus className="w-6 h-6" strokeWidth={2} />

@@ -16,6 +16,36 @@ export function UserItem({
   onSelect,
   onAddFriend,
 }: UserItemProps) {
+  const RightButton = () => {
+    if (user.section === 'friend') {
+      return (
+        <button
+          type="button"
+          onClick={onSelect}
+          className={`w-10 h-10 rounded-full ${
+            selected ? 'bg-blue-500' : 'bg-gray-200'
+          } flex items-center justify-center`}
+          aria-label="Chat with this user"
+        >
+          <MessageCircle className="w-5 h-5 text-white" />
+        </button>
+      );
+    }
+    return (
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          onAddFriend?.();
+        }}
+        className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
+        aria-label="Add friend"
+      >
+        <UserPlus className="w-5 h-5 text-white" />
+      </button>
+    );
+  };
+
   return (
     <div className="flex items-center justify-between gap-2 min-w-0">
       <div className="flex items-center gap-3 min-w-0 flex-1">
@@ -36,30 +66,7 @@ export function UserItem({
         </div>
       </div>
       <div className="flex items-center flex-shrink-0">
-        {user.section === 'friend' ? (
-          <button
-            type="button"
-            onClick={onSelect}
-            className={`w-10 h-10 rounded-full ${
-              selected ? 'bg-blue-500' : 'bg-gray-200'
-            } flex items-center justify-center`}
-            aria-label="Chat with this user"
-          >
-            <MessageCircle className="w-5 h-5 text-white" />
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={(e) => {
-              e.stopPropagation();
-              onAddFriend?.();
-            }}
-            className="w-9 h-9 rounded-full bg-blue-500 flex items-center justify-center hover:bg-blue-600 transition-colors"
-            aria-label="Add friend"
-          >
-            <UserPlus className="w-5 h-5 text-white" />
-          </button>
-        )}
+        <RightButton />
       </div>
     </div>
   );

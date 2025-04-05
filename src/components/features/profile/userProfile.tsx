@@ -1,10 +1,10 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
+import { LinkButton } from '@/components/ui/linkButton';
 import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
 import { useIsFriend } from './hooks/useIsFriend';
 
 interface UserProfileProps {
@@ -38,6 +38,40 @@ export const UserProfile = ({
     await removeFriend(currentUserId, userId);
   };
 
+  const FriendButton = () => {
+    const handleClick = isFriend ? handleRemoveFriend : handleAddFriend;
+    const buttonClassName = isFriend
+      ? 'bg-gray-400 hover:bg-gray-500'
+      : 'bg-blue-500 hover:bg-blue-600';
+
+    const buttonIcon = isFriend ? (
+      <UserMinus className="w-6 h-6" strokeWidth={2} />
+    ) : (
+      <UserPlus className="w-6 h-6" strokeWidth={2} />
+    );
+
+    return (
+      <Button
+        className={`h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 ${buttonClassName} text-white`}
+        onClick={handleClick}
+      >
+        {buttonIcon}
+      </Button>
+    );
+  };
+
+  const RightButton = () => {
+    return isOwnProfile ? (
+      <LinkButton
+        href="/profile/edit"
+        content="Edit Profile"
+        className="h-9 rounded-2xl text-sm px-5 bg-gray-200 hover:bg-gray-300 border-0 text-gray-600 mt-3 font-black shrink-0"
+      />
+    ) : (
+      <FriendButton />
+    );
+  };
+
   return (
     <div className="px-4 pt-4">
       <div className="mb-8">
@@ -58,34 +92,7 @@ export const UserProfile = ({
                 {userId}
               </p>
             </div>
-            {isOwnProfile ? (
-              <Link href="/profile/edit">
-                <Button
-                  variant="outline"
-                  className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
-                >
-                  Edit Profile
-                </Button>
-              </Link>
-            ) : (
-              <>
-                {isFriend ? (
-                  <Button
-                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-gray-400 hover:bg-gray-500 text-white"
-                    onClick={handleRemoveFriend}
-                  >
-                    <UserMinus className="w-6 h-6" strokeWidth={2} />
-                  </Button>
-                ) : (
-                  <Button
-                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-blue-500 hover:bg-blue-600 text-white"
-                    onClick={handleAddFriend}
-                  >
-                    <UserPlus className="w-6 h-6" strokeWidth={2} />
-                  </Button>
-                )}
-              </>
-            )}
+            <RightButton />
           </div>
         </div>
 

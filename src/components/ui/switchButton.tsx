@@ -8,11 +8,14 @@ export interface SwitchButtonProps {
   inactiveIcon?: React.ReactNode;
   activeColor?: string;
   inactiveColor?: string;
-  onClick: () => void;
+  onClick?: () => void;
   className?: string;
 }
 
-export const SwitchButton = React.forwardRef<HTMLButtonElement, SwitchButtonProps>(
+export const SwitchButton = React.forwardRef<
+  HTMLButtonElement,
+  SwitchButtonProps
+>(
   (
     {
       isActive,

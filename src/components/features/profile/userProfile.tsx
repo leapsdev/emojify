@@ -39,6 +39,30 @@ export const UserProfile = ({
     await removeFriend(currentUserId, userId);
   };
 
+  const RightButton = () => {
+    if (isOwnProfile) {
+      return (
+        <Link href="/profile/edit">
+          <Button
+            variant="outline"
+            className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
+          >
+            Edit Profile
+          </Button>
+        </Link>
+      );
+    }
+  
+    return (
+      <SwitchButton
+        isActive={isFriend}
+        activeIcon={<UserMinus className="w-6 h-6" strokeWidth={2} />}
+        inactiveIcon={<UserPlus className="w-6 h-6" strokeWidth={2} />}
+        onClick={isFriend ? handleRemoveFriend : handleAddFriend}
+      />
+    );
+  };
+
   return (
     <div className="px-4 pt-4">
       <div className="mb-8">
@@ -59,23 +83,7 @@ export const UserProfile = ({
                 {userId}
               </p>
             </div>
-            {isOwnProfile ? (
-              <Link href="/profile/edit">
-                <Button
-                  variant="outline"
-                  className="h-9 rounded-2xl text-sm px-5 bg-gray-50 hover:bg-gray-100 border-0 text-gray-600 mt-3 font-black shrink-0"
-                >
-                  Edit Profile
-                </Button>
-              </Link>
-            ) : (
-              <SwitchButton
-                isActive={isFriend}
-                activeIcon={<UserMinus className="w-6 h-6" strokeWidth={2} />}
-                inactiveIcon={<UserPlus className="w-6 h-6" strokeWidth={2} />}
-                onClick={isFriend ? handleRemoveFriend : handleAddFriend}
-              />
-            )}
+            <RightButton />
           </div>
         </div>
 

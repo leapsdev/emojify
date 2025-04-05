@@ -1,7 +1,6 @@
 'use client';
 
 import { Button } from '@/components/ui/button';
-import { SwitchButton } from '@/components/ui/switchButton';
 import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
@@ -69,12 +68,23 @@ export const UserProfile = ({
                 </Button>
               </Link>
             ) : (
-              <SwitchButton
-                isActive={isFriend}
-                activeIcon={<UserMinus className="w-6 h-6" strokeWidth={2} />}
-                inactiveIcon={<UserPlus className="w-6 h-6" strokeWidth={2} />}
-                onClick={isFriend ? handleRemoveFriend : handleAddFriend}
-              />
+              <>
+                {isFriend ? (
+                  <Button
+                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-gray-400 hover:bg-gray-500 text-white"
+                    onClick={handleRemoveFriend}
+                  >
+                    <UserMinus className="w-6 h-6" strokeWidth={2} />
+                  </Button>
+                ) : (
+                  <Button
+                    className="h-9 rounded-2xl px-7 w-24 flex items-center justify-center mt-3 bg-blue-500 hover:bg-blue-600 text-white"
+                    onClick={handleAddFriend}
+                  >
+                    <UserPlus className="w-6 h-6" strokeWidth={2} />
+                  </Button>
+                )}
+              </>
             )}
           </div>
         </div>

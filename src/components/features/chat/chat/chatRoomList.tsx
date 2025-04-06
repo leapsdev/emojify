@@ -1,4 +1,5 @@
 import type { ChatRoom } from '@/types/database';
+import { DotBadge } from '@/components/ui/dotBadge';
 import { formatRelativeTime } from '@/utils/date';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -32,11 +33,14 @@ export const ChatRoomList = ({
                     .map(([, member]) => member.username)
                     .join(', ')}
                 </h3>
-                <span className="text-sm text-gray-500">
-                  {room.lastMessage
-                    ? formatRelativeTime(room.lastMessage.createdAt)
-                    : formatRelativeTime(room.createdAt)}
-                </span>
+                <div className="flex items-center gap-2">
+                  <DotBadge />
+                  <span className="text-sm text-gray-500">
+                    {room.lastMessage
+                      ? formatRelativeTime(room.lastMessage.createdAt)
+                      : formatRelativeTime(room.createdAt)}
+                  </span>
+                </div>
               </div>
             </div>
           </div>

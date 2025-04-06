@@ -51,8 +51,10 @@ export async function createChatRoom(members: string[]): Promise<string> {
     throw new Error('Failed to generate room ID');
   }
 
-  const membersRecord: Record<string, { joinedAt: number; username: string }> =
-    {};
+  const membersRecord: Record<
+    string,
+    { joinedAt: number; username: string; lastReadAt: number }
+  > = {};
   const now = Date.now();
 
   // メンバーのユーザー情報を取得
@@ -69,6 +71,7 @@ export async function createChatRoom(members: string[]): Promise<string> {
     membersRecord[members[index]] = {
       joinedAt: now,
       username: user.username,
+      lastReadAt: now,
     };
   });
 
@@ -136,7 +139,7 @@ export async function sendMessage(
 
   await newMessageRef.set(message);
 
-  // ルームの最終メッセージを更新
+  // ルームの最終メッセージを更新し、送信者の既読状態も更新
   const roomUpdate: Partial<ChatRoom> = {
     lastMessage: {
       content,
@@ -144,6 +147,7 @@ export async function sendMessage(
       createdAt: now,
     },
     updatedAt: now,
+    [`members/${senderId}/lastReadAt`]: now,
   };
 
   await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).update(roomUpdate);
@@ -189,7 +193,7 @@ export async function addRoomMember(
 ): Promise<void> {
   const updates: Record<
     string,
-    { joinedAt: number; username: string } | boolean
+    { joinedAt: number; username: string; lastReadAt: number } | boolean
   > = {};
   const now = Date.now();
 
@@ -202,6 +206,7 @@ export async function addRoomMember(
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`] = {
     joinedAt: now,
     username: user.username,
+    lastReadAt: now,
   };
 
   // ユーザーのルームインデックスを更新
@@ -254,4 +259,34 @@ export async function deleteChatRoom(roomId: string): Promise<void> {
   updates[`${DB_INDEXES.roomMessages}/${roomId}`] = null;
 
   await adminDb.ref().update(updates);
+}
+
+/**
+ * メッセージを既読にする
+ */
+export async function updateLastReadAction(
+  roomId: string,
+  userId: string,
+): Promise<void> {
+  // パラメータのバリデーション
+  if (!roomId) throw new Error('Room ID is required');
+  if (!userId) throw new Error('User ID is required');
+
+  const now = Date.now();
+
+  // ルームとユーザーの存在確認
+  const roomRef = adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`);
+  const roomSnapshot = await roomRef.get();
+
+  if (!roomSnapshot.exists()) {
+    throw new Error(`Room not found: ${roomId}`);
+  }
+
+  const room = roomSnapshot.val() as ChatRoom;
+  if (!room.members[userId]) {
+    throw new Error(`User ${userId} is not a member of room ${roomId}`);
+  }
+
+  // 最終既読時刻を更新
+  await roomRef.child(`members/${userId}/lastReadAt`).set(now);
 }

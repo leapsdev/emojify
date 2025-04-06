@@ -48,6 +48,7 @@ export interface ChatRoom {
     {
       joinedAt: number;
       username: string;
+      lastReadAt: number;
     }
   >;
   lastMessage?: {

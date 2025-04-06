@@ -15,7 +15,7 @@ export function MessageList({
   currentUserId,
   initialMessages,
 }: MessageListProps) {
-  const messages = useRoomMessages(roomId, initialMessages);
+  const messages = useRoomMessages(roomId, currentUserId, initialMessages);
 
   if (!messages.length) {
     return (

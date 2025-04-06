@@ -1,9 +1,9 @@
-import { EmojiList } from '../features/explore/components/emojiList';
+import { EmojiList } from '@/components/features/explore/components/emojiList';
 
 export function ExplorePage() {
   return (
-    <div className="flex flex-col">
+    <main className="flex flex-col">
       <EmojiList />
-    </div>
+    </main>
   );
 }

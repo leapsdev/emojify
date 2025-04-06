@@ -1,5 +1,3 @@
-'use client';
-
 import { ProfileEditForm } from '@/components/features/profile/edit/profileEditForm';
 import { ProfileImage } from '@/components/features/profile/edit/profileImage';
 import type { User } from '@/types/database';

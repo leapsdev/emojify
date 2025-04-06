@@ -1,10 +1,9 @@
-import { EMOJI_DATA } from '@/components/features/collect-emoji/constants';
-import type { EmojiData } from '@/components/features/collect-emoji/types';
 import { CollectButton } from '@/components/features/collect-emoji/components/CollectButton';
 import { CreatorInfo } from '@/components/features/collect-emoji/components/CreatorInfo';
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
-
+import { EMOJI_DATA } from '@/components/features/collect-emoji/constants';
+import type { EmojiData } from '@/components/features/collect-emoji/types';
 
 interface Props {
   emoji?: EmojiData;

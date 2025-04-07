@@ -1,8 +1,15 @@
 'use client';
 
 import { Input } from '@/components/ui/input';
-import { Send } from 'lucide-react';
+import { Send, Smile } from 'lucide-react';
 import { useState } from 'react';
+import dynamic from 'next/dynamic';
+import type { EmojiClickData } from 'emoji-picker-react';
+
+const EmojiPicker = dynamic(
+  () => import('emoji-picker-react'),
+  { ssr: false }
+);
 import { sendMessageAction } from './actions';
 
 type ChatRoomInputProps = {
@@ -14,7 +21,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const trimmedMessage = message.trim();
@@ -45,19 +52,32 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
         {error && <div className="text-sm text-red-500 px-2">{error}</div>}
         <div className="flex items-center gap-2">
           <div className="flex-1 relative">
-            <Input
-              type="text"
-              placeholder="メッセージを入力..."
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              className="w-full bg-gray-100 border-none rounded-full py-6 pl-4 pr-12 text-base"
-              disabled={isLoading}
-            />
             <button
               type="button"
-              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400"
-              disabled={isLoading}
+              onClick={() => setShowEmojiPicker(!showEmojiPicker)}
+              className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors z-10"
+            >
+              <Smile className="w-6 h-6" />
+            </button>
+            <Input
+              type="text"
+              placeholder="絵文字を選択してください..."
+              value={message}
+              className={`w-full bg-gray-100 border-none rounded-full py-6 px-4 text-base ${isLoading ? 'opacity-50' : ''}`}
+              disabled={true}
             />
+            {showEmojiPicker && (
+              <div className="absolute bottom-full right-0 mb-2 z-50">
+              <EmojiPicker
+                onEmojiClick={(emojiData: EmojiClickData) => {
+                  setMessage(emojiData.emoji);
+                  setShowEmojiPicker(false);
+                }}
+                width={350}
+                height={400}
+              />
+              </div>
+            )}
           </div>
           <button
             type="submit"

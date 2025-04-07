@@ -43,7 +43,6 @@ export function MessageList({
     }
   }, []); // 依存配列を空にして、マウント時のみ実行
 
-
   if (!messages.length) {
     return (
       <div className="flex-1 overflow-auto p-4 flex items-center justify-center">

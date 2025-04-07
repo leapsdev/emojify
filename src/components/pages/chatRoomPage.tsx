@@ -1,4 +1,4 @@
-import { ChatRoomInput } from '@/components/features/chat/chat-room/input';
+import { ChatRoomInput } from '@/components/features/chat/chat-room/chatInput';
 import { MessageList } from '@/components/features/chat/chat-room/message-list';
 import type { Message } from '@/types/database';
 

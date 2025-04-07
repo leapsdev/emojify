@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
 import type { EmojiClickData } from 'emoji-picker-react';
+import { useEffect, useRef, useState } from 'react';
 
 export function useEmojiInput() {
   const [message, setMessage] = useState('');
@@ -31,11 +31,11 @@ export function useEmojiInput() {
   }, [showEmojiPicker]);
 
   const handleEmojiClick = (emojiData: EmojiClickData) => {
-    setMessage(prevMessage => prevMessage + emojiData.emoji);
+    setMessage((prevMessage) => prevMessage + emojiData.emoji);
   };
 
   const handleDeleteLastEmoji = () => {
-    setMessage(prevMessage => {
+    setMessage((prevMessage) => {
       const lastEmojiMatch = prevMessage.match(/[\p{Emoji}]+$/u);
       if (lastEmojiMatch) {
         return prevMessage.slice(0, -lastEmojiMatch[0].length);
@@ -45,7 +45,7 @@ export function useEmojiInput() {
   };
 
   const toggleEmojiPicker = () => {
-    setShowEmojiPicker(prev => !prev);
+    setShowEmojiPicker((prev) => !prev);
   };
 
   const clearMessage = () => {

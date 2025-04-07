@@ -2,9 +2,9 @@
 
 import { Send } from 'lucide-react';
 import { useState } from 'react';
-import { useEmojiInput } from './hooks/useEmojiInput';
-import { EmojiPicker } from './components/EmojiPicker';
 import { sendMessageAction } from './actions';
+import { EmojiPicker } from './components/EmojiPicker';
+import { useEmojiInput } from './hooks/useEmojiInput';
 
 type ChatRoomInputProps = {
   roomId: string;

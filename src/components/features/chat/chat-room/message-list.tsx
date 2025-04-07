@@ -58,13 +58,13 @@ export function MessageList({
                   }`}
                 >
                   <div
-                    className={`px-4 py-2 rounded-[22px] text-lg max-w-[80%] ${
+                    className={`px-4 py-2 rounded-[22px] text-4xl max-w-[80%] ${
                       isSentByCurrentUser
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 text-black'
                     }`}
                   >
-                    {message.content}
+                    <span className="leading-none">{message.content}</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-400 px-1">
                     <span>

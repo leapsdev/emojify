@@ -63,7 +63,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
               type="text"
               placeholder="絵文字を選択してください..."
               value={message}
-              className={`w-full bg-gray-100 border-none rounded-full py-6 px-4 text-base ${isLoading ? 'opacity-50' : ''}`}
+              className="w-full bg-gray-100 border-none rounded-full py-6 px-4 text-base disabled:text-black disabled:opacity-100"
               disabled={true}
             />
             {showEmojiPicker && (

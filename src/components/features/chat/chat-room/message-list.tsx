@@ -2,8 +2,8 @@
 
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
-import { useRoomMessages } from './hooks/useRoomMessages';
 import { useEffect, useRef } from 'react';
+import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
   roomId: string;
@@ -19,12 +19,33 @@ export function MessageList({
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
   useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // 初期スクロール
     scrollToBottom();
+
+    // メッセージコンテナの監視を設定
+    const container = messagesEndRef.current?.parentElement;
+    if (container) {
+      const observer = new MutationObserver(() => {
+        scrollToBottom();
+      });
+
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+
+      return () => observer.disconnect();
+    }
+  }, []); // 依存配列を空にして、マウント時のみ実行
+
+  // メッセージが更新されたときのスクロール
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
   if (!messages.length) {

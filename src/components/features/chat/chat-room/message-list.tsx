@@ -2,6 +2,7 @@
 
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
+import { useEffect, useRef } from 'react';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
@@ -16,6 +17,31 @@ export function MessageList({
   initialMessages,
 }: MessageListProps) {
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    // 初期スクロール
+    scrollToBottom();
+
+    // メッセージコンテナの監視を設定
+    const container = messagesEndRef.current?.parentElement;
+    if (container) {
+      const observer = new MutationObserver(() => {
+        scrollToBottom();
+      });
+
+      observer.observe(container, {
+        childList: true,
+        subtree: true,
+      });
+
+      return () => observer.disconnect();
+    }
+  }, []); // 依存配列を空にして、マウント時のみ実行
 
   if (!messages.length) {
     return (
@@ -58,13 +84,13 @@ export function MessageList({
                   }`}
                 >
                   <div
-                    className={`px-4 py-2 rounded-[22px] text-lg max-w-[80%] ${
+                    className={`px-4 py-2 rounded-[22px] text-4xl max-w-[80%] ${
                       isSentByCurrentUser
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 text-black'
                     }`}
                   >
-                    {message.content}
+                    <span className="leading-none">{message.content}</span>
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-400 px-1">
                     <span>
@@ -83,6 +109,7 @@ export function MessageList({
           </div>
         </div>
       ))}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

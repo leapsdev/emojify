@@ -3,6 +3,7 @@
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import { useRoomMessages } from './hooks/useRoomMessages';
+import { useEffect, useRef } from 'react';
 
 type MessageListProps = {
   roomId: string;
@@ -16,6 +17,15 @@ export function MessageList({
   initialMessages,
 }: MessageListProps) {
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   if (!messages.length) {
     return (
@@ -83,6 +93,7 @@ export function MessageList({
           </div>
         </div>
       ))}
+      <div ref={messagesEndRef} />
     </div>
   );
 }

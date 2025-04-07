@@ -43,10 +43,6 @@ export function MessageList({
     }
   }, []); // 依存配列を空にして、マウント時のみ実行
 
-  // メッセージが更新されたときのスクロール
-  useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages]);
 
   if (!messages.length) {
     return (

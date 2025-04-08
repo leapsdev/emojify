@@ -30,7 +30,7 @@ export function EmojiPicker({
 }: EmojiPickerProps) {
   return (
     <div className="flex-1 relative">
-      <div className="relative w-full" onClick={onToggleEmojiPicker}>
+      <div className="relative w-full">
         <input
           ref={inputRef}
           type="text"
@@ -38,6 +38,7 @@ export function EmojiPicker({
           placeholder="クリックして絵文字を選択..."
           value={message}
           readOnly
+          onClick={onToggleEmojiPicker}
           className="w-full h-12 bg-gray-100 border-none rounded-full px-4 text-2xl leading-none cursor-pointer focus:outline-none placeholder:text-base"
         />
         {message && (
@@ -45,6 +46,7 @@ export function EmojiPicker({
             ref={deleteButtonRef}
             type="button"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               onDeleteLastEmoji();
             }}

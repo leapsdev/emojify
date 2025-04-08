@@ -56,15 +56,21 @@ export function EmojiPicker({
       {showEmojiPicker && (
         <div
           ref={emojiPickerRef}
-          className="absolute bottom-full right-0 mb-2 z-50 bg-white rounded-lg shadow-lg"
+          className="fixed inset-x-4 bottom-24 z-50 bg-white rounded-lg shadow-lg md:absolute md:inset-x-auto md:bottom-full md:right-0 md:mb-2"
         >
-          <EmojiPickerComponent
-            onEmojiClick={onEmojiClick}
-            width={350}
-            height={400}
-            theme={Theme.LIGHT}
-            searchPlaceholder="絵文字を検索..."
-          />
+          <div className="max-w-[95vw] w-full md:w-[350px]">
+            <EmojiPickerComponent
+              onEmojiClick={(emoji) => {
+                onEmojiClick(emoji);
+                onToggleEmojiPicker(); // 絵文字選択後にピッカーを閉じる
+              }}
+              lazyLoadEmojis={true}
+              width="100%"
+              height={350}
+              theme={Theme.LIGHT}
+              searchPlaceholder="絵文字を検索..."
+            />
+          </div>
         </div>
       )}
     </div>

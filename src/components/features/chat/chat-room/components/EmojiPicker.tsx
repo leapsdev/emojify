@@ -60,10 +60,7 @@ export function EmojiPicker({
         >
           <div className="max-w-[95vw] w-full md:w-[350px]">
             <EmojiPickerComponent
-              onEmojiClick={(emoji) => {
-                onEmojiClick(emoji);
-                onToggleEmojiPicker(); // 絵文字選択後にピッカーを閉じる
-              }}
+              onEmojiClick={onEmojiClick}
               lazyLoadEmojis={true}
               width="100%"
               height={350}

@@ -66,7 +66,7 @@ export function EmojiPicker({
               width="100%"
               height={350}
               theme={Theme.LIGHT}
-              searchPlaceholder="絵文字を検索..."
+              searchDisabled={true}
             />
           </div>
         </div>

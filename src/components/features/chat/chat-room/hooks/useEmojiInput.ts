@@ -44,13 +44,7 @@ export function useEmojiInput() {
   };
 
   const handleDeleteLastEmoji = () => {
-    setMessage((prevMessage) => {
-      const lastEmojiMatch = prevMessage.match(/[\p{Emoji}]+$/u);
-      if (lastEmojiMatch) {
-        return prevMessage.slice(0, -lastEmojiMatch[0].length);
-      }
-      return prevMessage;
-    });
+    setMessage('');
   };
 
   const toggleEmojiPicker = () => {

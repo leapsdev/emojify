@@ -57,7 +57,11 @@ export function useRoomMessages(
     return initialMessages;
   }, [initialMessages]);
 
-  const messages = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const messages = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
 
   // メッセージをメモ化してソート
   const sortedMessages = useMemo(() => {

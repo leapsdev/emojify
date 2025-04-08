@@ -11,9 +11,12 @@ export function useEmojiInput() {
   useEffect(() => {
     const handleOutsideClick = (event: MouseEvent | TouchEvent) => {
       const target = event.target as Node;
-      const isOutsideEmojiPicker = emojiPickerRef.current && !emojiPickerRef.current.contains(target);
-      const isOutsideInput = inputRef.current && !inputRef.current.contains(target);
-      const isOutsideDeleteButton = deleteButtonRef.current && !deleteButtonRef.current.contains(target);
+      const isOutsideEmojiPicker =
+        emojiPickerRef.current && !emojiPickerRef.current.contains(target);
+      const isOutsideInput =
+        inputRef.current && !inputRef.current.contains(target);
+      const isOutsideDeleteButton =
+        deleteButtonRef.current && !deleteButtonRef.current.contains(target);
 
       if (isOutsideEmojiPicker && isOutsideInput && isOutsideDeleteButton) {
         setShowEmojiPicker(false);
@@ -22,8 +25,12 @@ export function useEmojiInput() {
 
     if (showEmojiPicker) {
       // タッチデバイスとマウスの両方に対応
-      document.addEventListener('mousedown', handleOutsideClick, { passive: true });
-      document.addEventListener('touchstart', handleOutsideClick, { passive: true });
+      document.addEventListener('mousedown', handleOutsideClick, {
+        passive: true,
+      });
+      document.addEventListener('touchstart', handleOutsideClick, {
+        passive: true,
+      });
 
       return () => {
         document.removeEventListener('mousedown', handleOutsideClick);

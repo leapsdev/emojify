@@ -39,7 +39,7 @@ export function MessageList({
 
       return () => observer.disconnect();
     }
-  }, [messages]); // messagesの変更を監視
+  }, []);
 
   if (!messages.length) {
     return (
@@ -59,7 +59,7 @@ export function MessageList({
       acc[date].push(message);
       return acc;
     },
-    {}
+    {},
   );
 
   return (

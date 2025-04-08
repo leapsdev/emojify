@@ -8,7 +8,7 @@ import {
 import type { Message } from '@/types/database';
 import { DB_INDEXES } from '@/types/database';
 import { onValue, ref } from 'firebase/database';
-import { useCallback, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 
 export function useRoomMessages(
   roomId: string,
@@ -28,9 +28,7 @@ export function useRoomMessages(
       const unsubscribe = onValue(dbRef, async () => {
         try {
           const { messages } = await getChatRoomAction(roomId);
-          messagesRef.current = [...messages].sort(
-            (a, b) => a.createdAt - b.createdAt,
-          );
+          messagesRef.current = messages;
 
           // メッセージを受信したら既読状態を更新
           if (
@@ -59,5 +57,16 @@ export function useRoomMessages(
     return initialMessages;
   }, [initialMessages]);
 
-  return useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const messages = useSyncExternalStore(
+    subscribe,
+    getSnapshot,
+    getServerSnapshot,
+  );
+
+  // メッセージをメモ化してソート
+  const sortedMessages = useMemo(() => {
+    return [...messages].sort((a, b) => a.createdAt - b.createdAt);
+  }, [messages]);
+
+  return sortedMessages;
 }

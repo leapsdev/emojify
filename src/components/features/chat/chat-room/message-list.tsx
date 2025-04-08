@@ -30,9 +30,7 @@ export function MessageList({
     // メッセージコンテナの監視を設定
     const container = messagesEndRef.current?.parentElement;
     if (container) {
-      const observer = new MutationObserver(() => {
-        scrollToBottom();
-      });
+      const observer = new MutationObserver(scrollToBottom);
 
       observer.observe(container, {
         childList: true,
@@ -41,7 +39,7 @@ export function MessageList({
 
       return () => observer.disconnect();
     }
-  }, []); // 依存配列を空にして、マウント時のみ実行
+  }, []);
 
   if (!messages.length) {
     return (

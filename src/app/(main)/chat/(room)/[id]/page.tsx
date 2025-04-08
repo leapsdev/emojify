@@ -11,8 +11,7 @@ type Props = {
 };
 
 export default async function Page({ params }: Props) {
-  const resolvedParams = await params;
-  const { id: roomId } = resolvedParams;
+  const roomId = (await params).id;
 
   const userId = await getUserId();
   if (!userId) throw new Error('Authentication required');

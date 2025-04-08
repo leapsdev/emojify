@@ -34,6 +34,7 @@ export function EmojiPicker({
         <input
           ref={inputRef}
           type="text"
+          inputMode="none"
           placeholder="クリックして絵文字を選択..."
           value={message}
           readOnly

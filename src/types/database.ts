@@ -16,9 +16,9 @@
  */
 export interface User {
   id: string;
-  email: string | null;
+  email?: string | null;
   username: string;
-  bio: string | null;
+  bio?: string | null;
   createdAt: number;
   updatedAt: number;
   friends?: Record<string, { createdAt: number }>;

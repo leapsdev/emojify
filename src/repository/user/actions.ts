@@ -14,7 +14,7 @@ export async function createUser(data: ProfileForm, privyId: string) {
   const user: User = {
     id: privyId,
     username: data.username,
-    bio: data.bio ?? null,
+    bio: data.bio || null,
     createdAt: timestamp,
     updatedAt: timestamp,
     email: data.email || null,

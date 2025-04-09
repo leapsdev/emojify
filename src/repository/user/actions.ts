@@ -17,7 +17,7 @@ export async function createUser(data: ProfileForm, privyId: string) {
     bio: data.bio ?? null,
     createdAt: timestamp,
     updatedAt: timestamp,
-    email: data.email,
+    email: data.email || undefined,
   };
 
   await userRef.set(user);

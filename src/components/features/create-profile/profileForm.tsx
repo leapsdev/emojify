@@ -36,13 +36,11 @@ export function ProfileForm() {
       onSubmit={form.onSubmit}
       action={formAction}
     >
-      {user?.email?.address && (
-        <input
-          type="hidden"
-          name={fields.email.name}
-          value={user.email.address}
-        />
-      )}
+      <input
+        type="hidden"
+        name={fields.email.name}
+        value={user?.email?.address || ''}
+      />
 
       {state?.message && (
         <div

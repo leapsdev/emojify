@@ -16,7 +16,7 @@
  */
 export interface User {
   id: string;
-  email?: string;
+  email: string | null;
   username: string;
   bio: string | null;
   createdAt: number;

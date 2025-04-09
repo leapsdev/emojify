@@ -43,7 +43,7 @@ export async function handleProfileFormAction(
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
     email: submission.payload.email
       ? String(submission.payload.email)
-      : undefined,
+      : null,
   };
 
   try {

@@ -25,7 +25,6 @@ export function CreateEmojiForm() {
       // NFTをミント
       const result = await mintEmojiNFT({
         toAddress: walletAddress,
-        tokenId: BigInt(1), // トークンIDは適切な値に変更する必要があります
         supply: BigInt(1),
         metadata: {
           name: '絵文字NFT',

@@ -7,12 +7,10 @@ import { Sepolia } from "@thirdweb-dev/chains";
 // NFTをミントする関数
 export async function mintEmojiNFT({
   toAddress,
-  tokenId,
   supply,
   metadata
 }: {
   toAddress: string;
-  tokenId: bigint;
   supply: bigint;
   metadata: {
     name: string;
@@ -39,7 +37,7 @@ export async function mintEmojiNFT({
       supply: supply.toString(),
     });
 
-    const receipt = await result.receipt;
+    const receipt = result.receipt;
     console.log("NFTがミントされました。トランザクションハッシュ:", receipt.transactionHash);
     
     return {

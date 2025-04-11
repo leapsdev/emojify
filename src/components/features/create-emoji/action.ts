@@ -1,7 +1,8 @@
 'use server'
 
 import { ThirdwebSDK } from "@thirdweb-dev/sdk";
-import { baseSepolia, EMOJI_CONTRACT_ADDRESS } from "@/lib/thirdweb";
+import { EMOJI_CONTRACT_ADDRESS } from "@/lib/thirdweb";
+import { Sepolia } from "@thirdweb-dev/chains";
 
 // NFTをミントする関数
 export async function mintEmojiNFT({
@@ -25,30 +26,25 @@ export async function mintEmojiNFT({
     }
 
     // SDKの初期化
-    const sdk = ThirdwebSDK.fromPrivateKey(
-      process.env.THIRDWEB_SECRET_KEY,
-      baseSepolia,
-      {
-        secretKey: process.env.THIRDWEB_SECRET_KEY,
-      }
-    );
+    const sdk = new ThirdwebSDK(Sepolia, {
+      secretKey: process.env.THIRDWEB_SECRET_KEY,
+    });
 
     // コントラクトの取得
     const contract = await sdk.getContract(EMOJI_CONTRACT_ADDRESS);
 
     // NFTのミント
-    const transaction = await contract.erc1155.mint({
-      to: toAddress,
-      tokenId: tokenId.toString(),
-      amount: supply.toString(),
-      metadata: metadata,
+    const result = await contract.erc1155.mintTo(toAddress, {
+      metadata,
+      supply: supply.toString(),
     });
 
-    console.log("NFTがミントされました。トランザクションハッシュ:", transaction.hash);
+    const receipt = await result.receipt;
+    console.log("NFTがミントされました。トランザクションハッシュ:", receipt.transactionHash);
     
     return {
       success: true,
-      transactionHash: transaction.hash,
+      transactionHash: receipt.transactionHash,
     };
   } catch (error) {
     console.error("NFTのミントに失敗しました:", error);

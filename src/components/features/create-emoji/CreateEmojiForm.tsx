@@ -1,11 +1,11 @@
 'use client';
 
-import { useFileUpload } from './hooks/useFileUpload';
-import { FileUpload } from './components/FileUpload';
-import { CreateButton } from './components/CreateButton';
+import { usePrivy } from '@privy-io/react-auth';
 import { useState } from 'react';
 import { mintEmojiNFT } from './action';
-import { usePrivy } from '@privy-io/react-auth';
+import { CreateButton } from './components/CreateButton';
+import { FileUpload } from './components/FileUpload';
+import { useFileUpload } from './hooks/useFileUpload';
 
 export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
@@ -49,15 +49,13 @@ export function CreateEmojiForm() {
   };
 
   return (
-    <main className="bg-white">
-      <div className="pt-14 max-w-md mx-auto px-4">
-        <FileUpload preview={preview} onFileSelect={handleFileSelect} />
-        <CreateButton
-          disabled={!selectedFile || !walletAddress}
-          onClick={handleCreate}
-          loading={loading}
-        />
-      </div>
-    </main>
+    <div className="pt-14 max-w-md mx-auto px-4">
+      <FileUpload preview={preview} onFileSelect={handleFileSelect} />
+      <CreateButton
+        disabled={!selectedFile || !walletAddress}
+        onClick={handleCreate}
+        loading={loading}
+      />
+    </div>
   );
 }

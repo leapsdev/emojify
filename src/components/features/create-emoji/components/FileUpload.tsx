@@ -4,6 +4,7 @@ import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRef } from 'react';
 import { useImagePreview } from '../hooks/useImagePreview';
+import { ResetButton } from './ResetButton';
 
 interface FileUploadProps {
   onFileChange?: (file: File | null) => void;
@@ -41,30 +42,7 @@ export function FileUpload({ onFileChange }: FileUploadProps) {
               className="object-cover"
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
-            <button
-              type="button"
-              onClick={handleReset}
-              className="absolute top-4 right-4 bg-white/80 hover:bg-white p-2 rounded-full shadow-md transition-colors"
-              aria-label="Reset"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                role="img"
-                aria-labelledby="closeIconTitle"
-              >
-                <title id="closeIconTitle">Close icon</title>
-                <line x1="18" y1="6" x2="6" y2="18" />
-                <line x1="6" y1="6" x2="18" y2="18" />
-              </svg>
-            </button>
+            <ResetButton onClick={handleReset} />
           </div>
         ) : (
           <ImageIcon className="w-12 h-12 text-gray-400 mb-8" />

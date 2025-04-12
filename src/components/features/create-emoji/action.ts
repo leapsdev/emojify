@@ -16,12 +16,8 @@ export async function uploadToIPFS(formData: FormData): Promise<UploadResult> {
       throw new Error('ファイルが見つかりません');
     }
 
-    // ファイルをArrayBufferに変換
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
     const sdk = getSDK();
-    const uri = await sdk.storage.upload(buffer, {
+    const uri = await sdk.storage.upload(file, {
       uploadWithGatewayUrl: true
     });
 

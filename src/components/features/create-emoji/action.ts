@@ -61,14 +61,14 @@ export async function mintEmojiNFT({
     
     // コントラクトの取得
     const contract = await sdk.getContract(EMOJI_CONTRACT_ADDRESS);
-
-    // NFTのミント
-    const result = await contract.erc1155.mintTo(toAddress, {
-      metadata,
-      supply: supply.toString(),
+    
+    console.log('コントラクト取得成功:', {
+      address: contract.getAddress()
     });
 
-    const receipt = result.receipt;
+    // NFTのミント
+    const tx = await contract.call("mint", [toAddress, metadata]);
+    const receipt = await tx.wait();
     console.log(
       'NFTがミントされました。トランザクションハッシュ:',
       receipt.transactionHash,

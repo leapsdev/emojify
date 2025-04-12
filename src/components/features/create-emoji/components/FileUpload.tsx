@@ -3,40 +3,38 @@
 import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRef } from 'react';
-import { useImagePreview } from '../hooks/useImagePreview';
 import { ResetButton } from './ResetButton';
 
 interface FileUploadProps {
-  onFileChange?: (file: File | null) => void;
+  preview: string | null;
+  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
-export function FileUpload({ onFileChange }: FileUploadProps) {
-  const { previewUrl, handleFileSelect, reset } = useImagePreview();
+export function FileUpload({ preview, onFileSelect }: FileUploadProps) {
   const inputRef = useRef<HTMLInputElement>(null);
-
-  // ファイル変更を親コンポーネントに通知
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    handleFileSelect(e);
-    onFileChange?.(e.target.files?.[0] ?? null);
-  };
 
   // リセット処理
   const handleReset = () => {
-    reset();
-    onFileChange?.(null);
-    // input要素の値をリセット
     if (inputRef.current) {
       inputRef.current.value = '';
+      // 空のファイルリストでonFileSelectを呼び出し
+      onFileSelect({
+        target: { files: null, value: '' } as unknown as HTMLInputElement,
+        currentTarget: {
+          files: null,
+          value: '',
+        } as unknown as HTMLInputElement,
+      } as React.ChangeEvent<HTMLInputElement>);
     }
   };
 
   return (
     <div className="w-full h-0 pb-[100%] relative bg-gray-100 rounded-xl mb-6">
       <div className="absolute inset-0 flex flex-col items-center justify-center overflow-hidden">
-        {previewUrl ? (
+        {preview ? (
           <div className="relative w-full h-full">
             <Image
-              src={previewUrl}
+              src={preview}
               alt="Preview"
               fill
               className="object-cover"
@@ -53,7 +51,7 @@ export function FileUpload({ onFileChange }: FileUploadProps) {
           accept="image/jpeg,image/png,image/gif,video/quicktime,video/mp4"
           className="hidden"
           id="file-upload"
-          onChange={handleChange}
+          onChange={onFileSelect}
         />
         <label
           htmlFor="file-upload"

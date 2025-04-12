@@ -16,6 +16,10 @@ export function useFileUpload() {
         setPreview(reader.result as string);
       };
       reader.readAsDataURL(file);
+    } else {
+      // ファイルが選択されていない場合はクリア
+      setSelectedFile(null);
+      setPreview(null);
     }
   };
 

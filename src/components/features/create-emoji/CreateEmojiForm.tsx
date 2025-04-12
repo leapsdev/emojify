@@ -2,6 +2,7 @@
 
 import { usePrivy } from '@privy-io/react-auth';
 import { useState } from 'react';
+import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { mintEmojiNFT, uploadToIPFS } from './action';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
@@ -18,6 +19,11 @@ export function CreateEmojiForm() {
 
     try {
       setLoading(true);
+      
+      console.log('NFTミント開始:', {
+        walletAddress,
+        contractAddress: EMOJI_CONTRACT_ADDRESS
+      });
 
       // FormDataの作成
       const formData = new FormData();
@@ -42,7 +48,11 @@ export function CreateEmojiForm() {
       });
 
       if (result.success) {
-        console.log('NFTがミントされました:', result.transactionHash);
+        console.log('NFTがミントされました:', {
+          transactionHash: result.transactionHash,
+          contractAddress: EMOJI_CONTRACT_ADDRESS,
+          imageUri: uploadResult.uri
+        });
         // 成功時の処理（通知など）
       } else {
         console.error('NFTのミントに失敗しました:', result.error);

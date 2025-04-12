@@ -29,24 +29,9 @@ export const getSDK = () => {
     throw new Error('THIRDWEB_SECRET_KEY is not defined');
   }
   
-  // Sepolia testnetの詳細設定
-  const sepolia = {
-    ...Sepolia,
-    rpc: [
-      "https://rpc.sepolia.org",
-      "https://eth-sepolia.g.alchemy.com/v2/demo",
-      "https://sepolia.infura.io/v3/",
-    ],
-    chainId: 11155111,
-    nativeCurrency: {
-      name: "Sepolia Ether",
-      symbol: "SEP",
-      decimals: 18,
-    },
-  };
-
-  return new ThirdwebSDK(sepolia, {
-    clientId: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID,
+  // Sepoliaネットワークの設定
+  // Sepolia TestnetのChainID: 11155111
+  return new ThirdwebSDK(11155111, {
     secretKey: process.env.THIRDWEB_SECRET_KEY,
   });
 };

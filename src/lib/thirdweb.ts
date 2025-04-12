@@ -19,9 +19,9 @@ export function getServerClient() {
   });
 }
 
-// コントラクトアドレス
+// コントラクトアドレス（Sepolia Testnet）
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x70f37e00D14b12A8Fe1386E84BAa73cFDc59EF4a';
+  '0x87E56d3F8F6FCb8455b98aE3c0852B95EdD0Ba1a'; // テスト用のコントラクトアドレス
 
 // SDKの初期化
 export const getSDK = () => {
@@ -29,13 +29,24 @@ export const getSDK = () => {
     throw new Error('THIRDWEB_SECRET_KEY is not defined');
   }
   
-  // Sepolia testnetの設定
+  // Sepolia testnetの詳細設定
   const sepolia = {
     ...Sepolia,
-    rpc: ["https://rpc.sepolia.org"], // バックアップRPCを追加
+    rpc: [
+      "https://rpc.sepolia.org",
+      "https://eth-sepolia.g.alchemy.com/v2/demo",
+      "https://sepolia.infura.io/v3/",
+    ],
+    chainId: 11155111,
+    nativeCurrency: {
+      name: "Sepolia Ether",
+      symbol: "SEP",
+      decimals: 18,
+    },
   };
 
   return new ThirdwebSDK(sepolia, {
+    clientId: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID,
     secretKey: process.env.THIRDWEB_SECRET_KEY,
   });
 };

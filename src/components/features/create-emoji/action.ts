@@ -4,6 +4,50 @@ import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { Sepolia } from '@thirdweb-dev/chains';
 import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 
+type UploadToIPFSSuccess = {
+  success: true;
+  uri: string;
+};
+
+type UploadToIPFSError = {
+  success: false;
+  error: string;
+};
+
+type UploadToIPFSResult = UploadToIPFSSuccess | UploadToIPFSError;
+
+// IPFSにファイルをアップロードする関数
+export async function uploadToIPFS(file: File): Promise<UploadToIPFSResult> {
+  try {
+    if (!process.env.THIRDWEB_SECRET_KEY) {
+      throw new Error('THIRDWEB_SECRET_KEY is not defined');
+    }
+
+    // SDKの初期化
+    const sdk = new ThirdwebSDK(Sepolia, {
+      secretKey: process.env.THIRDWEB_SECRET_KEY,
+    });
+
+    // ファイルをIPFSにアップロード
+    const uri = await sdk.storage.upload(file);
+    
+    if (!uri) {
+      throw new Error('アップロードに失敗しました: URIが取得できません');
+    }
+
+    return {
+      success: true,
+      uri: uri,
+    } as UploadToIPFSSuccess;
+  } catch (error) {
+    console.error('IPFSへのアップロードに失敗しました:', error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}
+
 // NFTをミントする関数
 export async function mintEmojiNFT({
   toAddress,

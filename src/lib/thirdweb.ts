@@ -21,7 +21,7 @@ export function getServerClient() {
 
 // コントラクトアドレス（Sepolia Testnet）
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x70f37e00D14b12A8Fe1386E84BAa73cFDc59EF4a';
+  '0x87E56d3F8F6FCb8455b98aE3c0852B95EdD0Ba1a'; // テスト用のコントラクトアドレス
 
 // SDKの初期化
 export const getSDK = () => {

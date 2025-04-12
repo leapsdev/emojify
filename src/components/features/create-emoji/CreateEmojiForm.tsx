@@ -2,7 +2,7 @@
 
 import { usePrivy } from '@privy-io/react-auth';
 import { useState } from 'react';
-import { mintEmojiNFT, uploadToIPFS } from './action';
+import { mintEmojiNFT } from './action';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
@@ -19,12 +19,8 @@ export function CreateEmojiForm() {
     try {
       setLoading(true);
 
-      // 画像をIPFSにアップロード
-      const uploadResult = await uploadToIPFS(selectedFile);
-      
-      if (!uploadResult.success) {
-        throw new Error(uploadResult.error || 'IPFSへのアップロードに失敗しました');
-      }
+      // 画像をIPFSにアップロード（この実装は後で追加）
+      const imageUrl = 'ipfs://your-image-hash';
 
       // NFTをミント
       const result = await mintEmojiNFT({
@@ -33,7 +29,7 @@ export function CreateEmojiForm() {
         metadata: {
           name: '絵文字NFT',
           description: '新しく作成した絵文字NFT',
-          image: uploadResult.uri,
+          image: imageUrl,
         },
       });
 

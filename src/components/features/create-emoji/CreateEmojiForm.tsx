@@ -19,10 +19,14 @@ export function CreateEmojiForm() {
     try {
       setLoading(true);
 
+      // FormDataの作成
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+
       // 画像をIPFSにアップロード
-      const uploadResult = await uploadToIPFS(selectedFile);
+      const uploadResult = await uploadToIPFS(formData);
       
-      if (!uploadResult.success) {
+      if (!uploadResult.success || !uploadResult.uri) {
         throw new Error(uploadResult.error || 'IPFSへのアップロードに失敗しました');
       }
 

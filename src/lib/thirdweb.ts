@@ -28,7 +28,14 @@ export const getSDK = () => {
   if (!process.env.THIRDWEB_SECRET_KEY) {
     throw new Error('THIRDWEB_SECRET_KEY is not defined');
   }
-  return new ThirdwebSDK(Sepolia, {
+  
+  // Sepolia testnetの設定
+  const sepolia = {
+    ...Sepolia,
+    rpc: ["https://rpc.sepolia.org"], // バックアップRPCを追加
+  };
+
+  return new ThirdwebSDK(sepolia, {
     secretKey: process.env.THIRDWEB_SECRET_KEY,
   });
 };

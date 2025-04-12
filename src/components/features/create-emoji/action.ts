@@ -1,26 +1,36 @@
 'use server';
 
-import { EMOJI_CONTRACT_ADDRESS, getSDK } from '@/lib/thirdweb';
+import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
+import { Sepolia } from '@thirdweb-dev/chains';
+import { ThirdwebSDK } from '@thirdweb-dev/sdk';
 
-type UploadResult = {
-  success: boolean;
-  uri?: string;
-  error?: string;
+type UploadToIPFSSuccess = {
+  success: true;
+  uri: string;
 };
 
+type UploadToIPFSError = {
+  success: false;
+  error: string;
+};
+
+type UploadToIPFSResult = UploadToIPFSSuccess | UploadToIPFSError;
+
 // IPFSにファイルをアップロードする関数
-export async function uploadToIPFS(formData: FormData): Promise<UploadResult> {
+export async function uploadToIPFS(file: File): Promise<UploadToIPFSResult> {
   try {
-    const file = formData.get('file');
-    if (!file || !(file instanceof File)) {
-      throw new Error('ファイルが見つかりません');
+    if (!process.env.THIRDWEB_SECRET_KEY) {
+      throw new Error('THIRDWEB_SECRET_KEY is not defined');
     }
 
-    const sdk = getSDK();
-    const uri = await sdk.storage.upload(file, {
-      uploadWithGatewayUrl: true
+    // SDKの初期化
+    const sdk = new ThirdwebSDK(Sepolia, {
+      secretKey: process.env.THIRDWEB_SECRET_KEY,
     });
 
+    // ファイルをIPFSにアップロード
+    const uri = await sdk.storage.upload(file);
+    
     if (!uri) {
       throw new Error('アップロードに失敗しました: URIが取得できません');
     }
@@ -28,7 +38,7 @@ export async function uploadToIPFS(formData: FormData): Promise<UploadResult> {
     return {
       success: true,
       uri: uri,
-    };
+    } as UploadToIPFSSuccess;
   } catch (error) {
     console.error('IPFSへのアップロードに失敗しました:', error);
     return {
@@ -53,8 +63,15 @@ export async function mintEmojiNFT({
   };
 }) {
   try {
-    const sdk = getSDK();
-    
+    if (!process.env.THIRDWEB_SECRET_KEY) {
+      throw new Error('THIRDWEB_SECRET_KEY is not defined');
+    }
+
+    // SDKの初期化
+    const sdk = new ThirdwebSDK(Sepolia, {
+      secretKey: process.env.THIRDWEB_SECRET_KEY,
+    });
+
     // コントラクトの取得
     const contract = await sdk.getContract(EMOJI_CONTRACT_ADDRESS);
 

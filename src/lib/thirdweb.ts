@@ -30,8 +30,20 @@ export const getSDK = () => {
   }
   
   // Sepoliaネットワークの設定
-  // Sepolia TestnetのChainID: 11155111
-  return new ThirdwebSDK(11155111, {
+  // カスタムSepoliaチェーン設定
+  const sepoliaChain = {
+    chainId: 11155111,
+    rpc: ["https://eth-sepolia.g.alchemy.com/v2/demo"],
+    nativeCurrency: {
+      name: "Sepolia Ether",
+      symbol: "SEP",
+      decimals: 18
+    },
+    slug: "sepolia"
+  };
+
+  return new ThirdwebSDK(sepoliaChain, {
     secretKey: process.env.THIRDWEB_SECRET_KEY,
+    clientId: process.env.NEXT_PUBLIC_TEMPLATE_CLIENT_ID
   });
 };

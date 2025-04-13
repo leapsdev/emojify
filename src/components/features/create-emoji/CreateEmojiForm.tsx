@@ -28,29 +28,31 @@ export function CreateEmojiForm() {
       // Step 1: NFTのミント
       writeContract({
         address: EMOJI_CONTRACT_ADDRESS as `0x${string}`,
-        abi: [{
-          name: 'mint',
-          type: 'function',
-          stateMutability: 'payable',
-          inputs: [
-            { name: 'to', type: 'address' },
-            { name: 'tokenId', type: 'uint256' },
-            { name: 'amount', type: 'uint256' },
-            { name: 'baseURI', type: 'string' },
-            { name: 'data', type: 'bytes' }
-          ],
-          outputs: [],
-        }],
+        abi: [
+          {
+            name: 'mint',
+            type: 'function',
+            stateMutability: 'payable',
+            inputs: [
+              { name: 'to', type: 'address' },
+              { name: 'tokenId', type: 'uint256' },
+              { name: 'amount', type: 'uint256' },
+              { name: 'baseURI', type: 'string' },
+              { name: 'data', type: 'bytes' },
+            ],
+            outputs: [],
+          },
+        ],
         functionName: 'mint',
         args: [
           walletAddress as `0x${string}`,
           BigInt(0),
           BigInt(1),
-          "test",
+          'test',
           '0x' as `0x${string}`,
         ],
+        gas: BigInt(100000), // ガス制限を設定
       });
-
     } catch (error) {
       console.error('エラーが発生しました:', error);
       alert('トランザクションの送信中にエラーが発生しました');

@@ -3,6 +3,11 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
 import { PrivyProvider } from '@/components/providers/privy-provider';
 import { Toaster } from 'sonner';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { WagmiProvider } from '@privy-io/wagmi';
+import { config } from '@/lib/wagmi';
+
+const queryClient = new QueryClient();
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,8 +40,12 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          {children}
-          <Toaster />
+          <QueryClientProvider client={queryClient}>
+            <WagmiProvider config={config}>
+              {children}
+              <Toaster />
+            </WagmiProvider>
+          </QueryClientProvider>
         </PrivyProvider>
       </body>
     </html>

@@ -93,47 +93,101 @@ export function CreateEmojiForm() {
       console.log(metadataHttpUrl);
 
       // Step 3: NFTのミント用トランザクションを準備
-      const metadataBytes = new TextEncoder().encode(metadataUrl);
-      const metadataHex = `0x${Buffer.from(metadataBytes).toString('hex')}`;
+      try {
+        // thirdwebのprepareContractCallを使用
+        const transaction = prepareContractCall({
+          contract,
+          method: "function mint(address to, uint256 tokenId, uint256 amount, string baseURI, bytes data) payable",
+          params: [
+            walletAddress,
+            BigInt(0),
+            BigInt(1),
+            metadataUrl,
+            "0x" as `0x${string}`, // 最小限のバイトデータ
+          ],
+        });
+        
+        console.log('Full Transaction:', transaction);
+        
+        // データが関数である場合は実行して取得
+        let transactionData;
+        if (typeof transaction.data === 'function') {
+          try {
+            transactionData = await transaction.data();
+            console.log('Executed transaction data:', transactionData);
+          } catch (dataError) {
+            console.error('データ関数の実行エラー:', dataError);
+            throw new Error('トランザクションデータの生成に失敗しました');
+          }
+        } else {
+          transactionData = transaction.data;
+        }
+        
+        if (!transactionData) {
+          console.error('トランザクションデータがありません');
+          throw new Error('トランザクションデータの生成に失敗しました');
+        }
+        
+        const txRequest = {
+          from: walletAddress,
+          to: transaction.to,
+          data: transactionData,
+          gas: '0x55555', // 十分な量のガス
+          maxFeePerGas: '0x2540be400', // 例: 10 Gwei
+          maxPriorityFeePerGas: '0x3b9aca00', // 例: 1 Gwei
+          // value を明示的に16進数文字列として設定
+          value: '0x0',
+          // 正しいチェーンIDを明示的に設定
+          chainId: `0x${baseSepolia.id.toString(16)}` // Base SepoliaのチェーンID（84532）
+        };
 
-      const transaction = prepareContractCall({
-        contract,
-        method:
-          'function mint(address to, uint256 tokenId, uint256 amount, bytes data) payable',
-        params: [
-          walletAddress,
-          BigInt(0), // tokenId will be auto-incremented by contract
-          BigInt(1),
-          metadataHex as `0x${string}`,
-        ],
-      });
-
-      if (!embeddedWallet) {
-        throw new Error('ウォレットが接続されていません');
+        console.log('Final Transaction Request:', txRequest);
+        
+        if (!embeddedWallet) {
+          throw new Error('ウォレットが接続されていません');
+        }
+        
+        // トランザクションを送信
+        const provider = await embeddedWallet.getEthereumProvider();
+        
+        // トランザクションを送信前に確認
+        console.log('送信するトランザクション:', {
+          method: 'eth_sendTransaction',
+          params: [txRequest]
+        });
+        
+        const transactionHash = await provider.request({
+          method: 'eth_sendTransaction',
+          params: [txRequest]
+        });
+        
+        console.log('トランザクション成功！ハッシュ:', transactionHash);
+        
+        alert(`NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`);
+      } catch (error: unknown) {
+        console.error('トランザクションエラー:', error);
+        
+        // エラーメッセージを詳細に表示
+        console.dir(error, { depth: null }); // エラーオブジェクトの詳細を表示
+        
+        // エラーメッセージを安全に取得
+        let errorMessage = 'Unknown error';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        } else if (typeof error === 'string') {
+          errorMessage = error;
+        } else if (error && typeof error === 'object') {
+          try {
+            errorMessage = JSON.stringify(error);
+          } catch {
+            if ('message' in error) {
+              errorMessage = String((error as { message: unknown }).message);
+            }
+          }
+        }
+        
+        alert(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
       }
-
-      // トランザクションを送信
-      const provider = await embeddedWallet.getEthereumProvider();
-      const transactionHash = await provider.request({
-        method: 'eth_sendTransaction',
-        params: [
-          {
-            from: walletAddress,
-            to: transaction.to,
-            data: transaction.data,
-            value: transaction.value?.toString() || '0x0',
-          },
-        ],
-      });
-
-      // 成功したらフォームをリセット
-      handleFileSelect({
-        target: { files: null },
-      } as ChangeEvent<HTMLInputElement>);
-
-      alert(
-        `NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`,
-      );
     } catch (error: unknown) {
       console.error('エラーが発生しました:', error);
 

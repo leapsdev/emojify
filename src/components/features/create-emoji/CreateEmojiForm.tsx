@@ -11,11 +11,13 @@ function isWalletError(error: unknown): error is WalletError {
 import { EMOJI_CONTRACT_ADDRESS, baseSepolia } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
 import { ThirdwebStorage } from '@thirdweb-dev/storage';
-import { type ChangeEvent, useState } from 'react';
+import { useState } from 'react';
 import {
   createThirdwebClient,
   getContract,
   prepareContractCall,
+  sendTransaction,
+  resolveMethod,
 } from 'thirdweb';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
@@ -54,7 +56,7 @@ export function CreateEmojiForm() {
   const walletAddress = embeddedWallet?.address;
 
   const handleCreate = async () => {
-    if (!selectedFile || !walletAddress) return;
+    if (!selectedFile || !walletAddress || !embeddedWallet) return;
 
     try {
       setLoading(true);
@@ -92,12 +94,12 @@ export function CreateEmojiForm() {
       );
       console.log(metadataHttpUrl);
 
-      // Step 3: NFTのミント用トランザクションを準備
+      // Step 3: NFTのミント用トランザクションを準備と送信
       try {
         // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,
-          method: "function mint(address to, uint256 tokenId, uint256 amount, string baseURI, bytes data) payable",
+          method: resolveMethod("mint"),
           params: [
             walletAddress,
             BigInt(0),
@@ -105,64 +107,67 @@ export function CreateEmojiForm() {
             metadataUrl,
             "0x" as `0x${string}`, // 最小限のバイトデータ
           ],
+          value: BigInt(0), // 送信するETHの量
+          gas: BigInt(300000), // ガスリミットを設定
+          maxFeePerGas: BigInt(1101314), // 最大ガス価格
+          maxPriorityFeePerGas: BigInt(1100000), // 最大優先ガス価格
+          gasPrice: BigInt(1101314), // ガス価格
+          maxFeePerBlobGas: BigInt(0), // Blobトランザクションの最大ガス価格
         });
-        
-        console.log('Full Transaction:', transaction);
-        
-        // データが関数である場合は実行して取得
-        let transactionData;
-        if (typeof transaction.data === 'function') {
-          try {
-            transactionData = await transaction.data();
-            console.log('Executed transaction data:', transactionData);
-          } catch (dataError) {
-            console.error('データ関数の実行エラー:', dataError);
-            throw new Error('トランザクションデータの生成に失敗しました');
-          }
-        } else {
-          transactionData = transaction.data;
-        }
-        
-        if (!transactionData) {
-          console.error('トランザクションデータがありません');
-          throw new Error('トランザクションデータの生成に失敗しました');
-        }
-        
-        const txRequest = {
-          from: walletAddress,
-          to: transaction.to,
-          data: transactionData,
-          gas: '0x55555', // 十分な量のガス
-          maxFeePerGas: '0x2540be400', // 例: 10 Gwei
-          maxPriorityFeePerGas: '0x3b9aca00', // 例: 1 Gwei
-          // value を明示的に16進数文字列として設定
-          value: '0x0',
-          // 正しいチェーンIDを明示的に設定
-          chainId: `0x${baseSepolia.id.toString(16)}` // Base SepoliaのチェーンID（84532）
-        };
 
-        console.log('Final Transaction Request:', txRequest);
-        
-        if (!embeddedWallet) {
-          throw new Error('ウォレットが接続されていません');
-        }
-        
+        // トランザクションの詳細を確認
+        console.log('トランザクションの詳細:', transaction);
+
         // トランザクションを送信
         const provider = await embeddedWallet.getEthereumProvider();
-        
-        // トランザクションを送信前に確認
-        console.log('送信するトランザクション:', {
-          method: 'eth_sendTransaction',
-          params: [txRequest]
+        const { transactionHash } = await sendTransaction({
+          account: {
+            address: walletAddress,
+            signMessage: async (message) => {
+              const signature = await provider.request({
+                method: 'personal_sign',
+                params: [message, walletAddress],
+              });
+              return signature as `0x${string}`;
+            },
+            signTransaction: async (tx) => {
+              const signedTx = await provider.request({
+                method: 'eth_signTransaction',
+                params: [{
+                  ...tx,
+                  gas: transaction.gas?.toString(),
+                  maxFeePerGas: transaction.maxFeePerGas?.toString(),
+                  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+                }],
+              });
+              return signedTx as `0x${string}`;
+            },
+            sendTransaction: async (tx) => {
+              const txHash = await provider.request({
+                method: 'eth_sendTransaction',
+                params: [{
+                  ...tx,
+                  gas: transaction.gas?.toString(),
+                  maxFeePerGas: transaction.maxFeePerGas?.toString(),
+                  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
+                }],
+              });
+              return {
+                transactionHash: txHash as `0x${string}`,
+              };
+            },
+            signTypedData: async (typedData) => {
+              const signature = await provider.request({
+                method: 'eth_signTypedData',
+                params: [walletAddress, typedData],
+              });
+              return signature as `0x${string}`;
+            },
+          },
+          transaction,
         });
-        
-        const transactionHash = await provider.request({
-          method: 'eth_sendTransaction',
-          params: [txRequest]
-        });
-        
+
         console.log('トランザクション成功！ハッシュ:', transactionHash);
-        
         alert(`NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`);
       } catch (error: unknown) {
         console.error('トランザクションエラー:', error);

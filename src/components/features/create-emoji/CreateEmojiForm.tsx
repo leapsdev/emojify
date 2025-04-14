@@ -14,11 +14,11 @@ import { ThirdwebStorage } from '@thirdweb-dev/storage';
 import { useState } from 'react';
 import {
   createThirdwebClient,
+  estimateGas,
   getContract,
   prepareContractCall,
-  sendTransaction,
   resolveMethod,
-  estimateGas,
+  sendTransaction,
   simulateTransaction,
 } from 'thirdweb';
 import { CreateButton } from './components/CreateButton';
@@ -101,13 +101,13 @@ export function CreateEmojiForm() {
         // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,
-          method: resolveMethod("mint"),
+          method: resolveMethod('mint'),
           params: [
             walletAddress,
             BigInt(0),
             BigInt(1),
             metadataUrl,
-            "0x" as `0x${string}`, // 最小限のバイトデータ
+            '0x' as `0x${string}`, // 最小限のバイトデータ
           ],
           value: BigInt(0), // 送信するETHの量
         });
@@ -115,15 +115,15 @@ export function CreateEmojiForm() {
         // ガスコストを推定
         try {
           const gasEstimate = await estimateGas({ transaction });
-          console.log("推定ガス量:", gasEstimate);
-          
+          console.log('推定ガス量:', gasEstimate);
+
           // 推定ガス量の1.5倍を設定
           const gasLimit = (gasEstimate * BigInt(15)) / BigInt(10);
-          console.log("設定ガス量:", gasLimit);
+          console.log('設定ガス量:', gasLimit);
 
           // トランザクションをシミュレート
           const simulationResult = await simulateTransaction({ transaction });
-          console.log("シミュレーション結果:", simulationResult);
+          console.log('シミュレーション結果:', simulationResult);
 
           // トランザクションの詳細を確認
           console.log('トランザクションの詳細:', transaction);
@@ -143,20 +143,24 @@ export function CreateEmojiForm() {
               signTransaction: async (tx) => {
                 const signedTx = await provider.request({
                   method: 'eth_signTransaction',
-                  params: [{
-                    ...tx,
-                    gas: gasLimit.toString(),
-                  }],
+                  params: [
+                    {
+                      ...tx,
+                      gas: gasLimit.toString(),
+                    },
+                  ],
                 });
                 return signedTx as `0x${string}`;
               },
               sendTransaction: async (tx) => {
                 const txHash = await provider.request({
                   method: 'eth_sendTransaction',
-                  params: [{
-                    ...tx,
-                    gas: gasLimit.toString(),
-                  }],
+                  params: [
+                    {
+                      ...tx,
+                      gas: gasLimit.toString(),
+                    },
+                  ],
                 });
                 return {
                   transactionHash: txHash as `0x${string}`,
@@ -174,13 +178,15 @@ export function CreateEmojiForm() {
           });
 
           console.log('トランザクション成功！ハッシュ:', transactionHash);
-          alert(`NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`);
+          alert(
+            `NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`,
+          );
         } catch (error: unknown) {
           console.error('トランザクションエラー:', error);
-          
+
           // エラーメッセージを詳細に表示
           console.dir(error, { depth: null }); // エラーオブジェクトの詳細を表示
-          
+
           // エラーメッセージを安全に取得
           let errorMessage = 'Unknown error';
           if (error instanceof Error) {
@@ -196,7 +202,7 @@ export function CreateEmojiForm() {
               }
             }
           }
-          
+
           alert(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
         }
       } catch (error: unknown) {

@@ -18,6 +18,8 @@ import {
   prepareContractCall,
   sendTransaction,
   resolveMethod,
+  estimateGas,
+  simulateTransaction,
 } from 'thirdweb';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
@@ -108,90 +110,110 @@ export function CreateEmojiForm() {
             "0x" as `0x${string}`, // 最小限のバイトデータ
           ],
           value: BigInt(0), // 送信するETHの量
-          gas: BigInt(300000), // ガスリミットを設定
-          maxFeePerGas: BigInt(1101314), // 最大ガス価格
-          maxPriorityFeePerGas: BigInt(1100000), // 最大優先ガス価格
-          gasPrice: BigInt(1101314), // ガス価格
-          maxFeePerBlobGas: BigInt(0), // Blobトランザクションの最大ガス価格
         });
 
-        // トランザクションの詳細を確認
-        console.log('トランザクションの詳細:', transaction);
+        // ガスコストを推定
+        try {
+          const gasEstimate = await estimateGas({ transaction });
+          console.log("推定ガス量:", gasEstimate);
+          
+          // 推定ガス量の1.5倍を設定
+          const gasLimit = (gasEstimate * BigInt(15)) / BigInt(10);
+          console.log("設定ガス量:", gasLimit);
 
-        // トランザクションを送信
-        const provider = await embeddedWallet.getEthereumProvider();
-        const { transactionHash } = await sendTransaction({
-          account: {
-            address: walletAddress,
-            signMessage: async (message) => {
-              const signature = await provider.request({
-                method: 'personal_sign',
-                params: [message, walletAddress],
-              });
-              return signature as `0x${string}`;
-            },
-            signTransaction: async (tx) => {
-              const signedTx = await provider.request({
-                method: 'eth_signTransaction',
-                params: [{
-                  ...tx,
-                  gas: transaction.gas?.toString(),
-                  maxFeePerGas: transaction.maxFeePerGas?.toString(),
-                  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
-                }],
-              });
-              return signedTx as `0x${string}`;
-            },
-            sendTransaction: async (tx) => {
-              const txHash = await provider.request({
-                method: 'eth_sendTransaction',
-                params: [{
-                  ...tx,
-                  gas: transaction.gas?.toString(),
-                  maxFeePerGas: transaction.maxFeePerGas?.toString(),
-                  maxPriorityFeePerGas: transaction.maxPriorityFeePerGas?.toString(),
-                }],
-              });
-              return {
-                transactionHash: txHash as `0x${string}`,
-              };
-            },
-            signTypedData: async (typedData) => {
-              const signature = await provider.request({
-                method: 'eth_signTypedData',
-                params: [walletAddress, typedData],
-              });
-              return signature as `0x${string}`;
-            },
-          },
-          transaction,
-        });
+          // トランザクションをシミュレート
+          const simulationResult = await simulateTransaction({ transaction });
+          console.log("シミュレーション結果:", simulationResult);
 
-        console.log('トランザクション成功！ハッシュ:', transactionHash);
-        alert(`NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`);
-      } catch (error: unknown) {
-        console.error('トランザクションエラー:', error);
-        
-        // エラーメッセージを詳細に表示
-        console.dir(error, { depth: null }); // エラーオブジェクトの詳細を表示
-        
-        // エラーメッセージを安全に取得
-        let errorMessage = 'Unknown error';
-        if (error instanceof Error) {
-          errorMessage = error.message;
-        } else if (typeof error === 'string') {
-          errorMessage = error;
-        } else if (error && typeof error === 'object') {
-          try {
-            errorMessage = JSON.stringify(error);
-          } catch {
-            if ('message' in error) {
-              errorMessage = String((error as { message: unknown }).message);
+          // トランザクションの詳細を確認
+          console.log('トランザクションの詳細:', transaction);
+
+          // トランザクションを送信
+          const provider = await embeddedWallet.getEthereumProvider();
+          const { transactionHash } = await sendTransaction({
+            account: {
+              address: walletAddress,
+              signMessage: async (message) => {
+                const signature = await provider.request({
+                  method: 'personal_sign',
+                  params: [message, walletAddress],
+                });
+                return signature as `0x${string}`;
+              },
+              signTransaction: async (tx) => {
+                const signedTx = await provider.request({
+                  method: 'eth_signTransaction',
+                  params: [{
+                    ...tx,
+                    gas: gasLimit.toString(),
+                  }],
+                });
+                return signedTx as `0x${string}`;
+              },
+              sendTransaction: async (tx) => {
+                const txHash = await provider.request({
+                  method: 'eth_sendTransaction',
+                  params: [{
+                    ...tx,
+                    gas: gasLimit.toString(),
+                  }],
+                });
+                return {
+                  transactionHash: txHash as `0x${string}`,
+                };
+              },
+              signTypedData: async (typedData) => {
+                const signature = await provider.request({
+                  method: 'eth_signTypedData',
+                  params: [walletAddress, typedData],
+                });
+                return signature as `0x${string}`;
+              },
+            },
+            transaction,
+          });
+
+          console.log('トランザクション成功！ハッシュ:', transactionHash);
+          alert(`NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`);
+        } catch (error: unknown) {
+          console.error('トランザクションエラー:', error);
+          
+          // エラーメッセージを詳細に表示
+          console.dir(error, { depth: null }); // エラーオブジェクトの詳細を表示
+          
+          // エラーメッセージを安全に取得
+          let errorMessage = 'Unknown error';
+          if (error instanceof Error) {
+            errorMessage = error.message;
+          } else if (typeof error === 'string') {
+            errorMessage = error;
+          } else if (error && typeof error === 'object') {
+            try {
+              errorMessage = JSON.stringify(error);
+            } catch {
+              if ('message' in error) {
+                errorMessage = String((error as { message: unknown }).message);
+              }
             }
           }
+          
+          alert(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
         }
-        
-        alert(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
+      } catch (error: unknown) {
+        console.error('エラーが発生しました:', error);
+
+        // ユーザーがトランザクションを拒否した場合
+        if (isWalletError(error) && error.code === 4001) {
+          alert(
+            'トランザクションがキャンセルされました。\n※画像とメタデータはIPFSにアップロード済みです。',
+          );
+        } else {
+          alert(
+            'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
+          );
+        }
+      } finally {
+        setLoading(false);
       }
     } catch (error: unknown) {
       console.error('エラーが発生しました:', error);
@@ -206,8 +228,6 @@ export function CreateEmojiForm() {
           'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
         );
       }
-    } finally {
-      setLoading(false);
     }
   };
 

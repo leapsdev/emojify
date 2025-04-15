@@ -21,7 +21,6 @@ import {
   estimateGas,
   getContract,
   prepareContractCall,
-  resolveMethod,
   sendTransaction,
   simulateTransaction,
 } from 'thirdweb';

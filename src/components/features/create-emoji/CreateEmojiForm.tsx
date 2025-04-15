@@ -132,7 +132,7 @@ export function CreateEmojiForm() {
           const provider = await embeddedWallet.getEthereumProvider();
           const { transactionHash } = await sendTransaction({
             account: {
-              address: walletAddress,
+              address: walletAddress as `0x${string}`,
               signMessage: async (message) => {
                 const signature = await provider.request({
                   method: 'personal_sign',

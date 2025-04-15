@@ -8,7 +8,7 @@ function isWalletError(error: unknown): error is WalletError {
   return typeof error === 'object' && error !== null && 'code' in error;
 }
 
-import { EMOJI_CONTRACT_ADDRESS, baseSepolia } from '@/lib/thirdweb';
+import { EMOJI_CONTRACT_ADDRESS, EMOJI_CONTRACT_ABI, baseSepolia } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
 import { ThirdwebStorage } from '@thirdweb-dev/storage';
 import { useState } from 'react';
@@ -35,6 +35,7 @@ const contract = getContract({
   client,
   chain: baseSepolia,
   address: EMOJI_CONTRACT_ADDRESS,
+  abi: EMOJI_CONTRACT_ABI,
 });
 
 // ThirdwebStorageインスタンスの初期化
@@ -101,7 +102,7 @@ export function CreateEmojiForm() {
         // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,
-          method: resolveMethod('mint'),
+          method: "mint",
           params: [
             walletAddress,
             BigInt(0),

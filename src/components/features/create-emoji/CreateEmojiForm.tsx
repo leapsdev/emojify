@@ -76,7 +76,7 @@ export function CreateEmojiForm() {
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
       const imageHttpUrl = ipfsToHttp(imageUrl);
-      alert(
+      console.log(
         `画像のアップロードが完了しました。\n以下のURLで確認できます：\n${imageHttpUrl}`,
       );
 
@@ -95,7 +95,7 @@ export function CreateEmojiForm() {
 
       const metadataUrl = await storage.upload(metadata);
       const metadataHttpUrl = ipfsToHttp(metadataUrl);
-      alert(
+      console.log(
         `メタデータのアップロードが完了しました。\n以下のURLで確認できます：\n${metadataHttpUrl}`,
       );
       console.log(metadataHttpUrl);
@@ -182,9 +182,6 @@ export function CreateEmojiForm() {
           });
 
           console.log('トランザクション成功！ハッシュ:', transactionHash);
-          alert(
-            `NFTの作成に成功しました！\nトランザクションハッシュ: ${transactionHash}`,
-          );
         } catch (error: unknown) {
           console.error('トランザクションエラー:', error);
 
@@ -207,18 +204,18 @@ export function CreateEmojiForm() {
             }
           }
 
-          alert(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
+          console.log(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
         }
       } catch (error: unknown) {
         console.error('エラーが発生しました:', error);
 
         // ユーザーがトランザクションを拒否した場合
         if (isWalletError(error) && error.code === 4001) {
-          alert(
+          console.log(
             'トランザクションがキャンセルされました。\n※画像とメタデータはIPFSにアップロード済みです。',
           );
         } else {
-          alert(
+          console.log(
             'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
           );
         }
@@ -230,11 +227,11 @@ export function CreateEmojiForm() {
 
       // ユーザーがトランザクションを拒否した場合
       if (isWalletError(error) && error.code === 4001) {
-        alert(
+        console.log(
           'トランザクションがキャンセルされました。\n※画像とメタデータはIPFSにアップロード済みです。',
         );
       } else {
-        alert(
+        console.log(
           'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
         );
       }

@@ -108,11 +108,11 @@ export function CreateEmojiForm() {
           contract,
           method: 'mint',
           params: [
-            walletAddress,
-            BigInt(0),
-            BigInt(1),
-            metadataUrl,
-            '0x' as `0x${string}`, // 最小限のバイトデータ
+            walletAddress, // to: 受信者のアドレス
+            BigInt(0), // tokenId: トークンID
+            BigInt(1), // amount: ミントする数量
+            metadataUrl, // baseURI: メタデータのURI
+            '0x' as `0x${string}`, // data: 追加データ
           ],
           value: BigInt(0), // 送信するETHの量
         });

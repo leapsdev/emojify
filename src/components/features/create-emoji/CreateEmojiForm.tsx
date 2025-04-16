@@ -102,6 +102,7 @@ export function CreateEmojiForm() {
 
       // Step 3: NFTのミント用トランザクションを準備と送信
       try {
+        console.log("コントラクト:", contract);
         // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,

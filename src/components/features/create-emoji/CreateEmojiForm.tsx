@@ -11,6 +11,7 @@ function isWalletError(error: unknown): error is WalletError {
 import {
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
+  CLIENT_ID,
   baseSepolia,
 } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
@@ -30,7 +31,7 @@ import { useFileUpload } from './hooks/useFileUpload';
 
 // ThirdWebクライアントの初期化
 const client = createThirdwebClient({
-  clientId: 'af87b9c2acce067efa781dc3ea43644d',
+  clientId: CLIENT_ID,
 });
 
 // コントラクトの取得
@@ -43,7 +44,7 @@ const contract = getContract({
 
 // ThirdwebStorageインスタンスの初期化
 const storage = new ThirdwebStorage({
-  clientId: 'af87b9c2acce067efa781dc3ea43644d',
+  clientId: CLIENT_ID,
 });
 
 // IPFSアップロード関数
@@ -102,7 +103,7 @@ export function CreateEmojiForm() {
 
       // Step 3: NFTのミント用トランザクションを準備と送信
       try {
-        console.log("コントラクト:", contract);
+        console.log('コントラクト:', contract);
         // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,

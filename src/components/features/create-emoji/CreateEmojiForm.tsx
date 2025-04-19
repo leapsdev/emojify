@@ -9,9 +9,9 @@ function isWalletError(error: unknown): error is WalletError {
 }
 
 import {
+  CLIENT_ID,
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
-  CLIENT_ID,
   baseSepolia,
 } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';

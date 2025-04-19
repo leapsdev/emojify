@@ -2,7 +2,6 @@
 
 import { Plus, User2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useActionState } from 'react';
 import { useRef, useState } from 'react';
 import { uploadImage } from './uploadImage';
 

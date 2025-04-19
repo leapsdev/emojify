@@ -19,6 +19,7 @@ export interface User {
   email?: string | null;
   username: string;
   bio?: string | null;
+  imageUrl?: string | null;
   createdAt: number;
   updatedAt: number;
   friends?: Record<string, { createdAt: number }>;

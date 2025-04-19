@@ -8,6 +8,7 @@ import type { User } from '@/types/database';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { useActionState } from 'react';
+import { forwardRef } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
 
@@ -17,7 +18,10 @@ interface ProfileEditFormProps {
 
 const initialState: ProfileFormState = null;
 
-export function ProfileEditForm({ user }: ProfileEditFormProps) {
+export const ProfileEditForm = forwardRef<
+  HTMLFormElement,
+  ProfileEditFormProps
+>(function ProfileEditForm({ user }, ref) {
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
@@ -45,6 +49,7 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       id={form.id}
       onSubmit={form.onSubmit}
       action={formAction}
+      ref={ref}
     >
       <input type="hidden" name="userId" value={user.id} />
       <input type="hidden" name={fields.email.name} value={user.email || ''} />
@@ -112,4 +117,4 @@ export function ProfileEditForm({ user }: ProfileEditFormProps) {
       </div>
     </form>
   );
-}
+});

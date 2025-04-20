@@ -100,7 +100,6 @@ export function CreateEmojiForm() {
         `メタデータのアップロードが完了しました。\n以下のURLで確認できます：\n${metadataHttpUrl}`,
       );
       console.log(metadataHttpUrl);
-
       // Step 3: NFTのミント用トランザクションを準備と送信
       try {
         console.log('コントラクト:', contract);

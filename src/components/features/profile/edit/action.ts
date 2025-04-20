@@ -42,6 +42,9 @@ export async function handleProfileFormAction(
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
     email: submission.payload.email ? String(submission.payload.email) : null,
+    imageUrl: submission.payload.imageUrl
+      ? String(submission.payload.imageUrl)
+      : null,
   };
 
   try {

@@ -49,6 +49,5 @@ export function formatRelativeTime(timestamp: number): string {
     return `${diffDays} days ago`;
   }
 
-  // Show date for older than a week
   return formatDateToYYYYMMDD(timestamp);
 }

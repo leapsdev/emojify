@@ -60,7 +60,7 @@ jobs:
         run: pnpm install
 
       - name: Check dependencies
-        run: pnpm why
+        run: pnpm list
 
       - name: Run Biome check
         run: pnpm biome check ./src

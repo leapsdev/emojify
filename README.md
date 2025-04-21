@@ -48,30 +48,43 @@
 ├── src/
 │   ├── app/                   
 │   │   ├── layout.tsx         
-│   │   ├── page.tsx         
-│   │   ├── auth/           
-│   │   ├── chat/           
-│   │   └── marketplace/    
+│   │   ├── (main)/           
+│   │   ├── (auth)/           
+│   │   └── refresh/          
 │   ├── components/          
 │   │   ├── ui/            
-│   │   ├── auth/          
-│   │   ├── chat/         
-│   │   └── marketplace/  
+│   │   ├── providers/     
+│   │   ├── shared/       
+│   │   ├── features/     
+│   │   └── pages/        
 │   ├── lib/               
-│   │   ├── db/          
-│   │   ├── web3/       
-│   │   └── utils/       
-│   └── styles/          
+│   │   ├── firebase/     
+│   │   ├── auth.ts      
+│   │   ├── thirdweb.ts  
+│   │   ├── usePrivy.ts  
+│   │   └── utils.ts     
+│   ├── repository/       
+│   ├── types/           
+│   ├── utils/           
+│   ├── styles/          
+│   └── middleware.ts    
+├── contract/            
 ├── public/             
-├── drizzle/           
-│   └── schema.ts     
+├── .wrangler/          
+├── .github/            
 ├── .next/             
 ├── node_modules/      
 ├── .env              
 ├── .gitignore       
-├── package.json    
-├── postcss.config.js 
-└── README.md     
+├── package.json      
+├── next.config.ts    
+├── tailwind.config.ts
+├── tsconfig.json     
+├── postcss.config.mjs
+├── eslint.config.mjs 
+├── biome.json        
+├── components.json   
+└── README.md         
 ```
 
 ## セットアップ 🔧

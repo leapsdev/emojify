@@ -7,7 +7,7 @@ export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x70f37e00D14b12A8Fe1386E84BAa73cFDc59EF4a';
+  '0x9351996D35172D091bdF63d162EC49dE8E4E3665';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [
@@ -17,63 +17,147 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'constructor',
   },
   {
-    inputs: [],
-    name: 'AccountBalanceOverflow',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'target',
+        type: 'address',
+      },
+    ],
+    name: 'AddressEmptyCode',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'balance',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'needed',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'tokenId',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC1155InsufficientBalance',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'approver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1155InvalidApprover',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'idsLength',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'valuesLength',
+        type: 'uint256',
+      },
+    ],
+    name: 'ERC1155InvalidArrayLength',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1155InvalidOperator',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'receiver',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1155InvalidReceiver',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1155InvalidSender',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'operator',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1155MissingApprovalForAll',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'implementation',
+        type: 'address',
+      },
+    ],
+    name: 'ERC1967InvalidImplementation',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'AlreadyInitialized',
+    name: 'ERC1967NonPayable',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'ArrayLengthsMismatch',
+    name: 'EnforcedPause',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'CallbackExecutionReverted',
+    name: 'ExpectedPause',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'CallbackFunctionAlreadyInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionNotSupported',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionRequired',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionUnauthorizedCall',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'FallbackFunctionAlreadyInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'FallbackFunctionNotInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'IndexOutOfBounds',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InsufficientBalance',
+    name: 'FailedCall',
     type: 'error',
   },
   {
@@ -83,73 +167,45 @@ export const EMOJI_CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'ModuleAlreadyInstalled',
+    name: 'NotInitializing',
     type: 'error',
   },
   {
     inputs: [
       {
-        internalType: 'bytes4',
-        name: 'requiredInterfaceId',
-        type: 'bytes4',
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
       },
     ],
-    name: 'ModuleInterfaceNotCompatible',
+    name: 'OwnableInvalidOwner',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'OwnableUnauthorizedAccount',
     type: 'error',
   },
   {
     inputs: [],
-    name: 'ModuleNotInstalled',
+    name: 'UUPSUnauthorizedCallContext',
     type: 'error',
   },
   {
-    inputs: [],
-    name: 'ModuleOutOfSync',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NewOwnerIsZeroAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NoHandoverRequest',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NotInitializing',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NotOwnerNorApproved',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'Reentrancy',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'SignatureMintUnauthorized',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'TransferToNonERC1155ReceiverImplementer',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'TransferToZeroAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'Unauthorized',
+    inputs: [
+      {
+        internalType: 'bytes32',
+        name: 'slot',
+        type: 'bytes32',
+      },
+    ],
+    name: 'UUPSUnsupportedProxiableUUID',
     type: 'error',
   },
   {
@@ -158,7 +214,7 @@ export const EMOJI_CONTRACT_ABI = [
       {
         indexed: true,
         internalType: 'address',
-        name: 'owner',
+        name: 'account',
         type: 'address',
       },
       {
@@ -170,17 +226,11 @@ export const EMOJI_CONTRACT_ABI = [
       {
         indexed: false,
         internalType: 'bool',
-        name: 'isApproved',
+        name: 'approved',
         type: 'bool',
       },
     ],
     name: 'ApprovalForAll',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [],
-    name: 'ContractURIUpdated',
     type: 'event',
   },
   {
@@ -200,85 +250,9 @@ export const EMOJI_CONTRACT_ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'caller',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'implementation',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'installedModule',
-        type: 'address',
-      },
-    ],
-    name: 'ModuleInstalled',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'caller',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'implementation',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'installedModule',
-        type: 'address',
-      },
-    ],
-    name: 'ModuleUninstalled',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
         indexed: true,
         internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnershipHandoverCanceled',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
-    ],
-    name: 'OwnershipHandoverRequested',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'oldOwner',
+        name: 'previousOwner',
         type: 'address',
       },
       {
@@ -295,19 +269,13 @@ export const EMOJI_CONTRACT_ABI = [
     anonymous: false,
     inputs: [
       {
-        indexed: true,
+        indexed: false,
         internalType: 'address',
-        name: 'user',
+        name: 'account',
         type: 'address',
       },
-      {
-        indexed: true,
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
     ],
-    name: 'RolesUpdated',
+    name: 'Paused',
     type: 'event',
   },
   {
@@ -340,7 +308,7 @@ export const EMOJI_CONTRACT_ABI = [
       {
         indexed: false,
         internalType: 'uint256[]',
-        name: 'amounts',
+        name: 'values',
         type: 'uint256[]',
       },
     ],
@@ -377,7 +345,7 @@ export const EMOJI_CONTRACT_ABI = [
       {
         indexed: false,
         internalType: 'uint256',
-        name: 'amount',
+        name: 'value',
         type: 'uint256',
       },
     ],
@@ -404,14 +372,49 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'event',
   },
   {
-    stateMutability: 'payable',
-    type: 'fallback',
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'account',
+        type: 'address',
+      },
+    ],
+    name: 'Unpaused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'implementation',
+        type: 'address',
+      },
+    ],
+    name: 'Upgraded',
+    type: 'event',
+  },
+  {
+    inputs: [],
+    name: 'UPGRADE_INTERFACE_VERSION',
+    outputs: [
+      {
+        internalType: 'string',
+        name: '',
+        type: 'string',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [
       {
         internalType: 'address',
-        name: 'owner',
+        name: 'account',
         type: 'address',
       },
       {
@@ -424,7 +427,7 @@ export const EMOJI_CONTRACT_ABI = [
     outputs: [
       {
         internalType: 'uint256',
-        name: 'result',
+        name: '',
         type: 'uint256',
       },
     ],
@@ -435,7 +438,7 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [
       {
         internalType: 'address[]',
-        name: 'owners',
+        name: 'accounts',
         type: 'address[]',
       },
       {
@@ -448,111 +451,7 @@ export const EMOJI_CONTRACT_ABI = [
     outputs: [
       {
         internalType: 'uint256[]',
-        name: 'balances',
-        type: 'uint256[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'cancelOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
-    ],
-    name: 'completeOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'contractURI',
-    outputs: [
-      {
-        internalType: 'string',
         name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'eip712Domain',
-    outputs: [
-      {
-        internalType: 'bytes1',
-        name: 'fields',
-        type: 'bytes1',
-      },
-      {
-        internalType: 'string',
-        name: 'name',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'version',
-        type: 'string',
-      },
-      {
-        internalType: 'uint256',
-        name: 'chainId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'verifyingContract',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'salt',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'extensions',
         type: 'uint256[]',
       },
     ],
@@ -560,133 +459,14 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'function',
   },
   {
-    inputs: [],
-    name: 'getInstalledModules',
-    outputs: [
-      {
-        components: [
-          {
-            internalType: 'address',
-            name: 'implementation',
-            type: 'address',
-          },
-          {
-            components: [
-              {
-                internalType: 'bool',
-                name: 'registerInstallationCallback',
-                type: 'bool',
-              },
-              {
-                internalType: 'bytes4[]',
-                name: 'requiredInterfaces',
-                type: 'bytes4[]',
-              },
-              {
-                internalType: 'bytes4[]',
-                name: 'supportedInterfaces',
-                type: 'bytes4[]',
-              },
-              {
-                components: [
-                  {
-                    internalType: 'bytes4',
-                    name: 'selector',
-                    type: 'bytes4',
-                  },
-                ],
-                internalType: 'struct IModuleConfig.CallbackFunction[]',
-                name: 'callbackFunctions',
-                type: 'tuple[]',
-              },
-              {
-                components: [
-                  {
-                    internalType: 'bytes4',
-                    name: 'selector',
-                    type: 'bytes4',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'permissionBits',
-                    type: 'uint256',
-                  },
-                ],
-                internalType: 'struct IModuleConfig.FallbackFunction[]',
-                name: 'fallbackFunctions',
-                type: 'tuple[]',
-              },
-            ],
-            internalType: 'struct IModuleConfig.ModuleConfig',
-            name: 'config',
-            type: 'tuple',
-          },
-        ],
-        internalType: 'struct ICore.InstalledModule[]',
-        name: '_installedModules',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'getSupportedCallbackFunctions',
-    outputs: [
-      {
-        components: [
-          {
-            internalType: 'bytes4',
-            name: 'selector',
-            type: 'bytes4',
-          },
-          {
-            internalType: 'enum ICore.CallbackMode',
-            name: 'mode',
-            type: 'uint8',
-          },
-        ],
-        internalType: 'struct ICore.SupportedCallbackFunction[]',
-        name: 'supportedCallbackFunctions',
-        type: 'tuple[]',
-      },
-    ],
-    stateMutability: 'pure',
-    type: 'function',
-  },
-  {
     inputs: [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
         internalType: 'uint256',
-        name: 'roles',
+        name: 'id',
         type: 'uint256',
       },
     ],
-    name: 'grantRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    name: 'hasAllRoles',
+    name: 'exists',
     outputs: [
       {
         internalType: 'bool',
@@ -700,22 +480,17 @@ export const EMOJI_CONTRACT_ABI = [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
         internalType: 'uint256',
-        name: 'roles',
+        name: '',
         type: 'uint256',
       },
     ],
-    name: 'hasAnyRole',
+    name: 'firstMinter',
     outputs: [
       {
-        internalType: 'bool',
+        internalType: 'address',
         name: '',
-        type: 'bool',
+        type: 'address',
       },
     ],
     stateMutability: 'view',
@@ -724,64 +499,21 @@ export const EMOJI_CONTRACT_ABI = [
   {
     inputs: [
       {
-        internalType: 'string',
-        name: '_name',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_symbol',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_contractURI',
-        type: 'string',
-      },
-      {
         internalType: 'address',
-        name: '_owner',
+        name: 'initialOwner',
         type: 'address',
-      },
-      {
-        internalType: 'address[]',
-        name: '_modules',
-        type: 'address[]',
-      },
-      {
-        internalType: 'bytes[]',
-        name: '_moduleInstallData',
-        type: 'bytes[]',
       },
     ],
     name: 'initialize',
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
       {
         internalType: 'address',
-        name: '_module',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: '_data',
-        type: 'bytes',
-      },
-    ],
-    name: 'installModule',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
+        name: 'account',
         type: 'address',
       },
       {
@@ -794,7 +526,7 @@ export const EMOJI_CONTRACT_ABI = [
     outputs: [
       {
         internalType: 'bool',
-        name: 'result',
+        name: '',
         type: 'bool',
       },
     ],
@@ -805,23 +537,18 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [
       {
         internalType: 'address',
-        name: 'to',
+        name: 'account',
         type: 'address',
       },
       {
         internalType: 'uint256',
-        name: 'tokenId',
+        name: 'id',
         type: 'uint256',
       },
       {
         internalType: 'uint256',
         name: 'amount',
         type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'baseURI',
-        type: 'string',
       },
       {
         internalType: 'bytes',
@@ -831,7 +558,7 @@ export const EMOJI_CONTRACT_ABI = [
     ],
     name: 'mint',
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -842,66 +569,24 @@ export const EMOJI_CONTRACT_ABI = [
         type: 'address',
       },
       {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
+        internalType: 'uint256[]',
+        name: 'ids',
+        type: 'uint256[]',
       },
       {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'baseURI',
-        type: 'string',
+        internalType: 'uint256[]',
+        name: 'amounts',
+        type: 'uint256[]',
       },
       {
         internalType: 'bytes',
         name: 'data',
         type: 'bytes',
       },
-      {
-        internalType: 'bytes',
-        name: 'signature',
-        type: 'bytes',
-      },
     ],
-    name: 'mintWithSignature',
+    name: 'mintBatch',
     outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'bytes[]',
-        name: 'data',
-        type: 'bytes[]',
-      },
-    ],
-    name: 'multicall',
-    outputs: [
-      {
-        internalType: 'bytes[]',
-        name: '',
-        type: 'bytes[]',
-      },
-    ],
     stateMutability: 'nonpayable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'name',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
     type: 'function',
   },
   {
@@ -910,7 +595,7 @@ export const EMOJI_CONTRACT_ABI = [
     outputs: [
       {
         internalType: 'address',
-        name: 'result',
+        name: '',
         type: 'address',
       },
     ],
@@ -918,19 +603,33 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'function',
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
-    ],
-    name: 'ownershipHandoverExpiresAt',
+    inputs: [],
+    name: 'pause',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'paused',
     outputs: [
       {
-        internalType: 'uint256',
-        name: 'result',
-        type: 'uint256',
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'proxiableUUID',
+    outputs: [
+      {
+        internalType: 'bytes32',
+        name: '',
+        type: 'bytes32',
       },
     ],
     stateMutability: 'view',
@@ -940,64 +639,7 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [],
     name: 'renounceOwnership',
     outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    name: 'renounceRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [],
-    name: 'requestOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    name: 'revokeRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-    ],
-    name: 'rolesOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
@@ -1014,12 +656,12 @@ export const EMOJI_CONTRACT_ABI = [
       },
       {
         internalType: 'uint256[]',
-        name: 'tokenIds',
+        name: 'ids',
         type: 'uint256[]',
       },
       {
         internalType: 'uint256[]',
-        name: 'amounts',
+        name: 'values',
         type: 'uint256[]',
       },
       {
@@ -1047,12 +689,12 @@ export const EMOJI_CONTRACT_ABI = [
       },
       {
         internalType: 'uint256',
-        name: 'tokenId',
+        name: 'id',
         type: 'uint256',
       },
       {
         internalType: 'uint256',
-        name: 'amount',
+        name: 'value',
         type: 'uint256',
       },
       {
@@ -1088,11 +730,11 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [
       {
         internalType: 'string',
-        name: 'uri',
+        name: 'newuri',
         type: 'string',
       },
     ],
-    name: 'setContractURI',
+    name: 'setURI',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',
@@ -1118,12 +760,12 @@ export const EMOJI_CONTRACT_ABI = [
   },
   {
     inputs: [],
-    name: 'symbol',
+    name: 'totalSupply',
     outputs: [
       {
-        internalType: 'string',
+        internalType: 'uint256',
         name: '',
-        type: 'string',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -1133,7 +775,7 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'tokenId',
+        name: 'id',
         type: 'uint256',
       },
     ],
@@ -1158,23 +800,30 @@ export const EMOJI_CONTRACT_ABI = [
     ],
     name: 'transferOwnership',
     outputs: [],
-    stateMutability: 'payable',
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'unpause',
+    outputs: [],
+    stateMutability: 'nonpayable',
     type: 'function',
   },
   {
     inputs: [
       {
         internalType: 'address',
-        name: '_module',
+        name: 'newImplementation',
         type: 'address',
       },
       {
         internalType: 'bytes',
-        name: '_data',
+        name: 'data',
         type: 'bytes',
       },
     ],
-    name: 'uninstallModule',
+    name: 'upgradeToAndCall',
     outputs: [],
     stateMutability: 'payable',
     type: 'function',
@@ -1183,7 +832,7 @@ export const EMOJI_CONTRACT_ABI = [
     inputs: [
       {
         internalType: 'uint256',
-        name: 'tokenId',
+        name: '',
         type: 'uint256',
       },
     ],

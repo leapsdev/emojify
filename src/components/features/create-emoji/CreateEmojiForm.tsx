@@ -28,7 +28,6 @@ import {
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
-import { TransactionRequest } from 'ethers';
 
 // ThirdWebクライアントの初期化
 const client = createThirdwebClient({
@@ -64,17 +63,22 @@ export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const { wallets } = useWallets();
-  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>('');
+  const [selectedWalletAddress, setSelectedWalletAddress] =
+    useState<string>('');
 
   console.log(wallets);
   // ウォレット選択用のUIコンポーネント
   const WalletSelector = () => {
     return (
       <div className="space-y-2">
-        <label className="block text-sm font-medium text-gray-700">
+        <label
+          htmlFor="wallet-select"
+          className="block text-sm font-medium text-gray-700"
+        >
           使用するウォレットを選択してください
         </label>
         <select
+          id="wallet-select"
           value={selectedWalletAddress}
           onChange={(e) => setSelectedWalletAddress(e.target.value)}
           className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
@@ -86,13 +90,13 @@ export function CreateEmojiForm() {
             if (wallet.walletClientType === 'privy') {
               walletType = 'Embedded Wallet';
             }
-            
+
             const displayAddress = `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`;
             const chainId = wallet.chainId.split(':')[1]; // "eip155:1" -> "1"
-            
+
             return (
-              <option 
-                key={`${wallet.address}-${wallet.walletClientType}-${index}`} 
+              <option
+                key={`${wallet.address}-${wallet.walletClientType}-${index}`}
                 value={wallet.address}
               >
                 {`${walletType} (Chain: ${chainId}) - ${displayAddress}`}
@@ -108,7 +112,7 @@ export function CreateEmojiForm() {
     if (!selectedFile || !selectedWalletAddress) return;
 
     const selectedWallet = wallets.find(
-      (wallet) => wallet.address === selectedWalletAddress
+      (wallet) => wallet.address === selectedWalletAddress,
     );
 
     if (!selectedWallet) return;
@@ -126,7 +130,7 @@ export function CreateEmojiForm() {
 
       // Step 2: メタデータを作成してIPFSにアップロード
       const tokenId = BigInt(0); // トークンIDを設定
-      
+
       const metadata = {
         name: '',
         description: '',
@@ -189,8 +193,11 @@ export function CreateEmojiForm() {
               },
               signTransaction: async (tx) => {
                 // トランザクションデータを取得
-                const txData = typeof tx.data === 'function' ? await (tx.data as () => Promise<string>)() : tx.data;
-                
+                const txData =
+                  typeof tx.data === 'function'
+                    ? await (tx.data as () => Promise<string>)()
+                    : tx.data;
+
                 // BigInt を 16進数文字列に変換
                 const params = {
                   from: selectedWalletAddress,
@@ -199,9 +206,15 @@ export function CreateEmojiForm() {
                   gasLimit: `0x${gasLimit.toString(16)}`,
                   type: tx.type ? Number(tx.type) : undefined,
                   nonce: tx.nonce ? Number(tx.nonce) : undefined,
-                  value: tx.value ? `0x${BigInt(tx.value).toString(16)}` : '0x0',
-                  maxFeePerGas: tx.maxFeePerGas ? `0x${BigInt(tx.maxFeePerGas).toString(16)}` : undefined,
-                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}` : undefined,
+                  value: tx.value
+                    ? `0x${BigInt(tx.value).toString(16)}`
+                    : '0x0',
+                  maxFeePerGas: tx.maxFeePerGas
+                    ? `0x${BigInt(tx.maxFeePerGas).toString(16)}`
+                    : undefined,
+                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas
+                    ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}`
+                    : undefined,
                 };
 
                 const signedTx = await provider.request({
@@ -212,8 +225,11 @@ export function CreateEmojiForm() {
               },
               sendTransaction: async (tx) => {
                 // トランザクションデータを取得
-                const txData = typeof tx.data === 'function' ? await (tx.data as () => Promise<string>)() : tx.data;
-                
+                const txData =
+                  typeof tx.data === 'function'
+                    ? await (tx.data as () => Promise<string>)()
+                    : tx.data;
+
                 // BigInt を 16進数文字列に変換
                 const params = {
                   from: selectedWalletAddress,
@@ -222,9 +238,15 @@ export function CreateEmojiForm() {
                   gasLimit: `0x${gasLimit.toString(16)}`,
                   type: tx.type ? Number(tx.type) : undefined,
                   nonce: tx.nonce ? Number(tx.nonce) : undefined,
-                  value: tx.value ? `0x${BigInt(tx.value).toString(16)}` : '0x0',
-                  maxFeePerGas: tx.maxFeePerGas ? `0x${BigInt(tx.maxFeePerGas).toString(16)}` : undefined,
-                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}` : undefined,
+                  value: tx.value
+                    ? `0x${BigInt(tx.value).toString(16)}`
+                    : '0x0',
+                  maxFeePerGas: tx.maxFeePerGas
+                    ? `0x${BigInt(tx.maxFeePerGas).toString(16)}`
+                    : undefined,
+                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas
+                    ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}`
+                    : undefined,
                 };
 
                 const txHash = await provider.request({

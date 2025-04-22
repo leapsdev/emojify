@@ -28,6 +28,7 @@ import {
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
+import { TransactionRequest } from 'ethers';
 
 // ThirdWebクライアントの初期化
 const client = createThirdwebClient({
@@ -53,35 +54,79 @@ const uploadToIPFS = async (file: File) => {
   return uri;
 };
 
+// IPFSのURLをhttpsに変換する関数
+const ipfsToHttp = (ipfsUrl: string) => {
+  const hash = ipfsUrl.replace('ipfs://', '');
+  return `https://ipfs.io/ipfs/${hash}`;
+};
+
 export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const { wallets } = useWallets();
-  const embeddedWallet = wallets.find(
-    (wallet) => wallet.walletClientType === 'privy',
-  );
-  const walletAddress = embeddedWallet?.address;
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>('');
+
+  console.log(wallets);
+  // ウォレット選択用のUIコンポーネント
+  const WalletSelector = () => {
+    return (
+      <div className="space-y-2">
+        <label className="block text-sm font-medium text-gray-700">
+          使用するウォレットを選択してください
+        </label>
+        <select
+          value={selectedWalletAddress}
+          onChange={(e) => setSelectedWalletAddress(e.target.value)}
+          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+        >
+          <option value="">ウォレットを選択</option>
+          {wallets.map((wallet, index) => {
+            // ウォレットタイプの表示名を設定
+            let walletType = wallet.meta.name;
+            if (wallet.walletClientType === 'privy') {
+              walletType = 'Embedded Wallet';
+            }
+            
+            const displayAddress = `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`;
+            const chainId = wallet.chainId.split(':')[1]; // "eip155:1" -> "1"
+            
+            return (
+              <option 
+                key={`${wallet.address}-${wallet.walletClientType}-${index}`} 
+                value={wallet.address}
+              >
+                {`${walletType} (Chain: ${chainId}) - ${displayAddress}`}
+              </option>
+            );
+          })}
+        </select>
+      </div>
+    );
+  };
 
   const handleCreate = async () => {
-    if (!selectedFile || !walletAddress || !embeddedWallet) return;
+    if (!selectedFile || !selectedWalletAddress) return;
+
+    const selectedWallet = wallets.find(
+      (wallet) => wallet.address === selectedWalletAddress
+    );
+
+    if (!selectedWallet) return;
 
     try {
       setLoading(true);
-
-      // IPFSのURLをhttpsに変換する関数
-      const ipfsToHttp = (ipfsUrl: string) => {
-        const hash = ipfsUrl.replace('ipfs://', '');
-        return `https://ipfs.io/ipfs/${hash}`;
-      };
 
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
       const imageHttpUrl = ipfsToHttp(imageUrl);
       console.log(
-        `画像のアップロードが完了しました。\n以下のURLで確認できます：\n${imageHttpUrl}`,
+        `画像のアップロードが完了しました。\n以下のURLで確認できます：\n${imageHttpUrl}
+        \n ${imageUrl}`,
       );
 
       // Step 2: メタデータを作成してIPFSにアップロード
+      const tokenId = BigInt(0); // トークンIDを設定
+      
       const metadata = {
         name: '',
         description: '',
@@ -89,7 +134,7 @@ export function CreateEmojiForm() {
         attributes: [
           {
             trait_type: 'creator',
-            value: walletAddress,
+            value: selectedWalletAddress,
           },
         ],
       };
@@ -99,23 +144,19 @@ export function CreateEmojiForm() {
       console.log(
         `メタデータのアップロードが完了しました。\n以下のURLで確認できます：\n${metadataHttpUrl}`,
       );
-      console.log(metadataHttpUrl);
 
       // Step 3: NFTのミント用トランザクションを準備と送信
       try {
         console.log('コントラクト:', contract);
-        // thirdwebのprepareContractCallを使用
         const transaction = prepareContractCall({
           contract,
           method: 'mint',
           params: [
-            walletAddress, // to: 受信者のアドレス
-            BigInt(0), // tokenId: トークンID
+            selectedWalletAddress, // to: 受信者のアドレス
+            tokenId, // tokenId: トークンID
             BigInt(1), // amount: ミントする数量
-            metadataUrl, // baseURI: メタデータのURI
-            '0x' as `0x${string}`, // data: 追加データ
+            '0x' as `0x${string}`, // data: 空のバイト列
           ],
-          value: BigInt(0), // 送信するETHの量
         });
 
         // ガスコストを推定
@@ -135,38 +176,60 @@ export function CreateEmojiForm() {
           console.log('トランザクションの詳細:', transaction);
 
           // トランザクションを送信
-          const provider = await embeddedWallet.getEthereumProvider();
+          const provider = await selectedWallet.getEthereumProvider();
           const { transactionHash } = await sendTransaction({
             account: {
-              address: walletAddress as `0x${string}`,
+              address: selectedWalletAddress as `0x${string}`,
               signMessage: async (message) => {
                 const signature = await provider.request({
                   method: 'personal_sign',
-                  params: [message, walletAddress],
+                  params: [message, selectedWalletAddress],
                 });
                 return signature as `0x${string}`;
               },
               signTransaction: async (tx) => {
+                // トランザクションデータを取得
+                const txData = typeof tx.data === 'function' ? await (tx.data as () => Promise<string>)() : tx.data;
+                
+                // BigInt を 16進数文字列に変換
+                const params = {
+                  from: selectedWalletAddress,
+                  to: tx.to,
+                  data: txData,
+                  gasLimit: `0x${gasLimit.toString(16)}`,
+                  type: tx.type ? Number(tx.type) : undefined,
+                  nonce: tx.nonce ? Number(tx.nonce) : undefined,
+                  value: tx.value ? `0x${BigInt(tx.value).toString(16)}` : '0x0',
+                  maxFeePerGas: tx.maxFeePerGas ? `0x${BigInt(tx.maxFeePerGas).toString(16)}` : undefined,
+                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}` : undefined,
+                };
+
                 const signedTx = await provider.request({
                   method: 'eth_signTransaction',
-                  params: [
-                    {
-                      ...tx,
-                      gas: gasLimit.toString(),
-                    },
-                  ],
+                  params: [params],
                 });
                 return signedTx as `0x${string}`;
               },
               sendTransaction: async (tx) => {
+                // トランザクションデータを取得
+                const txData = typeof tx.data === 'function' ? await (tx.data as () => Promise<string>)() : tx.data;
+                
+                // BigInt を 16進数文字列に変換
+                const params = {
+                  from: selectedWalletAddress,
+                  to: tx.to,
+                  data: txData,
+                  gasLimit: `0x${gasLimit.toString(16)}`,
+                  type: tx.type ? Number(tx.type) : undefined,
+                  nonce: tx.nonce ? Number(tx.nonce) : undefined,
+                  value: tx.value ? `0x${BigInt(tx.value).toString(16)}` : '0x0',
+                  maxFeePerGas: tx.maxFeePerGas ? `0x${BigInt(tx.maxFeePerGas).toString(16)}` : undefined,
+                  maxPriorityFeePerGas: tx.maxPriorityFeePerGas ? `0x${BigInt(tx.maxPriorityFeePerGas).toString(16)}` : undefined,
+                };
+
                 const txHash = await provider.request({
                   method: 'eth_sendTransaction',
-                  params: [
-                    {
-                      ...tx,
-                      gas: gasLimit.toString(),
-                    },
-                  ],
+                  params: [params],
                 });
                 return {
                   transactionHash: txHash as `0x${string}`,
@@ -175,7 +238,7 @@ export function CreateEmojiForm() {
               signTypedData: async (typedData) => {
                 const signature = await provider.request({
                   method: 'eth_signTypedData',
-                  params: [walletAddress, typedData],
+                  params: [selectedWalletAddress, typedData],
                 });
                 return signature as `0x${string}`;
               },
@@ -243,8 +306,9 @@ export function CreateEmojiForm() {
   return (
     <div className="pt-14 max-w-md mx-auto px-4 space-y-4">
       <FileUpload preview={preview} onFileSelect={handleFileSelect} />
+      <WalletSelector />
       <CreateButton
-        disabled={!selectedFile || !walletAddress}
+        disabled={!selectedFile || !selectedWalletAddress}
         onClick={handleCreate}
         loading={loading}
       />

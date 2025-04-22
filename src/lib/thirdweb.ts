@@ -7,1195 +7,844 @@ export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x70f37e00D14b12A8Fe1386E84BAa73cFDc59EF4a';
+  '0x9351996D35172D091bdF63d162EC49dE8E4E3665';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [
   {
-    inputs: [],
-    stateMutability: 'nonpayable',
-    type: 'constructor',
+    "inputs": [],
+    "stateMutability": "nonpayable",
+    "type": "constructor"
   },
   {
-    inputs: [],
-    name: 'AccountBalanceOverflow',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'AlreadyInitialized',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'ArrayLengthsMismatch',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackExecutionReverted',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionAlreadyInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionNotSupported',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionRequired',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'CallbackFunctionUnauthorizedCall',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'FallbackFunctionAlreadyInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'FallbackFunctionNotInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'IndexOutOfBounds',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InsufficientBalance',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'InvalidInitialization',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'ModuleAlreadyInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'bytes4',
-        name: 'requiredInterfaceId',
-        type: 'bytes4',
-      },
+        "internalType": "address",
+        "name": "target",
+        "type": "address"
+      }
     ],
-    name: 'ModuleInterfaceNotCompatible',
-    type: 'error',
+    "name": "AddressEmptyCode",
+    "type": "error"
   },
   {
-    inputs: [],
-    name: 'ModuleNotInstalled',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'ModuleOutOfSync',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NewOwnerIsZeroAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NoHandoverRequest',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NotInitializing',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'NotOwnerNorApproved',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'Reentrancy',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'SignatureMintUnauthorized',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'TransferToNonERC1155ReceiverImplementer',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'TransferToZeroAddress',
-    type: 'error',
-  },
-  {
-    inputs: [],
-    name: 'Unauthorized',
-    type: 'error',
-  },
-  {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
       },
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
+        "internalType": "uint256",
+        "name": "balance",
+        "type": "uint256"
       },
       {
-        indexed: false,
-        internalType: 'bool',
-        name: 'isApproved',
-        type: 'bool',
+        "internalType": "uint256",
+        "name": "needed",
+        "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "tokenId",
+        "type": "uint256"
+      }
     ],
-    name: 'ApprovalForAll',
-    type: 'event',
+    "name": "ERC1155InsufficientBalance",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [],
-    name: 'ContractURIUpdated',
-    type: 'event',
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "approver",
+        "type": "address"
+      }
+    ],
+    "name": "ERC1155InvalidApprover",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: false,
-        internalType: 'uint64',
-        name: 'version',
-        type: 'uint64',
+        "internalType": "uint256",
+        "name": "idsLength",
+        "type": "uint256"
       },
+      {
+        "internalType": "uint256",
+        "name": "valuesLength",
+        "type": "uint256"
+      }
     ],
-    name: 'Initialized',
-    type: 'event',
+    "name": "ERC1155InvalidArrayLength",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'caller',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'implementation',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'installedModule',
-        type: 'address',
-      },
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
     ],
-    name: 'ModuleInstalled',
-    type: 'event',
+    "name": "ERC1155InvalidOperator",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: false,
-        internalType: 'address',
-        name: 'caller',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'implementation',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'installedModule',
-        type: 'address',
-      },
+        "internalType": "address",
+        "name": "receiver",
+        "type": "address"
+      }
     ],
-    name: 'ModuleUninstalled',
-    type: 'event',
+    "name": "ERC1155InvalidReceiver",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
+        "internalType": "address",
+        "name": "sender",
+        "type": "address"
+      }
     ],
-    name: 'OwnershipHandoverCanceled',
-    type: 'event',
+    "name": "ERC1155InvalidSender",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
       },
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
     ],
-    name: 'OwnershipHandoverRequested',
-    type: 'event',
+    "name": "ERC1155MissingApprovalForAll",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
+    "inputs": [
       {
-        indexed: true,
-        internalType: 'address',
-        name: 'oldOwner',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
     ],
-    name: 'OwnershipTransferred',
-    type: 'event',
+    "name": "ERC1967InvalidImplementation",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    name: 'RolesUpdated',
-    type: 'event',
+    "inputs": [],
+    "name": "ERC1967NonPayable",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256[]',
-        name: 'ids',
-        type: 'uint256[]',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256[]',
-        name: 'amounts',
-        type: 'uint256[]',
-      },
-    ],
-    name: 'TransferBatch',
-    type: 'event',
+    "inputs": [],
+    "name": "EnforcedPause",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        indexed: true,
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'id',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-    ],
-    name: 'TransferSingle',
-    type: 'event',
+    "inputs": [],
+    "name": "ExpectedPause",
+    "type": "error"
   },
   {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'string',
-        name: 'value',
-        type: 'string',
-      },
-      {
-        indexed: true,
-        internalType: 'uint256',
-        name: 'id',
-        type: 'uint256',
-      },
-    ],
-    name: 'URI',
-    type: 'event',
+    "inputs": [],
+    "name": "FailedCall",
+    "type": "error"
   },
   {
-    stateMutability: 'payable',
-    type: 'fallback',
+    "inputs": [],
+    "name": "InvalidInitialization",
+    "type": "error"
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'id',
-        type: 'uint256',
-      },
-    ],
-    name: 'balanceOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: 'result',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "inputs": [],
+    "name": "NotInitializing",
+    "type": "error"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address[]',
-        name: 'owners',
-        type: 'address[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'ids',
-        type: 'uint256[]',
-      },
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
     ],
-    name: 'balanceOfBatch',
-    outputs: [
-      {
-        internalType: 'uint256[]',
-        name: 'balances',
-        type: 'uint256[]',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "OwnableInvalidOwner",
+    "type": "error"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    name: 'burn',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
   },
   {
-    inputs: [],
-    name: 'cancelOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "inputs": [],
+    "name": "UUPSUnauthorizedCallContext",
+    "type": "error"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
-      },
+        "internalType": "bytes32",
+        "name": "slot",
+        "type": "bytes32"
+      }
     ],
-    name: 'completeOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "UUPSUnsupportedProxiableUUID",
+    "type": "error"
   },
   {
-    inputs: [],
-    name: 'contractURI',
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'string',
-        name: '',
-        type: 'string',
+        "indexed": true,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "ApprovalForAll",
+    "type": "event"
   },
   {
-    inputs: [],
-    name: 'eip712Domain',
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'bytes1',
-        name: 'fields',
-        type: 'bytes1',
-      },
-      {
-        internalType: 'string',
-        name: 'name',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: 'version',
-        type: 'string',
-      },
-      {
-        internalType: 'uint256',
-        name: 'chainId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'address',
-        name: 'verifyingContract',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes32',
-        name: 'salt',
-        type: 'bytes32',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'extensions',
-        type: 'uint256[]',
-      },
+        "indexed": false,
+        "internalType": "uint64",
+        "name": "version",
+        "type": "uint64"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "Initialized",
+    "type": "event"
   },
   {
-    inputs: [],
-    name: 'getInstalledModules',
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        components: [
-          {
-            internalType: 'address',
-            name: 'implementation',
-            type: 'address',
-          },
-          {
-            components: [
-              {
-                internalType: 'bool',
-                name: 'registerInstallationCallback',
-                type: 'bool',
-              },
-              {
-                internalType: 'bytes4[]',
-                name: 'requiredInterfaces',
-                type: 'bytes4[]',
-              },
-              {
-                internalType: 'bytes4[]',
-                name: 'supportedInterfaces',
-                type: 'bytes4[]',
-              },
-              {
-                components: [
-                  {
-                    internalType: 'bytes4',
-                    name: 'selector',
-                    type: 'bytes4',
-                  },
-                ],
-                internalType: 'struct IModuleConfig.CallbackFunction[]',
-                name: 'callbackFunctions',
-                type: 'tuple[]',
-              },
-              {
-                components: [
-                  {
-                    internalType: 'bytes4',
-                    name: 'selector',
-                    type: 'bytes4',
-                  },
-                  {
-                    internalType: 'uint256',
-                    name: 'permissionBits',
-                    type: 'uint256',
-                  },
-                ],
-                internalType: 'struct IModuleConfig.FallbackFunction[]',
-                name: 'fallbackFunctions',
-                type: 'tuple[]',
-              },
-            ],
-            internalType: 'struct IModuleConfig.ModuleConfig',
-            name: 'config',
-            type: 'tuple',
-          },
-        ],
-        internalType: 'struct ICore.InstalledModule[]',
-        name: '_installedModules',
-        type: 'tuple[]',
+        "indexed": true,
+        "internalType": "address",
+        "name": "previousOwner",
+        "type": "address"
       },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "OwnershipTransferred",
+    "type": "event"
   },
   {
-    inputs: [],
-    name: 'getSupportedCallbackFunctions',
-    outputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        components: [
-          {
-            internalType: 'bytes4',
-            name: 'selector',
-            type: 'bytes4',
-          },
-          {
-            internalType: 'enum ICore.CallbackMode',
-            name: 'mode',
-            type: 'uint8',
-          },
-        ],
-        internalType: 'struct ICore.SupportedCallbackFunction[]',
-        name: 'supportedCallbackFunctions',
-        type: 'tuple[]',
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    stateMutability: 'pure',
-    type: 'function',
+    "name": "Paused",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
       },
       {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
       },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "ids",
+        "type": "uint256[]"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      }
     ],
-    name: 'grantRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "TransferBatch",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
+        "indexed": true,
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
       },
       {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
+        "indexed": true,
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
       },
+      {
+        "indexed": true,
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      }
     ],
-    name: 'hasAllRoles',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "TransferSingle",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
+        "indexed": false,
+        "internalType": "string",
+        "name": "value",
+        "type": "string"
       },
       {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
+        "indexed": true,
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
     ],
-    name: 'hasAnyRole',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "URI",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'string',
-        name: '_name',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_symbol',
-        type: 'string',
-      },
-      {
-        internalType: 'string',
-        name: '_contractURI',
-        type: 'string',
-      },
-      {
-        internalType: 'address',
-        name: '_owner',
-        type: 'address',
-      },
-      {
-        internalType: 'address[]',
-        name: '_modules',
-        type: 'address[]',
-      },
-      {
-        internalType: 'bytes[]',
-        name: '_moduleInstallData',
-        type: 'bytes[]',
-      },
+        "indexed": false,
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
     ],
-    name: 'initialize',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "Unpaused",
+    "type": "event"
   },
   {
-    inputs: [
+    "anonymous": false,
+    "inputs": [
       {
-        internalType: 'address',
-        name: '_module',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: '_data',
-        type: 'bytes',
-      },
+        "indexed": true,
+        "internalType": "address",
+        "name": "implementation",
+        "type": "address"
+      }
     ],
-    name: 'installModule',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "Upgraded",
+    "type": "event"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "UPGRADE_INTERFACE_VERSION",
+    "outputs": [
       {
-        internalType: 'address',
-        name: 'owner',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
-      },
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
     ],
-    name: 'isApprovedForAll',
-    outputs: [
-      {
-        internalType: 'bool',
-        name: 'result',
-        type: 'bool',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       },
       {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'baseURI',
-        type: 'string',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
     ],
-    name: 'mint',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "balanceOf",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
+        "internalType": "address[]",
+        "name": "accounts",
+        "type": "address[]"
       },
       {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: 'baseURI',
-        type: 'string',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-      {
-        internalType: 'bytes',
-        name: 'signature',
-        type: 'bytes',
-      },
+        "internalType": "uint256[]",
+        "name": "ids",
+        "type": "uint256[]"
+      }
     ],
-    name: 'mintWithSignature',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "balanceOfBatch",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'bytes[]',
-        name: 'data',
-        type: 'bytes[]',
-      },
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
     ],
-    name: 'multicall',
-    outputs: [
+    "name": "exists",
+    "outputs": [
       {
-        internalType: 'bytes[]',
-        name: '',
-        type: 'bytes[]',
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
     ],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: 'name',
-    outputs: [
+    "inputs": [
       {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "firstMinter",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: 'owner',
-    outputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'result',
-        type: 'address',
-      },
+        "internalType": "address",
+        "name": "initialOwner",
+        "type": "address"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "initialize",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'pendingOwner',
-        type: 'address',
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
       },
-    ],
-    name: 'ownershipHandoverExpiresAt',
-    outputs: [
       {
-        internalType: 'uint256',
-        name: 'result',
-        type: 'uint256',
-      },
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "isApprovedForAll",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: 'renounceOwnership',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "mint",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
       },
+      {
+        "internalType": "uint256[]",
+        "name": "ids",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
     ],
-    name: 'renounceRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "mintBatch",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: 'requestOwnershipHandover',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "inputs": [],
+    "name": "owner",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    name: 'revokeRoles',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "inputs": [],
+    "name": "pause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "paused",
+    "outputs": [
       {
-        internalType: 'address',
-        name: 'user',
-        type: 'address',
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
     ],
-    name: 'rolesOf',
-    outputs: [
-      {
-        internalType: 'uint256',
-        name: 'roles',
-        type: 'uint256',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "proxiableUUID",
+    "outputs": [
       {
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'tokenIds',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'uint256[]',
-        name: 'amounts',
-        type: 'uint256[]',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
+        "internalType": "bytes32",
+        "name": "",
+        "type": "bytes32"
+      }
     ],
-    name: 'safeBatchTransferFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
-      {
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        internalType: 'address',
-        name: 'to',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        internalType: 'bytes',
-        name: 'data',
-        type: 'bytes',
-      },
-    ],
-    name: 'safeTransferFrom',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: 'operator',
-        type: 'address',
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
       },
       {
-        internalType: 'bool',
-        name: 'approved',
-        type: 'bool',
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
       },
+      {
+        "internalType": "uint256[]",
+        "name": "ids",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "uint256[]",
+        "name": "values",
+        "type": "uint256[]"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
     ],
-    name: 'setApprovalForAll',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "safeBatchTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'string',
-        name: 'uri',
-        type: 'string',
+        "internalType": "address",
+        "name": "from",
+        "type": "address"
       },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "value",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
     ],
-    name: 'setContractURI',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function',
+    "name": "safeTransferFrom",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'bytes4',
-        name: 'interfaceId',
-        type: 'bytes4',
+        "internalType": "address",
+        "name": "operator",
+        "type": "address"
       },
-    ],
-    name: 'supportsInterface',
-    outputs: [
       {
-        internalType: 'bool',
-        name: '',
-        type: 'bool',
-      },
+        "internalType": "bool",
+        "name": "approved",
+        "type": "bool"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "setApprovalForAll",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [],
-    name: 'symbol',
-    outputs: [
+    "inputs": [
       {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
+        "internalType": "string",
+        "name": "newuri",
+        "type": "string"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "setURI",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
+        "internalType": "bytes4",
+        "name": "interfaceId",
+        "type": "bytes4"
+      }
     ],
-    name: 'totalSupply',
-    outputs: [
+    "name": "supportsInterface",
+    "outputs": [
       {
-        internalType: 'uint256',
-        name: '',
-        type: 'uint256',
-      },
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
     ],
-    stateMutability: 'view',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [],
+    "name": "totalSupply",
+    "outputs": [
       {
-        internalType: 'address',
-        name: 'newOwner',
-        type: 'address',
-      },
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
     ],
-    name: 'transferOwnership',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'address',
-        name: '_module',
-        type: 'address',
-      },
-      {
-        internalType: 'bytes',
-        name: '_data',
-        type: 'bytes',
-      },
+        "internalType": "uint256",
+        "name": "id",
+        "type": "uint256"
+      }
     ],
-    name: 'uninstallModule',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
+    "name": "totalSupply",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
   },
   {
-    inputs: [
+    "inputs": [
       {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
     ],
-    name: 'uri',
-    outputs: [
-      {
-        internalType: 'string',
-        name: '',
-        type: 'string',
-      },
-    ],
-    stateMutability: 'view',
-    type: 'function',
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
   },
+  {
+    "inputs": [],
+    "name": "unpause",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newImplementation",
+        "type": "address"
+      },
+      {
+        "internalType": "bytes",
+        "name": "data",
+        "type": "bytes"
+      }
+    ],
+    "name": "upgradeToAndCall",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "name": "uri",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  }
 ] as const;

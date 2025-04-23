@@ -130,6 +130,9 @@ export function CreateEmojiForm() {
       // Step 2: メタデータを作成してIPFSにアップロード
       const tokenId = BigInt(0); // トークンIDを設定
 
+      // トークンIDを16進数に変換し、64桁の0パディングを行う
+      const paddedTokenId = tokenId.toString(16).padStart(64, '0');
+
       const metadata = {
         name: '',
         description: '',
@@ -143,9 +146,17 @@ export function CreateEmojiForm() {
       };
 
       const metadataUrl = await storage.upload(metadata);
-      const metadataHttpUrl = ipfsToHttp(metadataUrl);
+      
+      // メタデータURIを構築（ERC-1155仕様に従って）
+      const metadataUri = `ipfs://${metadataUrl.replace('ipfs://', '')}/${paddedTokenId}.json`;
+      const metadataHttpUrl = ipfsToHttp(metadataUri);
+
       console.log(
         `メタデータのアップロードが完了しました。\n以下のURLで確認できます：\n${metadataHttpUrl}`,
+      );
+
+      console.log(
+        `メタデータのURI：\n${metadataUri}`,
       );
 
       // Step 3: NFTのミント用トランザクションを準備と送信

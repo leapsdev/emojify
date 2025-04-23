@@ -1,13 +1,4 @@
 'use client';
-
-interface WalletError {
-  code: number;
-}
-
-function isWalletError(error: unknown): error is WalletError {
-  return typeof error === 'object' && error !== null && 'code' in error;
-}
-
 import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
@@ -28,6 +19,14 @@ import {
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
+
+interface WalletError {
+  code: number;
+}
+
+function isWalletError(error: unknown): error is WalletError {
+  return typeof error === 'object' && error !== null && 'code' in error;
+}
 
 // ThirdWebクライアントの初期化
 const client = createThirdwebClient({

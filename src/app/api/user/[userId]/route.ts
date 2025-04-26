@@ -6,18 +6,18 @@ const privy = new PrivyClient(
   process.env.PRIVY_APP_SECRET || '',
 );
 
-type Context = {
-  params: {
+type RouteContext = {
+  params: Promise<{
     userId: string;
-  };
+  }>;
 };
 
 export async function GET(
   _request: NextRequest,
-  context: Context
+  context: RouteContext
 ) {
   try {
-    const userId = context.params.userId;
+    const { userId } = await context.params;
     const user = await privy.getUser(userId);
     return NextResponse.json(user);
   } catch {

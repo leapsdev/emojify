@@ -12,6 +12,7 @@ export const config = {
     // 認証が必要なページのみをマッチ
     '/((?!api|_next|static|favicon.ico|manifest.json|sw.js|workbox-).*)',
   ],
+  runtime: 'nodejs', // エッジ関数ではなくNode.jsランタイムを使用
 };
 
 export async function middleware(req: NextRequest) {

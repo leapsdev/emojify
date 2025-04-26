@@ -30,6 +30,24 @@ const withPWA = withPWAInit({
 
 const nextConfig: NextConfig = {
   devIndicators: false,
+  // エッジ関数を無効化
+  experimental: {
+    serverComponentsExternalPackages: [],
+  },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Content-Security-Policy',
+            value:
+              "frame-ancestors 'self' http://localhost:3000 https://emoji-chat.netlify.app https://www.emoji-chat.netlify.app https://auth.privy.io",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withPWA(nextConfig);

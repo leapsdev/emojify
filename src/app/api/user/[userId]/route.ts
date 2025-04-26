@@ -1,5 +1,5 @@
 import { PrivyClient } from '@privy-io/server-auth';
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const privy = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
@@ -7,18 +7,14 @@ const privy = new PrivyClient(
 );
 
 export async function GET(
-  request: Request,
-  { params }: { params: { userId: string } },
+  req: NextRequest,
+  { params }: { params: { userId: string } }
 ) {
   try {
-    const userId = await Promise.resolve(params).then((p) => p.userId);
-
+    const userId = params.userId;
     const user = await privy.getUser(userId);
-
-    console.log('Fetched user:', user);
     return NextResponse.json(user);
-  } catch (error) {
-    console.error('Error fetching user:', error);
+  } catch {
     return NextResponse.json(
       { error: 'Failed to fetch user' },
       { status: 500 },

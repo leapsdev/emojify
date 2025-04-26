@@ -3,7 +3,6 @@ import { ProfileForm } from '@/components/features/create-profile/profileForm';
 import { ProfileImage } from '@/components/features/create-profile/profileImage';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 
-
 export function CreateProfilePage() {
   return (
     <EthereumProviders>

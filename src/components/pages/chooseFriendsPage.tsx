@@ -8,6 +8,7 @@ import { ChatButton } from '@/components/features/choose-friends/chatButton';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 import { SearchBar } from '@/components/features/choose-friends/searchBar';
 import { UserSection } from '@/components/features/choose-friends/userSection';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
@@ -81,30 +82,32 @@ export function ClientChooseFriendsPage({
   };
 
   return (
-    <main className="flex flex-col">
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+    <EthereumProviders>
+      <main className="flex flex-col">
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-      <div className="px-4 space-y-6 flex-1 overflow-auto">
-        <UserSection
-          title="Friends"
-          users={friends}
-          selectedUsers={selectedUsers}
-          onUserSelect={handleUserSelect}
+        <div className="px-4 space-y-6 flex-1 overflow-auto">
+          <UserSection
+            title="Friends"
+            users={friends}
+            selectedUsers={selectedUsers}
+            onUserSelect={handleUserSelect}
+          />
+
+          <UserSection
+            title="Others"
+            users={others}
+            selectedUsers={selectedUsers}
+            onUserSelect={handleUserSelect}
+            onAddFriend={handleAddFriend}
+          />
+        </div>
+
+        <ChatButton
+          visible={selectedUsers.length > 0}
+          onClick={handleCreateChatRoom}
         />
-
-        <UserSection
-          title="Others"
-          users={others}
-          selectedUsers={selectedUsers}
-          onUserSelect={handleUserSelect}
-          onAddFriend={handleAddFriend}
-        />
-      </div>
-
-      <ChatButton
-        visible={selectedUsers.length > 0}
-        onClick={handleCreateChatRoom}
-      />
-    </main>
+      </main>
+    </EthereumProviders>
   );
 }

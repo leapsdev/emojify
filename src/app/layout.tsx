@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
 import { PrivyProvider } from '@/components/providers/privy-provider';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { Toaster } from 'sonner';
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -35,10 +35,8 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          <EthereumProviders>
-            {children}
-            <Toaster />
-          </EthereumProviders>
+          {children}
+          <Toaster />
         </PrivyProvider>
       </body>
     </html>

@@ -4,7 +4,7 @@ import dynamic from 'next/dynamic';
 
 const PrivyProviderClient = dynamic(
   () => import('@privy-io/react-auth').then((mod) => mod.PrivyProvider),
-  { ssr: false }
+  { ssr: false },
 );
 
 export function PrivyProvider({ children }: { children: React.ReactNode }) {

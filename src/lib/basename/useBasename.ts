@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { type Basename, getBasename } from './basename';
 
-export function useBasename(userId?: string) {
+export function useBasename(userId?: string, isProfile?: boolean) {
   const { user } = useUser();
   const [basename, setBasename] = useState<Basename | undefined>();
 
@@ -23,8 +23,10 @@ export function useBasename(userId?: string) {
     if (result) {
       setBasename(result);
     }
-    setBasename(wallet.address);
-  }, [effectiveUserId]);
+    if (!isProfile) {
+      setBasename(wallet.address);
+    }
+  }, [effectiveUserId, isProfile]);
 
   useEffect(() => {
     fetchBasename();

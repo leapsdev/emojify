@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useBasename } from '@/lib/basename/useBasename';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
@@ -10,13 +11,12 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
-import { useBasename } from '@/lib/basename/useBasename';
 
 const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
   const { user } = usePrivy();
-  const basename = useBasename();
+  const basename = useBasename(undefined, true);
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,

@@ -2,7 +2,7 @@ import type { DisplayUser } from '@/types/display';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-
+import { useBasename } from '@/lib/basename/useBasename';
 interface UserItemProps {
   user: DisplayUser;
   selected: boolean;
@@ -16,6 +16,7 @@ export function UserItem({
   onSelect,
   onAddFriend,
 }: UserItemProps) {
+  const basename = useBasename(user.id);
   const RightButton = () => {
     if (user.section === 'friend') {
       return (
@@ -62,7 +63,7 @@ export function UserItem({
           <span className="font-semibold text-base truncate">
             {user.displayName}
           </span>
-          <span className="text-sm text-gray-500 truncate">{user.userId}</span>
+          <span className="text-sm text-gray-500 truncate">{basename}</span>
         </div>
       </div>
       <div className="flex items-center flex-shrink-0">

@@ -1,31 +1,34 @@
-import { useWallets } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import type { Address } from 'viem';
 import { type Basename, getBasename } from './basename';
+import { useUser } from '@privy-io/react-auth';
 
-export function useBasename() {
-  const { wallets } = useWallets();
+export function useBasename(userId?: string) {
+  const { user } = useUser();
   const [basename, setBasename] = useState<Basename | undefined>();
+  
+  const effectiveUserId = userId || user?.id;
+
+  const fetchBasename = useCallback(async () => {
+    if (!effectiveUserId) {
+      return;
+    }
+    const response = await fetch(`/api/user/${effectiveUserId}`);
+    const userData = await response.json();
+    const wallet = userData.wallet
+    if (!wallet?.address) {
+      return;
+    }
+    const result = await getBasename(wallet.address as Address);
+    if (result) {
+      setBasename(result);
+    }
+    setBasename(wallet.address);
+  }, [effectiveUserId]);
 
   useEffect(() => {
-    const fetchBasename = async () => {
-      // 接続されているウォレットがある場合は最初のウォレットのアドレスを使用
-      const address = wallets[0]?.address;
-      if (address) {
-        try {
-          const result = await getBasename(address as Address);
-          setBasename(result);
-        } catch (error) {
-          console.error('Error fetching basename:', error);
-        }
-      }
-    };
+    fetchBasename();
+  }, [fetchBasename]);
 
-    if (wallets.length > 0) {
-      fetchBasename();
-    }
-  }, [wallets]);
-
-  // basenameが存在する場合はそれを、なければウォレットアドレスを返す
-  return basename ?? wallets[0]?.address ?? null;
+  return basename ?? null;
 }

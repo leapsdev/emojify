@@ -1,8 +1,8 @@
+import { useBasename } from '@/lib/basename/useBasename';
 import type { DisplayUser } from '@/types/display';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useBasename } from '@/lib/basename/useBasename';
 interface UserItemProps {
   user: DisplayUser;
   selected: boolean;

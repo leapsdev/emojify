@@ -7,6 +7,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { LinkButton } from '@/components/ui/linkButton';
 import { MoreVertical } from 'lucide-react';
 
 export const ProfileMenu = () => {
@@ -21,6 +22,20 @@ export const ProfileMenu = () => {
       >
         <DropdownMenuItem asChild className="rounded-lg">
           <SignOutButton />
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="rounded-lg">
+          <LinkButton
+            href="/privacy-policy"
+            content="Privacy Policy"
+            className="w-full text-center px-2 py-1.5r justify-center text-base hover:bg-gray-200"
+          />
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild className="rounded-lg">
+          <LinkButton
+            href="/terms"
+            content="Term"
+            className="w-full text-center px-2 py-1.5r justify-center text-base hover:bg-gray-200"
+          />
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

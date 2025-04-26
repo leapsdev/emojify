@@ -14,7 +14,7 @@ export const SignOutButton = () => {
 
   return (
     <button
-      className="w-full text-center px-2 py-1.5"
+      className="w-full text-center px-2 py-1.5 hover:bg-gray-200"
       type="button"
       onClick={handleLogout}
       disabled={!ready || !authenticated}

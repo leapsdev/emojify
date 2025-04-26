@@ -21,6 +21,19 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
         },
+        defaultChain: {
+          id: 84532, // Base Sepolia
+          name: 'Base Sepolia',
+          nativeCurrency: {
+            name: 'Ether',
+            symbol: 'ETH',
+            decimals: 18,
+          },
+          rpcUrls: {
+            default: { http: ['https://sepolia.base.org'] },
+            public: { http: ['https://sepolia.base.org'] },
+          },
+        },
       }}
     >
       {children}

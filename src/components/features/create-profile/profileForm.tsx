@@ -3,6 +3,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
+import { useBasename } from '@/lib/basename/useBasename';
 import { profileFormSchema } from '@/repository/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
@@ -15,6 +16,7 @@ const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
   const { user } = usePrivy();
+  const basename = useBasename(undefined, true);
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
@@ -66,6 +68,7 @@ export function ProfileForm() {
           className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
             fields.username.errors ? 'border-red-500' : ''
           }`}
+          defaultValue={basename ?? ''}
           required
         />
         {fields.username.errors && (

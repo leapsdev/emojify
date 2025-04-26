@@ -1,5 +1,3 @@
-'use client';
-
 import { Header } from '@/components/shared/layout/header';
 import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
 import { NewChatButton } from '@/components/ui/newChatButton';

@@ -1,5 +1,3 @@
-export const dynamic = 'force-dynamic';
-
 import { ChatRoomListPage } from '@/components/pages/chatRoomListPage';
 import { getPrivyId } from '@/lib/auth';
 import { getUserRooms } from '@/repository/chat/actions';

@@ -1,5 +1,5 @@
 import { PrivyClient } from '@privy-io/server-auth';
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 
 const privy = new PrivyClient(
   process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
@@ -7,11 +7,11 @@ const privy = new PrivyClient(
 );
 
 export async function GET(
-  req: NextRequest,
-  { params }: { params: { userId: string } }
+  _request: Request,
+  context: { params: { userId: string } }
 ) {
   try {
-    const userId = params.userId;
+    const userId = context.params.userId;
     const user = await privy.getUser(userId);
     return NextResponse.json(user);
   } catch {

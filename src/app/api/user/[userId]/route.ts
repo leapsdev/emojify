@@ -12,12 +12,25 @@ type RouteContext = {
   }>;
 };
 
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
 export async function GET(_request: NextRequest, context: RouteContext) {
   try {
     const { userId } = await context.params;
+    if (!userId) {
+      return NextResponse.json(
+        { error: 'User ID is required' },
+        { status: 400 },
+      );
+    }
     const user = await privy.getUser(userId);
     return NextResponse.json(user);
-  } catch {
+  } catch (error) {
+    console.error('Error fetching user:', error);
     return NextResponse.json(
       { error: 'Failed to fetch user' },
       { status: 500 },

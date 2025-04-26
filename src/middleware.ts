@@ -20,6 +20,11 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
+  // APIルートへのリクエストはスキップ
+  if (req.nextUrl.pathname.startsWith('/api/')) {
+    return NextResponse.next();
+  }
+
   const cookieAuthToken = req.cookies.get('privy-token');
   const cookieSession = req.cookies.get('privy-session');
 

@@ -65,6 +65,5 @@ export async function getBasename(address: Address) {
     }
   } catch (error) {
     console.error(error);
-    return null;
   }
 }

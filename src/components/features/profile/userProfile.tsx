@@ -2,11 +2,11 @@
 
 import { Button } from '@/components/ui/button';
 import { LinkButton } from '@/components/ui/linkButton';
+import { useBasename } from '@/lib/basename/useBasename';
 import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { useIsFriend } from './hooks/useIsFriend';
-
 interface UserProfileProps {
   username: string;
   bio: string;
@@ -26,6 +26,7 @@ export const UserProfile = ({
   currentUserId,
   initialIsFriend = false,
 }: UserProfileProps) => {
+  const basename = useBasename();
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 
   const handleAddFriend = async () => {
@@ -89,7 +90,7 @@ export const UserProfile = ({
             <div className="pt-3 min-w-0">
               <h2 className="text-2xl font-black truncate">{username}</h2>
               <p className="text-[13px] text-gray-600 font-bold truncate">
-                {userId}
+                {basename}
               </p>
             </div>
             <RightButton />

@@ -37,12 +37,13 @@ const nextConfig: NextConfig = {
         headers: [
           {
             key: 'Content-Security-Policy',
-            value: "frame-ancestors 'self' http://localhost:3000 https://emoji-chat.netlify.app https://www.emoji-chat.netlify.app https://auth.privy.io"
-          }
-        ]
-      }
-    ]
-  }
+            value:
+              "frame-ancestors 'self' http://localhost:3000 https://emoji-chat.netlify.app https://www.emoji-chat.netlify.app https://auth.privy.io",
+          },
+        ],
+      },
+    ];
+  },
 };
 
 export default withPWA(nextConfig);

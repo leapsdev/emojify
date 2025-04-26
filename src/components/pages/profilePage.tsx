@@ -2,6 +2,7 @@ import { ProfileMenu } from '@/components/features/choose-friends/profileMenu';
 import { ProfileTabs } from '@/components/features/profile/profileTabs';
 import { UserProfile } from '@/components/features/profile/userProfile';
 import { Header } from '@/components/shared/layout/header';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import type { User } from '@/types/database';
 
 interface ProfilePageProps {
@@ -20,7 +21,7 @@ export const ProfilePage = ({
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   return (
-    <>
+    <EthereumProviders>
       <Header backHref={backHref} rightContent={rightContent} />
       <main className="flex flex-col font-nunito overflow-hidden max-w-full">
         <div className="overflow-y-auto overflow-x-hidden flex-1">
@@ -50,6 +51,6 @@ export const ProfilePage = ({
           </div>
         </div>
       </main>
-    </>
+    </EthereumProviders>
   );
 };

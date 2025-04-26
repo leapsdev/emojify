@@ -12,6 +12,8 @@ import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 
 interface ClientChooseFriendsPageProps {
   initialFriends?: User[];
@@ -81,8 +83,9 @@ export function ClientChooseFriendsPage({
   };
 
   return (
-    <main className="flex flex-col">
-      <SearchBar value={searchQuery} onChange={setSearchQuery} />
+    <EthereumProviders>
+      <main className="flex flex-col">
+        <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
       <div className="px-4 space-y-6 flex-1 overflow-auto">
         <UserSection
@@ -103,8 +106,9 @@ export function ClientChooseFriendsPage({
 
       <ChatButton
         visible={selectedUsers.length > 0}
-        onClick={handleCreateChatRoom}
-      />
-    </main>
+          onClick={handleCreateChatRoom}
+        />
+      </main>
+    </EthereumProviders>
   );
 }

@@ -10,11 +10,13 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
+import { useBasename } from '@/lib/basename/useBasename';
 
 const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
   const { user } = usePrivy();
+  const basename = useBasename();
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
@@ -66,6 +68,7 @@ export function ProfileForm() {
           className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
             fields.username.errors ? 'border-red-500' : ''
           }`}
+          defaultValue={basename ?? ''}
           required
         />
         {fields.username.errors && (

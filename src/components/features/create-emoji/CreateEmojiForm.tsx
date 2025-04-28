@@ -16,7 +16,7 @@ import {
 } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
 import { ThirdwebStorage } from '@thirdweb-dev/storage';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   createThirdwebClient,
   estimateGas,
@@ -63,47 +63,37 @@ export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const { wallets } = useWallets();
-  const [selectedWalletAddress, setSelectedWalletAddress] =
-    useState<string>('');
+  const [selectedWalletAddress, setSelectedWalletAddress] = useState<string>('');
+  const [noWalletWarning, setNoWalletWarning] = useState(false);
 
-  console.log(wallets);
-  // ウォレット選択用のUIコンポーネント
-  const WalletSelector = () => {
+  // 利用可能な最初のウォレットを選択
+  useEffect(() => {
+    if (wallets.length > 0) {
+      setSelectedWalletAddress(wallets[0].address);
+      setNoWalletWarning(false);
+    } else {
+      setSelectedWalletAddress('');
+      setNoWalletWarning(true);
+    }
+  }, [wallets]);
+
+  // ウォレットが存在しない場合の警告メッセージ
+  const NoWalletWarning = () => {
+    if (!noWalletWarning) return null;
     return (
-      <div className="space-y-2">
-        <label
-          htmlFor="wallet-select"
-          className="block text-sm font-medium text-gray-700"
-        >
-          使用するウォレットを選択してください
-        </label>
-        <select
-          id="wallet-select"
-          value={selectedWalletAddress}
-          onChange={(e) => setSelectedWalletAddress(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
-        >
-          <option value="">ウォレットを選択</option>
-          {wallets.map((wallet, index) => {
-            // ウォレットタイプの表示名を設定
-            let walletType = wallet.meta.name;
-            if (wallet.walletClientType === 'privy') {
-              walletType = 'Embedded Wallet';
-            }
-
-            const displayAddress = `${wallet.address.slice(0, 6)}...${wallet.address.slice(-4)}`;
-            const chainId = wallet.chainId.split(':')[1]; // "eip155:1" -> "1"
-
-            return (
-              <option
-                key={`${wallet.address}-${wallet.walletClientType}-${index}`}
-                value={wallet.address}
-              >
-                {`${walletType} (Chain: ${chainId}) - ${displayAddress}`}
-              </option>
-            );
-          })}
-        </select>
+      <div className="rounded-md bg-yellow-50 p-4 mb-4">
+        <div className="flex">
+          <div className="ml-3">
+            <h3 className="text-sm font-medium text-yellow-800">
+              No wallet connected
+            </h3>
+            <div className="mt-2 text-sm text-yellow-700">
+              <p>
+                A connected wallet is required to create an NFT.
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     );
   };
@@ -124,12 +114,12 @@ export function CreateEmojiForm() {
       const imageUrl = await uploadToIPFS(selectedFile);
       const imageHttpUrl = ipfsToHttp(imageUrl);
       console.log(
-        `画像のアップロードが完了しました。\n以下のURLで確認できます：\n${imageHttpUrl}
+        `Image upload completed.\nYou can check it at:\n${imageHttpUrl}
         \n ${imageUrl}`,
       );
 
       // Step 2: メタデータを作成してIPFSにアップロード
-      const tokenId = BigInt(0); // トークンIDを設定
+      const tokenId = BigInt(11); // トークンIDを設定
 
       const metadata = {
         name: '',
@@ -146,12 +136,12 @@ export function CreateEmojiForm() {
       const metadataUrl = await storage.upload(metadata);
       const metadataHttpUrl = ipfsToHttp(metadataUrl);
       console.log(
-        `メタデータのアップロードが完了しました。\n以下のURLで確認できます：\n${metadataHttpUrl}`,
+        `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
       );
 
       // Step 3: NFTのミント用トランザクションを準備と送信
       try {
-        console.log('コントラクト:', contract);
+        console.log('Contract:', contract);
         const transaction = prepareContractCall({
           contract,
           method: 'mint',
@@ -166,18 +156,18 @@ export function CreateEmojiForm() {
         // ガスコストを推定
         try {
           const gasEstimate = await estimateGas({ transaction });
-          console.log('推定ガス量:', gasEstimate);
+          console.log('Estimated gas:', gasEstimate);
 
           // 推定ガス量の1.5倍を設定
           const gasLimit = (gasEstimate * BigInt(15)) / BigInt(10);
-          console.log('設定ガス量:', gasLimit);
+          console.log('Set gas limit:', gasLimit);
 
           // トランザクションをシミュレート
           const simulationResult = await simulateTransaction({ transaction });
-          console.log('シミュレーション結果:', simulationResult);
+          console.log('Simulation result:', simulationResult);
 
           // トランザクションの詳細を確認
-          console.log('トランザクションの詳細:', transaction);
+          console.log('Transaction details:', transaction);
 
           // トランザクションを送信
           const provider = await selectedWallet.getEthereumProvider();
@@ -268,9 +258,9 @@ export function CreateEmojiForm() {
             transaction,
           });
 
-          console.log('トランザクション成功！ハッシュ:', transactionHash);
+          console.log('Transaction successful! Hash:', transactionHash);
         } catch (error: unknown) {
-          console.error('トランザクションエラー:', error);
+          console.error('Transaction error:', error);
 
           // エラーメッセージを詳細に表示
           console.dir(error, { depth: null }); // エラーオブジェクトの詳細を表示
@@ -291,35 +281,35 @@ export function CreateEmojiForm() {
             }
           }
 
-          console.log(`NFTの作成中にエラーが発生しました: ${errorMessage}`);
+          console.log(`Error occurred while creating NFT: ${errorMessage}`);
         }
       } catch (error: unknown) {
-        console.error('エラーが発生しました:', error);
+        console.error('An error occurred:', error);
 
         // ユーザーがトランザクションを拒否した場合
         if (isWalletError(error) && error.code === 4001) {
           console.log(
-            'トランザクションがキャンセルされました。\n※画像とメタデータはIPFSにアップロード済みです。',
+            'Transaction cancelled.\n※Image and metadata have already been uploaded to IPFS.',
           );
         } else {
           console.log(
-            'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
+            'An error occurred while creating NFT. Please try again.\n※Image and metadata have already been uploaded to IPFS.',
           );
         }
       } finally {
         setLoading(false);
       }
     } catch (error: unknown) {
-      console.error('エラーが発生しました:', error);
+      console.error('An error occurred:', error);
 
       // ユーザーがトランザクションを拒否した場合
       if (isWalletError(error) && error.code === 4001) {
         console.log(
-          'トランザクションがキャンセルされました。\n※画像とメタデータはIPFSにアップロード済みです。',
+          'Transaction cancelled.\n※Image and metadata have already been uploaded to IPFS.',
         );
       } else {
         console.log(
-          'NFTの作成中にエラーが発生しました。もう一度お試しください。\n※画像とメタデータはIPFSにアップロード済みです。',
+          'An error occurred while creating NFT. Please try again.\n※Image and metadata have already been uploaded to IPFS.',
         );
       }
     }
@@ -328,9 +318,9 @@ export function CreateEmojiForm() {
   return (
     <div className="pt-14 max-w-md mx-auto px-4 space-y-4">
       <FileUpload preview={preview} onFileSelect={handleFileSelect} />
-      <WalletSelector />
+      <NoWalletWarning />
       <CreateButton
-        disabled={!selectedFile || !selectedWalletAddress}
+        disabled={!selectedFile || noWalletWarning}
         onClick={handleCreate}
         loading={loading}
       />

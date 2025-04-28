@@ -1,15 +1,15 @@
 'use client';
 
-import { Suspense } from 'react';
-import dynamic from 'next/dynamic';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import dynamic from 'next/dynamic';
+import { Suspense } from 'react';
 
 const PrivyProviderClient = dynamic(
   () => import('@privy-io/react-auth').then((mod) => mod.PrivyProvider),
-  { 
+  {
     ssr: false,
-    loading: () => <LoadingSpinner />
-  }
+    loading: () => <LoadingSpinner />,
+  },
 );
 
 export function PrivyProvider({ children }: { children: React.ReactNode }) {

@@ -35,7 +35,7 @@ export function usePrivyId() {
     userId,
     isInitialized,
     error,
-    isLoading: !isInitialized && !error
+    isLoading: !isInitialized && !error,
   };
 }
 
@@ -56,6 +56,6 @@ export function usePrivy() {
   return {
     ...privyContext,
     isInitialized,
-    isLoading: !isInitialized
+    isLoading: !isInitialized,
   };
 }

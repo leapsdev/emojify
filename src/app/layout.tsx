@@ -1,10 +1,10 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
-import { Suspense } from 'react';
-import { ErrorBoundary } from '@/components/shared/error-boundary';
 import { PrivyProvider } from '@/components/providers/privy-provider';
+import { ErrorBoundary } from '@/components/shared/error-boundary';
 import { LoadingSpinner } from '@/components/ui/loading-spinner';
+import { Suspense } from 'react';
 import { Toaster } from 'sonner';
 
 const geistSans = Geist({
@@ -39,9 +39,7 @@ export default function RootLayout({
       >
         <ErrorBoundary>
           <PrivyProvider>
-            <Suspense fallback={<LoadingSpinner />}>
-              {children}
-            </Suspense>
+            <Suspense fallback={<LoadingSpinner />}>{children}</Suspense>
             <Toaster />
           </PrivyProvider>
         </ErrorBoundary>

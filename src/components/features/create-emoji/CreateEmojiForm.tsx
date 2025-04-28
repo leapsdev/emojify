@@ -33,8 +33,7 @@ export function CreateEmojiForm() {
       );
 
       // Step 2: メタデータを作成してIPFSにアップロード
-      const tokenId = BigInt(11);
-      const metadataUrl = await uploadMetadataToIPFS(imageUrl, selectedWalletAddress, tokenId);
+      const metadataUrl = await uploadMetadataToIPFS(imageUrl, selectedWalletAddress);
       const metadataHttpUrl = ipfsToHttp(metadataUrl);
       console.log(`Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`);
 

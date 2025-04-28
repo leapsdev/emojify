@@ -1,15 +1,10 @@
 'use client';
 
-import dynamic from 'next/dynamic';
-
-const PrivyProviderClient = dynamic(
-  () => import('@privy-io/react-auth').then((mod) => mod.PrivyProvider),
-  { ssr: false },
-);
+import { PrivyProvider as Privy } from '@privy-io/react-auth';
 
 export function PrivyProvider({ children }: { children: React.ReactNode }) {
   return (
-    <PrivyProviderClient
+    <Privy
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
         loginMethods: ['wallet', 'email'],
@@ -24,6 +19,6 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
       }}
     >
       {children}
-    </PrivyProviderClient>
+    </Privy>
   );
 }

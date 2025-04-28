@@ -26,7 +26,6 @@ export function ClientChooseFriendsPage({
   const userId = usePrivyId();
   const router = useRouter();
 
-  // usePrivyIdがundefinedを返す可能性があるため、空文字列をフォールバックとして使用
   const {
     selectedUsers,
     searchQuery,
@@ -35,7 +34,7 @@ export function ClientChooseFriendsPage({
     others,
     handleUserSelect,
   } = useUserSelection({
-    currentUserId: userId || '',
+    currentUserId: userId ?? '',
     initialFriends,
     initialOthers,
   });

@@ -1,0 +1,139 @@
+import {
+  CLIENT_ID,
+  EMOJI_CONTRACT_ABI,
+  EMOJI_CONTRACT_ADDRESS,
+  baseSepolia,
+} from '@/lib/thirdweb';
+import {
+  createThirdwebClient,
+  estimateGas,
+  getContract,
+  prepareContractCall,
+  sendTransaction,
+  simulateTransaction,
+} from 'thirdweb';
+
+// ThirdWebクライアントの初期化
+const client = createThirdwebClient({
+  clientId: CLIENT_ID,
+});
+
+// コントラクトの取得
+const contract = getContract({
+  client,
+  chain: baseSepolia,
+  address: EMOJI_CONTRACT_ADDRESS,
+  abi: EMOJI_CONTRACT_ABI,
+});
+
+interface WalletError {
+  code: number;
+}
+
+function isWalletError(error: unknown): error is WalletError {
+  return typeof error === 'object' && error !== null && 'code' in error;
+}
+
+export const useThirdwebMint = () => {
+  const mintNFT = async (
+    walletAddress: string,
+    getEthereumProvider: () => Promise<{
+      request: (params: {
+        method: string;
+        params: unknown[];
+      }) => Promise<string>;
+    }>,
+  ) => {
+    try {
+      //TODO: 新規の場合の採番方法を考える
+      const tokenId = BigInt(11);
+
+      const transaction = prepareContractCall({
+        contract,
+        method: 'mint',
+        params: [walletAddress, tokenId, BigInt(1), '0x' as `0x${string}`],
+      });
+
+      const gasEstimate = await estimateGas({ transaction });
+      const gasLimit = (gasEstimate * BigInt(15)) / BigInt(10);
+
+      await simulateTransaction({ transaction });
+
+      const provider = await getEthereumProvider();
+      const { transactionHash } = await sendTransaction({
+        account: {
+          address: walletAddress as `0x${string}`,
+          signMessage: async ({ message }) => {
+            const signature = await provider.request({
+              method: 'personal_sign',
+              params: [message, walletAddress],
+            });
+            return signature as `0x${string}`;
+          },
+          signTransaction: async (tx: {
+            to?: string | null;
+            data?: string | (() => Promise<string>);
+            value?: bigint;
+          }) => {
+            const data =
+              typeof tx.data === 'function' ? await tx.data() : tx.data;
+            return (await provider.request({
+              method: 'eth_signTransaction',
+              params: [
+                {
+                  from: walletAddress,
+                  to: tx.to,
+                  data,
+                  gas: `0x${gasLimit.toString(16)}`,
+                  value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
+                },
+              ],
+            })) as `0x${string}`;
+          },
+          sendTransaction: async (tx: {
+            to?: string | null;
+            data?: string | (() => Promise<string>);
+            value?: bigint;
+          }) => {
+            const txHash = await provider.request({
+              method: 'eth_sendTransaction',
+              params: [
+                {
+                  from: walletAddress,
+                  to: tx.to || '',
+                  data: tx.data
+                    ? typeof tx.data === 'function'
+                      ? await tx.data()
+                      : tx.data
+                    : '0x',
+                  gas: `0x${gasLimit.toString(16)}`,
+                  value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
+                },
+              ],
+            });
+            return { transactionHash: txHash as `0x${string}` };
+          },
+          signTypedData: async (typedData: unknown) => {
+            const signature = await provider.request({
+              method: 'eth_signTypedData',
+              params: [walletAddress, typedData],
+            });
+            return signature as `0x${string}`;
+          },
+        },
+        transaction,
+      });
+
+      return { transactionHash };
+    } catch (error: unknown) {
+      if (isWalletError(error) && error.code === 4001) {
+        throw new Error('Transaction cancelled.');
+      }
+      throw error;
+    }
+  };
+
+  return {
+    mintNFT,
+  };
+};

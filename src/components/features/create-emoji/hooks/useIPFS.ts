@@ -20,8 +20,10 @@ export const useIPFS = () => {
   };
 
   // メタデータをIPFSにアップロード
-  const uploadMetadataToIPFS = async (imageUrl: string, creatorAddress: string) => {
-    const tokenId = BigInt(1);
+  const uploadMetadataToIPFS = async (
+    imageUrl: string,
+    creatorAddress: string,
+  ) => {
     const metadata = {
       name: '',
       description: '',

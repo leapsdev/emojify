@@ -45,17 +45,13 @@ export const useThirdwebMint = () => {
     }>,
   ) => {
     try {
+      //TODO: 新規の場合の採番方法を考える
       const tokenId = BigInt(11);
-      
+
       const transaction = prepareContractCall({
         contract,
         method: 'mint',
-        params: [
-          walletAddress,
-          tokenId,
-          BigInt(1),
-          '0x' as `0x${string}`,
-        ],
+        params: [walletAddress, tokenId, BigInt(1), '0x' as `0x${string}`],
       });
 
       const gasEstimate = await estimateGas({ transaction });
@@ -74,37 +70,46 @@ export const useThirdwebMint = () => {
             });
             return signature as `0x${string}`;
           },
-          signTransaction: async (tx: { 
+          signTransaction: async (tx: {
             to?: string | null;
             data?: string | (() => Promise<string>);
             value?: bigint;
           }) => {
-            const data = typeof tx.data === 'function' ? await tx.data() : tx.data;
+            const data =
+              typeof tx.data === 'function' ? await tx.data() : tx.data;
             return (await provider.request({
               method: 'eth_signTransaction',
-              params: [{
-                from: walletAddress,
-                to: tx.to,
-                data,
-                gas: `0x${gasLimit.toString(16)}`,
-                value: tx.value ? `0x${tx.value.toString(16)}` : '0x0'
-              }]
+              params: [
+                {
+                  from: walletAddress,
+                  to: tx.to,
+                  data,
+                  gas: `0x${gasLimit.toString(16)}`,
+                  value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
+                },
+              ],
             })) as `0x${string}`;
           },
-          sendTransaction: async (tx: { 
+          sendTransaction: async (tx: {
             to?: string | null;
             data?: string | (() => Promise<string>);
             value?: bigint;
           }) => {
             const txHash = await provider.request({
               method: 'eth_sendTransaction',
-              params: [{
-                from: walletAddress,
-                to: tx.to || '',
-                data: tx.data ? (typeof tx.data === 'function' ? await tx.data() : tx.data) : '0x',
-                gas: `0x${gasLimit.toString(16)}`,
-                value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
-              }],
+              params: [
+                {
+                  from: walletAddress,
+                  to: tx.to || '',
+                  data: tx.data
+                    ? typeof tx.data === 'function'
+                      ? await tx.data()
+                      : tx.data
+                    : '0x',
+                  gas: `0x${gasLimit.toString(16)}`,
+                  value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
+                },
+              ],
             });
             return { transactionHash: txHash as `0x${string}` };
           },

@@ -12,7 +12,8 @@ import { useWallet } from './hooks/useWallet';
 export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
-  const { selectedWalletAddress, noWalletWarning, getSelectedWallet } = useWallet();
+  const { selectedWalletAddress, noWalletWarning, getSelectedWallet } =
+    useWallet();
   const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
   const { mintNFT } = useThirdwebMint();
 
@@ -33,12 +34,20 @@ export function CreateEmojiForm() {
       );
 
       // Step 2: メタデータを作成してIPFSにアップロード
-      const metadataUrl = await uploadMetadataToIPFS(imageUrl, selectedWalletAddress);
+      const metadataUrl = await uploadMetadataToIPFS(
+        imageUrl,
+        selectedWalletAddress,
+      );
       const metadataHttpUrl = ipfsToHttp(metadataUrl);
-      console.log(`Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`);
+      console.log(
+        `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
+      );
 
       // Step 3: NFTのミント
-      await mintNFT(selectedWalletAddress, selectedWallet.getEthereumProvider.bind(selectedWallet));
+      await mintNFT(
+        selectedWalletAddress,
+        selectedWallet.getEthereumProvider.bind(selectedWallet),
+      );
       console.log('NFT minted successfully!');
     } catch (error) {
       console.error('An error occurred:', error);

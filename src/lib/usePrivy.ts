@@ -6,37 +6,23 @@ import { useEffect, useState } from 'react';
 /**
  * クライアントサイドでPrivyのユーザーIDを取得するためのカスタムフック
  * SSRとクライアントサイドの状態を適切に管理
- * @returns ユーザーID、準備完了状態、エラー状態
+ * @returns オブジェクト { userId, isInitialized, error, isLoading } の代わりに直接userId文字列を返す
  */
-export function usePrivyId() {
+export function usePrivyId(): string | undefined {
   const { user, ready } = usePrivyOriginal();
-  const [userId, setUserId] = useState<string | null>(null);
-  const [error, setError] = useState<Error | null>(null);
-  const [isInitialized, setIsInitialized] = useState(false);
+  const [userId, setUserId] = useState<string>();
 
   useEffect(() => {
-    // Privyの初期化完了を待つ
     if (!ready) return;
 
-    try {
-      if (user) {
-        setUserId(user.id);
-      } else {
-        setUserId(null);
-      }
-    } catch (err) {
-      setError(err instanceof Error ? err : new Error('Failed to get user ID'));
-    } finally {
-      setIsInitialized(true);
+    if (user) {
+      setUserId(user.id);
+    } else {
+      setUserId(undefined);
     }
   }, [ready, user]);
 
-  return {
-    userId,
-    isInitialized,
-    error,
-    isLoading: !isInitialized && !error,
-  };
+  return userId;
 }
 
 /**
@@ -56,6 +42,6 @@ export function usePrivy() {
   return {
     ...privyContext,
     isInitialized,
-    isLoading: !isInitialized,
+    isLoading: !isInitialized
   };
 }

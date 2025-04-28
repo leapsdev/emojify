@@ -1,9 +1,12 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@/styles/globals.css';
+import { Suspense } from 'react';
+import { ErrorBoundary } from '@/components/shared/error-boundary';
 import { PrivyProvider } from '@/components/providers/privy-provider';
-
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 import { Toaster } from 'sonner';
+
 const geistSans = Geist({
   variable: '--font-geist-sans',
   subsets: ['latin'],
@@ -34,10 +37,14 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PrivyProvider>
-          {children}
-          <Toaster />
-        </PrivyProvider>
+        <ErrorBoundary>
+          <PrivyProvider>
+            <Suspense fallback={<LoadingSpinner />}>
+              {children}
+            </Suspense>
+            <Toaster />
+          </PrivyProvider>
+        </ErrorBoundary>
       </body>
     </html>
   );

@@ -42,6 +42,6 @@ export function usePrivy() {
   return {
     ...privyContext,
     isInitialized,
-    isLoading: !isInitialized
+    isLoading: !isInitialized,
   };
 }

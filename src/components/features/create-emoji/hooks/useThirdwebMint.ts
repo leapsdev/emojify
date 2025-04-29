@@ -42,7 +42,7 @@ export const useThirdwebMint = () => {
         params: unknown[];
       }) => Promise<string>;
     }>,
-    metadataUrl: string
+    metadataUrl: string,
   ) => {
     try {
       //TODO: 新規の場合の採番方法を考える

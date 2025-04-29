@@ -2,10 +2,10 @@ import { expect } from 'chai';
 import type { Signer } from 'ethers';
 import { ethers, ignition } from 'hardhat';
 import { DeployEmojiChatModule } from '../ignition/modules/DeployEmojiChat';
-import type { EmojiChat } from '../typechain-types/contracts/EmojiChat';
+import type { EmojiChatV3 } from '../typechain-types/contracts/EmojiChatV3';
 
-describe('EmojiChat (proxy)', () => {
-  let chat: EmojiChat;
+describe('EmojiChatV3 (proxy)', () => {
+  let chat: EmojiChatV3;
   let owner: Signer;
   let alice: Signer;
   let ownerAddress: string;
@@ -20,7 +20,7 @@ describe('EmojiChat (proxy)', () => {
 
     // DeployEmojiChatModule からデプロイ
     const { emojiChat } = await ignition.deploy(DeployEmojiChatModule);
-    chat = emojiChat as unknown as EmojiChat;
+    chat = emojiChat as unknown as EmojiChatV3;
 
     // 各テスト前に確実にunpause状態にする
     if (await chat.paused()) {
@@ -36,19 +36,19 @@ describe('EmojiChat (proxy)', () => {
     await expect(chat.initialize(ownerAddress)).to.be.reverted;
   });
 
-  it('Owner can set URI', async () => {
-    await chat.connect(owner).setURI('https://example.com/{id}.json');
-    expect(await chat.uri(0)).to.eq('https://example.com/{id}.json');
+  it('Owner can set token URI via dedicated method', async () => {
+    await chat.connect(owner).setTokenURI(0, 'https://example.com/0.json');
+    expect(await chat.uri(0)).to.eq('https://example.com/0.json');
   });
 
-  it('Non-owner cannot set URI', async () => {
-    await expect(chat.connect(alice).setURI('x')).to.be.reverted;
+  it('Non-owner cannot set token URI', async () => {
+    await expect(chat.connect(alice).setTokenURI(1, 'x')).to.be.reverted;
   });
 
   it('Pause / Unpause', async () => {
     await chat.connect(owner).pause();
     expect(await chat.paused()).to.be.true;
-    await expect(chat.mint(aliceAddress, 1, 10, '0x')).to.be.reverted;
+    await expect(chat.mint(aliceAddress, 1, 10, '', '0x')).to.be.reverted;
     await chat.connect(owner).unpause();
     expect(await chat.paused()).to.be.false;
   });
@@ -59,34 +59,34 @@ describe('EmojiChat (proxy)', () => {
   });
 
   it('Single mint sets firstMinter & balances', async () => {
-    await chat.connect(owner).mint(aliceAddress, 42, 5, '0x');
+    await chat.connect(owner).mint(aliceAddress, 42, 5, 'https://example.com/42.json', '0x');
     expect(await chat.firstMinter(42)).to.eq(aliceAddress);
     expect(await chat.balanceOf(aliceAddress, 42)).to.eq(5n);
     expect(await chat['totalSupply(uint256)'](42)).to.eq(5n);
 
     // 追加発行
-    await chat.connect(owner).mint(aliceAddress, 42, 3, '0x');
+    await chat.connect(owner).mint(aliceAddress, 42, 3, '', '0x');
     expect(await chat.firstMinter(42)).to.eq(aliceAddress);
     expect(await chat.balanceOf(aliceAddress, 42)).to.eq(8n);
     expect(await chat['totalSupply(uint256)'](42)).to.eq(8n);
   });
 
   it('Batch mint works and firstMinter is immutable', async () => {
-    await chat.connect(owner).mintBatch(ownerAddress, [1, 2], [2, 3], '0x');
+    await chat.connect(owner).mintBatch(ownerAddress, [1, 2], [2, 3], ['https://example.com/1.json','https://example.com/2.json'], '0x');
     expect(await chat.firstMinter(1)).to.eq(ownerAddress);
     expect(await chat.firstMinter(2)).to.eq(ownerAddress);
     expect(await chat.balanceOf(ownerAddress, 1)).to.eq(2n);
     expect(await chat.balanceOf(ownerAddress, 2)).to.eq(3n);
 
     // 再度バッチ
-    await chat.connect(owner).mintBatch(aliceAddress, [1, 2], [1, 1], '0x');
+    await chat.connect(owner).mintBatch(aliceAddress, [1, 2], [1, 1], ['', ''], '0x');
     expect(await chat.firstMinter(1)).to.eq(ownerAddress);
     expect(await chat.firstMinter(2)).to.eq(ownerAddress);
   });
 
   it('Transfer updates balances but not totalSupply', async () => {
     // 先にミントしておく
-    await chat.connect(owner).mintBatch(ownerAddress, [1], [2], '0x');
+    await chat.connect(owner).mintBatch(ownerAddress, [1], [2], ['https://example.com/1.json'], '0x');
     // owner がトークン id=1 を alice へ
     await chat
       .connect(owner)

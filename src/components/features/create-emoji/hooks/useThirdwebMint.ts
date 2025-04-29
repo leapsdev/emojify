@@ -43,6 +43,7 @@ export const useThirdwebMint = () => {
         params: unknown[];
       }) => Promise<string>;
     }>,
+    metadataUrl: string
   ) => {
     try {
       //TODO: 新規の場合の採番方法を考える
@@ -51,7 +52,7 @@ export const useThirdwebMint = () => {
       const transaction = prepareContractCall({
         contract,
         method: 'mint',
-        params: [walletAddress, tokenId, BigInt(1), '0x' as `0x${string}`],
+        params: [walletAddress, tokenId, BigInt(1), `0x${metadataUrl}` as `0x${string}`],
       });
 
       const gasEstimate = await estimateGas({ transaction });

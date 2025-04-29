@@ -6,7 +6,6 @@ import {
 } from '@/lib/thirdweb';
 import {
   createThirdwebClient,
-  estimateGas,
   getContract,
   prepareContractCall,
   sendTransaction,
@@ -43,20 +42,18 @@ export const useThirdwebMint = () => {
         params: unknown[];
       }) => Promise<string>;
     }>,
-    metadataUrl: string
+    metadataUrl: string,
   ) => {
     try {
       //TODO: 新規の場合の採番方法を考える
-      const tokenId = BigInt(11);
+      const tokenId = BigInt(1);
 
+      // NFTをミント
       const transaction = prepareContractCall({
         contract,
         method: 'mint',
-        params: [walletAddress, tokenId, BigInt(1), `0x${Buffer.from(metadataUrl).toString('hex')}` as `0x${string}`],
+        params: [walletAddress, tokenId, BigInt(1), metadataUrl, '0x'],
       });
-
-      const gasEstimate = await estimateGas({ transaction });
-      const gasLimit = (gasEstimate * BigInt(15)) / BigInt(10);
 
       await simulateTransaction({ transaction });
 
@@ -85,7 +82,6 @@ export const useThirdwebMint = () => {
                   from: walletAddress,
                   to: tx.to,
                   data,
-                  gas: `0x${gasLimit.toString(16)}`,
                   value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
                 },
               ],
@@ -107,7 +103,6 @@ export const useThirdwebMint = () => {
                       ? await tx.data()
                       : tx.data
                     : '0x',
-                  gas: `0x${gasLimit.toString(16)}`,
                   value: tx.value ? `0x${tx.value.toString(16)}` : '0x0',
                 },
               ],
@@ -130,7 +125,11 @@ export const useThirdwebMint = () => {
       if (isWalletError(error) && error.code === 4001) {
         throw new Error('Transaction cancelled.');
       }
-      throw error;
+      console.error('Transaction error:', error);
+      if (error instanceof Error) {
+        throw new Error(`Transaction failed: ${error.message}`);
+      }
+      throw new Error('Transaction failed with unknown error');
     }
   };
 

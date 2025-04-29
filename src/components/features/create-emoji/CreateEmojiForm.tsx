@@ -39,10 +39,6 @@ export function CreateEmojiForm() {
         selectedWalletAddress,
       );
       console.log(`metadataUrl: ${metadataUrl}`);
-      const metadataHttpUrl = ipfsToHttp(metadataUrl);
-      console.log(
-        `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
-      );
 
       // Step 3: NFTのミント
       await mintNFT(

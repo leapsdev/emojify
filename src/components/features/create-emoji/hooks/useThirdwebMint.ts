@@ -52,7 +52,7 @@ export const useThirdwebMint = () => {
       const transaction = prepareContractCall({
         contract,
         method: 'mint',
-        params: [walletAddress, tokenId, BigInt(1), `0x${metadataUrl}` as `0x${string}`],
+        params: [walletAddress, tokenId, BigInt(1), `0x${Buffer.from(metadataUrl).toString('hex')}` as `0x${string}`],
       });
 
       const gasEstimate = await estimateGas({ transaction });

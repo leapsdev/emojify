@@ -8,6 +8,7 @@ import { useFileUpload } from './hooks/useFileUpload';
 import { useIPFS } from './hooks/useIPFS';
 import { useThirdwebMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
+import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 
 export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
@@ -45,14 +46,21 @@ export function CreateEmojiForm() {
       );
 
       // Step 3: NFTのミント
-      await mintNFT(
+      const { transactionHash } = await mintNFT(
         selectedWalletAddress,
         selectedWallet.getEthereumProvider.bind(selectedWallet),
         metadataUrl
       );
       console.log('NFT minted successfully!');
+      console.log('Transaction Hash:', transactionHash);
+      console.log('View on OpenSea:', `https://testnets.opensea.io/ja/${EMOJI_CONTRACT_ADDRESS}/${selectedWalletAddress}`);
     } catch (error) {
       console.error('An error occurred:', error);
+      if (error instanceof Error) {
+        alert(`Error: ${error.message}`);
+      } else {
+        alert('An unknown error occurred');
+      }
     } finally {
       setLoading(false);
     }

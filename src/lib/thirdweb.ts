@@ -551,6 +551,11 @@ export const EMOJI_CONTRACT_ABI = [
         type: 'uint256',
       },
       {
+        internalType: 'string',
+        name: 'tokenURI',
+        type: 'string',
+      },
+      {
         internalType: 'bytes',
         name: 'data',
         type: 'bytes',

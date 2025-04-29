@@ -46,7 +46,7 @@ export const useThirdwebMint = () => {
   ) => {
     try {
       //TODO: 新規の場合の採番方法を考える
-      const tokenId = BigInt(11);
+      const tokenId = BigInt(1);
 
       // NFTをミント
       const transaction = prepareContractCall({

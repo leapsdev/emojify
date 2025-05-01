@@ -20,9 +20,7 @@ interface NFTMetadata {
 
 // IPFSゲートウェイのURLを定義
 const IPFS_GATEWAYS = [
-  'https://ipfs.io/ipfs/',
-  'https://cloudflare-ipfs.com/ipfs/',
-  'https://gateway.pinata.cloud/ipfs/',
+  'https://ipfs.io/ipfs/'
 ];
 
 // IPFSのURLをゲートウェイURLに変換する関数

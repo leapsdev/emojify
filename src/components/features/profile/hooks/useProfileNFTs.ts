@@ -18,46 +18,33 @@ interface NFTMetadata {
   [key: string]: unknown;
 }
 
-// IPFSゲートウェイのURLを定義
-const IPFS_GATEWAYS = ['https://ipfs.io/ipfs/'];
-
-// IPFSのURLをゲートウェイURLに変換する関数
-const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
+async function convertIpfsToGatewayUrl(ipfsUrl: string): Promise<string> {
   if (!ipfsUrl) return '';
-
   if (ipfsUrl.startsWith('ipfs://')) {
     const ipfsHash = ipfsUrl.replace('ipfs://', '');
-    // 最初のゲートウェイで試す
-    return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
+    return `https://ipfs.io/ipfs/${ipfsHash}`;
   }
   return ipfsUrl;
-};
+}
 
-// メタデータを取得する関数
-const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
-  for (const gateway of IPFS_GATEWAYS) {
-    try {
-      const gatewayUrl = url.startsWith('ipfs://')
-        ? `${gateway}${url.replace('ipfs://', '')}`
-        : url;
-
-      const response = await fetch(gatewayUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Invalid content type');
-      }
-      return await response.json();
-    } catch (error) {
-      console.warn(`Failed to fetch from ${gateway}:`, error);
+async function fetchMetadata(uri: string): Promise<NFTMetadata> {
+  try {
+    const httpUrl = await convertIpfsToGatewayUrl(uri);
+    console.log('Fetching metadata from:', httpUrl);
+    const response = await fetch(httpUrl);
+    if (!response.ok) {
+      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
     }
+    const metadata = await response.json();
+    console.log('Fetched metadata:', metadata);
+    return metadata;
+  } catch (error) {
+    console.error('Error fetching metadata:', error);
+    return {};
   }
-  throw new Error('Failed to fetch metadata from all gateways');
-};
+}
 
-export const useExploreNFTs = () => {
+export function useProfileNFTs(address?: string) {
   const [nfts, setNFTs] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,17 +54,24 @@ export const useExploreNFTs = () => {
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!contract || !totalSupply) return;
+      if (!contract || !totalSupply || !address) return;
 
       try {
         setLoading(true);
-        const nftPromises: Promise<NFT>[] = [];
+        const nftPromises: Promise<NFT | null>[] = [];
 
         // 各NFTの情報を取得
         for (let i = 0; i < Number(totalSupply); i++) {
           const tokenId = i + 1;
           const promise = (async () => {
             try {
+              // balanceOfをチェックして、アドレスがNFTを所有しているか確認
+              const balance = await contract.call('balanceOf', [
+                address,
+                tokenId,
+              ]);
+              if (Number(balance) === 0) return null;
+
               let uri: string;
               try {
                 uri = await contract.call('uri', [tokenId]);
@@ -91,38 +85,34 @@ export const useExploreNFTs = () => {
                 console.warn(`Empty URI for token ${tokenId}`);
                 return {
                   tokenId: tokenId.toString(),
-                  owner: 'Unknown',
+                  owner: address,
                   uri: '',
                   name: `NFT #${tokenId}`,
                   description: 'URIが設定されていません',
-                };
+                } as NFT;
               }
 
               // メタデータを取得
               const metadata = await fetchMetadata(uri);
+              console.log(`Token ${tokenId} metadata:`, metadata);
 
               // 画像URLもIPFSゲートウェイを使用するように変換
               const imageUrl = metadata.image
                 ? await convertIpfsToGatewayUrl(metadata.image)
                 : undefined;
+              console.log(`Token ${tokenId} image URL:`, imageUrl);
 
               return {
                 tokenId: tokenId.toString(),
-                owner: 'Unknown',
+                owner: address,
                 uri: await convertIpfsToGatewayUrl(uri),
                 imageUrl,
                 name: metadata.name || `NFT #${tokenId}`,
                 description: metadata.description || 'No description available',
-              };
+              } as NFT;
             } catch (err) {
               console.error(`Error fetching NFT #${tokenId}:`, err);
-              return {
-                tokenId: tokenId.toString(),
-                owner: 'Unknown',
-                uri: '',
-                name: `NFT #${tokenId}`,
-                description: 'メタデータの取得に失敗しました',
-              };
+              return null;
             }
           })();
 
@@ -130,7 +120,11 @@ export const useExploreNFTs = () => {
         }
 
         const nftResults = await Promise.all(nftPromises);
-        setNFTs(nftResults);
+        const filteredNFTs = nftResults.filter(
+          (nft): nft is NFT => nft !== null,
+        );
+        console.log('Filtered NFTs:', filteredNFTs);
+        setNFTs(filteredNFTs);
         setError(null);
       } catch (err) {
         console.error('Error fetching NFTs:', err);
@@ -141,11 +135,11 @@ export const useExploreNFTs = () => {
     };
 
     fetchNFTs();
-  }, [contract, totalSupply]);
+  }, [contract, totalSupply, address]);
 
   return {
     nfts,
     loading,
     error,
   };
-};
+}

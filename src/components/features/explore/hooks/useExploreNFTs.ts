@@ -1,6 +1,6 @@
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 interface NFT {
   tokenId: string;
@@ -22,13 +22,13 @@ interface NFTMetadata {
 const IPFS_GATEWAYS = [
   'https://ipfs.io/ipfs/',
   'https://cloudflare-ipfs.com/ipfs/',
-  'https://gateway.pinata.cloud/ipfs/'
+  'https://gateway.pinata.cloud/ipfs/',
 ];
 
 // IPFSのURLをゲートウェイURLに変換する関数
 const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
   if (!ipfsUrl) return '';
-  
+
   if (ipfsUrl.startsWith('ipfs://')) {
     const ipfsHash = ipfsUrl.replace('ipfs://', '');
     // 最初のゲートウェイで試す
@@ -41,10 +41,10 @@ const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
 const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
   for (const gateway of IPFS_GATEWAYS) {
     try {
-      const gatewayUrl = url.startsWith('ipfs://') 
+      const gatewayUrl = url.startsWith('ipfs://')
         ? `${gateway}${url.replace('ipfs://', '')}`
         : url;
-      
+
       const response = await fetch(gatewayUrl);
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -56,7 +56,6 @@ const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
       return await response.json();
     } catch (error) {
       console.warn(`Failed to fetch from ${gateway}:`, error);
-      continue;
     }
   }
   throw new Error('Failed to fetch metadata from all gateways');
@@ -68,7 +67,7 @@ export const useExploreNFTs = () => {
   const [error, setError] = useState<string | null>(null);
   const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
 
-  const { data: totalSupply } = useContractRead(contract, "totalSupply");
+  const { data: totalSupply } = useContractRead(contract, 'totalSupply');
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -83,9 +82,9 @@ export const useExploreNFTs = () => {
           const tokenId = i + 1;
           const promise = (async () => {
             try {
-              let uri;
+              let uri: string;
               try {
-                uri = await contract.call("uri", [tokenId]);
+                uri = await contract.call('uri', [tokenId]);
                 console.log(`Token ${tokenId} URI:`, uri);
               } catch (err) {
                 console.error(`Error fetching URI for token ${tokenId}:`, err);
@@ -96,37 +95,37 @@ export const useExploreNFTs = () => {
                 console.warn(`Empty URI for token ${tokenId}`);
                 return {
                   tokenId: tokenId.toString(),
-                  owner: "Unknown",
+                  owner: 'Unknown',
                   uri: '',
                   name: `NFT #${tokenId}`,
-                  description: 'URIが設定されていません'
+                  description: 'URIが設定されていません',
                 };
               }
 
               // メタデータを取得
               const metadata = await fetchMetadata(uri);
-              
+
               // 画像URLもIPFSゲートウェイを使用するように変換
-              const imageUrl = metadata.image 
+              const imageUrl = metadata.image
                 ? await convertIpfsToGatewayUrl(metadata.image)
                 : undefined;
 
               return {
                 tokenId: tokenId.toString(),
-                owner: "Unknown",
+                owner: 'Unknown',
                 uri: await convertIpfsToGatewayUrl(uri),
                 imageUrl,
                 name: metadata.name || `NFT #${tokenId}`,
-                description: metadata.description || 'No description available'
+                description: metadata.description || 'No description available',
               };
             } catch (err) {
               console.error(`Error fetching NFT #${tokenId}:`, err);
               return {
                 tokenId: tokenId.toString(),
-                owner: "Unknown",
+                owner: 'Unknown',
                 uri: '',
                 name: `NFT #${tokenId}`,
-                description: 'メタデータの取得に失敗しました'
+                description: 'メタデータの取得に失敗しました',
               };
             }
           })();
@@ -151,6 +150,6 @@ export const useExploreNFTs = () => {
   return {
     nfts,
     loading,
-    error
+    error,
   };
-}; 
+};

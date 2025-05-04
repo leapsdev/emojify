@@ -79,11 +79,13 @@ export const UserProfile = ({
       <div className="mb-8">
         {/* プロフィール画像とユーザー情報 */}
         <div className="flex flex-wrap mb-4">
-          <div className="relative w-24 h-24 flex-shrink-0">
+          <div className="relative w-24 h-24">
             <Image
-              src={avatar || '/placeholder.svg'}
-              alt="Profile"
+              src={avatar}
+              alt={username}
               fill
+              sizes="(max-width: 768px) 96px, 96px"
+              priority
               className="rounded-full object-cover"
             />
           </div>

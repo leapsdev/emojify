@@ -13,16 +13,25 @@ export const EmojiGrid = ({ emojis }: EmojiGridProps) => {
           key={emoji.id}
           className="relative aspect-square bg-white rounded-lg p-2"
         >
-          <div className="w-full h-full bg-red-500 relative">
-            {/* 花の茎 */}
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-4 h-8 bg-green-500" />
+          <div className="w-full h-full relative">
+            {/* NFT画像 */}
+            <div className="relative w-full h-full">
+              <Image
+                src={emoji.image || '/icons/icon-192x192.png'}
+                alt={`Emoji ${emoji.id}`}
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                className="object-cover rounded-lg"
+              />
+            </div>
             {/* クリエイターアイコン */}
             <div className="absolute -bottom-2 -left-2 w-6 h-6 rounded-full overflow-hidden border-2 border-white">
               <div className="relative w-full h-full">
                 <Image
-                  src={emoji.creator.avatar || '/placeholder.svg'}
+                  src={emoji.creator.avatar || '/icons/icon-192x192.png'}
                   alt="Creator"
                   fill
+                  sizes="24px"
                   className="object-cover"
                 />
               </div>

@@ -3,7 +3,7 @@ import { useUser } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 import { type Basename, getBasename } from './basename';
 
-export function useBasename(userId?: string, isProfile?: boolean) {
+export function useBasename(userId?: string, isProfile = false) {
   const { user } = useUser();
   const [basename, setBasename] = useState<Basename | ''>('');
 

@@ -27,7 +27,7 @@ export const UserProfile = ({
   currentUserId,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const basename = useBasename(currentUserId);
+  const basename = useBasename(currentUserId, true);
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 
   const handleAddFriend = async () => {

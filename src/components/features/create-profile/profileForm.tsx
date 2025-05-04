@@ -16,7 +16,7 @@ const initialState: ProfileFormState = null;
 
 export function ProfileForm() {
   const { user } = usePrivy();
-  const basename = useBasename(undefined, true);
+  const basename = useBasename(undefined);
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,

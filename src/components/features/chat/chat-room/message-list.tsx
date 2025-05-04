@@ -1,7 +1,11 @@
 'use client';
 
+import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
+import { ThirdwebProvider } from '@thirdweb-dev/react';
+import Image from 'next/image';
 import { useEffect, useRef } from 'react';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
@@ -11,13 +15,28 @@ type MessageListProps = {
   initialMessages: Message[];
 };
 
-export function MessageList({
+function MessageListContent({
   roomId,
   currentUserId,
   initialMessages,
 }: MessageListProps) {
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { selectedWalletAddress } = useWallet();
+  const { nfts } = useProfileNFTs(selectedWalletAddress);
+
+  // NFTの情報をマップに変換
+  const nftMap = nfts.reduce<
+    Record<string, { imageUrl: string; name: string }>
+  >((acc, nft) => {
+    if (nft.imageUrl && nft.name) {
+      acc[`nft-${nft.tokenId}`] = {
+        imageUrl: nft.imageUrl,
+        name: nft.name,
+      };
+    }
+    return acc;
+  }, {});
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -62,6 +81,26 @@ export function MessageList({
     {},
   );
 
+  const renderMessageContent = (content: string) => {
+    // NFTのIDを検出
+    const nftMatch = content.match(/nft-(\d+)/);
+    if (nftMatch && nftMap[nftMatch[0]]) {
+      const nft = nftMap[nftMatch[0]];
+      return (
+        <div className="flex items-center">
+          <Image
+            src={nft.imageUrl}
+            alt={nft.name}
+            width={48}
+            height={48}
+            className="rounded-full"
+          />
+        </div>
+      );
+    }
+    return <span className="leading-none">{content}</span>;
+  };
+
   return (
     <div className="flex-1 overflow-auto p-4 space-y-4">
       {Object.entries(messagesByDate).map(([date, messagesForDate]) => (
@@ -88,7 +127,7 @@ export function MessageList({
                         : 'bg-gray-100 text-black'
                     }`}
                   >
-                    <span className="leading-none">{message.content}</span>
+                    {renderMessageContent(message.content)}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-400 px-1">
                     <span>
@@ -109,5 +148,17 @@ export function MessageList({
       ))}
       <div ref={messagesEndRef} />
     </div>
+  );
+}
+
+export function MessageList(props: MessageListProps) {
+  return (
+    <ThirdwebProvider
+      activeChain="base-sepolia-testnet"
+      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
+      supportedWallets={[]}
+    >
+      <MessageListContent {...props} />
+    </ThirdwebProvider>
   );
 }

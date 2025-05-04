@@ -1,4 +1,4 @@
-import { Theme } from 'emoji-picker-react';
+import { type Categories, Theme } from 'emoji-picker-react';
 import type { EmojiClickData } from 'emoji-picker-react';
 import { X } from 'lucide-react';
 import dynamic from 'next/dynamic';
@@ -6,6 +6,12 @@ import dynamic from 'next/dynamic';
 const EmojiPickerComponent = dynamic(() => import('emoji-picker-react'), {
   ssr: false,
 });
+
+type CustomEmoji = {
+  id: string;
+  names: string[];
+  imgUrl: string;
+};
 
 type EmojiPickerProps = {
   message: string;
@@ -16,6 +22,11 @@ type EmojiPickerProps = {
   onEmojiClick: (emojiData: EmojiClickData) => void;
   onDeleteLastEmoji: () => void;
   onToggleEmojiPicker: () => void;
+  customEmojis?: CustomEmoji[];
+  categories?: Array<{
+    category: Categories;
+    name: string;
+  }>;
 };
 
 export function EmojiPicker({
@@ -27,6 +38,8 @@ export function EmojiPicker({
   onEmojiClick,
   onDeleteLastEmoji,
   onToggleEmojiPicker,
+  customEmojis = [],
+  categories,
 }: EmojiPickerProps) {
   return (
     <div className="flex-1 relative">
@@ -69,6 +82,8 @@ export function EmojiPicker({
               height={350}
               theme={Theme.LIGHT}
               searchDisabled={true}
+              customEmojis={customEmojis}
+              categories={categories}
             />
           </div>
         </div>

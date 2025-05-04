@@ -7,6 +7,7 @@ import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { useIsFriend } from './hooks/useIsFriend';
+
 interface UserProfileProps {
   username: string;
   bio: string;
@@ -26,7 +27,7 @@ export const UserProfile = ({
   currentUserId,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const basename = useBasename();
+  const basename = useBasename(currentUserId, true);
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 
   const handleAddFriend = async () => {

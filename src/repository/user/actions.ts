@@ -3,6 +3,8 @@
 import { adminDbRef } from '@/lib/firebase/admin';
 import type { User } from '@/types/database';
 import { getCurrentTimestamp } from '@/utils/date';
+import { PrivyClient } from '@privy-io/server-auth';
+import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
@@ -202,4 +204,29 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
     friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
     others: others.sort((a, b) => b.updatedAt - a.updatedAt),
   };
+}
+
+/**
+ * ユーザーのウォレットアドレスを取得する
+ * @param userId ユーザーID
+ * @returns ウォレットアドレスの配列
+ */
+export async function getWalletAddresses(userId: string): Promise<string[]> {
+  const privy = new PrivyClient(
+    process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
+    process.env.PRIVY_APP_SECRET || '',
+  );
+
+  try {
+    const user = await privy.getUser(userId);
+    return user.linkedAccounts
+      .filter(
+        (account): account is LinkedAccountWithMetadata & { type: 'wallet' } =>
+          account.type === 'wallet',
+      )
+      .map((account) => account.address);
+  } catch (error) {
+    console.error('Error fetching user wallet addresses:', error);
+    return [];
+  }
 }

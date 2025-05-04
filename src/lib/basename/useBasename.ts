@@ -1,36 +1,30 @@
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { useUser } from '@privy-io/react-auth';
-import { useCallback, useEffect, useState } from 'react';
-import type { Address } from 'viem';
+import { useEffect, useState } from 'react';
 import { type Basename, getBasename } from './basename';
 
-export function useBasename(userId?: string, isProfile?: boolean) {
+export function useBasename(userId?: string, isProfile = false) {
   const { user } = useUser();
-  const [basename, setBasename] = useState<Basename | undefined>();
-
-  const effectiveUserId = userId || user?.id;
-
-  const fetchBasename = useCallback(async () => {
-    if (!effectiveUserId) {
-      return;
-    }
-    const response = await fetch(`/api/user/${effectiveUserId}`);
-    const userData = await response.json();
-    const wallet = userData.wallet;
-    if (!wallet?.address) {
-      return;
-    }
-    const result = await getBasename(wallet.address as Address);
-    if (result) {
-      setBasename(result);
-    }
-    if (!isProfile) {
-      setBasename(wallet.address);
-    }
-  }, [effectiveUserId, isProfile]);
+  const [basename, setBasename] = useState<Basename | ''>('');
 
   useEffect(() => {
-    fetchBasename();
-  }, [fetchBasename]);
-
-  return basename ?? null;
+    const fetchData = async () => {
+      const effectiveUserId = userId || user?.id;
+      if (!effectiveUserId) return;
+      const addresses = await getWalletAddressesByUserId(effectiveUserId);
+      const result = await getBasename(addresses[0]);
+      console.log('result', result);
+      if (!result) {
+        if (isProfile) {
+          setBasename(addresses[0] as Basename);
+        } else {
+          setBasename('');
+        }
+      } else {
+        setBasename(result);
+      }
+    };
+    fetchData();
+  }, [userId, user?.id, isProfile]);
+  return basename;
 }

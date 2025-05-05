@@ -1,12 +1,11 @@
 'use client';
 
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
-import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
+import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
@@ -22,8 +21,7 @@ function MessageListContent({
 }: MessageListProps) {
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
-  const { selectedWalletAddress } = useWallet();
-  const { nfts } = useProfileNFTs(selectedWalletAddress);
+  const { nfts } = useGlobalNFTs();
 
   // NFTの情報をマップに変換
   const nftMap = nfts.reduce<
@@ -84,21 +82,27 @@ function MessageListContent({
   const renderMessageContent = (content: string) => {
     // NFTのIDを検出
     const nftMatch = content.match(/nft-(\d+)/);
-    if (nftMatch && nftMap[nftMatch[0]]) {
-      const nft = nftMap[nftMatch[0]];
-      return (
-        <div className="flex items-center">
-          <Image
-            src={nft.imageUrl}
-            alt={nft.name}
-            width={48}
-            height={48}
-            className="rounded-full"
-          />
-        </div>
-      );
+    if (nftMatch) {
+      const nftId = nftMatch[0];
+      const nft = nftMap[nftId];
+      if (nft) {
+        return (
+          <div className="flex items-center">
+            <Image
+              src={nft.imageUrl}
+              alt={nft.name}
+              width={48}
+              height={48}
+              className="rounded-full"
+            />
+          </div>
+        );
+      }
     }
-    return <span className="leading-none">{content}</span>;
+    // NFT以外のメッセージの場合
+    return (
+      <span className="leading-none">{content.replace(/nft-\d+/g, '')}</span>
+    );
   };
 
   return (
@@ -136,9 +140,7 @@ function MessageListContent({
                         minute: '2-digit',
                       })}
                     </span>
-                    {message.sent && isSentByCurrentUser && (
-                      <span>送信済み</span>
-                    )}
+                    {message.sent && isSentByCurrentUser && <span>送信済</span>}
                   </div>
                 </div>
               );

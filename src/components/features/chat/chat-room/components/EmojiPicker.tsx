@@ -2,6 +2,7 @@ import { type Categories, Theme } from 'emoji-picker-react';
 import type { EmojiClickData } from 'emoji-picker-react';
 import { X } from 'lucide-react';
 import dynamic from 'next/dynamic';
+import Image from 'next/image';
 
 const EmojiPickerComponent = dynamic(() => import('emoji-picker-react'), {
   ssr: false,
@@ -41,19 +42,52 @@ export function EmojiPicker({
   customEmojis = [],
   categories,
 }: EmojiPickerProps) {
+  // メッセージをNFTと絵文字に分割
+  const parts = message.split(/(nft-\d+)/).filter(Boolean);
+
   return (
     <div className="flex-1 relative">
       <div className="relative w-full">
-        <input
+        <div
           ref={inputRef}
-          type="text"
-          inputMode="none"
-          placeholder="クリックして絵文字を選択..."
-          value={message}
-          readOnly
           onClick={onToggleEmojiPicker}
-          className="w-full h-12 bg-gray-100 border-none rounded-full px-4 text-2xl leading-none cursor-pointer focus:outline-none placeholder:text-base"
-        />
+          className="w-full h-12 bg-gray-100 border-none rounded-full px-4 text-2xl leading-none cursor-pointer focus:outline-none flex items-center gap-1"
+        >
+          {parts.length > 0 ? (
+            <div className="flex items-center gap-1">
+              {parts.map((part, index) => {
+                const nftMatch = part.match(/nft-(\d+)/);
+                if (nftMatch) {
+                  const selectedNFT = customEmojis.find(
+                    (emoji) => emoji.id === nftMatch[0],
+                  );
+                  if (selectedNFT) {
+                    return (
+                      <div key={index} className="flex items-center">
+                        <Image
+                          src={selectedNFT.imgUrl}
+                          alt={selectedNFT.names[0]}
+                          width={32}
+                          height={32}
+                          className="rounded-full"
+                        />
+                      </div>
+                    );
+                  }
+                }
+                return (
+                  <span key={index} className="text-2xl">
+                    {part}
+                  </span>
+                );
+              })}
+            </div>
+          ) : (
+            <span className="text-base text-gray-500">
+              クリックして絵文字を選択...
+            </span>
+          )}
+        </div>
         {message && (
           <button
             ref={deleteButtonRef}

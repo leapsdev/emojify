@@ -46,28 +46,30 @@ function EmojiListContent() {
   return (
     <div className="p-2 flex-1">
       <div className="grid grid-cols-2 gap-2">
-        {nfts.map((nft) => (
-          <div
-            key={nft.tokenId}
-            className="bg-white rounded-lg shadow-lg overflow-hidden"
-          >
-            {nft.imageUrl && (
-              <div className="relative aspect-square">
-                <Image
-                  src={nft.imageUrl}
-                  alt={nft.name || `Emoji #${nft.tokenId}`}
-                  fill
-                  className="object-cover"
-                />
+        {nfts
+          .filter((nft) => nft.imageUrl)
+          .map((nft) => (
+            <div
+              key={nft.tokenId}
+              className="bg-white rounded-lg shadow-lg overflow-hidden"
+            >
+              {nft.imageUrl && (
+                <div className="relative aspect-square">
+                  <Image
+                    src={nft.imageUrl as string}
+                    alt={nft.name || `Emoji #${nft.tokenId}`}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+              <div className="p-2">
+                <h2 className="text-sm font-semibold truncate">
+                  {nft.name || `Emoji #${nft.tokenId}`}
+                </h2>
               </div>
-            )}
-            <div className="p-2">
-              <h2 className="text-sm font-semibold truncate">
-                {nft.name || `Emoji #${nft.tokenId}`}
-              </h2>
             </div>
-          </div>
-        ))}
+          ))}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import { formatDateToYYYYMMDD } from '@/utils/date';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';
 import { useEffect, useRef } from 'react';
+import React from 'react';
 import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
@@ -80,28 +81,71 @@ function MessageListContent({
   );
 
   const renderMessageContent = (content: string) => {
-    // NFTのIDを検出
-    const nftMatch = content.match(/nft-(\d+)/);
-    if (nftMatch) {
-      const nftId = nftMatch[0];
-      const nft = nftMap[nftId];
-      if (nft) {
-        return (
-          <div className="flex items-center">
-            <Image
-              src={nft.imageUrl}
-              alt={nft.name}
-              width={48}
-              height={48}
-              className="rounded-full"
-            />
-          </div>
-        );
-      }
-    }
-    // NFT以外のメッセージの場合
+    // メッセージをNFTと絵文字に分割
+    const parts = content.split(/(nft-\d+)/).filter(Boolean);
+
     return (
-      <span className="leading-none">{content.replace(/nft-\d+/g, '')}</span>
+      <div style={{ whiteSpace: 'normal', wordBreak: 'break-all' }}>
+        {parts.map((part, index) => {
+          const nftMatch = part.match(/nft-(\d+)/);
+          if (nftMatch) {
+            const nftId = nftMatch[0];
+            const nft = nftMap[nftId];
+            if (nft) {
+              return (
+                <span
+                  key={index}
+                  style={{
+                    display: 'inline-block',
+                    width: '1.5em',
+                    height: '1.5em',
+                    verticalAlign: 'middle',
+                    margin: '0',
+                  }}
+                >
+                  <Image
+                    src={nft.imageUrl}
+                    alt={nft.name}
+                    width={24}
+                    height={24}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '50%',
+                      display: 'block',
+                    }}
+                  />
+                </span>
+              );
+            }
+            // NFTが見つからない場合は何も表示しない
+            return null;
+          }
+          // 絵文字も1文字ずつspanでラップし、inline-blockで
+          return (
+            <React.Fragment key={index}>
+              {[...part].map((char, i) => (
+                <span
+                  key={`${index}-${i}`}
+                  className="leading-none text-4xl"
+                  style={{
+                    display: 'inline-block',
+                    width: '1.5em',
+                    height: '1.5em',
+                    verticalAlign: 'middle',
+                    textAlign: 'center',
+                    lineHeight: '1.5em',
+                    margin: '0',
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
+            </React.Fragment>
+          );
+        })}
+      </div>
     );
   };
 
@@ -129,7 +173,7 @@ function MessageListContent({
                       isSentByCurrentUser
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 text-black'
-                    }`}
+                    } inline-block`}
                   >
                     {renderMessageContent(message.content)}
                   </div>

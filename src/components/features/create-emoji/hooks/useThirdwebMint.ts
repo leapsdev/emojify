@@ -45,14 +45,11 @@ export const useThirdwebMint = () => {
     metadataUrl: string,
   ) => {
     try {
-      //TODO: 新規の場合の採番方法を考える
-      const tokenId = BigInt(1);
-
-      // NFTをミント
+      // NFTを作成
       const transaction = prepareContractCall({
         contract,
-        method: 'mint',
-        params: [walletAddress, tokenId, BigInt(1), metadataUrl, '0x'],
+        method: 'registerNewEmoji',
+        params: [walletAddress, metadataUrl, '0x'],
       });
 
       await simulateTransaction({ transaction });

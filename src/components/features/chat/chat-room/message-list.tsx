@@ -2,7 +2,11 @@
 
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
+import { ThirdwebProvider } from '@thirdweb-dev/react';
+import Image from 'next/image';
 import { useEffect, useRef } from 'react';
+import React from 'react';
+import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
@@ -11,13 +15,27 @@ type MessageListProps = {
   initialMessages: Message[];
 };
 
-export function MessageList({
+function MessageListContent({
   roomId,
   currentUserId,
   initialMessages,
 }: MessageListProps) {
   const messages = useRoomMessages(roomId, currentUserId, initialMessages);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { nfts } = useGlobalNFTs();
+
+  // NFTの情報をマップに変換
+  const nftMap = nfts.reduce<
+    Record<string, { imageUrl: string; name: string }>
+  >((acc, nft) => {
+    if (nft.imageUrl && nft.name) {
+      acc[`nft-${nft.tokenId}`] = {
+        imageUrl: nft.imageUrl,
+        name: nft.name,
+      };
+    }
+    return acc;
+  }, {});
 
   useEffect(() => {
     const scrollToBottom = () => {
@@ -62,6 +80,75 @@ export function MessageList({
     {},
   );
 
+  const renderMessageContent = (content: string) => {
+    // メッセージをNFTと絵文字に分割
+    const parts = content.split(/(nft-\d+)/).filter(Boolean);
+
+    return (
+      <div style={{ whiteSpace: 'normal', wordBreak: 'break-all' }}>
+        {parts.map((part, index) => {
+          const nftMatch = part.match(/nft-(\d+)/);
+          if (nftMatch) {
+            const nftId = nftMatch[0];
+            const nft = nftMap[nftId];
+            if (nft) {
+              return (
+                <span
+                  key={index}
+                  style={{
+                    display: 'inline-block',
+                    width: '1.5em',
+                    height: '1.5em',
+                    verticalAlign: 'middle',
+                    margin: '0',
+                  }}
+                >
+                  <Image
+                    src={nft.imageUrl}
+                    alt={nft.name}
+                    width={24}
+                    height={24}
+                    style={{
+                      width: '100%',
+                      height: '100%',
+                      objectFit: 'cover',
+                      borderRadius: '50%',
+                      display: 'block',
+                    }}
+                  />
+                </span>
+              );
+            }
+            // NFTが見つからない場合は何も表示しない
+            return null;
+          }
+          // 絵文字も1文字ずつspanでラップし、inline-blockで
+          return (
+            <React.Fragment key={index}>
+              {[...part].map((char, i) => (
+                <span
+                  key={`${index}-${i}`}
+                  className="leading-none text-4xl"
+                  style={{
+                    display: 'inline-block',
+                    width: '1.5em',
+                    height: '1.5em',
+                    verticalAlign: 'middle',
+                    textAlign: 'center',
+                    lineHeight: '1.5em',
+                    margin: '0',
+                  }}
+                >
+                  {char}
+                </span>
+              ))}
+            </React.Fragment>
+          );
+        })}
+      </div>
+    );
+  };
+
   return (
     <div className="flex-1 overflow-auto p-4 space-y-4">
       {Object.entries(messagesByDate).map(([date, messagesForDate]) => (
@@ -86,9 +173,9 @@ export function MessageList({
                       isSentByCurrentUser
                         ? 'bg-blue-500 text-white'
                         : 'bg-gray-100 text-black'
-                    }`}
+                    } inline-block`}
                   >
-                    <span className="leading-none">{message.content}</span>
+                    {renderMessageContent(message.content)}
                   </div>
                   <div className="flex items-center gap-1 text-xs text-gray-400 px-1">
                     <span>
@@ -97,9 +184,7 @@ export function MessageList({
                         minute: '2-digit',
                       })}
                     </span>
-                    {message.sent && isSentByCurrentUser && (
-                      <span>送信済み</span>
-                    )}
+                    {message.sent && isSentByCurrentUser && <span>送信済</span>}
                   </div>
                 </div>
               );
@@ -109,5 +194,17 @@ export function MessageList({
       ))}
       <div ref={messagesEndRef} />
     </div>
+  );
+}
+
+export function MessageList(props: MessageListProps) {
+  return (
+    <ThirdwebProvider
+      activeChain="base-sepolia-testnet"
+      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
+      supportedWallets={[]}
+    >
+      <MessageListContent {...props} />
+    </ThirdwebProvider>
   );
 }

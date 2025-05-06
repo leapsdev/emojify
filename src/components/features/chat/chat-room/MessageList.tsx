@@ -1,5 +1,6 @@
 'use client';
 
+import type { NFTData } from '@/components/features/explore/types';
 import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
@@ -25,13 +26,14 @@ function MessageListContent({
   const { nfts } = useGlobalNFTs();
 
   // NFTの情報をマップに変換
-  const nftMap = nfts.reduce<
-    Record<string, { imageUrl: string; name: string }>
-  >((acc, nft) => {
+  const nftMap = nfts.reduce<Record<string, NFTData>>((acc, nft) => {
     if (nft.imageUrl && nft.name) {
       acc[`nft-${nft.tokenId}`] = {
-        imageUrl: nft.imageUrl,
+        tokenId: nft.tokenId,
         name: nft.name,
+        imageUrl: nft.imageUrl,
+        creator: nft.creator,
+        details: nft.details,
       };
     }
     return acc;

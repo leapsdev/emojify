@@ -1,8 +1,8 @@
 'use client';
 
 import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
-import Image from 'next/image';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
+import { EmojiItem } from './EmojiItem';
 
 export function EmojiList() {
   return (
@@ -49,26 +49,24 @@ function EmojiListContent() {
         {nfts
           .filter((nft) => nft.imageUrl)
           .map((nft) => (
-            <div
+            <EmojiItem
               key={nft.tokenId}
-              className="bg-white rounded-lg shadow-lg overflow-hidden"
-            >
-              {nft.imageUrl && (
-                <div className="relative aspect-square">
-                  <Image
-                    src={nft.imageUrl as string}
-                    alt={nft.name || `Emoji #${nft.tokenId}`}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
-              <div className="p-2">
-                <h2 className="text-sm font-semibold truncate">
-                  {nft.name || `Emoji #${nft.tokenId}`}
-                </h2>
-              </div>
-            </div>
+              item={{
+                tokenId: nft.tokenId,
+                name: nft.name || `Emoji #${nft.tokenId}`,
+                imageUrl: nft.imageUrl || '/placeholder.svg',
+                creator: nft.owner
+                  ? {
+                      id: nft.owner,
+                      username: `${nft.owner.slice(0, 6)}...${nft.owner.slice(-4)}`,
+                    }
+                  : undefined,
+                details: {
+                  token: 'ETH',
+                  network: 'Base Sepolia',
+                },
+              }}
+            />
           ))}
       </div>
     </div>

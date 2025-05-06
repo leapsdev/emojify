@@ -8,16 +8,21 @@ interface EmojiItemProps {
 
 export function EmojiItem({ item }: EmojiItemProps) {
   return (
-    <Link href={`/explore/${item.id}`} className="block">
+    <Link href={`/explore/${item.tokenId}`} className="block">
       <div className="relative aspect-square bg-white rounded-lg overflow-hidden">
         <Image
-          src={item.image || '/placeholder.svg'}
-          alt=""
+          src={item.imageUrl || '/placeholder.svg'}
+          alt={item.name || ''}
           width={300}
           height={300}
           className="w-full h-full object-cover"
         />
       </div>
+      {item.name && (
+        <div className="p-2">
+          <h2 className="text-sm font-semibold truncate">{item.name}</h2>
+        </div>
+      )}
     </Link>
   );
 }

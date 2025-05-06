@@ -1,9 +1,16 @@
-export interface EmojiItemData {
-  id: string;
-  image: string;
-  name?: string;
-  creator: {
+export interface NFTData {
+  tokenId: string;
+  name: string;
+  imageUrl: string;
+  creator?: {
     id: string;
-    avatar: string;
+    username: string;
+  };
+  details?: {
+    token: string;
+    network: string;
   };
 }
+
+// EmojiItemDataはNFTDataと同じ型を使用
+export type EmojiItemData = NFTData;

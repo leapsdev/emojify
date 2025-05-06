@@ -1,31 +1,15 @@
-import Image from 'next/image';
 import type { DetailsData } from '../types';
 
-interface Props {
+interface EmojiDetailsProps {
   details: DetailsData;
 }
 
-export function EmojiDetails({ details }: Props) {
+export function EmojiDetails({ details }: EmojiDetailsProps) {
   return (
     <div className="mt-4">
       <h2 className="text-lg font-bold mb-4">Detail</h2>
 
       <div>
-        {/* First Collector */}
-        <div className="flex items-center justify-between p-4 border-b">
-          <span className="text-gray-700 text-lg">First Collector</span>
-          <div className="flex items-center gap-2">
-            <Image
-              src={details.firstCollectorAvatar || '/placeholder.svg'}
-              alt="First Collector"
-              width={32}
-              height={32}
-              className="w-6 h-6 rounded-full"
-            />
-            <span className="font-medium">{details.firstCollector}</span>
-          </div>
-        </div>
-
         {/* Token */}
         <div className="flex items-center justify-between p-4 border-b">
           <span className="text-gray-700 text-lg">Token</span>

@@ -65,21 +65,26 @@ function CollectEmojiPageContent() {
           ? convertIpfsToGatewayUrl(metadata.image)
           : '/placeholder.svg';
 
+        // クリエイター情報をメタデータから取得
+        const creatorAddress = metadata.attributes?.find(
+          (attr: { trait_type: string; value: string }) =>
+            attr.trait_type === 'creator',
+        )?.value;
+
         setEmojiData({
           id: tokenId,
           image: imageUrl,
           creator: {
-            id: '0x...', // 実際のクリエイターアドレスを設定
-            username: 'Creator',
-            avatar: '/placeholder.svg',
-            timeAgo: '2 days ago',
+            id: creatorAddress || 'Unknown',
+            username: creatorAddress
+              ? `${creatorAddress.slice(0, 6)}...${creatorAddress.slice(-4)}`
+              : 'Unknown',
           },
           details: {
-            firstCollector: '0x...', // 実際のコレクターアドレスを設定
-            firstCollectorAvatar: '/placeholder.svg',
             token: 'ETH',
             network: 'Base Sepolia',
           },
+          name: metadata.name,
         });
         setError(null);
       } catch (err) {
@@ -120,7 +125,7 @@ function CollectEmojiPageContent() {
           <EmojiImage image={emojiData.image} />
         </div>
         <div className="space-y-6">
-          <CreatorInfo creator={emojiData.creator} />
+          <CreatorInfo creator={emojiData.creator} name={emojiData.name} />
           <EmojiDetails details={emojiData.details} />
           <CollectButton tokenId={emojiData.id} />
         </div>

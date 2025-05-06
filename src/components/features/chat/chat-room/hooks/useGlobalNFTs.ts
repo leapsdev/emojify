@@ -1,13 +1,11 @@
+import type { NFTData } from '@/components/features/explore/types';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
 
-interface NFT {
-  tokenId: string;
+export interface NFT extends NFTData {
   owner: string;
   uri: string;
-  imageUrl?: string;
-  name?: string;
   description?: string;
 }
 
@@ -74,9 +72,10 @@ export function useGlobalNFTs() {
               if (!uri) {
                 return {
                   tokenId: tokenId.toString(),
+                  name: `NFT #${tokenId}`,
+                  imageUrl: '/placeholder.svg',
                   owner: '',
                   uri: '',
-                  name: `NFT #${tokenId}`,
                   description: 'URIが設定されていません',
                 } as NFT;
               }
@@ -87,14 +86,14 @@ export function useGlobalNFTs() {
               // 画像URLもIPFSゲートウェイを使用するように変換
               const imageUrl = metadata.image
                 ? await convertIpfsToGatewayUrl(metadata.image)
-                : undefined;
+                : '/placeholder.svg';
 
               return {
                 tokenId: tokenId.toString(),
+                name: metadata.name || `NFT #${tokenId}`,
+                imageUrl,
                 owner: '',
                 uri: await convertIpfsToGatewayUrl(uri),
-                imageUrl,
-                name: metadata.name || `NFT #${tokenId}`,
                 description: metadata.description || 'No description available',
               } as NFT;
             } catch (err) {

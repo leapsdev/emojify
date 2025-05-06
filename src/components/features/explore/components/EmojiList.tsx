@@ -52,12 +52,18 @@ function EmojiListContent() {
             <EmojiItem
               key={nft.tokenId}
               item={{
-                id: nft.tokenId,
-                image: nft.imageUrl as string,
+                tokenId: nft.tokenId,
                 name: nft.name || `Emoji #${nft.tokenId}`,
-                creator: {
-                  id: nft.owner || 'unknown',
-                  avatar: '/placeholder.svg',
+                imageUrl: nft.imageUrl || '/placeholder.svg',
+                creator: nft.owner
+                  ? {
+                      id: nft.owner,
+                      username: `${nft.owner.slice(0, 6)}...${nft.owner.slice(-4)}`,
+                    }
+                  : undefined,
+                details: {
+                  token: 'ETH',
+                  network: 'Base Sepolia',
                 },
               }}
             />

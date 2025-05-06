@@ -1,10 +1,10 @@
 'use client';
-import { ProfileMenu } from '@/components/features/choose-friends/profileMenu';
+import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
+import { UserProfile } from '@/components/features/profile/UserProfile';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import { ProfileTabs } from '@/components/features/profile/profileTabs';
-import { UserProfile } from '@/components/features/profile/userProfile';
-import { Header } from '@/components/shared/layout/header';
+import { Header } from '@/components/shared/layout/Header';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import type { User } from '@/types/database';
 import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';

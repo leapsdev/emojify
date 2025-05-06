@@ -1,13 +1,13 @@
 'use client';
 
-import { SignOutButton } from '@/components/features/auth/signOutButton';
+import { SignOutButton } from '@/components/features/auth/SignOutButton';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { LinkButton } from '@/components/ui/linkButton';
+} from '@/components/ui/DropdownMenu';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { MoreVertical } from 'lucide-react';
 
 export const ProfileMenu = () => {

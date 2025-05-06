@@ -1,4 +1,4 @@
-import { CollectEmojiPage } from '@/components/pages/collectEmojiPage';
+import { CollectEmojiPage } from '@/components/pages/CollectEmojiPage';
 
 export default function Page() {
   return <CollectEmojiPage />;

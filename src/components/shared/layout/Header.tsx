@@ -1,4 +1,4 @@
-import { LinkButton } from '@/components/ui/linkButton';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { cn } from '@/lib/utils';
 
 /**

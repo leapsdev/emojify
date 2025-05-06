@@ -1,43 +1,31 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import { Textarea } from '@/components/ui/Textarea';
+import { useBasename } from '@/lib/basename/useBasename';
 import { profileFormSchema } from '@/repository/user/schema';
-import type { User } from '@/types/database';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
+import { usePrivy } from '@privy-io/react-auth';
 import { useActionState } from 'react';
-import { forwardRef } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
 
-interface ProfileEditFormProps {
-  user: User;
-}
-
 const initialState: ProfileFormState = null;
 
-export const ProfileEditForm = forwardRef<
-  HTMLFormElement,
-  ProfileEditFormProps
->(function ProfileEditForm({ user }, ref) {
+export function ProfileForm() {
+  const { user } = usePrivy();
+  const basename = useBasename(undefined);
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
   );
 
-  const defaultValues = {
-    username: user.username,
-    bio: user.bio || '',
-    email: user.email || null,
-  };
-
   const [form, fields] = useForm({
-    id: 'profile-edit-form',
+    id: 'profile-form',
     shouldValidate: 'onInput',
     lastResult: state,
-    defaultValue: defaultValues,
     onValidate({ formData }) {
       return parseWithZod(formData, { schema: profileFormSchema });
     },
@@ -49,10 +37,12 @@ export const ProfileEditForm = forwardRef<
       id={form.id}
       onSubmit={form.onSubmit}
       action={formAction}
-      ref={ref}
     >
-      <input type="hidden" name="userId" value={user.id} />
-      <input type="hidden" name={fields.email.name} value={user.email || ''} />
+      <input
+        type="hidden"
+        name={fields.email.name}
+        value={user?.email?.address || ''}
+      />
 
       {state?.message && (
         <div
@@ -75,10 +65,10 @@ export const ProfileEditForm = forwardRef<
         <Input
           id={fields.username.id}
           name={fields.username.name}
-          defaultValue={user.username}
           className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
             fields.username.errors ? 'border-red-500' : ''
           }`}
+          defaultValue={basename ?? ''}
           required
         />
         {fields.username.errors && (
@@ -94,7 +84,6 @@ export const ProfileEditForm = forwardRef<
           <Textarea
             id={fields.bio.id}
             name={fields.bio.name}
-            defaultValue={user.bio || ''}
             placeholder="Tell us about you..."
             className={`rounded-2xl border-gray-200 bg-gray-50 min-h-[150px] p-4 text-lg resize-none ${
               fields.bio.errors ? 'border-red-500' : ''
@@ -112,9 +101,9 @@ export const ProfileEditForm = forwardRef<
           className="w-full bg-black text-white rounded-full py-6 text-lg font-bold hover:bg-gray-900"
           disabled={isPending}
         >
-          {isPending ? 'Updating...' : 'Update Profile'}
+          {isPending ? '作成中...' : 'プロフィールを作成'}
         </Button>
       </div>
     </form>
   );
-});
+}

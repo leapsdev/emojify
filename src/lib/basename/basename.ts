@@ -1,4 +1,4 @@
-import L2ResolverAbi from '@/lib/basename/L2ResolverAbi';
+import L2ResolverAbi from '@/lib/basename/l2ResolverAbi';
 import {
   http,
   type Address,

@@ -1,5 +1,5 @@
-import { ChatRoomPage } from '@/components/pages/chatRoomPage';
-import { Header } from '@/components/shared/layout/header';
+import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
+import { Header } from '@/components/shared/layout/Header';
 import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/chat/actions';
 import { notFound } from 'next/navigation';

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';

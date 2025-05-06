@@ -1,4 +1,4 @@
-import { ChatRoomListPage } from '@/components/pages/chatRoomListPage';
+import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
 import { getPrivyId } from '@/lib/auth';
 import { getUserRooms } from '@/repository/chat/actions';
 import { redirect } from 'next/navigation';

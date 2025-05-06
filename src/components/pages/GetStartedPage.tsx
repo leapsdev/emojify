@@ -1,6 +1,6 @@
-import { DynamicFloatingEmojis } from '@/components/features/getStarted/floatingEmojis';
-import Footer from '@/components/features/getStarted/footer';
-import MainContent from '@/components/features/getStarted/mainContent';
+import { DynamicFloatingEmojis } from '@/components/features/getStarted/FloatingEmojis';
+import Footer from '@/components/features/getStarted/Footer';
+import MainContent from '@/components/features/getStarted/MainContent';
 
 export const GetStartedPage = () => {
   return (

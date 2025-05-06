@@ -1,4 +1,4 @@
-import { ProfilePage } from '@/components/pages/profilePage';
+import { ProfilePage } from '@/components/pages/ProfilePage';
 export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';

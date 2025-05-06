@@ -1,6 +1,6 @@
 'use client';
 
-import { ChatRoomList } from '@/components/features/chat/chat/chatRoomList';
+import { ChatRoomList } from '@/components/features/chat/chat/ChatRoomList';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
 import type { ChatRoom } from '@/types/database';
 

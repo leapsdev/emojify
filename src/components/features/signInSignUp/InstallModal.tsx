@@ -4,7 +4,7 @@ import {
   DialogClose,
   DialogContent,
   DialogTitle,
-} from '../../ui/dialog';
+} from '../../ui/Dialog';
 
 interface InstallModalProps {
   open: boolean;

@@ -1,6 +1,6 @@
 'use client';
 
-import { EmojiList } from '@/components/features/explore/components/emojiList';
+import { EmojiList } from '@/components/features/explore/components/EmojiList';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 
 export function ExplorePage() {

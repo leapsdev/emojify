@@ -21,11 +21,6 @@ export function EmojiItem({ item }: EmojiItemProps) {
       {item.name && (
         <div className="p-2">
           <h2 className="text-sm font-semibold truncate">{item.name}</h2>
-          {item.creator && (
-            <p className="text-xs text-gray-500 truncate">
-              by {item.creator.username}
-            </p>
-          )}
         </div>
       )}
     </Link>

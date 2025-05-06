@@ -9,6 +9,7 @@ import {
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
+import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
 import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
@@ -25,7 +26,7 @@ export function ClientChooseFriendsPage({
 }: ClientChooseFriendsPageProps) {
   const userId = usePrivyId();
   const router = useRouter();
-
+  const toastRedirect = useToastRedirect();
   const {
     selectedUsers,
     searchQuery,
@@ -67,11 +68,7 @@ export function ClientChooseFriendsPage({
       // 現在のユーザーも含めてチャットルームを作成
       const result = await createChatRoomAction([userId, ...selectedUsers]);
       if (result.success && result.roomId) {
-        toast.success('Chat room created');
-        // トーストが表示される時間を確保するため、少し遅延させる
-        setTimeout(() => {
-          router.push(`/chat/${result.roomId}`);
-        }, 1000);
+        toastRedirect('Chat room created', `/chat/${result.roomId}`);
       } else {
         toast.error(result.error || 'Failed to create chat room');
       }

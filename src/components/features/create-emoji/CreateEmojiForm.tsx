@@ -1,5 +1,6 @@
 'use client';
 
+import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
@@ -11,6 +12,7 @@ import { useThirdwebMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
 
 export function CreateEmojiForm() {
+  const toastRedirect = useToastRedirect();
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const { selectedWalletAddress, noWalletWarning, getSelectedWallet } =
@@ -57,6 +59,7 @@ export function CreateEmojiForm() {
         'View on OpenSea:',
         `https://testnets.opensea.io/ja/${EMOJI_CONTRACT_ADDRESS}/${selectedWalletAddress}`,
       );
+      toastRedirect('NFT created successfully!', '/chat');
     } catch (error) {
       console.error('An error occurred:', error);
       if (error instanceof Error) {

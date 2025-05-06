@@ -1,13 +1,19 @@
 'use client';
+import {
+  type NFT,
+  useGlobalNFTs,
+} from '@/components/features/chat/chat-room/hooks/useGlobalNFTs';
 import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
-import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 import { Header } from '@/components/shared/layout/Header';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
+import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import type { User } from '@/types/database';
 import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
+import { useContract } from '@thirdweb-dev/react';
+import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
   user: User;
@@ -25,7 +31,53 @@ function ProfilePageContent({
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   const { selectedWalletAddress, noWalletWarning } = useWallet();
-  const { nfts, loading, error } = useProfileNFTs(selectedWalletAddress);
+  const { nfts, loading, error } = useGlobalNFTs();
+  const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
+  const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
+  const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
+
+  useEffect(() => {
+    const fetchNFTs = async () => {
+      if (!contract || !selectedWalletAddress || !nfts.length) return;
+
+      try {
+        const created: NFT[] = [];
+        const collected: NFT[] = [];
+
+        for (const nft of nfts) {
+          try {
+            // balanceOfをチェックして、アドレスがNFTを所有しているか確認
+            const balance = await contract.call('balanceOf', [
+              selectedWalletAddress,
+              nft.tokenId,
+            ]);
+
+            if (Number(balance) > 0) {
+              // firstMinterマッピングを使用して作成者を判定
+              const minter = await contract.call('firstMinter', [nft.tokenId]);
+              const isCreator =
+                minter.toLowerCase() === selectedWalletAddress.toLowerCase();
+
+              if (isCreator) {
+                created.push(nft);
+              } else {
+                collected.push(nft);
+              }
+            }
+          } catch (err) {
+            console.error(`Error processing NFT ${nft.tokenId}:`, err);
+          }
+        }
+
+        setCreatedNFTs(created);
+        setCollectedNFTs(collected);
+      } catch (err) {
+        console.error('Error fetching NFTs:', err);
+      }
+    };
+
+    fetchNFTs();
+  }, [contract, selectedWalletAddress, nfts]);
 
   // デバッグ情報
   console.log('Wallet Address:', selectedWalletAddress);
@@ -82,14 +134,20 @@ function ProfilePageContent({
               initialIsFriend={initialIsFriend}
             />
             <ProfileTabs
-              createdEmojis={nfts.map((nft) => ({
+              createdEmojis={createdNFTs.map((nft) => ({
                 id: nft.tokenId,
                 image: nft.imageUrl || '',
                 creator: {
                   avatar: '/icons/icon-192x192.png',
                 },
               }))}
-              collectedEmojis={[]}
+              collectedEmojis={collectedNFTs.map((nft) => ({
+                id: nft.tokenId,
+                image: nft.imageUrl || '',
+                creator: {
+                  avatar: '/icons/icon-192x192.png',
+                },
+              }))}
             />
           </div>
         </div>

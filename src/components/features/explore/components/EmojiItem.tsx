@@ -12,12 +12,17 @@ export function EmojiItem({ item }: EmojiItemProps) {
       <div className="relative aspect-square bg-white rounded-lg overflow-hidden">
         <Image
           src={item.image || '/placeholder.svg'}
-          alt=""
+          alt={item.name || ''}
           width={300}
           height={300}
           className="w-full h-full object-cover"
         />
       </div>
+      {item.name && (
+        <div className="p-2">
+          <h2 className="text-sm font-semibold truncate">{item.name}</h2>
+        </div>
+      )}
     </Link>
   );
 }

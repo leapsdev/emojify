@@ -120,7 +120,7 @@ function CollectEmojiPageContent() {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="max-w-md mx-auto space-y-8">
         <div>
           <EmojiImage image={emojiData.image} />
         </div>

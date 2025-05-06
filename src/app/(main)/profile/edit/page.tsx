@@ -1,4 +1,4 @@
-import { ProfileEditPage } from '@/components/pages/profileEditPage';
+import { ProfileEditPage } from '@/components/pages/ProfileEditPage';
 export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
 import { getUser } from '@/repository/user/actions';

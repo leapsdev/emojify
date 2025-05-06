@@ -1,6 +1,6 @@
-import { Header } from '@/components/shared/layout/header';
-import { FooterNavigation } from '@/components/shared/navigation/footerNavigation';
-import { NewChatButton } from '@/components/ui/newChatButton';
+import { Header } from '@/components/shared/layout/Header';
+import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
+import { NewChatButton } from '@/components/ui/NewChatButton';
 
 export default function ChatLayout({
   children,

@@ -1,4 +1,4 @@
-import { UserItem } from './userItem';
+import { UserItem } from './UserItem';
 
 import type { DisplayUser } from '@/types/display';
 

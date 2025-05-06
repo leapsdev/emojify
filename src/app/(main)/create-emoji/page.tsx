@@ -1,4 +1,4 @@
-import { CreateEmojiPage } from '@/components/pages/createEmojiPage';
+import { CreateEmojiPage } from '@/components/pages/CreateEmojiPage';
 
 export default function Page() {
   return <CreateEmojiPage />;

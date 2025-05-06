@@ -1,6 +1,6 @@
-import { AuthRedirect } from '@/components/features/auth/authRedirect';
-import { ProfileForm } from '@/components/features/create-profile/profileForm';
-import { ProfileImage } from '@/components/features/create-profile/profileImage';
+import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
+import { ProfileForm } from '@/components/features/create-profile/ProfileForm';
+import { ProfileImage } from '@/components/features/create-profile/ProfileImage';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 export function CreateProfilePage() {

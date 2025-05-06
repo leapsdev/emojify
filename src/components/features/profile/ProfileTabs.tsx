@@ -4,7 +4,7 @@ import type { EmojiProps } from '@/components/features/profile/types';
 import { cn } from '@/lib/utils';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import * as React from 'react';
-import { EmojiGrid } from './emojiGrid';
+import { EmojiGrid } from './EmojiGrid';
 
 interface ProfileTabsProps {
   createdEmojis: EmojiProps[];

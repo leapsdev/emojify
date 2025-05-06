@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { LinkButton } from '@/components/ui/linkButton';
+import { Button } from '@/components/ui/Button';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { useBasename } from '@/lib/basename/useBasename';
 import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';

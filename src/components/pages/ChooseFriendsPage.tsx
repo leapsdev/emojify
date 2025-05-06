@@ -1,13 +1,13 @@
 'use client';
 
+import { ChatButton } from '@/components/features/choose-friends/ChatButton';
+import { SearchBar } from '@/components/features/choose-friends/SearchBar';
+import { UserSection } from '@/components/features/choose-friends/UserSection';
 import {
   addFriendAction,
   createChatRoomAction,
 } from '@/components/features/choose-friends/actions';
-import { ChatButton } from '@/components/features/choose-friends/chatButton';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
-import { SearchBar } from '@/components/features/choose-friends/searchBar';
-import { UserSection } from '@/components/features/choose-friends/userSection';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';

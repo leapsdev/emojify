@@ -1,5 +1,5 @@
-import { InstallContent } from '@/components/features/signInSignUp/installContent';
-import { InstallSection } from '@/components/features/signInSignUp/installSection';
+import { InstallContent } from '@/components/features/signInSignUp/InstallContent';
+import { InstallSection } from '@/components/features/signInSignUp/InstallSection';
 
 export const SignInSignUpPage = () => {
   return (

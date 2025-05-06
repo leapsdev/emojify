@@ -1,4 +1,4 @@
-import { Header } from '@/components/shared/layout/header';
+import { Header } from '@/components/shared/layout/Header';
 
 export default function ChooseFriendsLayout({
   children,

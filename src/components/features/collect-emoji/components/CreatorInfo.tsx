@@ -1,13 +1,11 @@
 import Image from 'next/image';
-import type { EmojiData } from '../types';
+import type { CreatorData } from '../types';
 
 interface Props {
-  emoji: EmojiData;
+  creator: CreatorData;
 }
 
-export function CreatorInfo({ emoji }: Props) {
-  const { creator } = emoji;
-
+export function CreatorInfo({ creator }: Props) {
   return (
     <div className="px-4 pt-3">
       <div className="flex items-center justify-between mb-3">

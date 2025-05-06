@@ -1,13 +1,11 @@
 import Image from 'next/image';
-import type { EmojiData } from '../types';
+import type { DetailsData } from '../types';
 
 interface Props {
-  emoji: EmojiData;
+  details: DetailsData;
 }
 
-export function EmojiDetails({ emoji }: Props) {
-  const { details } = emoji;
-
+export function EmojiDetails({ details }: Props) {
   return (
     <div className="mt-4">
       <h2 className="text-lg font-bold mb-4">Detail</h2>

@@ -18,11 +18,6 @@ export function EmojiItem({ item }: EmojiItemProps) {
           className="w-full h-full object-cover"
         />
       </div>
-      {item.name && (
-        <div className="p-2">
-          <h2 className="text-sm font-semibold truncate">{item.name}</h2>
-        </div>
-      )}
     </Link>
   );
 }

@@ -10,24 +10,6 @@ const Footer: FC = () => {
           Get started
         </Button>
       </Link>
-
-      <div className="flex justify-center items-center gap-4 text-gray-500">
-        <Link href="#" className="hover:text-gray-600 font-bold">
-          Help Center
-        </Link>
-        <span>•</span>
-        <Link href="#" className="hover:text-gray-600 font-bold">
-          X
-        </Link>
-        <span>•</span>
-        <Link href="#" className="hover:text-gray-600 font-bold">
-          Instagram
-        </Link>
-        <span>•</span>
-        <Link href="#" className="hover:text-gray-600 font-bold">
-          Farcaster
-        </Link>
-      </div>
     </div>
   );
 };

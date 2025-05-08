@@ -108,15 +108,16 @@ function MessageListContent({
                   <Image
                     src={nft.imageUrl}
                     alt={nft.name}
-                    width={24}
-                    height={24}
+                    width={96}
+                    height={96}
                     style={{
                       width: '100%',
                       height: '100%',
-                      objectFit: 'cover',
+                      objectFit: 'contain',
                       borderRadius: '50%',
                       display: 'block',
                     }}
+                    quality={100}
                   />
                 </span>
               );

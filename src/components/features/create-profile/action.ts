@@ -23,7 +23,7 @@ export async function handleProfileFormAction(
   if (submission.status === 'error') {
     if (!submission.error) {
       return {
-        message: 'バリデーションエラーが発生しました',
+        message: 'A validation error has occurred',
         status: 'error' as const,
       };
     }
@@ -33,7 +33,7 @@ export async function handleProfileFormAction(
     );
 
     return {
-      message: firstError?.[1]?.[0] || 'バリデーションエラーが発生しました',
+      message: firstError?.[1]?.[0] || 'A validation error has occurred',
       status: 'error' as const,
     };
   }
@@ -48,7 +48,7 @@ export async function handleProfileFormAction(
     const privyId = await getPrivyId();
     if (!privyId) {
       return {
-        message: '認証情報の取得に失敗しました',
+        message: 'Failed to get authentication information',
         status: 'error' as const,
       };
     }
@@ -56,7 +56,7 @@ export async function handleProfileFormAction(
     await createUser(profileData, privyId);
   } catch (error) {
     return {
-      message: error instanceof Error ? error.message : 'エラーが発生しました',
+      message: error instanceof Error ? error.message : 'An error has occurred',
       status: 'error' as const,
     };
   }

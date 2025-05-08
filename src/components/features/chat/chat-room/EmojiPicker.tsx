@@ -84,7 +84,7 @@ export function EmojiPicker({
             </div>
           ) : (
             <span className="text-base text-gray-500">
-              クリックして絵文字を選択...
+              Click to select emojis...
             </span>
           )}
         </div>

@@ -69,7 +69,7 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
       clearMessage();
     } catch (error) {
       console.error('Failed to send message:', error);
-      setError('メッセージの送信に失敗しました。もう一度お試しください。');
+      setError('Failed to send message. Please try again.');
     } finally {
       setIsLoading(false);
     }

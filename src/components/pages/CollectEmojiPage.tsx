@@ -111,9 +111,7 @@ function CollectEmojiPageContent() {
   if (error || !emojiData) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500 text-xl">
-          {error || 'NFT not found.'}
-        </div>
+        <div className="text-red-500 text-xl">{error || 'NFT not found.'}</div>
       </div>
     );
   }

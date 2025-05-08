@@ -64,7 +64,7 @@ export function ProfileImage({
               width={128}
               height={128}
               src={imageUrl}
-              alt="プロフィール画像"
+              alt="Profile Image"
               className="w-full h-full object-cover"
             />
           ) : (

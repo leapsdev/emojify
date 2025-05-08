@@ -3,7 +3,7 @@ import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
-  throw new Error('Privy環境変数が設定されていません');
+  throw new Error('Privy environment variables are not set');
 }
 
 const privy = new PrivyClient(
@@ -30,7 +30,7 @@ export async function getPrivyId(): Promise<string | null> {
     const verifiedUser = await privy.verifyAuthToken(privyToken);
     return verifiedUser ? verifiedUser.userId : null;
   } catch (error) {
-    console.error('Privy認証エラー:', error);
+    console.error('Privy authentication error:', error);
     return null;
   }
 }
@@ -62,7 +62,7 @@ export async function getPrivyEmail(): Promise<string | null> {
     const user = await getUser(verifiedUser.userId);
     return user?.email ?? null;
   } catch (error) {
-    console.error('Privy認証エラー:', error);
+    console.error('Privy authentication error:', error);
     return null;
   }
 }

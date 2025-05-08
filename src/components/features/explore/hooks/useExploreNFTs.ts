@@ -94,7 +94,7 @@ export const useExploreNFTs = () => {
                   owner: 'Unknown',
                   uri: '',
                   name: `NFT #${tokenId}`,
-                  description: 'URIが設定されていません',
+                  description: 'URI is not set',
                 };
               }
 
@@ -121,7 +121,7 @@ export const useExploreNFTs = () => {
                 owner: 'Unknown',
                 uri: '',
                 name: `NFT #${tokenId}`,
-                description: 'メタデータの取得に失敗しました',
+                description: 'Failed to fetch metadata',
               };
             }
           })();
@@ -134,7 +134,7 @@ export const useExploreNFTs = () => {
         setError(null);
       } catch (err) {
         console.error('Error fetching NFTs:', err);
-        setError('NFTの取得中にエラーが発生しました。');
+        setError('An error occurred while fetching NFTs.');
       } finally {
         setLoading(false);
       }

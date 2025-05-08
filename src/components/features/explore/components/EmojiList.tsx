@@ -34,8 +34,8 @@ function EmojiListContent() {
           theme="dark"
           modalSize="wide"
           welcomeScreen={{
-            title: 'Emoji Chatへようこそ',
-            subtitle: 'NFTを探索するにはウォレットを接続してください',
+            title: 'Welcome to Emoji Chat',
+            subtitle: 'Connect your wallet to explore NFTs',
           }}
           modalTitleIconUrl=""
         />

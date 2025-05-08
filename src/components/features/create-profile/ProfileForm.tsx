@@ -101,7 +101,7 @@ export function ProfileForm() {
           className="w-full bg-black text-white rounded-full py-6 text-lg font-bold hover:bg-gray-900"
           disabled={isPending}
         >
-          {isPending ? '作成中...' : 'プロフィールを作成'}
+          {isPending ? 'Creating...' : 'Create Profile'}
         </Button>
       </div>
     </form>

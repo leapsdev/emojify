@@ -64,7 +64,7 @@ function MessageListContent({
   if (!messages.length) {
     return (
       <div className="flex-1 overflow-auto p-4 flex items-center justify-center">
-        <p className="text-gray-500">メッセージがありません</p>
+        <p className="text-gray-500">No messages</p>
       </div>
     );
   }
@@ -186,7 +186,7 @@ function MessageListContent({
                         minute: '2-digit',
                       })}
                     </span>
-                    {message.sent && isSentByCurrentUser && <span>送信済</span>}
+                    {message.sent && isSentByCurrentUser && <span>Sent</span>}
                   </div>
                 </div>
               );

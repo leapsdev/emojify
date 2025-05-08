@@ -89,7 +89,7 @@ function CollectEmojiPageContent() {
         setError(null);
       } catch (err) {
         console.error('Error fetching emoji data:', err);
-        setError('NFTデータの取得中にエラーが発生しました。');
+        setError('An error occurred while fetching NFT data.');
       } finally {
         setLoading(false);
       }
@@ -111,9 +111,7 @@ function CollectEmojiPageContent() {
   if (error || !emojiData) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500 text-xl">
-          {error || 'NFTが見つかりませんでした。'}
-        </div>
+        <div className="text-red-500 text-xl">{error || 'NFT not found.'}</div>
       </div>
     );
   }

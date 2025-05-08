@@ -88,13 +88,13 @@ function ProfilePageContent({
   if (noWalletWarning) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <div className="text-xl">ウォレットを接続してください</div>
+        <div className="text-xl">Please connect your wallet</div>
         <ConnectWallet
           theme="dark"
           modalSize="wide"
           welcomeScreen={{
-            title: 'Emoji Chatへようこそ',
-            subtitle: 'NFTを探索するにはウォレットを接続してください',
+            title: 'Welcome to Emoji Chat',
+            subtitle: 'Connect your wallet to explore NFTs',
           }}
           modalTitleIconUrl=""
         />

@@ -35,10 +35,10 @@ export function ProfileImage({
         setImageUrl(result.url);
         onImageUpload?.(result.url);
       } else {
-        console.error('アップロードエラー:', result.message);
+        console.error('Upload error:', result.message);
       }
     } catch (error) {
-      console.error('アップロードエラー:', error);
+      console.error('Upload error:', error);
     } finally {
       setIsPending(false);
     }
@@ -64,7 +64,7 @@ export function ProfileImage({
               width={128}
               height={128}
               src={imageUrl}
-              alt="プロフィール画像"
+              alt="Profile Image"
               className="w-full h-full object-cover"
             />
           ) : (

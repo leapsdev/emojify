@@ -76,7 +76,7 @@ export function useGlobalNFTs() {
                   imageUrl: '/placeholder.svg',
                   owner: '',
                   uri: '',
-                  description: 'URIが設定されていません',
+                  description: 'URI is not set',
                 } as NFT;
               }
 
@@ -113,7 +113,7 @@ export function useGlobalNFTs() {
         setError(null);
       } catch (err) {
         console.error('Error fetching NFTs:', err);
-        setError('NFTの取得中にエラーが発生しました。');
+        setError('An error occurred while fetching NFTs.');
       } finally {
         setLoading(false);
       }

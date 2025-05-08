@@ -20,7 +20,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     if (!file) {
       return {
         status: 'error',
-        message: 'ファイルが選択されていません。',
+        message: 'No file selected.',
       };
     }
 
@@ -41,7 +41,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
           },
           (error, uploadResult) => {
             if (error || !uploadResult) {
-              reject(error || new Error('アップロード結果が空です'));
+              reject(error || new Error('Upload result is empty'));
               return;
             }
             resolve(uploadResult);
@@ -53,13 +53,13 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
     if (!result || typeof result !== 'object' || !('secure_url' in result)) {
       return {
         status: 'error',
-        message: 'アップロード中にエラーが発生しました。',
+        message: 'An error occurred during upload.',
       };
     }
 
     return {
       status: 'success',
-      message: 'アップロードが完了しました。',
+      message: 'Upload completed successfully.',
       url: result.secure_url,
     };
   } catch (error) {
@@ -69,7 +69,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
       message:
         error instanceof Error
           ? error.message
-          : 'アップロード中にエラーが発生しました。',
+          : 'An error occurred during upload.',
     };
   }
 }

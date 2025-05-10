@@ -4,7 +4,7 @@ import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import { Categories } from 'emoji-picker-react';
-import { Send } from 'lucide-react';
+import Image from 'next/image';
 import { useState } from 'react';
 import { EmojiPicker } from './EmojiPicker';
 import { sendMessageAction } from './actions';
@@ -111,7 +111,12 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
             } text-white`}
             disabled={isLoading}
           >
-            <Send className="w-6 h-6" />
+            <Image
+              src="/paper-plane-icon.png"
+              alt="Send"
+              width={28}
+              height={28}
+            />
           </button>
         </div>
       </form>

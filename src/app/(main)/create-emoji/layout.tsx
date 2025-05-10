@@ -9,7 +9,6 @@ export default function CreateEmojiLayout({
     <>
       <Header
         backHref="/chat"
-        centerContent={<div className="text-2xl">🤪</div>}
         className="mb-6"
       />
       {children}

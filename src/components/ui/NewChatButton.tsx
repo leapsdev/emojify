@@ -1,5 +1,6 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -45,9 +46,7 @@ export const NewChatButton = () => {
         active:scale-95
       `}
     >
-      <span className="text-2xl" aria-hidden="true">
-        💬
-      </span>
+      <Image src="/chat-bubble-icon.png" alt="Chat" width={28} height={28} />
     </Link>
   );
 };

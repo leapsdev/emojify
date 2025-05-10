@@ -1,10 +1,12 @@
 'use client';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { FooterNavigationItem } from './FooterNavigationItem';
 
 export const FooterNavigation = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+  const pathName = usePathname();
 
   const debouncedScrollEnd = useCallback(() => {
     if (timeoutId) {
@@ -28,22 +30,45 @@ export const FooterNavigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [debouncedScrollEnd]);
 
+  const itemMap = [
+    {
+      href: '/chat',
+      iconSrc: '/chat-bubble-icon.png',
+      alt: 'Chat',
+    },
+    {
+      href: '/explore',
+      iconSrc: '/blue-search-icon.png',
+      alt: 'Search',
+    },
+    {
+      href: '/create-emoji',
+      iconSrc: '/green-plus-icon.png',
+      alt: 'Create',
+    },
+    {
+      href: '/profile',
+      iconSrc: '/green-user-icon.png',
+      alt: 'Profile',
+    },
+  ];
+
   return (
     <div
-      className={`fixed bottom-0 w-full border-t py-3 px-6 bg-white transition-transform duration-300 ${
+      className={`fixed bottom-6 left-0 right-0 flex justify-center transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <div className="flex justify-between items-center">
-        <Link href="/explore" className="text-gray-400">
-          <span className="text-2xl">🔍</span>
-        </Link>
-        <Link href="/create-emoji" className="text-gray-400">
-          <span className="text-2xl">🤪</span>
-        </Link>
-        <Link href="/profile" className="text-gray-400">
-          <span className="text-2xl">🙎‍♂️</span>
-        </Link>
+      <div className="bg-white rounded-full shadow-lg px-6 py-4 flex items-center justify-between w-[320px]">
+        {itemMap.map((item) => (
+          <FooterNavigationItem
+            key={item.href}
+            href={item.href}
+            iconSrc={item.iconSrc}
+            alt={item.alt}
+            isActive={pathName === item.href}
+          />
+        ))}
       </div>
     </div>
   );

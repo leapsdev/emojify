@@ -1,3 +1,5 @@
+import Image from 'next/image';
+
 interface ChatButtonProps {
   visible: boolean;
   disabled?: boolean;
@@ -19,7 +21,7 @@ export function ChatButton({
         disabled={disabled}
         onClick={onClick}
       >
-        💬
+        <Image src="/chat-bubble-icon.png" alt="Chat" width={32} height={32} />
       </button>
     </div>
   );

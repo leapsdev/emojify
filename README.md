@@ -1,134 +1,138 @@
 # Emoji Chat 🎨💬
 
-絵文字のみを使用したWeb3チャットアプリケーション。ユーザーは独自の絵文字を作成・販売でき、他のユーザーの絵文字を購入して使用することができます。
+A Web3 chat application that uses only emojis. Users can create and sell their own emojis, and purchase and use emojis from other users.
 
-## 機能 🚀
-[https://github.com/leapsdev/emoji-chat/issues/1](https://github.com/leapsdev/emoji-chat/issues/1)
+## Features 🚀
 
-### 認証機能
-- Privyを使用したWeb3認証システム([1](https://docs.privy.io/guide/react/authentication/))
-- メール、ウォレット、ソーシャルログインに対応
+### Authentication
+- Web3 authentication system using Privy
+- Support for email, wallet, and social login
 
-### チャット機能
-- リアルタイムチャット
-- グループチャット対応
-- 絵文字のみでコミュニケーション
+### Chat Features
+- Real-time chat (Firebase Realtime Database)
+- Group chat support
+- Communication using only emojis
 
-### 絵文字システム
-- オリジナル絵文字の作成
-- ブロックチェーン上での絵文字NFT化
-- マーケットプレイスでの売買
-- 絵文字検索機能
+### Emoji System
+- Original emoji creation
+- Image upload using Cloudinary
+- NFT conversion using Thirdweb
+- Marketplace for buying and selling
+- Emoji search functionality
 
-## 技術スタック 🛠
+## Tech Stack 🛠
 
-### フロントエンド
-- [React](https://react.dev/) - UIライブラリ
-- [Next.js](https://nextjs.org/) - Reactフレームワーク
-- [shadcn/ui](https://ui.shadcn.com/) - UIコンポーネント
-- [Conform](https://conform.guide/) - フォームバリデーション
-- [Zod](https://zod.dev/) - スキーマバリデーション
+### Frontend
+- [Next.js 15](https://nextjs.org/) - React framework
+- [React 19](https://react.dev/) - UI library
+- [shadcn/ui](https://ui.shadcn.com/) - UI components
+- [Conform](https://conform.guide/) - Form validation
+- [Zod](https://zod.dev/) - Schema validation
+- [Tailwind CSS](https://tailwindcss.com/) - Styling
 
-### バックエンド
-- [Cloudflare D1](https://developers.cloudflare.com/d1/) - エッジデータベース
-- [Drizzle ORM](https://orm.drizzle.team/) - TypeScript ORMツール
-- [Netlify](https://www.netlify.com/) - ホスティング
+### Backend
+- [Firebase](https://firebase.google.com/) - Realtime database
+- [Cloudinary](https://cloudinary.com/) - Image storage
+- [Thirdweb](https://thirdweb.com/) - Web3 infrastructure
 
-### Web3統合
-- [Privy](https://docs.privy.io/) - Web3認証 & ウォレット管理
+### Web3 Integration
+- [Privy](https://docs.privy.io/) - Web3 authentication & wallet management
+- [Wagmi](https://wagmi.sh/) - React Hooks for Ethereum
+- [Viem](https://viem.sh/) - TypeScript Ethereum client
 
-### 開発ツール
-- [pnpm](https://pnpm.io/) - パッケージマネージャー
-- [biome](https://biomejs.dev/) - コードフォーマッター
+### Development Tools
+- [pnpm](https://pnpm.io/) - Package manager
+- [Biome](https://biomejs.dev/) - Code formatter & linter
 
-## プロジェクト構造 📁
+## Project Structure 📁
 
-### ディレクトリ構造
+### Directory Structure
 ```
 ├── src/
-│   ├── app/                   
-│   │   ├── layout.tsx         
-│   │   ├── (main)/           
-│   │   ├── (auth)/           
-│   │   └── refresh/          
-│   ├── components/          
-│   │   ├── ui/            
-│   │   ├── providers/     
-│   │   ├── shared/       
-│   │   ├── features/     
-│   │   └── pages/        
-│   ├── lib/               
-│   │   ├── firebase/     
-│   │   ├── auth.ts      
-│   │   ├── thirdweb.ts  
-│   │   ├── usePrivy.ts  
-│   │   └── utils.ts     
-│   ├── repository/       
-│   ├── types/           
-│   ├── utils/           
-│   ├── styles/          
-│   └── middleware.ts    
-├── contract/            
-├── public/             
-├── .wrangler/          
-├── .github/            
-├── .next/             
-├── node_modules/      
-├── .env              
-├── .gitignore       
-├── package.json      
-├── next.config.ts    
-├── tailwind.config.ts
-├── tsconfig.json     
-├── postcss.config.mjs
-├── eslint.config.mjs 
-├── biome.json        
-├── components.json   
-└── README.md         
+│ ├── app/ # Next.js App Router
+│ │ ├── (main)/ # Main application
+│ │ ├── (auth)/ # Authentication related
+│ │ └── refresh/ # Refresh token
+│ ├── components/
+│ │ ├── ui/ # Basic UI components
+│ │ ├── providers/ # Provider components
+│ │ ├── shared/ # Shared components
+│ │ ├── features/ # Feature-specific components
+│ │ └── pages/ # Page components
+│ ├── lib/ # Utility functions
+│ ├── repository/ # Data access layer
+│ ├── types/ # Type definitions
+│ ├── utils/ # Helper functions
+│ ├── styles/ # Global styles
+│ └── middleware.ts # Next.js middleware
+├── public/ # Static files
+├── contract/ # Smart contracts
+└── README.md        
 ```
 
-## セットアップ 🔧
+## Setup 🔧
 
 ```bash
-# リポジトリのクローン
+# Clone repository
 git clone <repository-url>
 
-# 依存関係のインストール
+# Install dependencies
 pnpm install
 
-# 開発サーバーの起動
+# Start development server
 pnpm dev
 ```
 
-## データベース 💾
+## Environment Variables 🔐
 
-### モデリング
+The following environment variables need to be set:
 
-[https://github.com/leapsdev/emoji-chat/issues/2](https://github.com/leapsdev/emoji-chat/issues/2)
+```env
+# Firebase configuration
+NEXT_PUBLIC_FIREBASE_DATABASE_URL=
+NEXT_PUBLIC_FIREBASE_API_KEY=
+NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=
+NEXT_PUBLIC_FIREBASE_PROJECT_ID=
+NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=
+NEXT_PUBLIC_FIREBASE_APP_ID=
+NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID=
+FIREBASE_ADMIN_PROJECT_ID=
+FIREBASE_ADMIN_CLIENT_EMAIL=
+FIREBASE_ADMIN_PRIVATE_KEY=
 
-### データベーススキーマ 
+# Privy configuration
+NEXT_PUBLIC_PRIVY_APP_ID=
+PRIVY_APP_SECRET=
 
-```typescript
-// schema.ts
-import { sqliteTable, text, integer } from 'drizzle-orm/sqlite-core';
+# Cloudinary configuration
+NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=
+CLOUDINARY_API_KEY=
+CLOUDINARY_API_SECRET=
 
-export const users = sqliteTable('users', {
-  id: text('id').primaryKey(),
-  address: text('address'),
-  username: text('username'),
-});
-
-export const emojis = sqliteTable('emojis', {
-  id: text('id').primaryKey(),
-  creatorId: text('creator_id'),
-  tokenId: integer('token_id'),
-  imageUrl: text('image_url'),
-  price: integer('price'),
-});
+# Thirdweb configuration
+THIRDWEB_SECRET_KEY=
 ```
 
-## 環境変数 🔐
+## Development Commands 🛠
 
-## ライセンス 📄
+```bash
+# Start development server
+pnpm dev
+
+# Build
+pnpm build
+
+# Format code
+pnpm format
+
+# Run linter
+pnpm lint
+
+# Biome check
+pnpm check
+```
+
+## License 📄
 
 MIT

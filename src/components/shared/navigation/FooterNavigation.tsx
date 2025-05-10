@@ -1,11 +1,12 @@
 'use client';
-import Image from 'next/image';
-import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
+import { FooterNavigationItem } from './FooterNavigationItem';
 
 export const FooterNavigation = () => {
   const [isVisible, setIsVisible] = useState(true);
   const [timeoutId, setTimeoutId] = useState<NodeJS.Timeout>();
+  const pathName = usePathname();
 
   const debouncedScrollEnd = useCallback(() => {
     if (timeoutId) {
@@ -29,6 +30,29 @@ export const FooterNavigation = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [debouncedScrollEnd]);
 
+  const itemMap = [
+    {
+      href: '/chat',
+      iconSrc: '/chat-bubble-icon.png',
+      alt: 'Chat',
+    },
+    {
+      href: '/explore',
+      iconSrc: '/blue-search-icon.png',
+      alt: 'Search',
+    },
+    {
+      href: '/create-emoji',
+      iconSrc: '/green-plus-icon.png',
+      alt: 'Create',
+    },
+    {
+      href: '/profile',
+      iconSrc: '/green-user-icon.png',
+      alt: 'Profile',
+    },
+  ];
+
   return (
     <div
       className={`fixed bottom-6 left-0 right-0 flex justify-center transition-transform duration-300 ${
@@ -36,46 +60,15 @@ export const FooterNavigation = () => {
       }`}
     >
       <div className="bg-white rounded-full shadow-lg px-6 py-4 flex items-center justify-between w-[320px]">
-        <Link
-          href="/chat"
-          className="flex items-center justify-center p-2 bg-blue-100 rounded-full"
-        >
-          <div className="w-7 h-7 relative">
-            <Image
-              src="/chat-bubble-icon.png"
-              alt="Chat"
-              fill
-              className="object-contain"
-            />
-          </div>
-        </Link>
-        <Link href="/explore" className="flex items-center justify-center p-2">
-          <Image
-            src="/blue-search-icon.png"
-            alt="Search"
-            width={28}
-            height={28}
+        {itemMap.map((item) => (
+          <FooterNavigationItem
+            key={item.href}
+            href={item.href}
+            iconSrc={item.iconSrc}
+            alt={item.alt}
+            isActive={pathName === item.href}
           />
-        </Link>
-        <Link
-          href="/create-emoji"
-          className="flex items-center justify-center p-2"
-        >
-          <Image
-            src="/green-plus-icon.png"
-            alt="Create"
-            width={28}
-            height={28}
-          />
-        </Link>
-        <Link href="/profile" className="flex items-center justify-center p-2">
-          <Image
-            src="/green-user-icon.png"
-            alt="Profile"
-            width={28}
-            height={28}
-          />
-        </Link>
+        ))}
       </div>
     </div>
   );

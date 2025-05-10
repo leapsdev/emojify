@@ -3,7 +3,7 @@ import Link from 'next/link';
 
 type LinkButtonProps = {
   href: string;
-  content: string;
+  content: React.ReactNode;
   className?: string;
 };
 

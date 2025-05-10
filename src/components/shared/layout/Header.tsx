@@ -1,4 +1,5 @@
 import { LinkButton } from '@/components/ui/LinkButton';
+import { HiOutlineChevronLeft } from "react-icons/hi2";
 import { cn } from '@/lib/utils';
 
 /**
@@ -55,10 +56,10 @@ export const Header = ({
     (backHref || onBack) &&
     (onBack ? (
       <button type="button" onClick={onBack} className="text-2xl">
-        👈
+        <HiOutlineChevronLeft />
       </button>
     ) : (
-      <LinkButton href={backHref || ''} content="👈" className="text-2xl" />
+      <LinkButton href={backHref || ''} content={<HiOutlineChevronLeft />} className="text-2xl" />
     ));
 
   return (

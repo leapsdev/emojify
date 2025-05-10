@@ -1,6 +1,5 @@
 'use client';
 
-import { ImageIcon } from 'lucide-react';
 import Image from 'next/image';
 import { useRef } from 'react';
 import { ResetButton } from './ResetButton';
@@ -66,7 +65,14 @@ const PreviewArea = ({
 
   return (
     <>
-      <ImageIcon className="w-12 h-12 text-gray-400 mb-8" />
+      <Image
+        src="/image-icon.png"
+        alt="画像アイコン"
+        width={48}
+        height={48}
+        className="mb-8"
+        style={{ width: '4rem', height: '4rem', color: '#9ca3af' }}
+      />
       <label
         htmlFor="file-upload"
         className="bg-blue-500 text-white px-8 py-3 rounded-full font-semibold cursor-pointer hover:bg-blue-600 transition-colors mt-4"

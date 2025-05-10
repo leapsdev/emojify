@@ -7,11 +7,7 @@ export default function CreateEmojiLayout({
 }) {
   return (
     <>
-      <Header
-        backHref="/chat"
-        centerContent={<div className="text-2xl">🤪</div>}
-        className="mb-6"
-      />
+      <Header backHref="/chat" className="mb-6" />
       {children}
     </>
   );

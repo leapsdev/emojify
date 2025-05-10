@@ -8,6 +8,7 @@ import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
 import { Header } from '@/components/shared/layout/Header';
+import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import type { User } from '@/types/database';
@@ -152,6 +153,7 @@ function ProfilePageContent({
           </div>
         </div>
       </main>
+      <FooterNavigation />
     </>
   );
 }

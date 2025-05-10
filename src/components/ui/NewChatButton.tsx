@@ -34,7 +34,7 @@ export const NewChatButton = () => {
     <Link
       href="/choose-friends"
       className={`
-        fixed right-4 bottom-20
+        fixed right-4 bottom-[82px]
         w-14 h-14
         bg-blue-500 hover:bg-blue-600
         text-white

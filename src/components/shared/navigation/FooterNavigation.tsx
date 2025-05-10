@@ -55,11 +55,11 @@ export const FooterNavigation = () => {
 
   return (
     <div
-      className={`fixed bottom-6 left-0 right-0 flex justify-center transition-transform duration-300 ${
+      className={`fixed bottom-4 left-0 right-0 flex justify-center transition-transform duration-300 ${
         isVisible ? 'translate-y-0' : 'translate-y-full'
       }`}
     >
-      <div className="bg-white rounded-full shadow-lg px-6 py-4 flex items-center justify-between w-[320px]">
+      <div className="bg-white rounded-full shadow-lg px-4 py-2 flex items-center justify-between w-[320px]">
         {itemMap.map((item) => (
           <FooterNavigationItem
             key={item.href}

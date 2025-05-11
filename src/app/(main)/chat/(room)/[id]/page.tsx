@@ -25,7 +25,7 @@ export default async function Page({ params }: Props) {
   // 相手のユーザー情報を取得
   const otherMembers = Object.entries(room.members)
     .filter(([id]) => id !== userId)
-    .map(([_, member]) => member);
+    .map(([, member]) => member);
 
   if (otherMembers.length === 0) notFound();
 

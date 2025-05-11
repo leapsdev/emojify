@@ -322,3 +322,29 @@ export async function updateLastReadAction(
   // 最終既読時刻を更新
   await roomRef.child(`members/${userId}/lastReadAt`).set(now);
 }
+
+/**
+ * メンバーが完全一致するチャットルームを検索
+ * @param members 検索対象のメンバーID配列
+ * @returns 完全一致するチャットルーム、存在しない場合はnull
+ */
+export async function findChatRoomByMembers(
+  members: string[],
+): Promise<ChatRoom | null> {
+  // メンバー配列をSetに変換
+  const memberSet = new Set(members);
+
+  // 最初のメンバーのチャットルーム一覧を取得
+  const firstMemberRooms = await getUserRooms(members[0]);
+
+  // メンバーが完全一致するルームを検索
+  return (
+    firstMemberRooms.find((room) => {
+      const roomMembers = Object.keys(room.members);
+      return (
+        roomMembers.length === memberSet.size &&
+        roomMembers.every((memberId) => memberSet.has(memberId))
+      );
+    }) ?? null
+  );
+}

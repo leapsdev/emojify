@@ -1,9 +1,11 @@
 'use server';
 
 import { adminDbRef } from '@/lib/firebase/admin';
-import type { User } from '@/types/database';
 import { getCurrentTimestamp } from '@/utils/date';
 import { PrivyClient } from '@privy-io/server-auth';
+import { updateUserInChatRooms } from '../chat/actions';
+
+import type { User } from '@/types/database';
 import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import type { ProfileForm } from './schema';
 
@@ -41,7 +43,21 @@ export async function updateUser(
     updatedAt: timestamp,
   };
 
+  // ユーザー情報を更新
   await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
+
+  // ユーザー名またはimageUrlが更新された場合、チャットルーム内の情報も更新
+  if (data.username || data.imageUrl !== undefined) {
+    const chatRoomUpdates: Partial<Pick<User, 'username' | 'imageUrl'>> = {
+      ...(data.username && { username: data.username }),
+      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
+    };
+    await updateUserInChatRooms(
+      userId,
+      chatRoomUpdates as Pick<User, 'username' | 'imageUrl'>,
+    );
+  }
+
   return updates;
 }
 

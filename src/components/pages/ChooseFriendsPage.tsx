@@ -9,11 +9,9 @@ import {
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
-import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
 import { usePrivyId } from '@/lib/usePrivy';
 import type { User } from '@/types/database';
 import { useRouter } from 'next/navigation';
-import { toast } from 'sonner';
 
 interface ClientChooseFriendsPageProps {
   initialFriends?: User[];
@@ -26,7 +24,6 @@ export function ClientChooseFriendsPage({
 }: ClientChooseFriendsPageProps) {
   const userId = usePrivyId();
   const router = useRouter();
-  const toastRedirect = useToastRedirect();
   const {
     selectedUsers,
     searchQuery,
@@ -42,40 +39,30 @@ export function ClientChooseFriendsPage({
 
   const handleAddFriend = async (friendId: string) => {
     if (!userId) {
-      toast.error('Failed to get user ID');
       return;
     }
 
     try {
       const result = await addFriendAction(userId, friendId);
-      if (result.success) {
-        toast.success('Friend added');
-      } else {
+      if (!result.success) {
         router.refresh();
       }
     } catch (error) {
-      toast.error('An error occurred');
       console.error(error);
     }
   };
 
-  const handleCreateChatRoom = async () => {
-    try {
-      if (!userId) {
-        toast.error('Failed to get user ID');
-        return;
-      }
-      // 現在のユーザーも含めてチャットルームを作成
-      const result = await createChatRoomAction([userId, ...selectedUsers]);
-      if (result.success && result.roomId) {
-        toastRedirect('Chat room created', `/chat/${result.roomId}`);
-      } else {
-        toast.error(result.error || 'Failed to create chat room');
-      }
-    } catch (error) {
-      toast.error('Failed to create chat room');
-      console.error(error);
+  const handleCreateRoom = async () => {
+    if (!userId) {
+      return;
     }
+
+    const result = await createChatRoomAction([userId, ...selectedUsers]);
+    if (!result.success) {
+      return;
+    }
+
+    router.push(`/chat/${result.roomId}`);
   };
 
   return (
@@ -102,7 +89,7 @@ export function ClientChooseFriendsPage({
 
         <ChatButton
           visible={selectedUsers.length > 0}
-          onClick={handleCreateChatRoom}
+          onClick={handleCreateRoom}
         />
       </main>
     </EthereumProviders>

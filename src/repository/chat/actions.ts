@@ -1,7 +1,7 @@
 'use server';
 
 import { adminDb } from '@/lib/firebase/admin';
-import type { ChatRoom, Message } from '@/types/database';
+import type { ChatRoom, Message, User } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 
 /**
@@ -92,6 +92,38 @@ export async function createChatRoom(members: string[]): Promise<string> {
 
   await adminDb.ref().update(updates);
   return roomId;
+}
+
+/**
+ * チャットルーム内のユーザー情報を更新
+ */
+export async function updateUserInChatRooms(
+  userId: string,
+  userData: Pick<User, 'username' | 'imageUrl'>,
+): Promise<void> {
+  // ユーザーが参加している全てのチャットルームを取得
+  const userRoomsSnapshot = await adminDb
+    .ref(`${DB_INDEXES.userRooms}/${userId}`)
+    .get();
+  const userRooms = userRoomsSnapshot.val() || {};
+  const roomIds = Object.keys(userRooms);
+
+  // 各チャットルームのメンバー情報を更新
+  const updates: Record<string, string | null> = {};
+  roomIds.forEach((roomId) => {
+    if (userData.username) {
+      updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}/username`] =
+        userData.username;
+    }
+    if (userData.imageUrl !== undefined) {
+      updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}/imageUrl`] =
+        userData.imageUrl;
+    }
+  });
+
+  if (Object.keys(updates).length > 0) {
+    await adminDb.ref().update(updates);
+  }
 }
 
 /**

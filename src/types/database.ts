@@ -50,6 +50,7 @@ export interface ChatRoom {
       joinedAt: number;
       username: string;
       lastReadAt: number;
+      imageUrl?: string | null;
     }
   >;
   lastMessage?: {

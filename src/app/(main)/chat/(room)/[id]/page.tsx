@@ -30,7 +30,7 @@ export default async function Page({ params }: Props) {
   if (otherMembers.length === 0) notFound();
 
   // ヘッダーに表示するユーザー名を生成
-  const headerTitle = otherMembers.map(member => member.username).join(', ');
+  const headerTitle = otherMembers.map((member) => member.username).join(', ');
 
   return (
     <>

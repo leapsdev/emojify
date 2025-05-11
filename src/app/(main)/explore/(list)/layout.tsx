@@ -13,7 +13,7 @@ export default function CreateEmojiLayout({
         backHref="/chat"
         centerContent={
           <Image
-            src="/blue-search-icon.png"
+            src="/black-search-icon.png"
             alt="Search"
             width={32}
             height={32}

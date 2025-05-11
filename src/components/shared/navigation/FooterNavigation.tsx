@@ -38,17 +38,17 @@ export const FooterNavigation = () => {
     },
     {
       href: '/explore',
-      iconSrc: '/blue-search-icon.png',
+      iconSrc: '/black-search-icon.png',
       alt: 'Search',
     },
     {
       href: '/create-emoji',
-      iconSrc: '/green-plus-icon.png',
+      iconSrc: '/black-plus-icon.png',
       alt: 'Create',
     },
     {
       href: '/profile',
-      iconSrc: '/green-user-icon.png',
+      iconSrc: '/black-user-icon.png',
       alt: 'Profile',
     },
   ];

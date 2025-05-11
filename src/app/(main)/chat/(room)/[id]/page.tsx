@@ -20,8 +20,6 @@ export default async function Page({ params }: Props) {
   const { room, messages } = await getChatRoomAction(roomId);
   if (!room) notFound();
 
-  console.log(room);
-
   // 相手のユーザー情報を取得
   const otherMembers = Object.entries(room.members)
     .filter(([id]) => id !== userId)

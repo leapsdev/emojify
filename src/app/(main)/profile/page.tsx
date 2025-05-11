@@ -15,7 +15,5 @@ export default async function Page() {
     redirect('/');
   }
 
-  console.log(userData);
-
   return <ProfilePage user={userData} />;
 }

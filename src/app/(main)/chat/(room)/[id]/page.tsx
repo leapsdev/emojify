@@ -20,19 +20,26 @@ export default async function Page({ params }: Props) {
   const { room, messages } = await getChatRoomAction(roomId);
   if (!room) notFound();
 
-  // 相手のユーザー情報を取得
-  const otherMemberId = Object.keys(room.members).find((id) => id !== userId);
-  if (!otherMemberId) notFound();
+  console.log(room);
 
-  const otherMember = room.members[otherMemberId];
-  if (!otherMember) notFound();
+  // 相手のユーザー情報を取得
+  const otherMembers = Object.entries(room.members)
+    .filter(([id]) => id !== userId)
+    .map(([_, member]) => member);
+
+  if (otherMembers.length === 0) notFound();
+
+  // ヘッダーに表示するユーザー名を生成
+  const headerTitle = otherMembers.map(member => member.username).join(', ');
 
   return (
     <>
       <Header
         backHref="/chat"
         centerContent={
-          <h1 className="text-xl font-semibold">{otherMember.username}</h1>
+          <div className="max-w-[320px] w-full text-center">
+            <h1 className="font-semibold truncate">{headerTitle}</h1>
+          </div>
         }
       />
       <ChatRoomPage

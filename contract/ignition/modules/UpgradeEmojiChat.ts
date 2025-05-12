@@ -6,9 +6,9 @@ export const UpgradeEmojiChatModule = buildModule('UpgradeEmojiChat', (m) => {
 
   const owner = m.getAccount(0);
 
-  const newImplementation = m.contract('EmojiChatV2');
+  const newImplementation = m.contract('EmojiChatV5');
 
-  const emojiChatProxy = m.contractAt('EmojiChat', proxy, {
+  const emojiChatProxy = m.contractAt('EmojiChatV4', proxy, {
     id: 'EmojiChatProxyForUpgrade',
   });
 
@@ -16,7 +16,7 @@ export const UpgradeEmojiChatModule = buildModule('UpgradeEmojiChat', (m) => {
     from: owner,
   });
 
-  const upgradedEmojiChat = m.contractAt('EmojiChatV2', proxy, {
+  const upgradedEmojiChat = m.contractAt('EmojiChatV5', proxy, {
     id: 'UpgradedEmojiChatProxy',
   });
 

@@ -162,7 +162,8 @@ export function CollectButton({ tokenId }: Props) {
     }
   };
 
-  const buttonStyles = 'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
+  const buttonStyles =
+    'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
 
   return (
     <div className="space-y-4">

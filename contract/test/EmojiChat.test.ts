@@ -3,11 +3,13 @@ import { expect } from 'chai';
 import type { Signer } from 'ethers';
 import { ethers, ignition, upgrades } from 'hardhat';
 import { DeployEmojiChatModule } from '../ignition/modules/DeployEmojiChat';
-import type { EmojiChatV4 } from '../typechain-types/contracts/EmojiChatV4';
+import type { EmojiChatV5 } from '../typechain-types/contracts/EmojiChatV5';
+
+const defaultMintPrice = ethers.parseEther('0.0005');
 
 // Hardhatの推奨に従い、fixtureを使用
 async function deployEmojiChatFixture(): Promise<{
-  chat: EmojiChatV4;
+  chat: EmojiChatV5;
   owner: Signer;
   alice: Signer;
   bob: Signer;
@@ -24,7 +26,7 @@ async function deployEmojiChatFixture(): Promise<{
   const bobAddress = await bob.getAddress();
 
   const { emojiChat } = await ignition.deploy(DeployEmojiChatModule);
-  const chat = emojiChat as unknown as EmojiChatV4; // V4にキャスト
+  const chat = emojiChat as unknown as EmojiChatV5;
 
   // 必要であれば初期状態でunpause
   if (await chat.paused()) {
@@ -42,7 +44,7 @@ async function deployEmojiChatFixture(): Promise<{
   };
 }
 
-describe('EmojiChatV4 (proxy)', () => {
+describe('EmojiChatV5 (proxy)', () => {
   // --- Fixture を使用 ---
   async function setup() {
     return loadFixture(deployEmojiChatFixture);
@@ -56,25 +58,28 @@ describe('EmojiChatV4 (proxy)', () => {
     });
 
     it('should start with nextTokenId implicitly as 1 (tested via register)', async () => {
-      const { chat, alice, aliceAddress } = await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレスを事前取得
+      const { chat, alice, aliceAddress, bob, bobAddress } = await setup();
+      const aliceSignerAddress = await alice.getAddress();
       const tx = await chat
         .connect(alice)
-        .registerNewEmoji(aliceAddress, 'uri://1', '0x');
+        .registerNewEmoji(aliceAddress, 'uri://1', '0x', { value: defaultMintPrice });
       const receipt = await tx.wait();
-      // イベントの取得方法を ethers v6/hardhat-chai-matchers v2 に合わせる (より堅牢)
       await expect(tx)
         .to.emit(chat, 'NewEmojiRegistered')
         .withArgs(1n, aliceAddress, 'uri://1');
       await expect(tx)
         .to.emit(chat, 'TransferSingle')
         .withArgs(
-          aliceSignerAddress, // 修正: await alice.getAddress()
+          aliceSignerAddress,
           ethers.ZeroAddress,
           aliceAddress,
           1n,
           1n,
         );
+
+      await chat.connect(alice).registerNewEmoji(aliceAddress, "initial", "0x", {value: defaultMintPrice});
+      await expect(chat.connect(bob).addEmojiSupply(bobAddress, 1, 5, '0x', { value: defaultMintPrice * 5n })).to
+        .not.be.reverted;
     });
 
     it('should revert if initialized again', async () => {
@@ -90,42 +95,36 @@ describe('EmojiChatV4 (proxy)', () => {
   describe('Access Control', () => {
     it('owner can call owner-only functions', async () => {
       const { chat, owner } = await setup();
-      // ID 1 が存在しなくても Ownable チェックは通るはず
       await expect(chat.connect(owner).setTokenURI(1, 'newURI')).to.not.be
         .reverted;
-      // pause() が revert しないことを確認
       await expect(chat.connect(owner).pause()).to.not.be.reverted;
-      // pause 状態になっていることを確認
       expect(await chat.paused()).to.be.true;
-      // unpause() が revert しないことを確認
       await expect(chat.connect(owner).unpause()).to.not.be.reverted;
     });
 
     it('non-owner cannot call owner-only functions', async () => {
       const { chat, alice } = await setup();
-      const aliceAddress = await alice.getAddress(); // アドレスを事前取得
+      const aliceAddress = await alice.getAddress();
       const expectedRevertMsg = 'OwnableUnauthorizedAccount';
 
       await expect(chat.connect(alice).setTokenURI(1, 'x'))
         .to.be.revertedWithCustomError(chat, expectedRevertMsg)
-        .withArgs(aliceAddress); // 修正: await alice.getAddress()
+        .withArgs(aliceAddress);
       await expect(chat.connect(alice).pause())
         .to.be.revertedWithCustomError(chat, expectedRevertMsg)
-        .withArgs(aliceAddress); // 修正: await alice.getAddress()
-      // pause されていない状態で unpause を試みる
+        .withArgs(aliceAddress);
       await expect(chat.connect(alice).unpause())
         .to.be.revertedWithCustomError(chat, expectedRevertMsg)
-        .withArgs(aliceAddress); // 修正: await alice.getAddress()
+        .withArgs(aliceAddress);
     });
 
     it('anyone can call public minting functions', async () => {
       const { chat, alice, bob, aliceAddress, bobAddress } = await setup();
       await expect(
-        chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://alice', '0x'),
+        chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://alice', '0x', { value: defaultMintPrice }),
       ).to.not.be.reverted;
 
-      // ID 1 が alice によって登録された後、bob が供給を追加
-      await expect(chat.connect(bob).addEmojiSupply(bobAddress, 1, 5, '0x')).to
+      await expect(chat.connect(bob).addEmojiSupply(bobAddress, 1, 5, '0x', { value: defaultMintPrice * 5n })).to
         .not.be.reverted;
     });
   });
@@ -145,21 +144,19 @@ describe('EmojiChatV4 (proxy)', () => {
         await setup();
       await chat
         .connect(alice)
-        .registerNewEmoji(aliceAddress, 'uri://1', '0x');
+        .registerNewEmoji(aliceAddress, 'uri://1', '0x', { value: defaultMintPrice });
       await chat
         .connect(alice)
         .safeTransferFrom(aliceAddress, bobAddress, 1, 1, '0x');
 
       await chat.connect(owner).pause();
-      // ERC1155PausableUpgradeable のエラー名を確認 (5.0 では EnforcedPause)
       const expectedRevertMsg = 'EnforcedPause';
 
-      // Minting functions
       await expect(
-        chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://2', '0x'),
+        chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://2', '0x', { value: defaultMintPrice }),
       ).to.be.revertedWithCustomError(chat, expectedRevertMsg);
       await expect(
-        chat.connect(bob).addEmojiSupply(bobAddress, 1, 1, '0x'),
+        chat.connect(bob).addEmojiSupply(bobAddress, 1, 1, '0x', { value: defaultMintPrice }),
       ).to.be.revertedWithCustomError(chat, expectedRevertMsg);
       await expect(
         chat
@@ -170,7 +167,6 @@ describe('EmojiChatV4 (proxy)', () => {
         chat.connect(bob).addEmojiSupplyBatch(bobAddress, [1], [1], '0x'),
       ).to.be.revertedWithCustomError(chat, expectedRevertMsg);
 
-      // Transfer functions
       await expect(
         chat.connect(bob).safeTransferFrom(bobAddress, aliceAddress, 1, 1, '0x'),
       ).to.be.revertedWithCustomError(chat, expectedRevertMsg);
@@ -180,7 +176,6 @@ describe('EmojiChatV4 (proxy)', () => {
           .safeBatchTransferFrom(bobAddress, aliceAddress, [1], [1], '0x'),
       ).to.be.revertedWithCustomError(chat, expectedRevertMsg);
 
-      // Unpause して再開できることを確認
       await chat.connect(owner).unpause();
       await expect(
         chat.connect(bob).safeTransferFrom(bobAddress, aliceAddress, 1, 1, '0x'),
@@ -192,54 +187,49 @@ describe('EmojiChatV4 (proxy)', () => {
   describe('Register New Emoji', () => {
     it('registerNewEmoji correctly assigns ID, mints, sets URI and firstMinter', async () => {
       const { chat, alice, bob, aliceAddress, bobAddress } = await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレス事前取得
-      const bobSignerAddress = await bob.getAddress(); // アドレス事前取得
+      const aliceSignerAddress = await alice.getAddress();
+      const bobSignerAddress = await bob.getAddress();
       const uri1 = 'uri://emoji1';
       const uri2 = 'uri://emoji2';
 
-      // Alice が最初の絵文字を登録 (宛先は Bob)
-      await expect(chat.connect(alice).registerNewEmoji(bobAddress, uri1, '0x'))
+      await expect(chat.connect(alice).registerNewEmoji(bobAddress, uri1, '0x', { value: defaultMintPrice }))
         .to.emit(chat, 'NewEmojiRegistered')
         .withArgs(1n, bobAddress, uri1)
         .and.to.emit(chat, 'TransferSingle')
-        .withArgs(aliceSignerAddress, ethers.ZeroAddress, bobAddress, 1n, 1n); // 修正
+        .withArgs(aliceSignerAddress, ethers.ZeroAddress, bobAddress, 1n, 1n);
 
       expect(await chat.balanceOf(bobAddress, 1)).to.equal(1n);
       expect(await chat.balanceOf(aliceAddress, 1)).to.equal(0n);
       expect(await chat.uri(1)).to.equal(uri1);
-      expect(await chat.firstMinter(1)).to.equal(aliceSignerAddress); // 修正
+      expect(await chat.firstMinter(1)).to.equal(aliceSignerAddress);
       expect(await chat['totalSupply(uint256)'](1)).to.equal(1n);
 
-      // Bob が次の絵文字を登録 (宛先は Alice)
-      await expect(chat.connect(bob).registerNewEmoji(aliceAddress, uri2, '0x'))
+      await expect(chat.connect(bob).registerNewEmoji(aliceAddress, uri2, '0x', { value: defaultMintPrice }))
         .to.emit(chat, 'NewEmojiRegistered')
-        .withArgs(2n, aliceAddress, uri2) // ID は 2 になる
+        .withArgs(2n, aliceAddress, uri2)
         .and.to.emit(chat, 'TransferSingle')
-        .withArgs(bobSignerAddress, ethers.ZeroAddress, aliceAddress, 2n, 1n); // 修正
+        .withArgs(bobSignerAddress, ethers.ZeroAddress, aliceAddress, 2n, 1n);
 
       expect(await chat.balanceOf(aliceAddress, 2)).to.equal(1n);
       expect(await chat.uri(2)).to.equal(uri2);
-      expect(await chat.firstMinter(2)).to.equal(bobSignerAddress); // 修正
+      expect(await chat.firstMinter(2)).to.equal(bobSignerAddress);
       expect(await chat['totalSupply(uint256)'](2)).to.equal(1n);
     });
 
     it('registerNewEmojisBatch correctly assigns IDs, mints, sets URIs and firstMinter', async () => {
       const { chat, alice, bobAddress } = await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレス事前取得
+      const aliceSignerAddress = await alice.getAddress();
       const uris = ['uri://batch1', 'uri://batch2'];
 
-      // 修正: staticCall を実行前に移動
       const returnedIds = await chat
         .connect(alice)
         .registerNewEmojisBatch.staticCall(bobAddress, uris, '0x');
       expect(returnedIds).to.deep.equal([1n, 2n]);
 
-      // 実行
       const tx = await chat
         .connect(alice)
         .registerNewEmojisBatch(bobAddress, uris, '0x');
 
-      // イベント確認
       await expect(tx)
         .to.emit(chat, 'NewEmojiRegistered')
         .withArgs(1n, bobAddress, uris[0]);
@@ -256,7 +246,6 @@ describe('EmojiChatV4 (proxy)', () => {
           [1n, 1n],
         );
 
-      // 状態確認
       expect(await chat.balanceOf(bobAddress, 1)).to.equal(1n);
       expect(await chat.balanceOf(bobAddress, 2)).to.equal(1n);
       expect(await chat.uri(1)).to.equal(uris[0]);
@@ -271,19 +260,19 @@ describe('EmojiChatV4 (proxy)', () => {
       const { chat, alice, aliceAddress } = await setup();
       const returnedId = await chat
         .connect(alice)
-        .registerNewEmoji.staticCall(aliceAddress, 'uri://return', '0x'); // 修正: staticCall
+        .registerNewEmoji.staticCall(aliceAddress, 'uri://return', '0x', { value: defaultMintPrice });
       expect(returnedId).to.equal(1n);
-      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://return', '0x'); // 実行
+      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://return', '0x', { value: defaultMintPrice });
       const returnedId2 = await chat
         .connect(alice)
-        .registerNewEmoji.staticCall(aliceAddress, 'uri://return2', '0x'); // 修正: staticCall
+        .registerNewEmoji.staticCall(aliceAddress, 'uri://return2', '0x', { value: defaultMintPrice });
       expect(returnedId2).to.equal(2n);
     });
 
     it('should revert register if recipient is zero address', async () => {
       const { chat, alice } = await setup();
       await expect(
-        chat.connect(alice).registerNewEmoji(ethers.ZeroAddress, 'uri://zero', '0x'),
+        chat.connect(alice).registerNewEmoji(ethers.ZeroAddress, 'uri://zero', '0x', { value: defaultMintPrice }),
       ).to.be.revertedWithCustomError(chat, 'ERC1155InvalidReceiver').withArgs(ethers.ZeroAddress);
     });
   });
@@ -296,11 +285,9 @@ describe('EmojiChatV4 (proxy)', () => {
     async function setupWithRegisteredEmoji() {
       const setupData = await setup();
       const { chat, alice, aliceAddress } = setupData;
-      // 登録者を alice にする
       await chat
         .connect(alice)
-        .registerNewEmoji(aliceAddress, initialURI, '0x');
-      // firstMinter が alice になっていることを確認
+        .registerNewEmoji(aliceAddress, initialURI, '0x', { value: defaultMintPrice });
       expect(await chat.firstMinter(emojiId)).to.equal(
         await alice.getAddress(),
       );
@@ -310,19 +297,19 @@ describe('EmojiChatV4 (proxy)', () => {
     it('addEmojiSupply mints additional tokens to recipient', async () => {
       const { chat, alice, bob, aliceAddress, bobAddress } =
         await setupWithRegisteredEmoji();
-      const bobSignerAddress = await bob.getAddress(); // アドレス事前取得
+      const bobSignerAddress = await bob.getAddress();
 
       expect(await chat.balanceOf(bobAddress, emojiId)).to.equal(0n);
       expect(await chat.balanceOf(aliceAddress, emojiId)).to.equal(1n);
       expect(await chat['totalSupply(uint256)'](emojiId)).to.equal(1n);
 
       const amountToAdd = 5n;
-      // Bob が ID=1 の絵文字を Bob 自身に追加発行
+      const requiredValue = defaultMintPrice * amountToAdd;
       await expect(
-        chat.connect(bob).addEmojiSupply(bobAddress, emojiId, amountToAdd, '0x'),
+        chat.connect(bob).addEmojiSupply(bobAddress, emojiId, amountToAdd, '0x', { value: requiredValue }),
       )
         .to.emit(chat, 'TransferSingle')
-        .withArgs(bobSignerAddress, ethers.ZeroAddress, bobAddress, emojiId, amountToAdd); // 修正
+        .withArgs(bobSignerAddress, ethers.ZeroAddress, bobAddress, emojiId, amountToAdd);
 
       expect(await chat.balanceOf(bobAddress, emojiId)).to.equal(amountToAdd);
       expect(await chat.balanceOf(aliceAddress, emojiId)).to.equal(1n);
@@ -337,11 +324,13 @@ describe('EmojiChatV4 (proxy)', () => {
       const firstMinterBefore = await chat.firstMinter(emojiId);
       const uriBefore = await chat.uri(emojiId);
 
-      await chat.connect(bob).addEmojiSupply(bobAddress, emojiId, 5, '0x');
+      const amountToAdd = 5n;
+      const requiredValue = defaultMintPrice * amountToAdd;
+      await chat.connect(bob).addEmojiSupply(bobAddress, emojiId, amountToAdd, '0x', { value: requiredValue });
 
       expect(await chat.firstMinter(emojiId)).to.equal(firstMinterBefore);
       expect(await chat.uri(emojiId)).to.equal(uriBefore);
-      expect(firstMinterBefore).to.equal(await alice.getAddress()); // alice であることを確認
+      expect(firstMinterBefore).to.equal(await alice.getAddress());
       expect(uriBefore).to.equal(initialURI);
     });
 
@@ -349,15 +338,14 @@ describe('EmojiChatV4 (proxy)', () => {
       const { chat, bob, bobAddress } = await setup();
       const unregisteredId = 99n;
       await expect(
-        chat.connect(bob).addEmojiSupply(bobAddress, unregisteredId, 1, '0x'),
+        chat.connect(bob).addEmojiSupply(bobAddress, unregisteredId, 1, '0x', { value: defaultMintPrice }),
       ).to.be.revertedWithCustomError(chat, 'EmojiNotRegistered').withArgs(unregisteredId);
     });
 
     it('addEmojiSupplyBatch mints additional tokens correctly', async () => {
       const { chat, alice, bob, aliceAddress, bobAddress } = await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレス事前取得
-      const bobSignerAddress = await bob.getAddress(); // アドレス事前取得
-      // 準備: ID 1, 2 を alice が登録 (受信者は alice 自身)
+      const aliceSignerAddress = await alice.getAddress();
+      const bobSignerAddress = await bob.getAddress();
       await chat
         .connect(alice)
         .registerNewEmojisBatch(aliceAddress, ['uri://b1', 'uri://b2'], '0x');
@@ -369,14 +357,13 @@ describe('EmojiChatV4 (proxy)', () => {
       const idsToAdd = [1n, 2n];
       const amountsToAdd = [3n, 4n];
 
-      // Bob が ID 1, 2 を Bob 自身に追加発行
       await expect(
         chat
           .connect(bob)
           .addEmojiSupplyBatch(bobAddress, idsToAdd, amountsToAdd, '0x'),
       )
         .to.emit(chat, 'TransferBatch')
-        .withArgs(bobSignerAddress, ethers.ZeroAddress, bobAddress, idsToAdd, amountsToAdd); // 修正
+        .withArgs(bobSignerAddress, ethers.ZeroAddress, bobAddress, idsToAdd, amountsToAdd);
 
       expect(await chat.balanceOf(bobAddress, 1)).to.equal(amountsToAdd[0]);
       expect(await chat.balanceOf(bobAddress, 2)).to.equal(amountsToAdd[1]);
@@ -386,13 +373,13 @@ describe('EmojiChatV4 (proxy)', () => {
       expect(await chat['totalSupply(uint256)'](2)).to.equal(
         1n + amountsToAdd[1],
       );
-      expect(await chat.firstMinter(1)).to.equal(aliceSignerAddress); // firstMinter 変わらず
+      expect(await chat.firstMinter(1)).to.equal(aliceSignerAddress);
       expect(await chat.firstMinter(2)).to.equal(aliceSignerAddress);
     });
 
     it('addEmojiSupplyBatch reverts if any ID is unregistered', async () => {
       const { chat, alice, bob, aliceAddress, bobAddress } = await setup();
-      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://b1', '0x');
+      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://b1', '0x', { value: defaultMintPrice });
       const unregisteredId = 99n;
 
       await expect(
@@ -410,7 +397,7 @@ describe('EmojiChatV4 (proxy)', () => {
     it('addEmojiSupply does not revert if amount is zero', async () => {
       const { chat, bob, bobAddress } = await setupWithRegisteredEmoji();
       await expect(
-        chat.connect(bob).addEmojiSupply(bobAddress, emojiId, 0, '0x')
+        chat.connect(bob).addEmojiSupply(bobAddress, emojiId, 0, '0x', { value: 0 })
       ).to.not.be.reverted;
     });
   });
@@ -420,33 +407,30 @@ describe('EmojiChatV4 (proxy)', () => {
     it('should handle transfers correctly', async () => {
       const { chat, alice, bob, owner, aliceAddress, bobAddress, ownerAddress } =
         await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレス事前取得
-      const ownerSignerAddress = await owner.getAddress(); // アドレス事前取得
+      const aliceSignerAddress = await alice.getAddress();
+      const ownerSignerAddress = await owner.getAddress();
 
-      // 準備: alice が ID 1 を登録し、owner に 1 つ発行、その後 alice が owner に 9 個追加発行
-      await chat.connect(alice).registerNewEmoji(ownerAddress, 'uri://transfer', '0x'); // ID 1 を owner へ (firstMinter は alice)
-      await chat.connect(alice).addEmojiSupply(ownerAddress, 1, 9, '0x'); // owner は ID 1 を 10 個持つ
+      await chat.connect(alice).registerNewEmoji(ownerAddress, 'uri://transfer', '0x', { value: defaultMintPrice });
+      await chat.connect(alice).addEmojiSupply(ownerAddress, 1, 9, '0x', { value: defaultMintPrice * 9n });
       expect(await chat.balanceOf(ownerAddress, 1)).to.equal(10n);
       const firstMinter = await chat.firstMinter(1);
       const totalSupply = await chat['totalSupply(uint256)'](1);
       expect(firstMinter).to.equal(aliceSignerAddress);
       expect(totalSupply).to.equal(10n);
 
-      // Owner が Bob に 3 個転送
       await expect(
         chat
           .connect(owner)
           .safeTransferFrom(ownerAddress, bobAddress, 1, 3, '0x'),
       )
         .to.emit(chat, 'TransferSingle')
-        .withArgs(ownerSignerAddress, ownerAddress, bobAddress, 1n, 3n); // 修正
+        .withArgs(ownerSignerAddress, ownerAddress, bobAddress, 1n, 3n);
 
       expect(await chat.balanceOf(ownerAddress, 1)).to.equal(7n);
       expect(await chat.balanceOf(bobAddress, 1)).to.equal(3n);
-      expect(await chat.firstMinter(1)).to.equal(firstMinter); // 変わらない
-      expect(await chat['totalSupply(uint256)'](1)).to.equal(totalSupply); // 変わらない
+      expect(await chat.firstMinter(1)).to.equal(firstMinter);
+      expect(await chat['totalSupply(uint256)'](1)).to.equal(totalSupply);
 
-      // Bob が Alice に 1 個転送
       await chat
         .connect(bob)
         .safeTransferFrom(bobAddress, aliceAddress, 1, 1, '0x');
@@ -457,16 +441,15 @@ describe('EmojiChatV4 (proxy)', () => {
     it('should handle batch transfers correctly', async () => {
       const { chat, alice, bob, owner, aliceAddress, bobAddress, ownerAddress } =
         await setup();
-      const aliceSignerAddress = await alice.getAddress(); // アドレス事前取得
-      const ownerSignerAddress = await owner.getAddress(); // アドレス事前取得
+      const aliceSignerAddress = await alice.getAddress();
+      const ownerSignerAddress = await owner.getAddress();
 
-      // 準備: alice が ID 1, 2 を登録し、owner に発行 & 追加発行
       await chat
         .connect(alice)
-        .registerNewEmojisBatch(ownerAddress, ['uri://bt1', 'uri://bt2'], '0x'); // ID 1, 2 を owner へ (firstMinter は alice)
+        .registerNewEmojisBatch(ownerAddress, ['uri://bt1', 'uri://bt2'], '0x');
       await chat
         .connect(alice)
-        .addEmojiSupplyBatch(ownerAddress, [1, 2], [9, 19], '0x'); // owner は ID 1 を 10, ID 2 を 20 持つ
+        .addEmojiSupplyBatch(ownerAddress, [1, 2], [9, 19], '0x');
       expect(await chat.balanceOf(ownerAddress, 1)).to.equal(10n);
       expect(await chat.balanceOf(ownerAddress, 2)).to.equal(20n);
       const firstMinter1 = await chat.firstMinter(1);
@@ -480,7 +463,6 @@ describe('EmojiChatV4 (proxy)', () => {
 
       const idsToTransfer = [1n, 2n];
       const amountsToTransfer = [5n, 8n];
-      // Owner が Bob に ID 1 を 5 個、ID 2 を 8 個転送
       await expect(
         chat
           .connect(owner)
@@ -494,7 +476,7 @@ describe('EmojiChatV4 (proxy)', () => {
       )
         .to.emit(chat, 'TransferBatch')
         .withArgs(
-          ownerSignerAddress, // 修正
+          ownerSignerAddress,
           ownerAddress,
           bobAddress,
           idsToTransfer,
@@ -505,20 +487,19 @@ describe('EmojiChatV4 (proxy)', () => {
       expect(await chat.balanceOf(ownerAddress, 2)).to.equal(12n);
       expect(await chat.balanceOf(bobAddress, 1)).to.equal(5n);
       expect(await chat.balanceOf(bobAddress, 2)).to.equal(8n);
-      expect(await chat.firstMinter(1)).to.equal(firstMinter1); // 変わらない
-      expect(await chat.firstMinter(2)).to.equal(firstMinter2); // 変わらない
-      expect(await chat['totalSupply(uint256)'](1)).to.equal(totalSupply1); // 変わらない
-      expect(await chat['totalSupply(uint256)'](2)).to.equal(totalSupply2); // 変わらない
+      expect(await chat.firstMinter(1)).to.equal(firstMinter1);
+      expect(await chat.firstMinter(2)).to.equal(firstMinter2);
+      expect(await chat['totalSupply(uint256)'](1)).to.equal(totalSupply1);
+      expect(await chat['totalSupply(uint256)'](2)).to.equal(totalSupply2);
     });
 
     it('should handle approvals correctly', async () => {
       const { chat, alice, bob, owner, aliceAddress, bobAddress, ownerAddress } =
         await setup();
-      // 準備: owner が ID 1 を登録し、alice に 5 個発行
       await chat
         .connect(owner)
-        .registerNewEmoji(aliceAddress, 'uri://approval', '0x');
-      await chat.connect(owner).addEmojiSupply(aliceAddress, 1, 4, '0x');
+        .registerNewEmoji(aliceAddress, 'uri://approval', '0x', { value: defaultMintPrice });
+      await chat.connect(owner).addEmojiSupply(aliceAddress, 1, 4, '0x', { value: defaultMintPrice * 4n });
 
       expect(await chat.isApprovedForAll(aliceAddress, bobAddress)).to.be.false;
       await expect(chat.connect(alice).setApprovalForAll(bobAddress, true))
@@ -535,7 +516,6 @@ describe('EmojiChatV4 (proxy)', () => {
       await chat.connect(alice).setApprovalForAll(bobAddress, false);
       expect(await chat.isApprovedForAll(aliceAddress, bobAddress)).to.be.false;
 
-      // ERC1155 v5.0 Error: ERC1155MissingApprovalForAll(operator, owner)
       await expect(
         chat.connect(bob).safeTransferFrom(aliceAddress, ownerAddress, 1, 1, '0x'),
       ).to.be.revertedWithCustomError(chat, 'ERC1155MissingApprovalForAll').withArgs(bobAddress, aliceAddress);
@@ -544,7 +524,7 @@ describe('EmojiChatV4 (proxy)', () => {
     it('uri function returns correct URI', async () => {
       const { chat, alice, owner, aliceAddress } = await setup();
       const uri = 'uri://metadata';
-      await chat.connect(alice).registerNewEmoji(aliceAddress, uri, '0x');
+      await chat.connect(alice).registerNewEmoji(aliceAddress, uri, '0x', { value: defaultMintPrice });
       expect(await chat.uri(1)).to.equal(uri);
 
       const newUri = 'uri://newMetadata';
@@ -565,20 +545,15 @@ describe('EmojiChatV4 (proxy)', () => {
       const { chat, owner, ownerAddress } = await setup();
       const proxyAddress = await chat.getAddress();
 
-      const EmojiChatV4Factory = await ethers.getContractFactory('EmojiChatV4');
-      // ProxyのアドレスをforceImportして登録する
-      await upgrades.forceImport(proxyAddress, EmojiChatV4Factory);
+      const EmojiChatV5Factory = await ethers.getContractFactory('EmojiChatV5');
+      await upgrades.forceImport(proxyAddress, EmojiChatV5Factory);
 
-      // アップグレード実施
-      const upgradedChat = await upgrades.upgradeProxy(proxyAddress, EmojiChatV4Factory, {
+      const upgradedChat = await upgrades.upgradeProxy(proxyAddress, EmojiChatV5Factory, {
           kind: 'uups'
       });
 
-      // Proxyアドレスは変わらないことを確認
       expect(await upgradedChat.getAddress()).to.equal(proxyAddress);
-      // Owner は保持されていることを確認
       expect(await upgradedChat.owner()).to.equal(ownerAddress);
-      // アップグレード後も基本的な関数が呼べるか確認 (例: paused)
       expect(await upgradedChat.paused()).to.be.false;
     });
 
@@ -587,27 +562,22 @@ describe('EmojiChatV4 (proxy)', () => {
       const proxyAddress = await chat.getAddress();
       const aliceAddress = await alice.getAddress();
 
-      // ProxyのアドレスをforceImportして登録する
-      const EmojiChatV4Factory = await ethers.getContractFactory('EmojiChatV4');
-      await upgrades.forceImport(proxyAddress, EmojiChatV4Factory);
+      const EmojiChatV5Factory = await ethers.getContractFactory('EmojiChatV5');
+      await upgrades.forceImport(proxyAddress, EmojiChatV5Factory);
 
-      // 実装コントラクトをデプロイ
-      const implementation = await EmojiChatV4Factory.deploy();
+      const implementation = await EmojiChatV5Factory.deploy();
       const implementationAddress = await implementation.getAddress();
 
-      // UUPSUpgradeableインターフェースを使用
       const UUPSUpgradeableABI = [
         "function upgradeTo(address newImplementation) external"
       ];
 
-      // aliceが直接upgradeToを呼び出そうとする
       const aliceConnectedProxy = new ethers.Contract(
         proxyAddress,
         UUPSUpgradeableABI,
         alice
       );
 
-      // 権限がないのでリバートする - 具体的なエラーメッセージなしでリバートすることを確認
       await expect(
         aliceConnectedProxy.upgradeTo(implementationAddress)
       ).to.be.reverted;
@@ -619,28 +589,187 @@ describe('EmojiChatV4 (proxy)', () => {
       const ownerAddress = await owner.getAddress();
       const aliceSignerAddress = await alice.getAddress();
 
-      // 状態を変更
-      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://before', '0x');
+      await chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://before', '0x', { value: defaultMintPrice });
       const balanceBefore = await chat.balanceOf(aliceAddress, 1);
       const firstMinterBefore = await chat.firstMinter(1);
       const uriBefore = await chat.uri(1);
       expect(balanceBefore).to.equal(1n);
 
-      // ProxyのアドレスをforceImportして登録する
-      const EmojiChatV4Factory = await ethers.getContractFactory('EmojiChatV4');
-      await upgrades.forceImport(proxyAddress, EmojiChatV4Factory);
+      const EmojiChatV5Factory = await ethers.getContractFactory('EmojiChatV5');
+      await upgrades.forceImport(proxyAddress, EmojiChatV5Factory);
 
-      // Upgrade
-      const upgradedChat = await upgrades.upgradeProxy(proxyAddress, EmojiChatV4Factory, {
+      const upgradedChat = await upgrades.upgradeProxy(proxyAddress, EmojiChatV5Factory, {
           kind: 'uups'
       });
 
-      // Upgrade 後も状態が同じか確認
       expect(await upgradedChat.balanceOf(aliceAddress, 1)).to.equal(balanceBefore);
       expect(await upgradedChat.firstMinter(1)).to.equal(firstMinterBefore);
       expect(await upgradedChat.uri(1)).to.equal(uriBefore);
       expect(await upgradedChat.owner()).to.equal(ownerAddress);
       expect(firstMinterBefore).to.equal(aliceSignerAddress);
+    });
+  });
+
+  // --- Revenue Sharing ---
+  describe('Revenue Sharing', () => {
+    const defaultMintPrice = ethers.parseEther('0.0005');
+    const defaultProtocolFeePercent = 40n;
+    const defaultCreatorFeePercent = 100n - defaultProtocolFeePercent;
+
+    it('should initialize with default price and fee', async () => {
+      const { chat } = await setup();
+      expect(await chat.mintPrice()).to.equal(defaultMintPrice);
+      expect(await chat.protocolFeePercent()).to.equal(
+        defaultProtocolFeePercent,
+      );
+    });
+
+    describe('Setters', () => {
+      it('owner can set mint price', async () => {
+        const { chat, owner } = await setup();
+        const newPrice = ethers.parseEther('0.01');
+        await expect(chat.connect(owner).setMintPrice(newPrice))
+          .to.emit(chat, 'MintPriceSet')
+          .withArgs(newPrice);
+        expect(await chat.mintPrice()).to.equal(newPrice);
+      });
+
+      it('non-owner cannot set mint price', async () => {
+        const { chat, alice } = await setup();
+        const newPrice = ethers.parseEther('0.01');
+        await expect(
+          chat.connect(alice).setMintPrice(newPrice),
+        ).to.be.revertedWithCustomError(
+          chat,
+          'OwnableUnauthorizedAccount',
+        );
+      });
+
+      it('owner can set protocol fee percent', async () => {
+        const { chat, owner } = await setup();
+        const newFee = 50n;
+        await expect(chat.connect(owner).setProtocolFeePercent(newFee))
+          .to.emit(chat, 'ProtocolFeePercentSet')
+          .withArgs(newFee);
+        expect(await chat.protocolFeePercent()).to.equal(newFee);
+      });
+
+      it('non-owner cannot set protocol fee percent', async () => {
+        const { chat, alice } = await setup();
+        await expect(
+          chat.connect(alice).setProtocolFeePercent(50),
+        ).to.be.revertedWithCustomError(
+          chat,
+          'OwnableUnauthorizedAccount',
+        );
+      });
+
+      it('cannot set protocol fee percent over 100', async () => {
+        const { chat, owner } = await setup();
+        await expect(
+          chat.connect(owner).setProtocolFeePercent(101),
+        ).to.be.revertedWithCustomError(
+            chat,
+            'InvalidFeePercentage'
+        ).withArgs(101);
+      });
+    });
+
+    describe('registerNewEmoji with Revenue Sharing', () => {
+        it('reverts if incorrect ETH amount is sent', async () => {
+            const { chat, alice, aliceAddress } = await setup();
+            const wrongPrice = defaultMintPrice / 2n;
+            await expect(
+                chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://fail', '0x', { value: wrongPrice }),
+            ).to.be.revertedWithCustomError(
+                chat,
+                'IncorrectPaymentValue'
+            ).withArgs(defaultMintPrice, wrongPrice);
+        });
+
+        it('distributes fees correctly between creator (caller) and protocol (owner)', async () => {
+            const { chat, owner, alice, ownerAddress, aliceAddress } = await setup();
+            const protocolFee = (defaultMintPrice * defaultProtocolFeePercent) / 100n;
+            const creatorFee = defaultMintPrice - protocolFee;
+
+            await expect(
+                chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://distribute', '0x', { value: defaultMintPrice }),
+            ).to.changeEtherBalances(
+                [alice, owner],
+                [-defaultMintPrice + creatorFee, protocolFee],
+            );
+
+            const newId = 1n;
+            expect(await chat.firstMinter(newId)).to.equal(aliceAddress);
+            expect(await chat.balanceOf(aliceAddress, newId)).to.equal(1n);
+            expect(await chat.uri(newId)).to.equal('uri://distribute');
+        });
+
+        it('works correctly when mintPrice is zero', async () => {
+            const { chat, owner, alice, aliceAddress } = await setup();
+            await chat.connect(owner).setMintPrice(0);
+
+            await expect(
+                chat.connect(alice).registerNewEmoji(aliceAddress, 'uri://free', '0x', { value: 0 }),
+            ).to.changeEtherBalances([alice, owner], [0, 0]);
+
+            expect(await chat.balanceOf(aliceAddress, 1)).to.equal(1n);
+            expect(await chat.firstMinter(1)).to.equal(aliceAddress);
+        });
+    });
+
+     describe('addEmojiSupply with Revenue Sharing', () => {
+        const emojiId = 1n;
+        const initialURI = 'uri://supply-revenue';
+        const quantityToAdd = 3n;
+        const requiredPayment = defaultMintPrice * quantityToAdd;
+
+        async function setupWithRegisteredEmojiAndPrice() {
+            const setupData = await setup();
+            const { chat, alice, aliceAddress, owner, ownerAddress } = setupData;
+            await chat.connect(alice).registerNewEmoji(aliceAddress, initialURI, '0x', { value: defaultMintPrice });
+            expect(await chat.firstMinter(emojiId)).to.equal(aliceAddress);
+            expect(await chat.mintPrice()).to.equal(defaultMintPrice);
+            return setupData;
+        }
+
+        it('reverts if incorrect ETH amount is sent', async () => {
+            const { chat, bob, bobAddress } = await setupWithRegisteredEmojiAndPrice();
+            const wrongPrice = requiredPayment / 2n;
+            await expect(
+                chat.connect(bob).addEmojiSupply(bobAddress, emojiId, quantityToAdd, '0x', { value: wrongPrice }),
+            ).to.be.revertedWithCustomError(
+                chat,
+                'IncorrectPaymentValue'
+            ).withArgs(requiredPayment, wrongPrice);
+        });
+
+        it('distributes fees correctly between first minter (creator) and protocol (owner)', async () => {
+            const { chat, owner, alice, bob, ownerAddress, aliceAddress, bobAddress } = await setupWithRegisteredEmojiAndPrice();
+            const protocolFee = (requiredPayment * defaultProtocolFeePercent) / 100n;
+            const creatorFee = requiredPayment - protocolFee;
+
+            await expect(
+                chat.connect(bob).addEmojiSupply(bobAddress, emojiId, quantityToAdd, '0x', { value: requiredPayment }),
+            ).to.changeEtherBalances(
+                [alice, owner, bob],
+                [creatorFee, protocolFee, -requiredPayment],
+            );
+
+            expect(await chat.balanceOf(bobAddress, emojiId)).to.equal(quantityToAdd);
+            expect(await chat['totalSupply(uint256)'](emojiId)).to.equal(1n + quantityToAdd);
+        });
+
+         it('works correctly when mintPrice is zero', async () => {
+             const { chat, owner, alice, bob, aliceAddress, bobAddress } = await setupWithRegisteredEmojiAndPrice();
+             await chat.connect(owner).setMintPrice(0);
+
+             await expect(
+                 chat.connect(bob).addEmojiSupply(bobAddress, emojiId, quantityToAdd, '0x', { value: 0 }),
+             ).to.changeEtherBalances([alice, owner, bob], [0, 0, 0]);
+
+             expect(await chat.balanceOf(bobAddress, emojiId)).to.equal(quantityToAdd);
+         });
     });
   });
 });

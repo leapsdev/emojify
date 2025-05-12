@@ -8,7 +8,7 @@ const storage = new ThirdwebStorage({
 
 export const useIPFS = () => {
   // IPFSアップロード関数
-  const uploadToIPFS = async (file: File) => {
+  const uploadToIPFS = async (file: File): Promise<string> => {
     const uri = await storage.upload(file);
     return uri;
   };

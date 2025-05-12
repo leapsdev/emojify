@@ -50,6 +50,7 @@ export const useThirdwebMint = () => {
         contract,
         method: 'registerNewEmoji',
         params: [walletAddress, metadataUrl, '0x'],
+        value: BigInt('500000000000000'), // 0.0005 ETH in wei
       });
 
       await simulateTransaction({ transaction });

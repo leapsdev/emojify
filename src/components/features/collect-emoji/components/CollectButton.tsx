@@ -62,6 +62,7 @@ export function CollectButton({ tokenId }: Props) {
         contract,
         method: 'addEmojiSupply',
         params: [walletAddress, BigInt(tokenId), BigInt(1), '0x'],
+        value: BigInt('500000000000000'), // 0.0005 ETH in wei
       });
 
       await simulateTransaction({ transaction });

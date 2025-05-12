@@ -9,7 +9,10 @@ type LinkButtonProps = {
 
 export const LinkButton = ({ href, content, className }: LinkButtonProps) => {
   return (
-    <Link href={href} className={cn('text-2xl flex items-center', className)}>
+    <Link
+      href={href}
+      className={cn('text-2xl flex items-center justify-center', className)}
+    >
       {content}
     </Link>
   );

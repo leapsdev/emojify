@@ -1,6 +1,7 @@
 'use client';
 
-import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
+import { LinkButton } from '@/components/ui/LinkButton';
+import { TransactionResult } from '@/components/ui/TransactionResult';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
@@ -11,10 +12,15 @@ import { useIPFS } from './hooks/useIPFS';
 import { useThirdwebMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
 
+type MintResult = {
+  result: 'success' | 'error';
+  transactionHash?: string;
+} | null;
+
 export function CreateEmojiForm() {
-  const toastRedirect = useToastRedirect();
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
+  const [mintResult, setMintResult] = useState<MintResult>(null);
   const { selectedWalletAddress, noWalletWarning, getSelectedWallet } =
     useWallet();
   const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
@@ -28,6 +34,7 @@ export function CreateEmojiForm() {
 
     try {
       setLoading(true);
+      setMintResult(null);
 
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
@@ -59,9 +66,15 @@ export function CreateEmojiForm() {
         'View on OpenSea:',
         `https://testnets.opensea.io/ja/${EMOJI_CONTRACT_ADDRESS}/${selectedWalletAddress}`,
       );
-      toastRedirect('NFT created successfully!', '/chat');
+      setMintResult({
+        result: 'success',
+        transactionHash,
+      });
     } catch (error) {
       console.error('An error occurred:', error);
+      setMintResult({
+        result: 'error',
+      });
       if (error instanceof Error) {
         alert(`Error: ${error.message}`);
       } else {
@@ -72,15 +85,49 @@ export function CreateEmojiForm() {
     }
   };
 
+  const buttonStyles =
+    'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
+
   return (
     <div className="pt-14 max-w-md mx-auto px-4 space-y-4">
       <FileUpload preview={preview} onFileSelect={handleFileSelect} />
       <NoWalletWarning show={noWalletWarning} />
-      <CreateButton
-        disabled={!selectedFile || noWalletWarning}
-        onClick={handleCreate}
-        loading={loading}
-      />
+
+      {mintResult && (
+        <TransactionResult
+          result={mintResult.result}
+          title={
+            mintResult.result === 'success'
+              ? 'Successfully minted!'
+              : 'Failed to mint NFT'
+          }
+          message={
+            mintResult.result === 'error'
+              ? 'The transaction was rejected. Please try again.'
+              : undefined
+          }
+          transactionHash={mintResult.transactionHash}
+          explorerUrl={
+            mintResult.transactionHash
+              ? `https://basescan.org/tx/${mintResult.transactionHash}`
+              : undefined
+          }
+        />
+      )}
+
+      {mintResult ? (
+        <LinkButton
+          href="/chat"
+          content="Back to Chat"
+          className={buttonStyles}
+        />
+      ) : (
+        <CreateButton
+          disabled={!selectedFile || noWalletWarning}
+          onClick={handleCreate}
+          loading={loading}
+        />
+      )}
     </div>
   );
 }

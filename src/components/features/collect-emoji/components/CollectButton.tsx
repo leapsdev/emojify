@@ -1,4 +1,6 @@
 import { Button } from '@/components/ui/Button';
+import { LinkButton } from '@/components/ui/LinkButton';
+import { TransactionResult } from '@/components/ui/TransactionResult';
 import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
 import {
   CLIENT_ID,
@@ -38,14 +40,21 @@ interface WalletError {
   code: number;
 }
 
+type CollectResult = {
+  result: 'success' | 'error';
+  transactionHash?: string;
+} | null;
+
 function isWalletError(error: unknown): error is WalletError {
   return typeof error === 'object' && error !== null && 'code' in error;
 }
 
 export function CollectButton({ tokenId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
+  const [collectResult, setCollectResult] = useState<CollectResult>(null);
   const { wallets } = useWallets();
   const toastRedirect = useToastRedirect();
+
   const handleCollect = async () => {
     if (wallets.length === 0) {
       console.error('No wallet connected');
@@ -54,6 +63,7 @@ export function CollectButton({ tokenId }: Props) {
 
     try {
       setIsLoading(true);
+      setCollectResult(null);
       const walletAddress = wallets[0].address;
       const provider = await wallets[0].getEthereumProvider();
 
@@ -130,32 +140,77 @@ export function CollectButton({ tokenId }: Props) {
       });
 
       console.log('NFT collected successfully!', transactionHash);
+      setCollectResult({
+        result: 'success',
+        transactionHash,
+      });
       toastRedirect('NFT collected successfully!', '/chat');
     } catch (error: unknown) {
       if (isWalletError(error) && error.code === 4001) {
         console.error('Transaction cancelled.');
+        setCollectResult({
+          result: 'error',
+        });
       } else {
         console.error('Error collecting NFT:', error);
+        setCollectResult({
+          result: 'error',
+        });
       }
     } finally {
       setIsLoading(false);
     }
   };
 
+  const buttonStyles =
+    'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
+
   return (
-    <Button
-      className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-6 text-lg font-bold mt-8"
-      onClick={handleCollect}
-      disabled={isLoading || wallets.length === 0}
-    >
-      {isLoading ? (
-        <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
-      ) : (
-        <>
-          <Plus className="w-5 h-5 mr-2" />
-          Collect
-        </>
+    <div className="space-y-4">
+      {collectResult && (
+        <TransactionResult
+          result={collectResult.result}
+          title={
+            collectResult.result === 'success'
+              ? 'Successfully collected!'
+              : 'Failed to collect NFT'
+          }
+          message={
+            collectResult.result === 'error'
+              ? 'The transaction was rejected. Please try again.'
+              : undefined
+          }
+          transactionHash={collectResult.transactionHash}
+          explorerUrl={
+            collectResult.transactionHash
+              ? `https://basescan.org/tx/${collectResult.transactionHash}`
+              : undefined
+          }
+        />
       )}
-    </Button>
+
+      {collectResult ? (
+        <LinkButton
+          href="/explore"
+          content="Back to Explore"
+          className={buttonStyles}
+        />
+      ) : (
+        <Button
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold mt-8"
+          onClick={handleCollect}
+          disabled={isLoading || wallets.length === 0}
+        >
+          {isLoading ? (
+            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
+          ) : (
+            <>
+              <Plus className="w-5 h-5 mr-2" />
+              Collect
+            </>
+          )}
+        </Button>
+      )}
+    </div>
   );
 }

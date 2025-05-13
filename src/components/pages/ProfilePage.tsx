@@ -12,8 +12,8 @@ import { FooterNavigation } from '@/components/shared/navigation/FooterNavigatio
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import type { User } from '@/types/database';
-import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
 import { useContract } from '@thirdweb-dev/react';
+import { ThirdwebProvider } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
@@ -47,14 +47,12 @@ function ProfilePageContent({
 
         for (const nft of nfts) {
           try {
-            // balanceOfをチェックして、アドレスがNFTを所有しているか確認
             const balance = await contract.call('balanceOf', [
               selectedWalletAddress,
               nft.tokenId,
             ]);
 
             if (Number(balance) > 0) {
-              // firstMinterマッピングを使用して作成者を判定
               const minter = await contract.call('firstMinter', [nft.tokenId]);
               const isCreator =
                 minter.toLowerCase() === selectedWalletAddress.toLowerCase();
@@ -89,16 +87,10 @@ function ProfilePageContent({
   if (noWalletWarning) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen gap-4">
-        <div className="text-xl">Please connect your wallet</div>
-        <ConnectWallet
-          theme="dark"
-          modalSize="wide"
-          welcomeScreen={{
-            title: 'Welcome to Emoji Chat',
-            subtitle: 'Connect your wallet to explore NFTs',
-          }}
-          modalTitleIconUrl=""
-        />
+        <div className="text-xl">No wallet connected</div>
+        <div className="text-gray-500">
+          Please restart the app to connect your wallet and view NFTs
+        </div>
       </div>
     );
   }

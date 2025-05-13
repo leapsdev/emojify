@@ -29,7 +29,7 @@ function convertToDisplayUser(
     username: user.username,
     displayName: user.username,
     userId: user.id,
-    avatar: '/placeholder.svg?height=48&width=48',
+    avatar: user.imageUrl || '/icons/icon-192x192.png',
     section,
   };
 }

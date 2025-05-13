@@ -1,7 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { TransactionResult } from '@/components/ui/TransactionResult';
-import { useToastRedirect } from '@/lib/hooks/useToastRedirect';
 import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
@@ -53,7 +52,6 @@ export function CollectButton({ tokenId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [collectResult, setCollectResult] = useState<CollectResult>(null);
   const { wallets } = useWallets();
-  const toastRedirect = useToastRedirect();
 
   const handleCollect = async () => {
     if (wallets.length === 0) {
@@ -144,7 +142,6 @@ export function CollectButton({ tokenId }: Props) {
         result: 'success',
         transactionHash,
       });
-      toastRedirect('NFT collected successfully!', '/chat');
     } catch (error: unknown) {
       if (isWalletError(error) && error.code === 4001) {
         console.error('Transaction cancelled.');

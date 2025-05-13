@@ -130,7 +130,11 @@ export const useExploreNFTs = () => {
         }
 
         const nftResults = await Promise.all(nftPromises);
-        setNFTs(nftResults);
+        // トークンIDで降順に並べ替え（新しい順）
+        const sortedNFTs = nftResults.sort((a, b) => {
+          return Number.parseInt(b.tokenId) - Number.parseInt(a.tokenId);
+        });
+        setNFTs(sortedNFTs);
         setError(null);
       } catch (err) {
         console.error('Error fetching NFTs:', err);

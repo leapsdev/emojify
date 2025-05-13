@@ -19,6 +19,7 @@ export async function createUser(data: ProfileForm, privyId: string) {
     id: privyId,
     username: data.username,
     bio: data.bio || null,
+    imageUrl: data.imageUrl || null,
     createdAt: timestamp,
     updatedAt: timestamp,
     email: data.email || null,

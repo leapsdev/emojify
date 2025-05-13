@@ -52,7 +52,7 @@ export function UserItem({
       <div className="flex items-center gap-3 min-w-0 flex-1">
         <Link href={`/choose-friends/${user.id}`} className="flex-shrink-0">
           <Image
-            src={'/icons/icon-192x192.png'}
+            src={user.avatar}
             alt=""
             width={48}
             height={48}

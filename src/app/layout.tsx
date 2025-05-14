@@ -2,8 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
-import { PrivyProvider } from '@/components/providers/PrivyProvider';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
+import { PrivyProvider } from '@/components/providers/PrivyProvider';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({

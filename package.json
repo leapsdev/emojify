@@ -14,6 +14,7 @@
     "check:ci": "biome check ./src"
   },
   "dependencies": {
+    "@coinbase/onchainkit": "^0.38.13",
     "@conform-to/react": "^1.2.2",
     "@conform-to/zod": "^1.2.2",
     "@ducanh2912/next-pwa": "^10.2.9",

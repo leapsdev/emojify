@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
+import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
+import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -35,8 +37,10 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          {children}
-          <Toaster />
+          <OnchainProvider>
+            {children}
+            <Toaster />
+          </OnchainProvider>
         </PrivyProvider>
       </body>
     </html>

@@ -1,5 +1,6 @@
-import { useBasename } from '@/lib/basename/useBasename';
 import type { CreatorData } from '../types';
+import { Name } from '@coinbase/onchainkit/identity';
+import { base } from 'viem/chains'; 
 
 interface CreatorInfoProps {
   creator: CreatorData;
@@ -7,12 +8,8 @@ interface CreatorInfoProps {
 }
 
 export function CreatorInfo({ creator, name }: CreatorInfoProps) {
-  const basename = useBasename(undefined, true, creator.id);
-  const displayName =
-    basename ||
-    (creator.id
-      ? `${creator.id.slice(0, 6)}...${creator.id.slice(-4)}`
-      : 'Unknown');
+  console.log(creator.id);
+
 
   return (
     <div className="px-4 pt-3">
@@ -21,7 +18,9 @@ export function CreatorInfo({ creator, name }: CreatorInfoProps) {
           <div className="w-10 h-10 rounded-full bg-gray-200 flex items-center justify-center">
             <span className="text-xl">👤</span>
           </div>
-          <p className="font-semibold truncate max-w-[200px]">{displayName}</p>
+          <div className="font-semibold truncate max-w-[200px]">
+            {creator.id && <Name address={creator.id} chain={base} />}
+          </div>
         </div>
       </div>
 

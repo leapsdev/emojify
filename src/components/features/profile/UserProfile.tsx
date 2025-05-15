@@ -2,11 +2,16 @@
 
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
-import { useBasename } from '@/lib/basename/useBasename';
+import { Name } from '@coinbase/onchainkit/identity';
+import { base } from 'viem/chains'; 
 import { addFriend, removeFriend } from '@/repository/user/actions';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { useIsFriend } from './hooks/useIsFriend';
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
+import { useEffect, useState } from 'react';
+import { useUser } from '@privy-io/react-auth';
+
 
 interface UserProfileProps {
   username: string;
@@ -27,7 +32,18 @@ export const UserProfile = ({
   currentUserId,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const basename = useBasename(currentUserId, true);
+  const { user } = useUser();
+  const [addresses, setAddresses] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (!user?.id) return;
+      const addresses = await getWalletAddressesByUserId(user.id);
+      setAddresses(addresses);
+    };
+    fetchAddresses();
+  }, [user?.id]);
+
+
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 
   const handleAddFriend = async () => {
@@ -92,9 +108,9 @@ export const UserProfile = ({
           <div className="flex flex-1 min-w-0 items-start justify-between ml-4">
             <div className="pt-3 min-w-0">
               <h2 className="text-2xl font-black truncate">{username}</h2>
-              <p className="text-[13px] text-gray-600 font-bold truncate">
-                {basename}
-              </p>
+              <div className="text-[13px] text-gray-600 font-bold truncate">
+                {addresses[0] && <Name address={addresses[0]} chain={base} />}
+              </div>
             </div>
             <RightButton />
           </div>

@@ -8,9 +8,6 @@ interface CreatorInfoProps {
 }
 
 export function CreatorInfo({ creator, name }: CreatorInfoProps) {
-  console.log(creator.id);
-
-
   return (
     <div className="px-4 pt-3">
       <div className="flex items-center justify-between mb-3">

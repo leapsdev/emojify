@@ -3,7 +3,7 @@ import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 export const DeployEmojiChatModule = buildModule('DeployEmojiChat', (m) => {
   const deployer = m.getAccount(0);
 
-  const implementation = m.contract('EmojiChatV5');
+  const implementation = m.contract('EmojiChat');
 
   const initializeCalldata = m.encodeFunctionCall(
     implementation,
@@ -16,7 +16,7 @@ export const DeployEmojiChatModule = buildModule('DeployEmojiChat', (m) => {
     initializeCalldata,
   ]);
 
-  const emojiChat = m.contractAt('EmojiChatV5', proxy, {
+  const emojiChat = m.contractAt('EmojiChat', proxy, {
     id: 'EmojiChatProxy',
   });
 

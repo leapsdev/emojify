@@ -5,7 +5,8 @@
     "@nomicfoundation/hardhat-verify": "^2.0.13",
     "@openzeppelin/hardhat-upgrades": "^3.9.0",
     "dotenv": "^16.5.0",
-    "hardhat": "^2.24.0"
+    "hardhat": "^2.24.0",
+    "hardhat-gas-reporter": "^2.2.3"
   },
   "dependencies": {
     "@openzeppelin/contracts-upgradeable": "^5.3.0"

@@ -2,6 +2,7 @@ import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-verify';
 import '@openzeppelin/hardhat-upgrades';
 import * as dotenv from 'dotenv';
+import "hardhat-gas-reporter";
 import type { HardhatUserConfig } from 'hardhat/config';
 
 dotenv.config();
@@ -13,6 +14,7 @@ const deployerPrivateKey = process.env.DEPLOYER_PRIVATE_KEY || '';
 // If not set, it uses the default Etherscan API key.
 const etherscanApiKey = process.env.ETHERSCAN_API_KEY || '';
 const baseScanApiKey = process.env.BASESCAN_API_KEY || '';
+const coinmarketcapApiKey = process.env.COINMARKETCAP_API_KEY || '';
 
 const config: HardhatUserConfig = {
   solidity: '0.8.28',
@@ -50,6 +52,14 @@ const config: HardhatUserConfig = {
       baseSepolia: baseScanApiKey,
     },
   },
+  gasReporter: {
+    enabled: true,
+    L2: "base",
+    L1Etherscan: etherscanApiKey,
+    L2Etherscan: baseScanApiKey,
+    coinmarketcap: coinmarketcapApiKey,
+    token: "ETH",
+  }
 };
 
 export default config;

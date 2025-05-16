@@ -5,7 +5,7 @@ import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
-  baseSepolia,
+  baseMainnet,
 } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
 import { Plus } from 'lucide-react';
@@ -27,7 +27,7 @@ const client = createThirdwebClient({
 // コントラクトの取得
 const contract = getContract({
   client,
-  chain: baseSepolia,
+  chain: baseMainnet,
   address: EMOJI_CONTRACT_ADDRESS,
   abi: EMOJI_CONTRACT_ABI,
 });

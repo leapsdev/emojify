@@ -2,7 +2,7 @@ import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
-  baseSepolia,
+  baseMainnet,
 } from '@/lib/thirdweb';
 import {
   createThirdwebClient,
@@ -20,7 +20,7 @@ const client = createThirdwebClient({
 // コントラクトの取得
 const contract = getContract({
   client,
-  chain: baseSepolia,
+  chain: baseMainnet,
   address: EMOJI_CONTRACT_ADDRESS,
   abi: EMOJI_CONTRACT_ABI,
 });

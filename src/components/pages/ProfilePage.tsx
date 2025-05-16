@@ -12,8 +12,7 @@ import { FooterNavigation } from '@/components/shared/navigation/FooterNavigatio
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import type { User } from '@/types/database';
-import { useContract } from '@thirdweb-dev/react';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
+import { ThirdwebProvider, useContract } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
@@ -154,7 +153,7 @@ export const ProfilePage = (props: ProfilePageProps) => {
   return (
     <EthereumProviders>
       <ThirdwebProvider
-        activeChain="base-sepolia-testnet"
+        activeChain="base"
         clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
         supportedWallets={[]}
       >

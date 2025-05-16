@@ -127,7 +127,7 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
 export function ChatRoomInput(props: ChatRoomInputProps) {
   return (
     <ThirdwebProvider
-      activeChain="base-sepolia-testnet"
+      activeChain="base"
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
       supportedWallets={[]}
     >

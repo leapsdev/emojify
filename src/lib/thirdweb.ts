@@ -1,13 +1,13 @@
 import { defineChain } from 'thirdweb/chains';
 
-// Base Sepolia Testnet
-export const baseSepolia = defineChain(84532);
+// Base Mainnet
+export const baseMainnet = defineChain(8453);
 
 export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x10f12BC253e4833834CeA5a5B78c6b85c96F3e9b';
+  '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [

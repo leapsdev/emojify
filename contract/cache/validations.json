@@ -1811,12 +1811,12 @@
         },
         "solcVersion": "0.8.28"
       },
-      "contracts/EmojiChatV5.sol:EmojiChatV5": {
-        "src": "contracts/EmojiChatV5.sol:18",
+      "contracts/EmojiChat.sol:EmojiChat": {
+        "src": "contracts/EmojiChat.sol:18",
         "version": {
-          "withMetadata": "b9bf68c9759abd752d4ed74db0fafb57191594974d06818f74364333fd1df02d",
-          "withoutMetadata": "9f06b924a93b3d066ace07ef9ec13f5b4002073223be9adf79a9cb7793dd299c",
-          "linkedWithoutMetadata": "9f06b924a93b3d066ace07ef9ec13f5b4002073223be9adf79a9cb7793dd299c"
+          "withMetadata": "00f95958f5fc99368e774a89e81ef32954408d1aa43b7411314b5fb0ddaeda03",
+          "withoutMetadata": "7f04509dc22f0c07f8a3142c1731a33bdecf2f983d12d644f6be0a37775dcb7f",
+          "linkedWithoutMetadata": "7f04509dc22f0c07f8a3142c1731a33bdecf2f983d12d644f6be0a37775dcb7f"
         },
         "inherit": [
           "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol:ReentrancyGuardUpgradeable",
@@ -1860,32 +1860,32 @@
               "offset": 0,
               "slot": "0",
               "type": "t_mapping(t_uint256,t_address)",
-              "contract": "EmojiChatV5",
-              "src": "contracts/EmojiChatV5.sol:28"
+              "contract": "EmojiChat",
+              "src": "contracts/EmojiChat.sol:28"
             },
             {
               "label": "_nextTokenId",
               "offset": 0,
               "slot": "1",
               "type": "t_uint256",
-              "contract": "EmojiChatV5",
-              "src": "contracts/EmojiChatV5.sol:29"
+              "contract": "EmojiChat",
+              "src": "contracts/EmojiChat.sol:29"
             },
             {
               "label": "mintPrice",
               "offset": 0,
               "slot": "2",
               "type": "t_uint256",
-              "contract": "EmojiChatV5",
-              "src": "contracts/EmojiChatV5.sol:31"
+              "contract": "EmojiChat",
+              "src": "contracts/EmojiChat.sol:31"
             },
             {
               "label": "protocolFeePercent",
               "offset": 0,
               "slot": "3",
               "type": "t_uint256",
-              "contract": "EmojiChatV5",
-              "src": "contracts/EmojiChatV5.sol:32"
+              "contract": "EmojiChat",
+              "src": "contracts/EmojiChat.sol:32"
             }
           ],
           "types": {

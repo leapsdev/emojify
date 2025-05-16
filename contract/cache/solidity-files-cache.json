@@ -1,10 +1,10 @@
 {
   "_format": "hh-sol-cache-2",
   "files": {
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/contracts/EmojiChatV5.sol": {
-      "lastModificationDate": 1747061007306,
-      "contentHash": "4244759de75b9be7705a253dd8cd2e16",
-      "sourceName": "contracts/EmojiChatV5.sol",
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/contracts/EmojiChat.sol": {
+      "lastModificationDate": 1747395469001,
+      "contentHash": "9ed784e71902c406ed389faae9035c7b",
+      "sourceName": "contracts/EmojiChat.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -45,162 +45,7 @@
         "^0.8.28"
       ],
       "artifacts": [
-        "EmojiChatV5"
-      ]
-    },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
-      "lastModificationDate": 1745054107642,
-      "contentHash": "77d30f3cd93f46b80b6f8f1ebc574ee4",
-      "sourceName": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../utils/ContextUpgradeable.sol",
-        "../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "OwnableUpgradeable"
-      ]
-    },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
-      "lastModificationDate": 1745054107615,
-      "contentHash": "2acae54ad209714bca07edf4bae32f72",
-      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "Initializable"
-      ]
-    },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
-      "lastModificationDate": 1745054107330,
-      "contentHash": "c28aaa25d083a9a55bd9ec9e0b785122",
-      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ContextUpgradeable"
-      ]
-    },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol": {
-      "lastModificationDate": 1745054107649,
-      "contentHash": "24562076b21756e3358ede5e844008ce",
-      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../proxy/utils/Initializable.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "ReentrancyGuardUpgradeable"
+        "EmojiChat"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/ERC1155Upgradeable.sol": {
@@ -250,6 +95,83 @@
         "ERC1155Upgradeable"
       ]
     },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol": {
+      "lastModificationDate": 1745054107615,
+      "contentHash": "2acae54ad209714bca07edf4bae32f72",
+      "sourceName": "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Initializable"
+      ]
+    },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol": {
+      "lastModificationDate": 1745054107642,
+      "contentHash": "77d30f3cd93f46b80b6f8f1ebc574ee4",
+      "sourceName": "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../utils/ContextUpgradeable.sol",
+        "../proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "OwnableUpgradeable"
+      ]
+    },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol": {
       "lastModificationDate": 1745054107681,
       "contentHash": "08db0b4bea3d52072346c326c5b857b7",
@@ -289,6 +211,45 @@
       ],
       "artifacts": [
         "UUPSUpgradeable"
+      ]
+    },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol": {
+      "lastModificationDate": 1745054107649,
+      "contentHash": "24562076b21756e3358ede5e844008ce",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ReentrancyGuardUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ReentrancyGuardUpgradeable"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/token/ERC1155/extensions/ERC1155PausableUpgradeable.sol": {
@@ -414,6 +375,45 @@
         "ERC1155URIStorageUpgradeable"
       ]
     },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol": {
+      "lastModificationDate": 1745054107330,
+      "contentHash": "c28aaa25d083a9a55bd9ec9e0b785122",
+      "sourceName": "@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [
+        "../proxy/utils/Initializable.sol"
+      ],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "ContextUpgradeable"
+      ]
+    },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts-upgradeable/utils/introspection/ERC165Upgradeable.sol": {
       "lastModificationDate": 1745054107470,
       "contentHash": "61838d7249e45e3941fc2a45d1091448",
@@ -452,6 +452,45 @@
       ],
       "artifacts": [
         "ERC165Upgradeable"
+      ]
+    },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
+      "lastModificationDate": 1745054107771,
+      "contentHash": "267d92fe4de67b1bdb3302c08f387dbf",
+      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "IERC1155Errors",
+        "IERC20Errors",
+        "IERC721Errors"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/utils/Arrays.sol": {
@@ -494,45 +533,6 @@
       ],
       "artifacts": [
         "Arrays"
-      ]
-    },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/interfaces/draft-IERC6093.sol": {
-      "lastModificationDate": 1745054107771,
-      "contentHash": "267d92fe4de67b1bdb3302c08f387dbf",
-      "sourceName": "@openzeppelin/contracts/interfaces/draft-IERC6093.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC1155Errors",
-        "IERC20Errors",
-        "IERC721Errors"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/token/ERC1155/IERC1155.sol": {
@@ -611,45 +611,6 @@
         "IERC165"
       ]
     },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol": {
-      "lastModificationDate": 1745054107953,
-      "contentHash": "f8867afd172ace7ffa75d3752d785770",
-      "sourceName": "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
-      "solcConfig": {
-        "version": "0.8.28",
-        "settings": {
-          "evmVersion": "paris",
-          "optimizer": {
-            "enabled": false,
-            "runs": 200
-          },
-          "outputSelection": {
-            "*": {
-              "*": [
-                "abi",
-                "evm.bytecode",
-                "evm.deployedBytecode",
-                "evm.methodIdentifiers",
-                "metadata",
-                "storageLayout"
-              ],
-              "": [
-                "ast"
-              ]
-            }
-          }
-        }
-      },
-      "imports": [
-        "../IERC1155.sol"
-      ],
-      "versionPragmas": [
-        "^0.8.20"
-      ],
-      "artifacts": [
-        "IERC1155MetadataURI"
-      ]
-    },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/token/ERC1155/utils/ERC1155Utils.sol": {
       "lastModificationDate": 1745054107807,
       "contentHash": "4f861c27a66d75d2576d11c058a2e17b",
@@ -690,10 +651,10 @@
         "ERC1155Utils"
       ]
     },
-    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/utils/Comparators.sol": {
-      "lastModificationDate": 1745054107720,
-      "contentHash": "0e57405a6f979853cbfeb0df3546c3a3",
-      "sourceName": "@openzeppelin/contracts/utils/Comparators.sol",
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol": {
+      "lastModificationDate": 1745054107953,
+      "contentHash": "f8867afd172ace7ffa75d3752d785770",
+      "sourceName": "@openzeppelin/contracts/token/ERC1155/extensions/IERC1155MetadataURI.sol",
       "solcConfig": {
         "version": "0.8.28",
         "settings": {
@@ -719,12 +680,14 @@
           }
         }
       },
-      "imports": [],
+      "imports": [
+        "../IERC1155.sol"
+      ],
       "versionPragmas": [
         "^0.8.20"
       ],
       "artifacts": [
-        "Comparators"
+        "IERC1155MetadataURI"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/utils/SlotDerivation.sol": {
@@ -762,6 +725,43 @@
       ],
       "artifacts": [
         "SlotDerivation"
+      ]
+    },
+    "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/utils/Comparators.sol": {
+      "lastModificationDate": 1745054107720,
+      "contentHash": "0e57405a6f979853cbfeb0df3546c3a3",
+      "sourceName": "@openzeppelin/contracts/utils/Comparators.sol",
+      "solcConfig": {
+        "version": "0.8.28",
+        "settings": {
+          "evmVersion": "paris",
+          "optimizer": {
+            "enabled": false,
+            "runs": 200
+          },
+          "outputSelection": {
+            "*": {
+              "*": [
+                "abi",
+                "evm.bytecode",
+                "evm.deployedBytecode",
+                "evm.methodIdentifiers",
+                "metadata",
+                "storageLayout"
+              ],
+              "": [
+                "ast"
+              ]
+            }
+          }
+        }
+      },
+      "imports": [],
+      "versionPragmas": [
+        "^0.8.20"
+      ],
+      "artifacts": [
+        "Comparators"
       ]
     },
     "/Users/yui.saito/Projects/private/leapsdev/emoji-chat/contract/node_modules/@openzeppelin/contracts/utils/StorageSlot.sol": {

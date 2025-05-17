@@ -1,11 +1,11 @@
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import type { DisplayUser } from '@/types/display';
+import { Name } from '@coinbase/onchainkit/identity';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
-import { Name } from '@coinbase/onchainkit/identity';
-import { base } from 'viem/chains'; 
 import { useEffect, useState } from 'react';
+import { base } from 'viem/chains';
 
 interface UserItemProps {
   user: DisplayUser;
@@ -29,7 +29,6 @@ export function UserItem({
     };
     fetchAddresses();
   }, [user?.id]);
-
 
   const RightButton = () => {
     if (user.section === 'friend') {
@@ -76,7 +75,7 @@ export function UserItem({
         <div className="flex flex-col min-w-0">
           <span className="font-semibold text-base truncate">
             {user.displayName}
-          </span> 
+          </span>
           <span className="text-sm text-gray-500 truncate">
             {addresses[0] && <Name address={addresses[0]} chain={base} />}
           </span>

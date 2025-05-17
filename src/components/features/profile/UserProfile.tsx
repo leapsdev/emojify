@@ -2,16 +2,15 @@
 
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
-import { Name } from '@coinbase/onchainkit/identity';
-import { base } from 'viem/chains'; 
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { addFriend, removeFriend } from '@/repository/user/actions';
+import { Name } from '@coinbase/onchainkit/identity';
+import { useUser } from '@privy-io/react-auth';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
-import { useIsFriend } from './hooks/useIsFriend';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { useEffect, useState } from 'react';
-import { useUser } from '@privy-io/react-auth';
-
+import { base } from 'viem/chains';
+import { useIsFriend } from './hooks/useIsFriend';
 
 interface UserProfileProps {
   username: string;
@@ -42,7 +41,6 @@ export const UserProfile = ({
     };
     fetchAddresses();
   }, [user?.id]);
-
 
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
 

@@ -1,6 +1,6 @@
-import type { CreatorData } from '../types';
 import { Name } from '@coinbase/onchainkit/identity';
-import { base } from 'viem/chains'; 
+import { base } from 'viem/chains';
+import type { CreatorData } from '../types';
 
 interface CreatorInfoProps {
   creator: CreatorData;

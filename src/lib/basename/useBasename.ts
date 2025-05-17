@@ -1,10 +1,7 @@
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { useUser } from '@privy-io/react-auth';
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { type Basename, getBasename } from './basename';
-
-// デバウンス用のタイマー
-let debounceTimer: NodeJS.Timeout;
 
 export function useBasename(
   userId?: string,
@@ -14,52 +11,41 @@ export function useBasename(
   const { user } = useUser();
   const [basename, setBasename] = useState<Basename | ''>('');
 
-  const fetchBasename = useCallback(
-    async (addr: string) => {
-      const result = await getBasename(addr as `0x${string}`);
-      if (!result) {
-        if (isProfile) {
-          setBasename(addr as Basename);
-        } else {
-          setBasename('');
-        }
-      } else {
-        setBasename(result);
-      }
-    },
-    [isProfile],
-  );
-
   useEffect(() => {
     const fetchData = async () => {
       // アドレスが直接指定されている場合はそれを使用
       if (address) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          fetchBasename(address);
-        }, 300);
+        const result: Basename | undefined = await getBasename(
+          address as `0x${string}`,
+        );
+        if (!result) {
+          if (isProfile) {
+            setBasename(address as Basename);
+          } else {
+            setBasename('');
+          }
+        } else {
+          setBasename(result);
+        }
         return;
       }
 
       // 従来のuserIdを使用する場合
       const effectiveUserId = userId || user?.id;
       if (!effectiveUserId) return;
-
       const addresses = await getWalletAddressesByUserId(effectiveUserId);
-      if (addresses.length > 0) {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => {
-          fetchBasename(addresses[0]);
-        }, 300);
+      const result: Basename | undefined = await getBasename(addresses[0]);
+      if (!result) {
+        if (isProfile) {
+          setBasename(addresses[0] as Basename);
+        } else {
+          setBasename('');
+        }
+      } else {
+        setBasename(result);
       }
     };
-
     fetchData();
-
-    return () => {
-      clearTimeout(debounceTimer);
-    };
-  }, [userId, user?.id, address, fetchBasename]);
-
+  }, [userId, user?.id, address, isProfile]);
   return basename;
 }

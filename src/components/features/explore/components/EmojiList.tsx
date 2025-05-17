@@ -7,7 +7,7 @@ import { EmojiItem } from './EmojiItem';
 export function EmojiList() {
   return (
     <ThirdwebProvider
-      activeChain="base-sepolia-testnet"
+      activeChain="base"
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
     >
       <EmojiListContent />
@@ -63,7 +63,7 @@ function EmojiListContent() {
                   : undefined,
                 details: {
                   token: 'ETH',
-                  network: 'Base Sepolia',
+                  network: 'Base',
                 },
               }}
             />

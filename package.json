@@ -38,6 +38,7 @@
     "ethers": "^5.8.0",
     "firebase": "^11.4.0",
     "firebase-admin": "^13.2.0",
+    "hardhat-gas-reporter": "^2.2.3",
     "next": "15.2.1",
     "next-cloudinary": "^6.16.0",
     "react": "^19.0.0",

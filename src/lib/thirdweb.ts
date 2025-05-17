@@ -1,13 +1,13 @@
 import { defineChain } from 'thirdweb/chains';
 
-// Base Sepolia Testnet
-export const baseSepolia = defineChain(84532);
+// Base Mainnet
+export const baseMainnet = defineChain(8453);
 
 export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x10f12BC253e4833834CeA5a5B78c6b85c96F3e9b';
+  '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [
@@ -172,6 +172,33 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'error',
   },
   {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'expected',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'actual',
+        type: 'uint256',
+      },
+    ],
+    name: 'IncorrectPaymentValue',
+    type: 'error',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: 'feePercent',
+        type: 'uint256',
+      },
+    ],
+    name: 'InvalidFeePercentage',
+    type: 'error',
+  },
+  {
     inputs: [],
     name: 'InvalidInitialization',
     type: 'error',
@@ -266,6 +293,19 @@ export const EMOJI_CONTRACT_ABI = [
     anonymous: false,
     inputs: [
       {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newPrice',
+        type: 'uint256',
+      },
+    ],
+    name: 'MintPriceSet',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
         indexed: true,
         internalType: 'uint256',
         name: 'emojiId',
@@ -317,6 +357,19 @@ export const EMOJI_CONTRACT_ABI = [
       },
     ],
     name: 'Paused',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'newFeePercent',
+        type: 'uint256',
+      },
+    ],
+    name: 'ProtocolFeePercentSet',
     type: 'event',
   },
   {
@@ -476,7 +529,7 @@ export const EMOJI_CONTRACT_ABI = [
     ],
     name: 'addEmojiSupply',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -504,7 +557,7 @@ export const EMOJI_CONTRACT_ABI = [
     ],
     name: 'addEmojiSupplyBatch',
     outputs: [],
-    stateMutability: 'nonpayable',
+    stateMutability: 'payable',
     type: 'function',
   },
   {
@@ -632,6 +685,19 @@ export const EMOJI_CONTRACT_ABI = [
   },
   {
     inputs: [],
+    name: 'mintPrice',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
     name: 'owner',
     outputs: [
       {
@@ -658,6 +724,19 @@ export const EMOJI_CONTRACT_ABI = [
         internalType: 'bool',
         name: '',
         type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'protocolFeePercent',
+    outputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
       },
     ],
     stateMutability: 'view',
@@ -821,6 +900,32 @@ export const EMOJI_CONTRACT_ABI = [
       },
     ],
     name: 'setApprovalForAll',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_newPrice',
+        type: 'uint256',
+      },
+    ],
+    name: 'setMintPrice',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '_newFeePercent',
+        type: 'uint256',
+      },
+    ],
+    name: 'setProtocolFeePercent',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function',

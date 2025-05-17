@@ -5,7 +5,7 @@ import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
-  baseSepolia,
+  baseMainnet,
 } from '@/lib/thirdweb';
 import { useWallets } from '@privy-io/react-auth';
 import { Plus } from 'lucide-react';
@@ -14,6 +14,7 @@ import {
   createThirdwebClient,
   getContract,
   prepareContractCall,
+  readContract,
   sendTransaction,
   simulateTransaction,
 } from 'thirdweb';
@@ -26,7 +27,7 @@ const client = createThirdwebClient({
 // コントラクトの取得
 const contract = getContract({
   client,
-  chain: baseSepolia,
+  chain: baseMainnet,
   address: EMOJI_CONTRACT_ADDRESS,
   abi: EMOJI_CONTRACT_ABI,
 });
@@ -65,12 +66,24 @@ export function CollectButton({ tokenId }: Props) {
       const walletAddress = wallets[0].address;
       const provider = await wallets[0].getEthereumProvider();
 
+      // Check if the current user is the first minter
+      const firstMinterAddress = await readContract({
+        contract,
+        method: 'firstMinter',
+        params: [BigInt(tokenId)],
+      });
+
+      const isFirstMinter =
+        firstMinterAddress.toLowerCase() === walletAddress.toLowerCase();
+
+      const valueToSend = isFirstMinter ? BigInt(0) : BigInt('500000000000000'); // 0.0005 ETH in wei
+
       // NFTを取得
       const transaction = prepareContractCall({
         contract,
         method: 'addEmojiSupply',
         params: [walletAddress, BigInt(tokenId), BigInt(1), '0x'],
-        value: BigInt('500000000000000'), // 0.0005 ETH in wei
+        value: valueToSend,
       });
 
       await simulateTransaction({ transaction });

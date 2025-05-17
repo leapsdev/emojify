@@ -2,7 +2,7 @@ import {
   CLIENT_ID,
   EMOJI_CONTRACT_ABI,
   EMOJI_CONTRACT_ADDRESS,
-  baseSepolia,
+  baseMainnet,
 } from '@/lib/thirdweb';
 import {
   createThirdwebClient,
@@ -20,7 +20,7 @@ const client = createThirdwebClient({
 // コントラクトの取得
 const contract = getContract({
   client,
-  chain: baseSepolia,
+  chain: baseMainnet,
   address: EMOJI_CONTRACT_ADDRESS,
   abi: EMOJI_CONTRACT_ABI,
 });
@@ -50,7 +50,7 @@ export const useThirdwebMint = () => {
         contract,
         method: 'registerNewEmoji',
         params: [walletAddress, metadataUrl, '0x'],
-        value: BigInt('500000000000000'), // 0.0005 ETH in wei
+        // value: BigInt('500000000000000'), // 0.0005 ETH in wei // firstMinterはかからない
       });
 
       await simulateTransaction({ transaction });

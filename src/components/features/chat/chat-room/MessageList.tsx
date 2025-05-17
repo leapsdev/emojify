@@ -5,8 +5,7 @@ import type { Message } from '@/types/database';
 import { formatDateToYYYYMMDD } from '@/utils/date';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';
-import { useEffect, useRef } from 'react';
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
 
@@ -203,7 +202,7 @@ function MessageListContent({
 export function MessageList(props: MessageListProps) {
   return (
     <ThirdwebProvider
-      activeChain="base-sepolia-testnet"
+      activeChain="base"
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
       supportedWallets={[]}
     >

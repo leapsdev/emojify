@@ -14,11 +14,6 @@ export type Basename = `${string}.base.eth`;
 export const BASENAME_L2_RESOLVER_ADDRESS =
   '0xC6d566A56A1aFf6508b41f6c90ff131615583BCD';
 
-// キャッシュの実装
-const basenameCache = new Map<string, Basename | null>();
-const RETRY_DELAY = 2000; // 2秒
-const MAX_RETRIES = 3;
-
 const baseClient = createPublicClient({
   chain: base,
   transport: http('https://mainnet.base.org'),
@@ -56,58 +51,19 @@ export const convertReverseNodeToBytes = (
   return addressReverseNode;
 };
 
-interface RateLimitError extends Error {
-  message: string;
-}
-
 export async function getBasename(address: Address) {
   try {
-    // キャッシュをチェック
-    const cachedBasename = basenameCache.get(address);
-    if (cachedBasename !== undefined) {
-      return cachedBasename;
-    }
-
     const addressReverseNode = convertReverseNodeToBytes(address, base.id);
-
-    // リトライロジックの実装
-    let retries = 0;
-    while (retries < MAX_RETRIES) {
-      try {
-        const basename = await baseClient.readContract({
-          abi: L2ResolverAbi,
-          address: BASENAME_L2_RESOLVER_ADDRESS,
-          functionName: 'name',
-          args: [addressReverseNode],
-        });
-
-        if (basename) {
-          const result = basename as Basename;
-          basenameCache.set(address, result);
-          return result;
-        }
-        break;
-      } catch (error) {
-        const rateLimitError = error as RateLimitError;
-        if (
-          rateLimitError?.message?.includes('over rate limit') &&
-          retries < MAX_RETRIES - 1
-        ) {
-          retries++;
-          await new Promise((resolve) =>
-            setTimeout(resolve, RETRY_DELAY * retries),
-          );
-          continue;
-        }
-        throw error;
-      }
+    const basename = await baseClient.readContract({
+      abi: L2ResolverAbi,
+      address: BASENAME_L2_RESOLVER_ADDRESS,
+      functionName: 'name',
+      args: [addressReverseNode],
+    });
+    if (basename) {
+      return basename as Basename;
     }
-
-    // 結果が見つからない場合はnullをキャッシュ
-    basenameCache.set(address, null);
-    return null;
   } catch (error) {
-    console.error('Error fetching basename:', error);
-    return null;
+    console.error(error);
   }
 }

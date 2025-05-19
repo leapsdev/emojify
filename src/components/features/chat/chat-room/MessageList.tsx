@@ -1,7 +1,7 @@
 'use client';
 
 import type { NFTData } from '@/components/features/explore/types';
-import { formatDateToYYYYMMDD } from '@/lib/date';
+import { formatDateToYYYYMMDD } from '@/lib/utils';
 import type { Message } from '@/repository/db/database';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';

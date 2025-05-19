@@ -5,8 +5,8 @@ import {
   updateLastReadAction,
 } from '@/repository/chat/actions';
 import { db } from '@/repository/config/client';
-import type { Message } from '@/types/database';
-import { DB_INDEXES } from '@/types/database';
+import type { Message } from '@/repository/database';
+import { DB_INDEXES } from '@/repository/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 

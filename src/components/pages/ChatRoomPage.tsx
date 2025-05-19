@@ -1,6 +1,6 @@
 import { ChatRoomInput } from '@/components/features/chat/chat-room/ChatInput';
 import { MessageList } from '@/components/features/chat/chat-room/MessageList';
-import type { Message } from '@/types/database';
+import type { Message } from '@/repository/database';
 
 type ChatRoomPageProps = {
   roomId: string;

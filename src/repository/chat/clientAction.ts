@@ -1,8 +1,8 @@
 'use client';
 
 import { db } from '@/repository/config/client';
-import type { ChatRoom } from '@/types/database';
-import { DB_PATHS } from '@/types/database';
+import type { ChatRoom } from '@/repository/database';
+import { DB_PATHS } from '@/repository/database';
 import {
   get,
   onValue,

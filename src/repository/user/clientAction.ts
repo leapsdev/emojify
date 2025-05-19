@@ -1,7 +1,7 @@
 'use client';
 
 import { db } from '@/repository/config/client';
-import type { User } from '@/types/database';
+import type { User } from '@/repository/database';
 import type { DisplayUser } from '@/types/display';
 import { get, onValue, ref, update } from 'firebase/database';
 

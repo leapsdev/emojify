@@ -2,7 +2,7 @@
 
 import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
 import { db } from '@/repository/config/client';
-import type { User } from '@/types/database';
+import type { User } from '@/repository/database';
 import type { DisplayUser } from '@/types/display';
 import { onValue, ref } from 'firebase/database';
 import {

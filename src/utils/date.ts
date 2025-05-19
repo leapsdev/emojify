@@ -17,7 +17,7 @@ export function formatDateToYYYYMMDD(timestamp: number): string {
 }
 
 /**
- * Format date to relative time (e.g., just now, 5 minutes ago, yesterday)
+ * 日付を相対的な時間表示にフォーマット（例：今、5分前、昨日）
  */
 export function formatRelativeTime(timestamp: number): string {
   const now = new Date();

@@ -2,8 +2,14 @@
 
 import { db } from '@/repository/config/client';
 import type { User } from '@/repository/database';
-import type { DisplayUser } from '@/types/display';
 import { get, onValue, ref, update } from 'firebase/database';
+
+interface DisplayUser extends Pick<User, 'id' | 'username'> {
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'friend' | 'other';
+}
 
 const USERS_PATH = 'users';
 

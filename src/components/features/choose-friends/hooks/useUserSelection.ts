@@ -3,7 +3,6 @@
 import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
 import { db } from '@/repository/config/client';
 import type { User } from '@/repository/database';
-import type { DisplayUser } from '@/types/display';
 import { onValue, ref } from 'firebase/database';
 import {
   useCallback,
@@ -12,6 +11,13 @@ import {
   useState,
   useSyncExternalStore,
 } from 'react';
+
+interface DisplayUser extends Pick<User, 'id' | 'username'> {
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'friend' | 'other';
+}
 
 interface UseUserSelectionProps {
   currentUserId: string;

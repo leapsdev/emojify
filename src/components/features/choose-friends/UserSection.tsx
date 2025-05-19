@@ -1,4 +1,4 @@
-import type { User } from '@/repository/database';
+import type { User } from '@/repository/db/database';
 import { UserItem } from './UserItem';
 
 interface DisplayUser extends Pick<User, 'id' | 'username'> {

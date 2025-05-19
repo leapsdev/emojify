@@ -1,7 +1,7 @@
 'use client';
 
-import { db } from '@/repository/config/client';
-import type { User } from '@/repository/database';
+import { db } from '@/repository/db/config/client';
+import type { User } from '@/repository/db/database';
 import { get, onValue, ref, update } from 'firebase/database';
 
 interface DisplayUser extends Pick<User, 'id' | 'username'> {

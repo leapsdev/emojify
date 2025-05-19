@@ -1,6 +1,6 @@
 'use client';
 
-import { db } from '@/repository/config/client';
+import { db } from '@/repository/db/config/client';
 import { ref as dbRef, onValue } from 'firebase/database';
 import { useCallback, useRef } from 'react';
 import { useSyncExternalStore } from 'react';

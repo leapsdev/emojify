@@ -1,5 +1,5 @@
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
-import type { User } from '@/repository/database';
+import type { User } from '@/repository/db/database';
 import { Name } from '@coinbase/onchainkit/identity';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';

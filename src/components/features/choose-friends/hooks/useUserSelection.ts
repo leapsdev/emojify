@@ -1,8 +1,8 @@
 'use client';
 
 import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
-import { db } from '@/repository/config/client';
-import type { User } from '@/repository/database';
+import { db } from '@/repository/db/config/client';
+import type { User } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import {
   useCallback,

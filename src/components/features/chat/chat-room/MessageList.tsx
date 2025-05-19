@@ -2,7 +2,7 @@
 
 import type { NFTData } from '@/components/features/explore/types';
 import { formatDateToYYYYMMDD } from '@/lib/date';
-import type { Message } from '@/repository/database';
+import type { Message } from '@/repository/db/database';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';

@@ -3,10 +3,10 @@
 import {
   getChatRoomAction,
   updateLastReadAction,
-} from '@/repository/chat/actions';
-import { db } from '@/repository/config/client';
-import type { Message } from '@/repository/database';
-import { DB_INDEXES } from '@/repository/database';
+} from '@/repository/db/chat/actions';
+import { db } from '@/repository/db/config/client';
+import type { Message } from '@/repository/db/database';
+import { DB_INDEXES } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 

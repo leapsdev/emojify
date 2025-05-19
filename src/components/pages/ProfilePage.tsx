@@ -11,7 +11,7 @@ import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
-import type { User } from '@/repository/database';
+import type { User } from '@/repository/db/database';
 import { ThirdwebProvider, useContract } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
 

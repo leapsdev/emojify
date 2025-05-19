@@ -1,11 +1,11 @@
 'use server';
 
 import { getCurrentTimestamp } from '@/lib/date';
-import { adminDbRef } from '@/repository/config/server';
+import { adminDbRef } from '@/repository/db/config/server';
 import { PrivyClient } from '@privy-io/server-auth';
 import { updateUserInChatRooms } from '../chat/actions';
 
-import type { User } from '@/repository/database';
+import type { User } from '@/repository/db/database';
 import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import type { ProfileForm } from './schema';
 

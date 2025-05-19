@@ -1,7 +1,7 @@
 'use server';
 
 import { getPrivyId } from '@/lib/auth';
-import { isIdExists } from '@/repository/user/actions';
+import { isIdExists } from '@/repository/db/user/actions';
 
 export async function checkUserExists(): Promise<boolean> {
   const id = await getPrivyId();

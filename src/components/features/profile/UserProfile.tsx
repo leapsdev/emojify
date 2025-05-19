@@ -3,7 +3,7 @@
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
-import { addFriend, removeFriend } from '@/repository/user/actions';
+import { addFriend, removeFriend } from '@/repository/db/user/actions';
 import { Name } from '@coinbase/onchainkit/identity';
 import { useUser } from '@privy-io/react-auth';
 import { UserMinus, UserPlus } from 'lucide-react';

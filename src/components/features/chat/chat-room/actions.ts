@@ -1,6 +1,6 @@
 'use server';
 
-import { sendMessage } from '@/repository/chat/actions';
+import { sendMessage } from '@/repository/db/chat/actions';
 
 /**
  * メッセージを送信

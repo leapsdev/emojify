@@ -3,8 +3,8 @@
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import type { User } from '@/repository/database';
-import { profileFormSchema } from '@/repository/user/schema';
+import type { User } from '@/repository/db/database';
+import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { useActionState } from 'react';

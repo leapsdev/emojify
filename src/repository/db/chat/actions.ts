@@ -1,8 +1,8 @@
 'use server';
 
-import { adminDb } from '@/repository/config/server';
-import type { ChatRoom, Message, User } from '@/repository/database';
-import { DB_INDEXES, DB_PATHS } from '@/repository/database';
+import { adminDb } from '@/repository/db/config/server';
+import type { ChatRoom, Message, User } from '@/repository/db/database';
+import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 
 /**
  * チャットルームの情報とメッセージを取得

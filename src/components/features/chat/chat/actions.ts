@@ -1,6 +1,6 @@
 'use server';
 
-import { db } from '@/lib/firebase/client';
+import { db } from '@/repository/config/client';
 import type { ChatRoom } from '@/types/database';
 import { DB_PATHS } from '@/types/database';
 import { get, ref } from 'firebase/database';

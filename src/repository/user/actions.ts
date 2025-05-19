@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDbRef } from '@/lib/firebase/admin';
+import { adminDbRef } from '@/repository/config/server';
 import { getCurrentTimestamp } from '@/utils/date';
 import { PrivyClient } from '@privy-io/server-auth';
 import { updateUserInChatRooms } from '../chat/actions';

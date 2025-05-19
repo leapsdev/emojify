@@ -1,6 +1,6 @@
 'use server';
 
-import { adminDb } from '@/lib/firebase/admin';
+import { adminDb } from '@/repository/config/server';
 import type { ChatRoom, Message, User } from '@/types/database';
 import { DB_INDEXES, DB_PATHS } from '@/types/database';
 

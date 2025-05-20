@@ -1,12 +1,12 @@
 'use client';
 
-import { db } from '@/lib/firebase/client';
 import {
   getChatRoomAction,
   updateLastReadAction,
-} from '@/repository/chat/actions';
-import type { Message } from '@/types/database';
-import { DB_INDEXES } from '@/types/database';
+} from '@/repository/db/chat/actions';
+import { db } from '@/repository/db/config/client';
+import type { Message } from '@/repository/db/database';
+import { DB_INDEXES } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 

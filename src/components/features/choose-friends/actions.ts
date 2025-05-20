@@ -3,8 +3,11 @@
 import {
   createChatRoom,
   findChatRoomByMembers,
-} from '@/repository/chat/actions';
-import { addFriend, getUsersWithFriendship } from '@/repository/user/actions';
+} from '@/repository/db/chat/actions';
+import {
+  addFriend,
+  getUsersWithFriendship,
+} from '@/repository/db/user/actions';
 
 /**
  * フレンドを追加

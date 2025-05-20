@@ -1,4 +1,4 @@
-import { getWalletAddresses } from '@/repository/user/actions';
+import { getWalletAddresses } from '@/repository/db/user/actions';
 import { usePrivy } from '@privy-io/react-auth';
 
 /**

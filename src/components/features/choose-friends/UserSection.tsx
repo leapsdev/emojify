@@ -1,6 +1,12 @@
+import type { User } from '@/repository/db/database';
 import { UserItem } from './UserItem';
 
-import type { DisplayUser } from '@/types/display';
+interface DisplayUser extends Pick<User, 'id' | 'username'> {
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'friend' | 'other';
+}
 
 interface UserSectionProps {
   title: string;

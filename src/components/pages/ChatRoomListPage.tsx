@@ -2,7 +2,7 @@
 
 import { ChatRoomList } from '@/components/features/chat/chat/ChatRoomList';
 import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms';
-import type { ChatRoom } from '@/types/database';
+import type { ChatRoom } from '@/repository/db/database';
 
 type ChatRoomListPageProps = {
   userId: string;

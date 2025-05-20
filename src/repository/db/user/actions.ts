@@ -1,11 +1,11 @@
 'use server';
 
-import { adminDbRef } from '@/lib/firebase/admin';
-import { getCurrentTimestamp } from '@/utils/date';
+import { getCurrentTimestamp } from '@/lib/utils';
+import { adminDbRef } from '@/repository/db/config/server';
 import { PrivyClient } from '@privy-io/server-auth';
 import { updateUserInChatRooms } from '../chat/actions';
 
-import type { User } from '@/types/database';
+import type { User } from '@/repository/db/database';
 import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import type { ProfileForm } from './schema';
 

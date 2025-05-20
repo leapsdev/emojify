@@ -1,11 +1,18 @@
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
-import type { DisplayUser } from '@/types/display';
+import type { User } from '@/repository/db/database';
 import { Name } from '@coinbase/onchainkit/identity';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
+
+interface DisplayUser extends Pick<User, 'id' | 'username'> {
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'friend' | 'other';
+}
 
 interface UserItemProps {
   user: DisplayUser;

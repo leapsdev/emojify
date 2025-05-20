@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { getBasename } from '@/lib/basename/basename';
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
-import { profileFormSchema } from '@/repository/user/schema';
+import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { usePrivy } from '@privy-io/react-auth';

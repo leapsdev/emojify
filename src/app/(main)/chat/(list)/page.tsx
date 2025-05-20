@@ -1,6 +1,6 @@
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
 import { getPrivyId } from '@/lib/auth';
-import { getUserRooms } from '@/repository/chat/actions';
+import { getUserRooms } from '@/repository/db/chat/actions';
 import { redirect } from 'next/navigation';
 
 export const dynamic = 'force-dynamic';

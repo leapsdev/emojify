@@ -1,6 +1,6 @@
 import { ClientChooseFriendsPage } from '@/components/pages/ChooseFriendsPage';
 import { getPrivyId } from '@/lib/auth';
-import { getUsersWithFriendship } from '@/repository/user/actions';
+import { getUsersWithFriendship } from '@/repository/db/user/actions';
 
 export const dynamic = 'force-dynamic';
 

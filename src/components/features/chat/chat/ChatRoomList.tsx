@@ -1,6 +1,6 @@
 import { DotBadge } from '@/components/ui/DotBadge';
-import type { ChatRoom as ChatRoomType } from '@/types/database';
-import { formatRelativeTime } from '@/utils/date';
+import { formatRelativeTime } from '@/lib/utils';
+import type { ChatRoom as ChatRoomType } from '@/repository/db/database';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRoomMembers } from './hooks/useRoomMembers';

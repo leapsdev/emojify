@@ -1,9 +1,8 @@
 'use server';
 
-import { db } from '@/repository/db/config/client';
+import { adminDbRef } from '@/repository/db/config/server';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
-import { get, ref } from 'firebase/database';
 
 /**
  * ユーザーのチャットルーム一覧を取得
@@ -11,15 +10,15 @@ import { get, ref } from 'firebase/database';
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
   if (!userId) return [];
 
-  const userRoomsRef = ref(db, `${DB_PATHS.userRooms}/${userId}`);
-  const indexSnapshot = await get(userRoomsRef);
+  const userRoomsRef = adminDbRef(`${DB_PATHS.userRooms}/${userId}`);
+  const indexSnapshot = await userRoomsRef.get();
   const snapshotVal = indexSnapshot.val();
 
   if (!snapshotVal) return [];
 
   const roomIds = Object.keys(snapshotVal);
   const roomPromises = roomIds.map(async (roomId) => {
-    const snapshot = await get(ref(db, `${DB_PATHS.chatRooms}/${roomId}`));
+    const snapshot = await adminDbRef(`${DB_PATHS.chatRooms}/${roomId}`).get();
     return snapshot.val();
   });
 

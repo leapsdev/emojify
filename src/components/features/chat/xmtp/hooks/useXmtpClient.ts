@@ -1,7 +1,8 @@
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, type PrivyWallet } from '@privy-io/react-auth';
 import { initializeClient } from '@/repository/xmtp/client';
 import { useEffect, useState } from 'react';
 import type { XMTPClient } from '@/repository/xmtp/types';
+import type { Signer } from '@ethersproject/abstract-signer';
 
 export function useXmtpClient() {
   const { user, ready } = usePrivy();
@@ -17,17 +18,23 @@ export function useXmtpClient() {
       }
 
       try {
-        // ウォレットがある場合は最初のウォレットを使用
-        const wallet = user.wallet;
-        if (!wallet) {
+        if (!user?.wallet) {
           setError('No wallet found');
           setIsLoading(false);
           return;
         }
 
-        // ウォレットのサイナーを取得
-        const signer = await wallet.getEthersV5Signer();
-        
+        // Signerインターフェースを実装
+        const signer: Signer = {
+          getAddress: async () => (user.wallet as PrivyWallet).address,
+          signMessage: async (message: Uint8Array | string) => {
+            const messageString = typeof message === 'string' 
+              ? message 
+              : new TextDecoder().decode(message);
+            return await (user.wallet as PrivyWallet).sign(messageString);
+          }
+        } as Signer;
+
         // XMTPクライアントを初期化
         const xmtpClient = await initializeClient(signer);
         setClient(xmtpClient);

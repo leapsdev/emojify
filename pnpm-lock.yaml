@@ -17,6 +17,9 @@ dependencies:
   '@ducanh2912/next-pwa':
     specifier: ^10.2.9
     version: 10.2.9(next@15.2.1)(webpack@5.99.7)
+  '@ethersproject/abstract-signer':
+    specifier: ^5.8.0
+    version: 5.8.0
   '@privy-io/react-auth':
     specifier: ^2.13.1
     version: 2.13.2(@solana/web3.js@1.98.2)(@types/react@19.1.2)(bs58@6.0.0)(react-dom@19.1.0)(react@19.1.0)(typescript@5.8.3)(zod@3.24.3)

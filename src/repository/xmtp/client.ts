@@ -1,25 +1,33 @@
-import { Wallet } from 'ethers';
 import { Client } from '@xmtp/xmtp-js';
+import { type Signer } from '@ethersproject/abstract-signer';
 import type { XMTPClient, XMTPClientOptions } from './types';
 
 /**
  * XMTPクライアントのインスタンスを保持
  */
 let client: XMTPClient | null = null;
+let currentAddress: string | null = null;
 
 /**
  * XMTPクライアントを初期化する
  */
 export async function initializeClient(
-  wallet: Wallet,
+  signer: Signer,
   options?: XMTPClientOptions
 ): Promise<XMTPClient> {
-  if (client) return client;
+  const address = await signer.getAddress();
+
+  // すでにクライアントが存在し、同じアドレスの場合は再利用
+  if (client && currentAddress === address) {
+    return client;
+  }
 
   try {
-    client = await Client.create(wallet, {
+    // 新しいクライアントを作成
+    client = await Client.create(signer, {
       env: options?.env || 'production'
     });
+    currentAddress = address;
     return client;
   } catch (error) {
     console.error('Failed to initialize XMTP client:', error);

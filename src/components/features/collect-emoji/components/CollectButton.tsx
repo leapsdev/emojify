@@ -7,7 +7,7 @@ import {
   EMOJI_CONTRACT_ADDRESS,
   baseMainnet,
 } from '@/lib/thirdweb';
-import { useWallets } from '@privy-io/react-auth';
+import { usePrivy } from '@privy-io/react-auth';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
 import {
@@ -52,7 +52,7 @@ function isWalletError(error: unknown): error is WalletError {
 export function CollectButton({ tokenId }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const [collectResult, setCollectResult] = useState<CollectResult>(null);
-  const { wallets } = useWallets();
+  const { wallets } = usePrivy();
 
   const handleCollect = async () => {
     if (wallets.length === 0) {
@@ -139,7 +139,7 @@ export function CollectButton({ tokenId }: Props) {
             });
             return { transactionHash: txHash as `0x${string}` };
           },
-          signTypedData: async (typedData: unknown) => {
+          signTypedData: async (typedData) => {
             const signature = await provider.request({
               method: 'eth_signTypedData',
               params: [walletAddress, typedData],

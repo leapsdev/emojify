@@ -1,14 +1,15 @@
 'use client';
 
+import { usePrivy } from '@privy-io/react-auth';
 import { useState } from 'react';
 import { useMessages } from './hooks/useMessages';
-import { usePrivy } from '@privy-io/react-auth';
 
 export function TestChat() {
   const [recipientAddress, setRecipientAddress] = useState('');
   const [messageContent, setMessageContent] = useState('');
   const { ready, authenticated, login } = usePrivy();
-  const { messages, loading, error, sendMessage } = useMessages(recipientAddress);
+  const { messages, loading, error, sendMessage } =
+    useMessages(recipientAddress);
 
   if (!ready) {
     return <div>Loading...</div>;
@@ -18,6 +19,7 @@ export function TestChat() {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <button
+          type="button"
           onClick={login}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
@@ -57,7 +59,9 @@ export function TestChat() {
         ) : error ? (
           <div className="text-red-500 text-center">{error}</div>
         ) : messages.length === 0 ? (
-          <div className="text-center text-gray-500">メッセージはありません</div>
+          <div className="text-center text-gray-500">
+            メッセージはありません
+          </div>
         ) : (
           <div className="space-y-4">
             {messages.map((msg) => (

@@ -1,5 +1,5 @@
+import type { Conversation, DecodedMessage } from '@xmtp/xmtp-js';
 import { useEffect, useState } from 'react';
-import type { DecodedMessage, Conversation } from '@xmtp/xmtp-js';
 import { useXmtpClient } from './useXmtpClient';
 
 interface Message {

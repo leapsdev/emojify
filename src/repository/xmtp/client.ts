@@ -1,5 +1,5 @@
+import type { Signer } from '@ethersproject/abstract-signer';
 import { Client } from '@xmtp/xmtp-js';
-import { type Signer } from '@ethersproject/abstract-signer';
 import type { XMTPClient, XMTPClientOptions } from './types';
 
 /**
@@ -13,7 +13,7 @@ let currentAddress: string | null = null;
  */
 export async function initializeClient(
   signer: Signer,
-  options?: XMTPClientOptions
+  options?: XMTPClientOptions,
 ): Promise<XMTPClient> {
   const address = await signer.getAddress();
 
@@ -25,7 +25,7 @@ export async function initializeClient(
   try {
     // 新しいクライアントを作成
     client = await Client.create(signer, {
-      env: options?.env || 'production'
+      env: options?.env || 'production',
     });
     currentAddress = address;
     return client;

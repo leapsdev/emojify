@@ -1,14 +1,22 @@
-import type { Conversation, DecodedMessage, SendMessageResponse, ReceivedMessage } from './types';
 import { getClient } from './client';
+import type {
+  Conversation,
+  DecodedMessage,
+  ReceivedMessage,
+  SendMessageResponse,
+} from './types';
 
 /**
  * 特定のアドレスとの会話を開始または取得
  */
-export async function startConversation(peerAddress: string): Promise<Conversation> {
+export async function startConversation(
+  peerAddress: string,
+): Promise<Conversation> {
   const client = getClient();
-  
+
   try {
-    const conversation = await client.conversations.newConversation(peerAddress);
+    const conversation =
+      await client.conversations.newConversation(peerAddress);
     return conversation;
   } catch (error) {
     console.error('Failed to start conversation:', error);
@@ -21,17 +29,17 @@ export async function startConversation(peerAddress: string): Promise<Conversati
  */
 export async function sendMessage(
   conversation: Conversation,
-  messageContent: string
+  messageContent: string,
 ): Promise<SendMessageResponse> {
   try {
     const message = await conversation.send(messageContent);
-    
+
     return {
       id: message.id,
       messageContent: message.content,
       senderAddress: message.senderAddress,
       sent: true,
-      timestamp: message.sent
+      timestamp: message.sent,
     };
   } catch (error) {
     console.error('Failed to send message:', error);
@@ -42,15 +50,17 @@ export async function sendMessage(
 /**
  * 最新のメッセージを取得
  */
-export async function getMessages(conversation: Conversation): Promise<ReceivedMessage[]> {
+export async function getMessages(
+  conversation: Conversation,
+): Promise<ReceivedMessage[]> {
   try {
     const messages = await conversation.messages();
-    
+
     return messages.map((message: DecodedMessage) => ({
       id: message.id,
       messageContent: message.content,
       senderAddress: message.senderAddress,
-      timestamp: message.sent
+      timestamp: message.sent,
     }));
   } catch (error) {
     console.error('Failed to get messages:', error);
@@ -63,7 +73,7 @@ export async function getMessages(conversation: Conversation): Promise<ReceivedM
  */
 export async function streamMessages(
   conversation: Conversation,
-  onMessage: (message: ReceivedMessage) => void
+  onMessage: (message: ReceivedMessage) => void,
 ): Promise<() => void> {
   try {
     // メッセージストリームを開始
@@ -73,7 +83,7 @@ export async function streamMessages(
         id: message.id,
         messageContent: message.content,
         senderAddress: message.senderAddress,
-        timestamp: message.sent
+        timestamp: message.sent,
       };
       onMessage(receivedMessage);
     }
@@ -91,7 +101,7 @@ export async function streamMessages(
  */
 export async function listConversations(): Promise<Conversation[]> {
   const client = getClient();
-  
+
   try {
     return await client.conversations.list();
   } catch (error) {

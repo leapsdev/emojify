@@ -1,8 +1,8 @@
-import { usePrivy, type PrivyWallet } from '@privy-io/react-auth';
 import { initializeClient } from '@/repository/xmtp/client';
-import { useEffect, useState } from 'react';
 import type { XMTPClient } from '@/repository/xmtp/types';
 import type { Signer } from '@ethersproject/abstract-signer';
+import { type PrivyWallet, usePrivy } from '@privy-io/react-auth';
+import { useEffect, useState } from 'react';
 
 export function useXmtpClient() {
   const { user, ready } = usePrivy();
@@ -28,11 +28,12 @@ export function useXmtpClient() {
         const signer: Signer = {
           getAddress: async () => (user.wallet as PrivyWallet).address,
           signMessage: async (message: Uint8Array | string) => {
-            const messageString = typeof message === 'string' 
-              ? message 
-              : new TextDecoder().decode(message);
+            const messageString =
+              typeof message === 'string'
+                ? message
+                : new TextDecoder().decode(message);
             return await (user.wallet as PrivyWallet).sign(messageString);
-          }
+          },
         } as Signer;
 
         // XMTPクライアントを初期化

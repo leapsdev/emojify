@@ -1,4 +1,4 @@
-import { Client, Conversation, DecodedMessage } from '@xmtp/xmtp-js';
+import type { Client, Conversation, DecodedMessage } from '@xmtp/xmtp-js';
 
 /**
  * XMTPクライアントの設定オプション

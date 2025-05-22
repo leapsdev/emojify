@@ -4,7 +4,9 @@ import { Client } from '@xmtp/xmtp-js';
 import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 import type { DecodedMessage } from '@xmtp/xmtp-js';
-import { useAccount, useSignMessage } from 'wagmi';
+import { useAccount } from 'wagmi';
+import { createWalletClient, custom } from 'viem';
+import { base } from 'viem/chains';
 
 export function TestChat() {
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -12,7 +14,6 @@ export function TestChat() {
   const { ready, authenticated, login } = usePrivy();
   const { user } = usePrivy();
   const { address } = useAccount();
-  const { signMessage } = useSignMessage();
   const [messages, setMessages] = useState<{
     id: string;
     senderAddress: string;
@@ -27,7 +28,7 @@ export function TestChat() {
   useEffect(() => {
     const initClient = async () => {
       try {
-        if (!user?.wallet || !address || !signMessage) {
+        if (!user?.wallet || !address) {
           throw new Error('ウォレットアドレスが見つかりません');
         }
 
@@ -36,11 +37,20 @@ export function TestChat() {
           signMessage: async (message: string | Uint8Array) => {
             try {
               const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
-              const result = await signMessage({ message: messageString });
-              if (typeof result !== 'string') {
-                throw new Error('署名が生成されませんでした');
-              }
-              return result;
+              console.log('署名リクエスト:', { messageString });
+              
+              const walletClient = createWalletClient({
+                chain: base,
+                transport: custom(window.ethereum)
+              });
+
+              const signature = await walletClient.signMessage({
+                account: address as `0x${string}`,
+                message: messageString
+              });
+
+              console.log('署名結果:', { signature });
+              return signature;
             } catch (error) {
               console.error('署名エラー:', error);
               throw new Error('メッセージの署名に失敗しました');
@@ -80,7 +90,7 @@ export function TestChat() {
     };
 
     initClient();
-  }, [user, recipientAddress, address, signMessage]);
+  }, [user, recipientAddress, address]);
 
   if (!ready) {
     return <div>Loading...</div>;

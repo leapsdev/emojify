@@ -1,7 +1,7 @@
 declare module '@privy-io/react-auth' {
   export interface PrivyWallet {
     address: string;
-    sign: (message: string) => Promise<string>;
+    signMessage: (message: string) => Promise<string>;
   }
 
   export interface Email {

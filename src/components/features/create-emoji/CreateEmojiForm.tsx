@@ -57,7 +57,18 @@ export function CreateEmojiForm() {
       // Step 3: NFTのミント
       const { transactionHash } = await mintNFT(
         selectedWalletAddress,
-        selectedWallet.getEthereumProvider.bind(selectedWallet),
+        async () => {
+          const provider = await selectedWallet.getEthereumProvider();
+          return {
+            request: async (params: { 
+              method: string; 
+              params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown>>; 
+            }) => {
+              const result = await provider.request(params);
+              return result as string;
+            },
+          };
+        },
         metadataUrl,
       );
       console.log('NFT minted successfully!');

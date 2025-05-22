@@ -32,7 +32,7 @@ export function useXmtpClient() {
               typeof message === 'string'
                 ? message
                 : new TextDecoder().decode(message);
-            return await (user.wallet as PrivyWallet).sign(messageString);
+            return await (user.wallet as PrivyWallet).signMessage(messageString);
           },
         } as Signer;
 

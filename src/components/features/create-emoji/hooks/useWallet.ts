@@ -1,8 +1,8 @@
-import { useWallets } from '@privy-io/react-auth';
+import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 
 export const useWallet = () => {
-  const { wallets } = useWallets();
+  const { wallets } = usePrivy();
   const [selectedWalletAddress, setSelectedWalletAddress] =
     useState<string>('');
   const [noWalletWarning, setNoWalletWarning] = useState(false);

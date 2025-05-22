@@ -62,6 +62,12 @@ export function TestChat() {
 
         // 既存のメッセージを読み込む
         if (recipientAddress) {
+          // 宛先がXMTPネットワーク上に存在するか確認
+          const canMessage = await xmtp.canMessage(recipientAddress);
+          if (!canMessage) {
+            throw new Error(`${recipientAddress}はXMTPネットワーク上に存在しません`);
+          }
+
           const conversation = await xmtp.conversations.newConversation(recipientAddress);
           const msgs = await conversation.messages();
           setMessages(
@@ -112,6 +118,12 @@ export function TestChat() {
     if (!messageContent.trim() || !recipientAddress.trim() || !client) return;
 
     try {
+      // 宛先がXMTPネットワーク上に存在するか確認
+      const canMessage = await client.canMessage(recipientAddress);
+      if (!canMessage) {
+        throw new Error(`${recipientAddress}はXMTPネットワーク上に存在しません`);
+      }
+
       const conversation = await client.conversations.newConversation(recipientAddress);
       await conversation.send(messageContent);
       
@@ -127,7 +139,11 @@ export function TestChat() {
       setMessageContent('');
     } catch (err) {
       console.error('メッセージの送信に失敗:', err);
-      setError('メッセージの送信に失敗しました');
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('メッセージの送信に失敗しました');
+      }
     }
   };
 

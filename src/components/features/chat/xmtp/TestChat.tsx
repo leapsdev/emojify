@@ -20,7 +20,7 @@ export function TestChat() {
     sent: boolean;
     timestamp: Date;
   }[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
 
@@ -97,28 +97,28 @@ export function TestChat() {
     setError(null);
 
     try {
-      // XMTPクライアントが未初期化の場合は初期化
-      if (!client) {
+      let currentClient = client;
+      if (!currentClient) {
         await initXmtpClient();
-      }
-
-      if (!client) {
-        throw new Error('XMTPクライアントの初期化に失敗しました');
+        currentClient = client;
+        if (!currentClient) {
+          throw new Error('XMTPクライアントの初期化に失敗しました。再度お試しください。');
+        }
       }
 
       // 宛先がXMTPネットワーク上に存在するか確認
-      const canMessage = await client.canMessage(recipientAddress);
+      const canMessage = await currentClient.canMessage(recipientAddress);
       if (!canMessage) {
         throw new Error(`${recipientAddress}はXMTPネットワーク上に存在しません`);
       }
 
-      const conversation = await client.conversations.newConversation(recipientAddress);
+      const conversation = await currentClient.conversations.newConversation(recipientAddress);
       await conversation.send(messageContent);
       
       // メッセージを表示に追加
       setMessages(prev => [...prev, {
         id: Date.now().toString(),
-        senderAddress: client.address,
+        senderAddress: currentClient.address,
         content: messageContent,
         sent: true,
         timestamp: new Date(),

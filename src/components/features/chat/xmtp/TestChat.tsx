@@ -57,6 +57,7 @@ export function TestChat() {
       const xmtp = await Client.create(signer, clientOptions);
       setClient(xmtp);
       setError(null);
+      return xmtp;
 
     } catch (err) {
       console.error('XMTPクライアントの初期化に失敗:', err);
@@ -66,8 +67,6 @@ export function TestChat() {
         setError('メッセージングの初期化に失敗しました');
       }
       throw err; // 上位のエラーハンドリングに伝播させる
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -97,14 +96,12 @@ export function TestChat() {
     setError(null);
 
     try {
-      let currentClient = client;
+      // クライアントの初期化または取得
+      const currentClient = client || await initXmtpClient();
       if (!currentClient) {
-        await initXmtpClient();
-        currentClient = client;
-        if (!currentClient) {
-          throw new Error('XMTPクライアントの初期化に失敗しました。再度お試しください。');
-        }
+        throw new Error('XMTPクライアントの初期化に失敗しました。再度お試しください。');
       }
+      setLoading(false);
 
       // 宛先がXMTPネットワーク上に存在するか確認
       const canMessage = await currentClient.canMessage(recipientAddress);

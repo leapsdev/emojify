@@ -104,11 +104,14 @@ export function TestChat() {
       setLoading(false);
 
       // 宛先がXMTPネットワーク上に存在するか確認
+      // 宛先の検証
       const canMessage = await currentClient.canMessage(recipientAddress);
       if (!canMessage) {
-        throw new Error(`${recipientAddress}はXMTPネットワーク上に存在しません`);
+        setError(`指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません。\n宛先アドレスを確認してください。`);
+        return;
       }
 
+      // メッセージの送信
       const conversation = await currentClient.conversations.newConversation(recipientAddress);
       await conversation.send(messageContent);
       

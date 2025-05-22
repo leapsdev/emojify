@@ -5,7 +5,7 @@ import { LinkButton } from '@/components/ui/LinkButton';
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { addFriend, removeFriend } from '@/repository/db/user/actions';
 import { Name } from '@coinbase/onchainkit/identity';
-import { useUser } from '@privy-io/react-auth';
+import { usePrivy } from '@privy-io/react-auth';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
@@ -31,7 +31,7 @@ export const UserProfile = ({
   currentUserId,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const { user } = useUser();
+  const { user } = usePrivy();
   const [addresses, setAddresses] = useState<string[]>([]);
   useEffect(() => {
     const fetchAddresses = async () => {

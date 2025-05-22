@@ -45,5 +45,11 @@ declare module '@privy-io/react-auth' {
     wallets: Wallet[];
   }
 
+  export interface PrivyProviderProps {
+    appId: string;
+    children: React.ReactNode;
+  }
+
   export function usePrivy(): PrivyInterface;
+  export function PrivyProvider(props: PrivyProviderProps): JSX.Element;
 }

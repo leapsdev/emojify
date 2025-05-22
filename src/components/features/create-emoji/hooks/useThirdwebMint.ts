@@ -39,7 +39,7 @@ export const useThirdwebMint = () => {
     getEthereumProvider: () => Promise<{
       request: (params: {
         method: string;
-        params: unknown[];
+        params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown>>;
       }) => Promise<string>;
     }>,
     metadataUrl: string,
@@ -107,10 +107,10 @@ export const useThirdwebMint = () => {
             });
             return { transactionHash: txHash as `0x${string}` };
           },
-          signTypedData: async (typedData: unknown) => {
+          signTypedData: async (typedData: Record<string, unknown>) => {
             const signature = await provider.request({
-              method: 'eth_signTypedData',
-              params: [walletAddress, typedData],
+              method: 'eth_signTypedData_v4',
+              params: [walletAddress, JSON.stringify(typedData)],
             });
             return signature as `0x${string}`;
           },

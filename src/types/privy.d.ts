@@ -4,21 +4,35 @@ declare module '@privy-io/react-auth' {
     sign: (message: string) => Promise<string>;
   }
 
+  export interface Email {
+    address: string;
+    verified: boolean;
+  }
+
   export interface User {
     id: string;
     wallet: PrivyWallet;
+    email?: Email;
+  }
+
+  export interface TypedData {
+    types: Record<string, Array<{ name: string; type: string }>>;
+    primaryType: string;
+    domain: Record<string, string | number>;
+    message: Record<string, unknown>;
   }
 
   export interface EthereumProvider {
     request: (args: { 
       method: string; 
-      params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown>>; 
+      params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown> | TypedData>; 
     }) => Promise<string | number | boolean | Record<string, unknown> | Array<unknown>>;
   }
 
   export interface Wallet {
     address: string;
     getEthereumProvider: () => Promise<EthereumProvider>;
+    signTypedData?: (data: TypedData) => Promise<string>;
   }
 
   export interface PrivyInterface {

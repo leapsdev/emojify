@@ -44,16 +44,25 @@ export function TestChat() {
                 transport: custom(window.ethereum)
               });
 
-              const signature = await walletClient.signMessage({
-                account: address as `0x${string}`,
-                message: messageString
-              });
-
-              console.log('署名結果:', { signature });
-              return signature;
+              // 署名がキャンセルされた場合のエラーハンドリング
+              try {
+                const signature = await walletClient.signMessage({
+                  account: address as `0x${string}`,
+                  message: messageString
+                });
+                console.log('署名結果:', { signature });
+                return signature;
+              } catch (error) {
+                if (error instanceof Error && error.message.includes('User rejected')) {
+                  throw new Error('署名がキャンセルされました。XMTPの初期化には署名が必要です。');
+                }
+                throw error;
+              }
             } catch (error) {
               console.error('署名エラー:', error);
-              throw new Error('メッセージの署名に失敗しました');
+              const errorMessage = error instanceof Error ? error.message : 'メッセージの署名に失敗しました';
+              setError(errorMessage);
+              throw new Error(errorMessage);
             }
           },
         };
@@ -83,7 +92,11 @@ export function TestChat() {
         }
       } catch (err) {
         console.error('XMTPクライアントの初期化に失敗:', err);
-        setError('メッセージングの初期化に失敗しました');
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('メッセージングの初期化に失敗しました');
+        }
       } finally {
         setLoading(false);
       }

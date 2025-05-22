@@ -2,8 +2,7 @@
 
 import { Client } from '@xmtp/xmtp-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
-import type { DecodedMessage } from '@xmtp/xmtp-js';
+import { useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useViemWallet } from './hooks/useViemWallet';
 
@@ -25,75 +24,52 @@ export function TestChat() {
   const [error, setError] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
 
-  useEffect(() => {
-    const initClient = async () => {
-      try {
-        if (!user?.wallet || !address) {
-          throw new Error('ウォレットアドレスが見つかりません');
-        }
-
-        const signer = {
-          getAddress: async () => address,
-          signMessage: async (message: string | Uint8Array) => {
-            try {
-              const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
-              console.log('署名リクエスト:', { messageString });
-              
-              const signature = await viemSignMessage(address, messageString);
-              console.log('署名結果:', { signature });
-              return signature;
-            } catch (error) {
-              console.error('署名エラー:', error);
-              const errorMessage = error instanceof Error ? error.message : 'メッセージの署名に失敗しました';
-              setError(errorMessage);
-              throw new Error(errorMessage);
-            }
-          }
-        };
-
-        const clientOptions = {
-          env: 'production' as const,
-          skipContactPublishing: true,
-        };
-
-        const xmtp = await Client.create(signer, clientOptions);
-        setClient(xmtp);
-        setError(null);
-
-        // 既存のメッセージを読み込む
-        if (recipientAddress) {
-          // 宛先がXMTPネットワーク上に存在するか確認
-          const canMessage = await xmtp.canMessage(recipientAddress);
-          if (!canMessage) {
-            throw new Error(`${recipientAddress}はXMTPネットワーク上に存在しません`);
-          }
-
-          const conversation = await xmtp.conversations.newConversation(recipientAddress);
-          const msgs = await conversation.messages();
-          setMessages(
-            msgs.map((msg: DecodedMessage) => ({
-              id: msg.id,
-              senderAddress: msg.senderAddress,
-              content: msg.content,
-              sent: true,
-              timestamp: msg.sent,
-            })),
-          );
-        }
-      } catch (err) {
-        console.error('XMTPクライアントの初期化に失敗:', err);
-        if (err instanceof Error) {
-          setError(err.message);
-        } else {
-          setError('メッセージングの初期化に失敗しました');
-        }
-      } finally {
-        setLoading(false);
+  const initXmtpClient = async () => {
+    try {
+      if (!user?.wallet || !address) {
+        throw new Error('ウォレットアドレスが見つかりません');
       }
-    };
 
-    initClient();
-  }, [user, recipientAddress, address, viemSignMessage]);
+      const signer = {
+        getAddress: async () => address,
+        signMessage: async (message: string | Uint8Array) => {
+          try {
+            const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
+            console.log('署名リクエスト:', { messageString });
+            
+            const signature = await viemSignMessage(address, messageString);
+            console.log('署名結果:', { signature });
+            return signature;
+          } catch (error) {
+            console.error('署名エラー:', error);
+            const errorMessage = error instanceof Error ? error.message : 'メッセージの署名に失敗しました';
+            setError(errorMessage);
+            throw new Error(errorMessage);
+          }
+        }
+      };
+
+      const clientOptions = {
+        env: 'production' as const,
+        skipContactPublishing: true,
+      };
+
+      const xmtp = await Client.create(signer, clientOptions);
+      setClient(xmtp);
+      setError(null);
+
+    } catch (err) {
+      console.error('XMTPクライアントの初期化に失敗:', err);
+      if (err instanceof Error) {
+        setError(err.message);
+      } else {
+        setError('メッセージングの初期化に失敗しました');
+      }
+      throw err; // 上位のエラーハンドリングに伝播させる
+    } finally {
+      setLoading(false);
+    }
+  };
 
   if (!ready) {
     return <div>Loading...</div>;
@@ -115,9 +91,21 @@ export function TestChat() {
 
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageContent.trim() || !recipientAddress.trim() || !client) return;
+    if (!messageContent.trim() || !recipientAddress.trim()) return;
+
+    setLoading(true);
+    setError(null);
 
     try {
+      // XMTPクライアントが未初期化の場合は初期化
+      if (!client) {
+        await initXmtpClient();
+      }
+
+      if (!client) {
+        throw new Error('XMTPクライアントの初期化に失敗しました');
+      }
+
       // 宛先がXMTPネットワーク上に存在するか確認
       const canMessage = await client.canMessage(recipientAddress);
       if (!canMessage) {

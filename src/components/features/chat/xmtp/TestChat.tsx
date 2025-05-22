@@ -5,8 +5,7 @@ import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 import type { DecodedMessage } from '@xmtp/xmtp-js';
 import { useAccount } from 'wagmi';
-import { createWalletClient, custom } from 'viem';
-import { base } from 'viem/chains';
+import { useViemWallet } from './hooks/useViemWallet';
 
 export function TestChat() {
   const [recipientAddress, setRecipientAddress] = useState('');
@@ -14,6 +13,7 @@ export function TestChat() {
   const { ready, authenticated, login } = usePrivy();
   const { user } = usePrivy();
   const { address } = useAccount();
+  const { signMessage: viemSignMessage } = useViemWallet();
   const [messages, setMessages] = useState<{
     id: string;
     senderAddress: string;
@@ -39,32 +39,16 @@ export function TestChat() {
               const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
               console.log('署名リクエスト:', { messageString });
               
-              const walletClient = createWalletClient({
-                chain: base,
-                transport: custom(window.ethereum)
-              });
-
-              // 署名がキャンセルされた場合のエラーハンドリング
-              try {
-                const signature = await walletClient.signMessage({
-                  account: address as `0x${string}`,
-                  message: messageString
-                });
-                console.log('署名結果:', { signature });
-                return signature;
-              } catch (error) {
-                if (error instanceof Error && error.message.includes('User rejected')) {
-                  throw new Error('署名がキャンセルされました。XMTPの初期化には署名が必要です。');
-                }
-                throw error;
-              }
+              const signature = await viemSignMessage(address, messageString);
+              console.log('署名結果:', { signature });
+              return signature;
             } catch (error) {
               console.error('署名エラー:', error);
               const errorMessage = error instanceof Error ? error.message : 'メッセージの署名に失敗しました';
               setError(errorMessage);
               throw new Error(errorMessage);
             }
-          },
+          }
         };
 
         const clientOptions = {
@@ -103,7 +87,7 @@ export function TestChat() {
     };
 
     initClient();
-  }, [user, recipientAddress, address]);
+  }, [user, recipientAddress, address, viemSignMessage]);
 
   if (!ready) {
     return <div>Loading...</div>;

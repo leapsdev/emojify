@@ -102,14 +102,18 @@ export function TestChat() {
         throw new Error('XMTPクライアントが初期化されていません');
       }
 
-      // 自分自身へのメッセージングを防ぐ
+      // 自分自身へのメッセージングをチェック
       if (recipientAddress.toLowerCase() === address?.toLowerCase()) {
-        throw new Error('自分自身にメッセージを送ることはできません');
+        throw new Error('注意: 自分自身へのメッセージ送信はサポートされていません。他のアドレスを指定してください。');
       }
 
       const canMessage = await client.canMessage(recipientAddress);
       if (!canMessage) {
-        throw new Error(`指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません`);
+        throw new Error(
+          `指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません。\n` +
+          'XMTPを利用するには、受信者もXMTPネットワークに参加している必要があります。\n' +
+          '受信者に https://xmtp.chat でXMTPをセットアップするよう依頼してください。'
+        );
       }
 
       // 既存の会話を探す
@@ -188,6 +192,15 @@ export function TestChat() {
             有効なイーサリアムアドレスを入力してください
           </p>
         )}
+      </div>
+
+      <div className="mb-4 p-4 bg-blue-50 rounded text-sm">
+        <h3 className="font-bold mb-2">💡 使用方法</h3>
+        <ul className="list-disc pl-5 space-y-1">
+          <li>メッセージを送信するには、受信者のウォレットアドレスを入力してください</li>
+          <li>受信者は事前にXMTPネットワークに参加している必要があります</li>
+          <li>初めての方は https://xmtp.chat でセットアップできます</li>
+        </ul>
       </div>
 
       <div className="flex-1 overflow-auto bg-gray-50 rounded p-4 mb-4">

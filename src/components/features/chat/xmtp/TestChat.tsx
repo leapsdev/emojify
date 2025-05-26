@@ -15,6 +15,8 @@ type Message = {
   timestamp: Date;
 };
 
+let xmtpClient: Client | null = null;
+
 export function TestChat() {
   const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [messageContent, setMessageContent] = useState('');
@@ -30,7 +32,12 @@ export function TestChat() {
     if (authenticated && address && !client) {
       initXmtpClient();
     }
-  }, [authenticated, address, client]);
+    // クリーンアップ関数
+    return () => {
+      setMessages([]);
+      setError(null);
+    };
+  }, [authenticated, address]);
 
   const initXmtpClient = async () => {
     try {
@@ -41,6 +48,12 @@ export function TestChat() {
         throw new Error('ウォレットアドレスが見つかりません');
       }
 
+      // 既存のクライアントを再利用
+      if (xmtpClient) {
+        setClient(xmtpClient);
+        return;
+      }
+
       const signer = {
         getAddress: async () => address,
         signMessage: async (message: string | Uint8Array) => {
@@ -49,14 +62,14 @@ export function TestChat() {
         }
       };
 
-      const xmtp = await Client.create(signer, {
+      xmtpClient = await Client.create(signer, {
         env: 'production'
       });
-
-      setClient(xmtp);
       
+      setClient(xmtpClient);
+
       // 既存の会話を読み込む
-      const conversations = await xmtp.conversations.list();
+      const conversations = await xmtpClient.conversations.list();
       for (const conversation of conversations) {
         const messageList = await conversation.messages();
         const formattedMessages: Message[] = messageList.map(msg => ({
@@ -67,21 +80,6 @@ export function TestChat() {
           timestamp: msg.sent
         }));
         setMessages(prev => [...prev, ...formattedMessages]);
-      }
-
-      // メッセージのストリームを購読
-      for (const conversation of conversations) {
-        const stream = await conversation.streamMessages();
-        for await (const msg of stream) {
-          const newMessage: Message = {
-            id: msg.id,
-            senderAddress: msg.senderAddress,
-            content: msg.content ?? '',
-            sent: msg.senderAddress === address,
-            timestamp: msg.sent
-          };
-          setMessages(prev => [...prev, newMessage]);
-        }
       }
 
     } catch (err) {
@@ -104,12 +102,27 @@ export function TestChat() {
         throw new Error('XMTPクライアントが初期化されていません');
       }
 
+      // 自分自身へのメッセージングを防ぐ
+      if (recipientAddress.toLowerCase() === address?.toLowerCase()) {
+        throw new Error('自分自身にメッセージを送ることはできません');
+      }
+
       const canMessage = await client.canMessage(recipientAddress);
       if (!canMessage) {
         throw new Error(`指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません`);
       }
 
-      const conversation = await client.conversations.newConversation(recipientAddress);
+      // 既存の会話を探す
+      const conversations = await client.conversations.list();
+      let conversation = conversations.find(
+        conv => conv.peerAddress.toLowerCase() === recipientAddress.toLowerCase()
+      );
+
+      // 会話が存在しない場合は新規作成
+      if (!conversation) {
+        conversation = await client.conversations.newConversation(recipientAddress);
+      }
+
       await conversation.send(messageContent);
 
       const newMessage: Message = {
@@ -132,7 +145,6 @@ export function TestChat() {
   };
 
   const handleAddressChange = (input: string) => {
-    // 入力された文字列が16進数のみで構成されているか確認
     if (/^(0x)?[0-9a-fA-F]*$/.test(input)) {
       const formattedAddress = input.startsWith('0x') ? input : `0x${input}`;
       setRecipientAddress(formattedAddress);

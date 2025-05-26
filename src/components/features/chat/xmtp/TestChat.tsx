@@ -1,8 +1,8 @@
 'use client';
 
-import { Client } from '@xmtp/xmtp-js';
+import { Client, Conversation } from '@xmtp/xmtp-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useViemWallet } from './hooks/useViemWallet';
 import { Address, isAddress } from 'viem';
@@ -20,6 +20,9 @@ type GroupMember = {
   isOnXMTP: boolean;
 };
 
+type MessageMap = Map<string, Message[]>;
+type ConversationMap = Map<string, Conversation>;
+
 let xmtpClient: Client | null = null;
 
 export function TestChat() {
@@ -28,20 +31,57 @@ export function TestChat() {
   const { ready, authenticated, login, user } = usePrivy();
   const { address } = useAccount();
   const { signMessage: viemSignMessage } = useViemWallet();
-  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
   const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
   const [isXMTPReady, setIsXMTPReady] = useState(false);
+  const [conversations, setConversations] = useState<ConversationMap>(new Map());
+  const [messages, setMessages] = useState<MessageMap>(new Map());
+
+  const updateMessages = useCallback(async (peerAddress: string, conversation: Conversation) => {
+    const messageList = await conversation.messages();
+    const formattedMessages: Message[] = messageList.map(msg => ({
+      id: msg.id,
+      senderAddress: msg.senderAddress,
+      content: msg.content ?? '',
+      sent: msg.senderAddress === address,
+      timestamp: msg.sent
+    }));
+    setMessages(prev => {
+      const newMap = new Map(prev);
+      newMap.set(peerAddress.toLowerCase(), formattedMessages);
+      return newMap;
+    });
+  }, [address]);
+
+  const listenToMessages = useCallback(async (peerAddress: string, conversation: Conversation) => {
+    const stream = await conversation.streamMessages();
+    for await (const msg of stream) {
+      const newMessage: Message = {
+        id: msg.id,
+        senderAddress: msg.senderAddress,
+        content: msg.content ?? '',
+        sent: msg.senderAddress === address,
+        timestamp: msg.sent
+      };
+      
+      setMessages(prev => {
+        const newMap = new Map(prev);
+        const existingMessages = newMap.get(peerAddress.toLowerCase()) || [];
+        newMap.set(peerAddress.toLowerCase(), [...existingMessages, newMessage]);
+        return newMap;
+      });
+    }
+  }, [address]);
 
   useEffect(() => {
     if (authenticated && address && !client) {
       initXmtpClient();
     }
-    // クリーンアップ関数
     return () => {
-      setMessages([]);
+      setMessages(new Map());
+      setConversations(new Map());
       setError(null);
     };
   }, [authenticated, address]);
@@ -55,10 +95,8 @@ export function TestChat() {
         throw new Error('ウォレットアドレスが見つかりません');
       }
 
-      // 既存のクライアントを再利用
       if (xmtpClient) {
         setClient(xmtpClient);
-        // 自分自身をグループメンバーとして追加
         setGroupMembers([{ address: xmtpClient.address, isOnXMTP: true }]);
         setIsXMTPReady(true);
         return;
@@ -77,24 +115,23 @@ export function TestChat() {
       });
       
       setClient(xmtpClient);
-      
-      // 自分自身をグループメンバーとして追加
       setGroupMembers([{ address: xmtpClient.address, isOnXMTP: true }]);
       setIsXMTPReady(true);
 
       // 既存の会話を読み込む
-      const conversations = await xmtpClient.conversations.list();
-      for (const conversation of conversations) {
-        const messageList = await conversation.messages();
-        const formattedMessages: Message[] = messageList.map(msg => ({
-          id: msg.id,
-          senderAddress: msg.senderAddress,
-          content: msg.content ?? '',
-          sent: msg.senderAddress === address,
-          timestamp: msg.sent
-        }));
-        setMessages(prev => [...prev, ...formattedMessages]);
+      const convList = await xmtpClient.conversations.list();
+      const conversationMap: ConversationMap = new Map();
+      
+      for (const conversation of convList) {
+        const peerAddress = conversation.peerAddress.toLowerCase();
+        conversationMap.set(peerAddress, conversation);
+        // メッセージを取得
+        await updateMessages(peerAddress, conversation);
+        // ストリームを開始
+        listenToMessages(peerAddress, conversation).catch(console.error);
       }
+      
+      setConversations(conversationMap);
 
     } catch (err) {
       console.error('XMTPクライアントの初期化に失敗:', err);
@@ -127,7 +164,20 @@ export function TestChat() {
       setGroupMembers(prev => [...prev, newMember]);
       setRecipientAddress('');
 
-      if (!canMessage) {
+      if (canMessage) {
+        // 会話を開始
+        const conversation = await client.conversations.newConversation(recipientAddress);
+        const peerAddress = recipientAddress.toLowerCase();
+        
+        setConversations(prev => {
+          const newMap = new Map(prev);
+          newMap.set(peerAddress, conversation);
+          return newMap;
+        });
+
+        // メッセージストリームを開始
+        listenToMessages(peerAddress, conversation).catch(console.error);
+      } else {
         setError(
           `メンバーを追加しましたが、このアドレス（${recipientAddress}）はまだXMTPネットワーク上に存在しません。\n` +
           'メッセージを送信するには、メンバーがXMTPネットワークに参加する必要があります。\n' +
@@ -141,12 +191,24 @@ export function TestChat() {
   };
 
   const handleRemoveMember = (address: string) => {
-    // 自分自身は削除できないようにする
     if (address.toLowerCase() === client?.address.toLowerCase()) {
       setError('自分自身をグループから削除することはできません');
       return;
     }
     setGroupMembers(prev => prev.filter(member => member.address !== address));
+    
+    // 会話と関連メッセージを削除
+    const peerAddress = address.toLowerCase();
+    setConversations(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(peerAddress);
+      return newMap;
+    });
+    setMessages(prev => {
+      const newMap = new Map(prev);
+      newMap.delete(peerAddress);
+      return newMap;
+    });
   };
 
   const handleSend = async (e: React.FormEvent) => {
@@ -168,32 +230,26 @@ export function TestChat() {
 
       // XMTPに参加しているメンバーにのみ送信
       for (const member of activeMembers) {
-        // 自分自身へは送信しない
-        if (member.address.toLowerCase() === client.address.toLowerCase()) {
-          continue;
-        }
+        if (member.address.toLowerCase() === client.address.toLowerCase()) continue;
 
-        const conversations = await client.conversations.list();
-        let conversation = conversations.find(
-          conv => conv.peerAddress.toLowerCase() === member.address.toLowerCase()
-        );
+        const peerAddress = member.address.toLowerCase();
+        let conversation = conversations.get(peerAddress);
 
         if (!conversation) {
-          conversation = await client.conversations.newConversation(member.address);
+          const newConversation = await client.conversations.newConversation(member.address);
+          setConversations(prev => {
+            const newMap = new Map(prev);
+            newMap.set(peerAddress, newConversation);
+            return newMap;
+          });
+          // メッセージストリームを開始
+          listenToMessages(peerAddress, newConversation).catch(console.error);
+          await newConversation.send(messageContent);
+        } else {
+          await conversation.send(messageContent);
         }
-
-        await conversation.send(messageContent);
       }
 
-      const newMessage: Message = {
-        id: Date.now().toString(),
-        senderAddress: client.address,
-        content: messageContent,
-        sent: true,
-        timestamp: new Date()
-      };
-      
-      setMessages(prev => [...prev, newMessage]);
       setMessageContent('');
       
     } catch (err) {
@@ -209,6 +265,16 @@ export function TestChat() {
       const formattedAddress = input.startsWith('0x') ? input : `0x${input}`;
       setRecipientAddress(formattedAddress);
     }
+  };
+
+  // グループ内の全メッセージを取得
+  const getAllMessages = () => {
+    const allMessages: Message[] = [];
+    messages.forEach((msgs) => {
+      allMessages.push(...msgs);
+    });
+    // タイムスタンプでソート
+    return allMessages.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
   };
 
   if (!ready) {
@@ -314,13 +380,13 @@ export function TestChat() {
           <div className="text-center">メッセージを読み込み中...</div>
         ) : error ? (
           <div className="text-red-500 text-center whitespace-pre-line">{error}</div>
-        ) : messages.length === 0 ? (
+        ) : getAllMessages().length === 0 ? (
           <div className="text-center text-gray-500">
             メッセージはありません
           </div>
         ) : (
           <div className="space-y-4">
-            {messages.map((msg) => (
+            {getAllMessages().map((msg) => (
               <div
                 key={msg.id}
                 className={`p-2 rounded max-w-[80%] ${
@@ -330,6 +396,9 @@ export function TestChat() {
                 }`}
               >
                 <div className="text-sm">{msg.content}</div>
+                <div className="text-xs opacity-75">
+                  送信者: {msg.senderAddress.slice(0, 6)}...{msg.senderAddress.slice(-4)}
+                </div>
                 <div className="text-xs opacity-75">
                   {msg.timestamp.toLocaleTimeString()}
                 </div>

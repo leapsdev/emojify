@@ -1,40 +1,29 @@
-'use client';
-
-import { createWalletClient, custom } from 'viem';
-import { base } from 'viem/chains';
+import { useWalletClient } from 'wagmi';
 import { useCallback } from 'react';
+import { Address, Hex } from 'viem';
 
 export const useViemWallet = () => {
-  const createWallet = useCallback(() => {
-    if (!window.ethereum) {
-      throw new Error('Ethereumプロバイダーが見つかりません');
+  const { data: walletClient } = useWalletClient();
+
+  const signMessage = useCallback(async (address: Address, message: string): Promise<Hex> => {
+    if (!walletClient) {
+      throw new Error('ウォレットクライアントが見つかりません');
     }
 
-    return createWalletClient({
-      chain: base,
-      transport: custom(window.ethereum)
-    });
-  }, []);
-
-  const signMessage = useCallback(async (address: string, message: string): Promise<string> => {
     try {
-      const wallet = createWallet();
-      const signature = await wallet.signMessage({
-        account: address as `0x${string}`,
-        message: message
+      const signature = await walletClient.signMessage({
+        message: message as string,
+        account: address as Address,
       });
 
       return signature;
     } catch (error) {
-      if (error instanceof Error && error.message.includes('User rejected')) {
-        throw new Error('署名がキャンセルされました。XMTPの初期化には署名が必要です。');
-      }
-      throw error;
+      console.error('メッセージの署名に失敗:', error);
+      throw new Error('メッセージの署名に失敗しました');
     }
-  }, []);
+  }, [walletClient]);
 
   return {
-    createWallet,
-    signMessage
+    signMessage,
   };
 };

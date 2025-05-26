@@ -2,30 +2,41 @@
 
 import { Client } from '@xmtp/xmtp-js';
 import { usePrivy } from '@privy-io/react-auth';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAccount } from 'wagmi';
 import { useViemWallet } from './hooks/useViemWallet';
+import { Address, isAddress } from 'viem';
+
+type Message = {
+  id: string;
+  senderAddress: string;
+  content: string;
+  sent: boolean;
+  timestamp: Date;
+};
 
 export function TestChat() {
-  const [recipientAddress, setRecipientAddress] = useState('');
+  const [recipientAddress, setRecipientAddress] = useState<string>('');
   const [messageContent, setMessageContent] = useState('');
-  const { ready, authenticated, login } = usePrivy();
-  const { user } = usePrivy();
+  const { ready, authenticated, login, user } = usePrivy();
   const { address } = useAccount();
   const { signMessage: viemSignMessage } = useViemWallet();
-  const [messages, setMessages] = useState<{
-    id: string;
-    senderAddress: string;
-    content: string;
-    sent: boolean;
-    timestamp: Date;
-  }[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
 
+  useEffect(() => {
+    if (authenticated && address && !client) {
+      initXmtpClient();
+    }
+  }, [authenticated, address, client]);
+
   const initXmtpClient = async () => {
     try {
+      setLoading(true);
+      setError(null);
+
       if (!user?.wallet || !address) {
         throw new Error('ウォレットアドレスが見つかりません');
       }
@@ -33,45 +44,103 @@ export function TestChat() {
       const signer = {
         getAddress: async () => address,
         signMessage: async (message: string | Uint8Array) => {
-          try {
-            const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
-            console.log('署名リクエスト:', { messageString });
-            
-            const signature = await viemSignMessage(address, messageString);
-            console.log('署名結果:', { signature });
-            return signature;
-          } catch (error) {
-            console.error('署名エラー:', error);
-            const errorMessage = error instanceof Error ? error.message : 'メッセージの署名に失敗しました';
-            setError(errorMessage);
-            throw new Error(errorMessage);
-          }
+          const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
+          return viemSignMessage(address as Address, messageString);
         }
       };
 
-      const clientOptions = {
-        env: 'production' as const,
-        skipContactPublishing: true,
-      };
+      const xmtp = await Client.create(signer, {
+        env: 'production'
+      });
 
-      const xmtp = await Client.create(signer, clientOptions);
       setClient(xmtp);
-      setError(null);
-      return xmtp;
+      
+      // 既存の会話を読み込む
+      const conversations = await xmtp.conversations.list();
+      for (const conversation of conversations) {
+        const messageList = await conversation.messages();
+        const formattedMessages: Message[] = messageList.map(msg => ({
+          id: msg.id,
+          senderAddress: msg.senderAddress,
+          content: msg.content ?? '',
+          sent: msg.senderAddress === address,
+          timestamp: msg.sent
+        }));
+        setMessages(prev => [...prev, ...formattedMessages]);
+      }
+
+      // メッセージのストリームを購読
+      for (const conversation of conversations) {
+        const stream = await conversation.streamMessages();
+        for await (const msg of stream) {
+          const newMessage: Message = {
+            id: msg.id,
+            senderAddress: msg.senderAddress,
+            content: msg.content ?? '',
+            sent: msg.senderAddress === address,
+            timestamp: msg.sent
+          };
+          setMessages(prev => [...prev, newMessage]);
+        }
+      }
 
     } catch (err) {
       console.error('XMTPクライアントの初期化に失敗:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('メッセージングの初期化に失敗しました');
+      setError(err instanceof Error ? err.message : 'メッセージングの初期化に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSend = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!messageContent.trim() || !isAddress(recipientAddress)) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      if (!client) {
+        throw new Error('XMTPクライアントが初期化されていません');
       }
-      throw err; // 上位のエラーハンドリングに伝播させる
+
+      const canMessage = await client.canMessage(recipientAddress);
+      if (!canMessage) {
+        throw new Error(`指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません`);
+      }
+
+      const conversation = await client.conversations.newConversation(recipientAddress);
+      await conversation.send(messageContent);
+
+      const newMessage: Message = {
+        id: Date.now().toString(),
+        senderAddress: client.address,
+        content: messageContent,
+        sent: true,
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, newMessage]);
+      setMessageContent('');
+      
+    } catch (err) {
+      console.error('メッセージの送信に失敗:', err);
+      setError(err instanceof Error ? err.message : 'メッセージの送信に失敗しました');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleAddressChange = (input: string) => {
+    // 入力された文字列が16進数のみで構成されているか確認
+    if (/^(0x)?[0-9a-fA-F]*$/.test(input)) {
+      const formattedAddress = input.startsWith('0x') ? input : `0x${input}`;
+      setRecipientAddress(formattedAddress);
     }
   };
 
   if (!ready) {
-    return <div>Loading...</div>;
+    return <div className="flex justify-center items-center h-screen">読み込み中...</div>;
   }
 
   if (!authenticated) {
@@ -88,52 +157,7 @@ export function TestChat() {
     );
   }
 
-  const handleSend = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!messageContent.trim() || !recipientAddress.trim()) return;
-
-    setLoading(true);
-    setError(null);
-
-    try {
-      // クライアントの初期化または取得
-      const currentClient = client || await initXmtpClient();
-      if (!currentClient) {
-        throw new Error('XMTPクライアントの初期化に失敗しました。再度お試しください。');
-      }
-      setLoading(false);
-
-      // 宛先がXMTPネットワーク上に存在するか確認
-      // 宛先の検証
-      const canMessage = await currentClient.canMessage(recipientAddress);
-      if (!canMessage) {
-        setError(`指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません。\n宛先アドレスを確認してください。`);
-        return;
-      }
-
-      // メッセージの送信
-      const conversation = await currentClient.conversations.newConversation(recipientAddress);
-      await conversation.send(messageContent);
-      
-      // メッセージを表示に追加
-      setMessages(prev => [...prev, {
-        id: Date.now().toString(),
-        senderAddress: currentClient.address,
-        content: messageContent,
-        sent: true,
-        timestamp: new Date(),
-      }]);
-      
-      setMessageContent('');
-    } catch (err) {
-      console.error('メッセージの送信に失敗:', err);
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('メッセージの送信に失敗しました');
-      }
-    }
-  };
+  const isValidAddress = isAddress(recipientAddress);
 
   return (
     <div className="flex flex-col h-screen p-4 max-w-2xl mx-auto">
@@ -141,15 +165,22 @@ export function TestChat() {
         <input
           type="text"
           value={recipientAddress}
-          onChange={(e) => setRecipientAddress(e.target.value)}
-          placeholder="宛先のウォレットアドレス"
-          className="w-full p-2 border rounded"
+          onChange={(e) => handleAddressChange(e.target.value)}
+          placeholder="宛先のウォレットアドレス（0xで始まる42文字）"
+          className={`w-full p-2 border rounded ${
+            recipientAddress && !isValidAddress ? 'border-red-500' : ''
+          }`}
         />
+        {recipientAddress && !isValidAddress && (
+          <p className="text-red-500 text-sm mt-1">
+            有効なイーサリアムアドレスを入力してください
+          </p>
+        )}
       </div>
 
       <div className="flex-1 overflow-auto bg-gray-50 rounded p-4 mb-4">
         {loading ? (
-          <div className="text-center">Loading messages...</div>
+          <div className="text-center">メッセージを読み込み中...</div>
         ) : error ? (
           <div className="text-red-500 text-center">{error}</div>
         ) : messages.length === 0 ? (
@@ -184,10 +215,11 @@ export function TestChat() {
           onChange={(e) => setMessageContent(e.target.value)}
           placeholder="メッセージを入力..."
           className="flex-1 p-2 border rounded"
+          disabled={loading}
         />
         <button
           type="submit"
-          disabled={!messageContent.trim() || !recipientAddress.trim()}
+          disabled={!messageContent.trim() || !isValidAddress || loading}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
           送信

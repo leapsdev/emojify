@@ -128,7 +128,7 @@ export function TestChat() {
       };
 
       xmtpClient = await Client.create(signer, {
-        env: 'production'
+        env: 'dev'
       });
       
       setClient(xmtpClient);

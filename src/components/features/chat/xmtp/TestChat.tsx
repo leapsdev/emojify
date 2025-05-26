@@ -15,6 +15,10 @@ type Message = {
   timestamp: Date;
 };
 
+type GroupMember = {
+  address: string;
+};
+
 let xmtpClient: Client | null = null;
 
 export function TestChat() {
@@ -27,6 +31,7 @@ export function TestChat() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [client, setClient] = useState<Client | null>(null);
+  const [groupMembers, setGroupMembers] = useState<GroupMember[]>([]);
 
   useEffect(() => {
     if (authenticated && address && !client) {
@@ -90,9 +95,46 @@ export function TestChat() {
     }
   };
 
+  const handleAddMember = async () => {
+    if (!isAddress(recipientAddress)) return;
+
+    try {
+      if (!client) {
+        throw new Error('XMTPクライアントが初期化されていません');
+      }
+
+      const canMessage = await client.canMessage(recipientAddress);
+      if (!canMessage) {
+        throw new Error(
+          `指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません。\n` +
+          'XMTPを利用するには、参加者もXMTPネットワークに参加している必要があります。\n' +
+          '参加者に https://xmtp.chat でXMTPをセットアップするよう依頼してください。'
+        );
+      }
+
+      // メンバーが既に存在するか確認
+      const memberExists = groupMembers.some(
+        member => member.address.toLowerCase() === recipientAddress.toLowerCase()
+      );
+
+      if (!memberExists) {
+        setGroupMembers(prev => [...prev, { address: recipientAddress }]);
+      }
+
+      setRecipientAddress('');
+    } catch (err) {
+      console.error('メンバーの追加に失敗:', err);
+      setError(err instanceof Error ? err.message : 'メンバーの追加に失敗しました');
+    }
+  };
+
+  const handleRemoveMember = (address: string) => {
+    setGroupMembers(prev => prev.filter(member => member.address !== address));
+  };
+
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!messageContent.trim() || !isAddress(recipientAddress)) return;
+    if (!messageContent.trim() || groupMembers.length === 0) return;
 
     setLoading(true);
     setError(null);
@@ -102,32 +144,19 @@ export function TestChat() {
         throw new Error('XMTPクライアントが初期化されていません');
       }
 
-      // 自分自身へのメッセージングをチェック
-      if (recipientAddress.toLowerCase() === address?.toLowerCase()) {
-        throw new Error('注意: 自分自身へのメッセージ送信はサポートされていません。他のアドレスを指定してください。');
-      }
-
-      const canMessage = await client.canMessage(recipientAddress);
-      if (!canMessage) {
-        throw new Error(
-          `指定されたアドレス（${recipientAddress}）はXMTPネットワーク上に存在しません。\n` +
-          'XMTPを利用するには、受信者もXMTPネットワークに参加している必要があります。\n' +
-          '受信者に https://xmtp.chat でXMTPをセットアップするよう依頼してください。'
+      // 全メンバーに送信
+      for (const member of groupMembers) {
+        const conversations = await client.conversations.list();
+        let conversation = conversations.find(
+          conv => conv.peerAddress.toLowerCase() === member.address.toLowerCase()
         );
+
+        if (!conversation) {
+          conversation = await client.conversations.newConversation(member.address);
+        }
+
+        await conversation.send(messageContent);
       }
-
-      // 既存の会話を探す
-      const conversations = await client.conversations.list();
-      let conversation = conversations.find(
-        conv => conv.peerAddress.toLowerCase() === recipientAddress.toLowerCase()
-      );
-
-      // 会話が存在しない場合は新規作成
-      if (!conversation) {
-        conversation = await client.conversations.newConversation(recipientAddress);
-      }
-
-      await conversation.send(messageContent);
 
       const newMessage: Message = {
         id: Date.now().toString(),
@@ -178,15 +207,25 @@ export function TestChat() {
   return (
     <div className="flex flex-col h-screen p-4 max-w-2xl mx-auto">
       <div className="mb-4">
-        <input
-          type="text"
-          value={recipientAddress}
-          onChange={(e) => handleAddressChange(e.target.value)}
-          placeholder="宛先のウォレットアドレス（0xで始まる42文字）"
-          className={`w-full p-2 border rounded ${
-            recipientAddress && !isValidAddress ? 'border-red-500' : ''
-          }`}
-        />
+        <div className="flex gap-2 mb-2">
+          <input
+            type="text"
+            value={recipientAddress}
+            onChange={(e) => handleAddressChange(e.target.value)}
+            placeholder="メンバーのウォレットアドレス（0xで始まる42文字）"
+            className={`flex-1 p-2 border rounded ${
+              recipientAddress && !isValidAddress ? 'border-red-500' : ''
+            }`}
+          />
+          <button
+            type="button"
+            onClick={handleAddMember}
+            disabled={!isValidAddress || loading}
+            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
+          >
+            追加
+          </button>
+        </div>
         {recipientAddress && !isValidAddress && (
           <p className="text-red-500 text-sm mt-1">
             有効なイーサリアムアドレスを入力してください
@@ -194,11 +233,37 @@ export function TestChat() {
         )}
       </div>
 
+      <div className="mb-4">
+        <h3 className="font-bold mb-2">👥 グループメンバー</h3>
+        {groupMembers.length === 0 ? (
+          <p className="text-gray-500 text-sm">メンバーを追加してください</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {groupMembers.map((member) => (
+              <div
+                key={member.address}
+                className="flex items-center gap-2 bg-blue-100 px-3 py-1 rounded"
+              >
+                <span className="text-sm truncate max-w-[200px]">
+                  {member.address}
+                </span>
+                <button
+                  onClick={() => handleRemoveMember(member.address)}
+                  className="text-red-500 hover:text-red-700"
+                >
+                  ✕
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
       <div className="mb-4 p-4 bg-blue-50 rounded text-sm">
         <h3 className="font-bold mb-2">💡 使用方法</h3>
         <ul className="list-disc pl-5 space-y-1">
-          <li>メッセージを送信するには、受信者のウォレットアドレスを入力してください</li>
-          <li>受信者は事前にXMTPネットワークに参加している必要があります</li>
+          <li>メンバーを追加してグループチャットを開始できます</li>
+          <li>メンバーは事前にXMTPネットワークに参加している必要があります</li>
           <li>初めての方は https://xmtp.chat でセットアップできます</li>
         </ul>
       </div>
@@ -207,7 +272,7 @@ export function TestChat() {
         {loading ? (
           <div className="text-center">メッセージを読み込み中...</div>
         ) : error ? (
-          <div className="text-red-500 text-center">{error}</div>
+          <div className="text-red-500 text-center whitespace-pre-line">{error}</div>
         ) : messages.length === 0 ? (
           <div className="text-center text-gray-500">
             メッセージはありません
@@ -240,11 +305,11 @@ export function TestChat() {
           onChange={(e) => setMessageContent(e.target.value)}
           placeholder="メッセージを入力..."
           className="flex-1 p-2 border rounded"
-          disabled={loading}
+          disabled={loading || groupMembers.length === 0}
         />
         <button
           type="submit"
-          disabled={!messageContent.trim() || !isValidAddress || loading}
+          disabled={!messageContent.trim() || groupMembers.length === 0 || loading}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
         >
           送信

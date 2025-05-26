@@ -56,24 +56,41 @@ export function TestChat() {
   }, [address]);
 
   const listenToMessages = useCallback(async (peerAddress: string, conversation: Conversation) => {
-    const stream = await conversation.streamMessages();
-    for await (const msg of stream) {
-      const newMessage: Message = {
-        id: msg.id,
-        senderAddress: msg.senderAddress,
-        content: msg.content ?? '',
-        sent: msg.senderAddress === address,
-        timestamp: msg.sent
-      };
+    try {
+      const stream = await conversation.streamMessages();
+      for await (const msg of stream) {
+        // メッセージの重複を防ぐため、既存のメッセージをチェック
+        const newMessage: Message = {
+          id: msg.id,
+          senderAddress: msg.senderAddress,
+          content: msg.content ?? '',
+          sent: msg.senderAddress === address,
+          timestamp: msg.sent
+        };
+        
+        setMessages(prev => {
+          const newMap = new Map(prev);
+          const existingMessages = newMap.get(peerAddress.toLowerCase()) || [];
+          
+          // IDによる重複チェック
+          if (!existingMessages.some(m => m.id === msg.id)) {
+            newMap.set(peerAddress.toLowerCase(), [...existingMessages, newMessage]);
+          }
+          return newMap;
+        });
+      }
+    } catch (err) {
+      console.error('メッセージストリームのエラー:', err);
+      setError('メッセージの受信中にエラーが発生しました。再接続を試みています...');
       
-      setMessages(prev => {
-        const newMap = new Map(prev);
-        const existingMessages = newMap.get(peerAddress.toLowerCase()) || [];
-        newMap.set(peerAddress.toLowerCase(), [...existingMessages, newMessage]);
-        return newMap;
-      });
+      // エラー発生時は少し待ってから再接続を試みる
+      setTimeout(() => {
+        if (client) {
+          listenToMessages(peerAddress, conversation).catch(console.error);
+        }
+      }, 5000);
     }
-  }, [address]);
+  }, [address, client]);
 
   useEffect(() => {
     if (authenticated && address && !client) {

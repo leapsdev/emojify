@@ -527,16 +527,18 @@ export function TestChat() {
         </div>
 
         {/* メインコンテンツ */}
-        <div className="flex-1 flex flex-col p-4">
+        <div className="flex-1 flex flex-col">
           {showGroupManagement ? (
-            <GroupMembers
-              client={client}
-              group={selectedGroup}
-              onUpdateGroup={handleUpdateGroup}
-              onClose={handleCloseGroupManagement}
-            />
+            <div className="border-b border-gray-200 bg-white p-4">
+              <GroupMembers
+                client={client}
+                group={selectedGroup}
+                onUpdateGroup={handleUpdateGroup}
+                onClose={handleCloseGroupManagement}
+              />
+            </div>
           ) : (
-            <>
+            <div className="border-b border-gray-200 bg-white p-4">
               <div className="mb-4">
                 <div className="flex gap-2">
                   <input
@@ -564,7 +566,7 @@ export function TestChat() {
                 )}
               </div>
 
-              <div className="mb-4">
+              <div>
                 <h3 className="font-bold mb-2">👥 グループメンバー</h3>
                 {groupMembers.length === 0 ? (
                   <p className="text-gray-500 text-sm">メンバーを追加してください</p>
@@ -596,11 +598,11 @@ export function TestChat() {
                   </div>
                 )}
               </div>
-            </>
+            </div>
           )}
 
           {/* メッセージ表示エリア */}
-          <div className="flex-1 overflow-auto bg-white rounded-lg shadow-sm p-4 mb-4 min-h-[400px]">
+          <div className="flex-1 overflow-auto bg-white p-4 min-h-[400px]">
             {loading ? (
               <div className="text-center">メッセージを読み込み中...</div>
             ) : error ? (
@@ -634,23 +636,25 @@ export function TestChat() {
           </div>
 
           {/* メッセージ入力エリア */}
-          <form onSubmit={handleSend} className="flex gap-2 bg-white p-4 rounded-lg shadow-sm">
-            <input
-              type="text"
-              value={messageContent}
-              onChange={(e) => setMessageContent(e.target.value)}
-              placeholder="メッセージを入力..."
-              className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
-              disabled={loading || !isXMTPReady || groupMembers.length === 0}
-            />
-            <button
-              type="submit"
-              disabled={!messageContent.trim() || !isXMTPReady || groupMembers.length === 0 || loading}
-              className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              送信
-            </button>
-          </form>
+          <div className="border-t border-gray-200 bg-white p-4">
+            <form onSubmit={handleSend} className="flex gap-2">
+              <input
+                type="text"
+                value={messageContent}
+                onChange={(e) => setMessageContent(e.target.value)}
+                placeholder="メッセージを入力..."
+                className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+                disabled={loading || !isXMTPReady || groupMembers.length === 0}
+              />
+              <button
+                type="submit"
+                disabled={!messageContent.trim() || !isXMTPReady || groupMembers.length === 0 || loading}
+                className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                送信
+              </button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

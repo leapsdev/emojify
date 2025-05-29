@@ -142,32 +142,85 @@ export function TestChat() {
         getAddress: async () => address,
         signMessage: async (message: string | Uint8Array) => {
           const messageString = typeof message === 'string' ? message : new TextDecoder().decode(message);
-          return viemSignMessage(address as Address, messageString);
+          console.log('署名リクエスト:', {
+            address,
+            message: messageString
+          });
+          const signature = await viemSignMessage(address as Address, messageString);
+          console.log('署名完了:', {
+            address,
+            signature: signature.slice(0, 10) + '...'
+          });
+          return signature;
         }
       };
 
+      console.log('XMTPクライアント初期化開始:', {
+        address,
+        env: 'dev'
+      });
+
       xmtpClient = await Client.create(signer, {
         env: 'dev',
+      });
+      
+      console.log('XMTPクライアント初期化完了:', {
+        address: xmtpClient.address,
+        env: 'dev'
       });
       
       setClient(xmtpClient);
       setGroupMembers([{ address: xmtpClient.address, isOnXMTP: true }]);
       setIsXMTPReady(true);
 
-      // 既存の会話を読み込む
-      const convList = await xmtpClient.conversations.list();
-      const conversationMap: ConversationMap = new Map();
-      
-      for (const conversation of convList) {
-        const peerAddress = conversation.peerAddress.toLowerCase();
-        conversationMap.set(peerAddress, conversation);
-        // メッセージを取得
-        await updateMessages(peerAddress, conversation);
-        // ストリームを開始
-        listenToMessages(peerAddress, conversation).catch(console.error);
+      try {
+        // 既存の会話を読み込む
+        console.log('既存の会話を取得開始');
+        const convList = await xmtpClient.conversations.list();
+        console.log('取得した会話一覧:', convList.map(conv => ({
+          peerAddress: conv.peerAddress,
+          topic: conv.topic
+        })));
+        
+        const conversationMap: ConversationMap = new Map();
+        
+        for (const conversation of convList) {
+          try {
+            const peerAddress = conversation.peerAddress.toLowerCase();
+            console.log('会話の処理開始:', {
+              peerAddress,
+              topic: conversation.topic
+            });
+            
+            conversationMap.set(peerAddress, conversation);
+            
+            // メッセージを取得
+            console.log('メッセージの取得開始:', peerAddress);
+            await updateMessages(peerAddress, conversation);
+            console.log('メッセージの取得完了:', peerAddress);
+            
+            // ストリームを開始
+            console.log('メッセージストリームの開始:', peerAddress);
+            listenToMessages(peerAddress, conversation).catch(err => {
+              console.error('メッセージストリームの開始に失敗:', {
+                peerAddress,
+                error: err
+              });
+            });
+          } catch (err) {
+            console.error('会話の処理中にエラー:', {
+              peerAddress: conversation.peerAddress,
+              error: err
+            });
+          }
+        }
+        
+        setConversations(conversationMap);
+        console.log('会話一覧の設定完了');
+      } catch (err) {
+        console.error('会話一覧の取得に失敗:', err);
+        setError('会話履歴の取得に失敗しました。ページを再読み込みしてください。');
       }
-      
-      setConversations(conversationMap);
 
     } catch (err) {
       console.error('XMTPクライアントの初期化に失敗:', err);

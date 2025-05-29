@@ -6,6 +6,9 @@ import { useEffect, useState, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { useViemWallet } from './hooks/useViemWallet';
 import { Address, isAddress } from 'viem';
+import { GroupList } from '@/components/features/chat/xmtp/GroupList';
+import { GroupMembers } from '@/components/features/chat/xmtp/GroupMembers';
+import { Group } from './types';
 
 type Message = {
   id: string;
@@ -38,6 +41,9 @@ export function TestChat() {
   const [isXMTPReady, setIsXMTPReady] = useState(false);
   const [conversations, setConversations] = useState<ConversationMap>(new Map());
   const [messages, setMessages] = useState<MessageMap>(new Map());
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [showGroupManagement, setShowGroupManagement] = useState(false);
+  const [groups, setGroups] = useState<Group[]>([]);
 
   const updateMessages = useCallback(async (peerAddress: string, conversation: Conversation) => {
     const messageList = await conversation.messages();
@@ -57,8 +63,17 @@ export function TestChat() {
 
   const listenToMessages = useCallback(async (peerAddress: string, conversation: Conversation) => {
     try {
+      console.log('メッセージストリーム開始:', peerAddress);
       const stream = await conversation.streamMessages();
+      console.log('メッセージストリーム取得成功');
+
       for await (const msg of stream) {
+        console.log('メッセージを受信:', {
+          id: msg.id,
+          senderAddress: msg.senderAddress,
+          content: msg.content
+        });
+
         // メッセージの重複を防ぐため、既存のメッセージをチェック
         const newMessage: Message = {
           id: msg.id,
@@ -74,7 +89,10 @@ export function TestChat() {
           
           // IDによる重複チェック
           if (!existingMessages.some(m => m.id === msg.id)) {
+            console.log('新しいメッセージを追加');
             newMap.set(peerAddress.toLowerCase(), [...existingMessages, newMessage]);
+          } else {
+            console.log('重複メッセージをスキップ');
           }
           return newMap;
         });
@@ -86,6 +104,7 @@ export function TestChat() {
       // エラー発生時は少し待ってから再接続を試みる
       setTimeout(() => {
         if (client) {
+          console.log('メッセージストリームの再接続を試みます');
           listenToMessages(peerAddress, conversation).catch(console.error);
         }
       }, 5000);
@@ -128,7 +147,7 @@ export function TestChat() {
       };
 
       xmtpClient = await Client.create(signer, {
-        env: 'dev'
+        env: 'dev',
       });
       
       setClient(xmtpClient);
@@ -166,6 +185,11 @@ export function TestChat() {
         throw new Error('XMTPクライアントが初期化されていません');
       }
 
+      console.log('メンバー追加処理開始:', {
+        recipientAddress,
+        clientAddress: client.address
+      });
+
       // メンバーが既に存在するか確認
       const memberExists = groupMembers.some(
         member => member.address.toLowerCase() === recipientAddress.toLowerCase()
@@ -175,26 +199,61 @@ export function TestChat() {
         throw new Error('このアドレスは既にメンバーとして追加されています');
       }
 
+      console.log('XMTP初期化状態を確認中:', recipientAddress);
       const canMessage = await client.canMessage(recipientAddress);
+      console.log('XMTP初期化状態の結果:', {
+        address: recipientAddress,
+        canMessage
+      });
+
+      // メンバーを追加（XMTPの初期化状態に関係なく）
       const newMember = { address: recipientAddress, isOnXMTP: canMessage };
+      console.log('新しいメンバーを追加:', newMember);
       
-      setGroupMembers(prev => [...prev, newMember]);
+      // メンバーを追加
+      setGroupMembers(prev => {
+        const updatedMembers = [...prev, newMember];
+        console.log('更新後のメンバー一覧:', updatedMembers);
+        return updatedMembers;
+      });
+      
       setRecipientAddress('');
 
       if (canMessage) {
-        // 会話を開始
-        const conversation = await client.conversations.newConversation(recipientAddress);
-        const peerAddress = recipientAddress.toLowerCase();
-        
-        setConversations(prev => {
-          const newMap = new Map(prev);
-          newMap.set(peerAddress, conversation);
-          return newMap;
-        });
+        try {
+          // 会話を開始
+          console.log('新しい会話を作成開始:', recipientAddress);
+          const conversation = await client.conversations.newConversation(recipientAddress);
+          const peerAddress = recipientAddress.toLowerCase();
+          
+          console.log('新しい会話を作成完了:', {
+            peerAddress,
+            conversationTopic: conversation.topic
+          });
 
-        // メッセージストリームを開始
-        listenToMessages(peerAddress, conversation).catch(console.error);
+          // 会話を保存
+          setConversations(prev => {
+            const newMap = new Map(prev);
+            newMap.set(peerAddress, conversation);
+            console.log('更新後の会話一覧:', Array.from(newMap.entries()));
+            return newMap;
+          });
+
+          // メッセージストリームを開始
+          console.log('メッセージストリームを開始:', peerAddress);
+          listenToMessages(peerAddress, conversation).catch(err => {
+            console.error('メッセージストリームの開始に失敗:', err);
+          });
+
+          // 既存のメッセージを取得
+          console.log('既存のメッセージを取得:', peerAddress);
+          await updateMessages(peerAddress, conversation);
+        } catch (err) {
+          console.error('会話の作成に失敗:', err);
+          setError('会話の作成に失敗しました。もう一度お試しください。');
+        }
       } else {
+        console.log('メンバーを追加しましたが、XMTPは初期化されていません:', recipientAddress);
         setError(
           `メンバーを追加しましたが、このアドレス（${recipientAddress}）はまだXMTPネットワーク上に存在しません。\n` +
           'メッセージを送信するには、メンバーがXMTPネットワークに参加する必要があります。\n' +
@@ -206,6 +265,21 @@ export function TestChat() {
       setError(err instanceof Error ? err.message : 'メンバーの追加に失敗しました');
     }
   };
+
+  // メンバー追加後の状態を確認するためのデバッグ用エフェクト
+  useEffect(() => {
+    console.log('現在のメンバー一覧:', groupMembers);
+  }, [groupMembers]);
+
+  // 会話一覧の状態を確認するためのデバッグ用エフェクト
+  useEffect(() => {
+    console.log('現在の会話一覧:', Array.from(conversations.entries()));
+  }, [conversations]);
+
+  // メッセージ一覧の状態を確認するためのデバッグ用エフェクト
+  useEffect(() => {
+    console.log('現在のメッセージ一覧:', Array.from(messages.entries()));
+  }, [messages]);
 
   const handleRemoveMember = (address: string) => {
     if (address.toLowerCase() === client?.address.toLowerCase()) {
@@ -240,34 +314,107 @@ export function TestChat() {
         throw new Error('XMTPクライアントが初期化されていません');
       }
 
+      console.log('送信開始:', {
+        messageContent,
+        groupMembers,
+        clientAddress: client.address
+      });
+
       const activeMembers = groupMembers.filter(member => member.isOnXMTP);
+      console.log('アクティブメンバー:', activeMembers);
+
       if (activeMembers.length === 0) {
         throw new Error('メッセージを送信できるメンバーがいません');
       }
 
-      // XMTPに参加しているメンバーにのみ送信
+      // 送信したメッセージを作成
+      const sentMessage: Message = {
+        id: `sent-${Date.now()}`,
+        senderAddress: client.address,
+        content: messageContent,
+        sent: true,
+        timestamp: new Date()
+      };
+
+      console.log('送信するメッセージ:', sentMessage);
+
+      // 自分自身のメッセージを追加
+      setMessages(prev => {
+        const newMap = new Map(prev);
+        const existingMessages = newMap.get(client.address.toLowerCase()) || [];
+        newMap.set(client.address.toLowerCase(), [...existingMessages, sentMessage]);
+        return newMap;
+      });
+
+      let hasSentMessage = false;
+
+      // 各メンバーにメッセージを送信
       for (const member of activeMembers) {
-        if (member.address.toLowerCase() === client.address.toLowerCase()) continue;
-
         const peerAddress = member.address.toLowerCase();
-        let conversation = conversations.get(peerAddress);
+        
+        // 自分自身へのメッセージ送信はスキップ
+        if (peerAddress === client.address.toLowerCase()) {
+          console.log('自分自身への送信はスキップ:', peerAddress);
+          continue;
+        }
 
-        if (!conversation) {
-          const newConversation = await client.conversations.newConversation(member.address);
-          setConversations(prev => {
+        console.log('メンバーへの送信開始:', peerAddress);
+
+        try {
+          // 会話の取得または作成
+          let conversation = conversations.get(peerAddress);
+          if (!conversation) {
+            console.log('新しい会話を作成');
+            conversation = await client.conversations.newConversation(member.address);
+            console.log('新しい会話を作成完了:', conversation.topic);
+
+            setConversations(prev => {
+              const newMap = new Map(prev);
+              newMap.set(peerAddress, conversation!);
+              return newMap;
+            });
+
+            // メッセージストリームを開始
+            listenToMessages(peerAddress, conversation).catch(err => {
+              console.error('メッセージストリームの開始に失敗:', err);
+            });
+          }
+
+          if (!conversation) {
+            throw new Error('会話の作成に失敗しました');
+          }
+
+          // メッセージを送信
+          console.log('メッセージを送信:', {
+            to: peerAddress,
+            content: messageContent
+          });
+          await conversation.send(messageContent);
+          console.log('メッセージ送信完了');
+
+          // 送信したメッセージを追加
+          setMessages(prev => {
             const newMap = new Map(prev);
-            newMap.set(peerAddress, newConversation);
+            const existingMessages = newMap.get(peerAddress) || [];
+            newMap.set(peerAddress, [...existingMessages, sentMessage]);
             return newMap;
           });
-          // メッセージストリームを開始
-          listenToMessages(peerAddress, newConversation).catch(console.error);
-          await newConversation.send(messageContent);
-        } else {
-          await conversation.send(messageContent);
+
+          hasSentMessage = true;
+          console.log('メッセージをステートに追加完了');
+
+        } catch (err) {
+          console.error(`メンバー ${peerAddress} への送信に失敗:`, err);
+          throw err;
         }
       }
 
+      if (!hasSentMessage) {
+        console.log('送信可能なメンバーがいないため、メッセージは送信されませんでした');
+      }
+
       setMessageContent('');
+      console.log('送信処理完了');
       
     } catch (err) {
       console.error('メッセージの送信に失敗:', err);
@@ -282,6 +429,52 @@ export function TestChat() {
       const formattedAddress = input.startsWith('0x') ? input : `0x${input}`;
       setRecipientAddress(formattedAddress);
     }
+  };
+
+  // グループの作成
+  const handleCreateGroup = async (name: string) => {
+    if (!client) {
+      setError('XMTPクライアントが初期化されていません');
+      return;
+    }
+
+    try {
+      const newGroup: Group = {
+        id: `group-${Date.now()}`,
+        name,
+        members: [{ address: client.address, isOnXMTP: true }],
+        conversation: null
+      };
+
+      setGroups(prev => [...prev, newGroup]);
+      setSelectedGroup(newGroup);
+      setShowGroupManagement(true);
+    } catch (err) {
+      console.error('グループの作成に失敗:', err);
+      setError(err instanceof Error ? err.message : 'グループの作成に失敗しました');
+    }
+  };
+
+  // グループの更新
+  const handleUpdateGroup = (updatedGroup: Group) => {
+    setGroups(prev => prev.map(group => 
+      group.id === updatedGroup.id ? updatedGroup : group
+    ));
+    setSelectedGroup(updatedGroup);
+  };
+
+  // グループの選択
+  const handleGroupSelect = (group: Group) => {
+    setSelectedGroup(group);
+    setShowGroupManagement(true);
+    // グループのメンバーを設定
+    setGroupMembers(group.members);
+  };
+
+  // グループ管理を閉じる
+  const handleCloseGroupManagement = () => {
+    setShowGroupManagement(false);
+    setSelectedGroup(null);
   };
 
   // グループ内の全メッセージを取得
@@ -315,133 +508,151 @@ export function TestChat() {
   const isValidAddress = isAddress(recipientAddress);
 
   return (
-    <div className="flex flex-col h-screen p-4 max-w-2xl mx-auto">
+    <div className="flex flex-col h-screen bg-gray-50">
       {isXMTPReady && (
-        <div className="mb-4 p-2 bg-green-100 text-green-800 rounded text-sm">
+        <div className="p-2 bg-green-100 text-green-800 text-sm">
           ✅ XMTPネットワークに接続済み
         </div>
       )}
-      
-      <div className="mb-4">
-        <div className="flex gap-2 mb-2">
-          <input
-            type="text"
-            value={recipientAddress}
-            onChange={(e) => handleAddressChange(e.target.value)}
-            placeholder="メンバーのウォレットアドレス（0xで始まる42文字）"
-            className={`flex-1 p-2 border rounded ${
-              recipientAddress && !isValidAddress ? 'border-red-500' : ''
-            }`}
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* 左サイドバー - グループ一覧 */}
+        <div className="w-56 min-w-[220px] max-w-[260px] border-r border-gray-200 bg-white">
+          <GroupList
+            client={client}
+            groups={groups}
+            onCreateGroup={handleCreateGroup}
+            onSelectGroup={handleGroupSelect}
           />
-          <button
-            type="button"
-            onClick={handleAddMember}
-            disabled={!isValidAddress || loading}
-            className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
-          >
-            追加
-          </button>
         </div>
-        {recipientAddress && !isValidAddress && (
-          <p className="text-red-500 text-sm mt-1">
-            有効なイーサリアムアドレスを入力してください
-          </p>
-        )}
-      </div>
 
-      <div className="mb-4">
-        <h3 className="font-bold mb-2">👥 グループメンバー</h3>
-        {groupMembers.length === 0 ? (
-          <p className="text-gray-500 text-sm">メンバーを追加してください</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {groupMembers.map((member) => (
-              <div
-                key={member.address}
-                className={`flex items-center gap-2 px-3 py-1 rounded ${
-                  member.isOnXMTP ? 'bg-blue-100' : 'bg-gray-100'
-                }`}
-              >
-                <span className="text-sm truncate max-w-[200px]">
-                  {member.address === client?.address ? `${member.address} (自分)` : member.address}
-                </span>
-                {!member.isOnXMTP && (
-                  <span className="text-yellow-600 text-xs">未参加</span>
-                )}
-                {member.address !== client?.address && (
+        {/* メインコンテンツ */}
+        <div className="flex-1 flex flex-col p-4">
+          {showGroupManagement ? (
+            <GroupMembers
+              client={client}
+              group={selectedGroup}
+              onUpdateGroup={handleUpdateGroup}
+              onClose={handleCloseGroupManagement}
+            />
+          ) : (
+            <>
+              <div className="mb-4">
+                <div className="flex gap-2">
+                  <input
+                    type="text"
+                    value={recipientAddress}
+                    onChange={(e) => handleAddressChange(e.target.value)}
+                    placeholder="メンバーのウォレットアドレス（0xで始まる42文字）"
+                    className={`flex-1 p-2 border rounded ${
+                      recipientAddress && !isValidAddress ? 'border-red-500' : ''
+                    }`}
+                  />
                   <button
-                    onClick={() => handleRemoveMember(member.address)}
-                    className="text-red-500 hover:text-red-700"
+                    type="button"
+                    onClick={handleAddMember}
+                    disabled={!isValidAddress || loading}
+                    className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
                   >
-                    ✕
+                    追加
                   </button>
+                </div>
+                {recipientAddress && !isValidAddress && (
+                  <p className="text-red-500 text-sm mt-1">
+                    有効なイーサリアムアドレスを入力してください
+                  </p>
                 )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
 
-      <div className="mb-4 p-4 bg-blue-50 rounded text-sm">
-        <h3 className="font-bold mb-2">💡 使用方法</h3>
-        <ul className="list-disc pl-5 space-y-1">
-          <li>メンバーを追加してグループチャットを開始できます</li>
-          <li>メンバーは事前にXMTPネットワークに参加している必要があります</li>
-          <li>初めての方は https://xmtp.chat でセットアップできます</li>
-          <li>XMTPに未参加のメンバーには送信できません</li>
-        </ul>
-      </div>
-
-      <div className="flex-1 overflow-auto bg-gray-50 rounded p-4 mb-4">
-        {loading ? (
-          <div className="text-center">メッセージを読み込み中...</div>
-        ) : error ? (
-          <div className="text-red-500 text-center whitespace-pre-line">{error}</div>
-        ) : getAllMessages().length === 0 ? (
-          <div className="text-center text-gray-500">
-            メッセージはありません
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {getAllMessages().map((msg) => (
-              <div
-                key={msg.id}
-                className={`p-2 rounded max-w-[80%] ${
-                  msg.sent
-                    ? 'ml-auto bg-blue-500 text-white'
-                    : 'bg-gray-200 text-black'
-                }`}
-              >
-                <div className="text-sm">{msg.content}</div>
-                <div className="text-xs opacity-75">
-                  送信者: {msg.senderAddress.slice(0, 6)}...{msg.senderAddress.slice(-4)}
-                </div>
-                <div className="text-xs opacity-75">
-                  {msg.timestamp.toLocaleTimeString()}
-                </div>
+              <div className="mb-4">
+                <h3 className="font-bold mb-2">👥 グループメンバー</h3>
+                {groupMembers.length === 0 ? (
+                  <p className="text-gray-500 text-sm">メンバーを追加してください</p>
+                ) : (
+                  <div className="flex flex-wrap gap-2">
+                    {groupMembers.map((member) => (
+                      <div
+                        key={member.address}
+                        className={`flex items-center gap-2 px-3 py-1 rounded ${
+                          member.isOnXMTP ? 'bg-blue-100' : 'bg-gray-100'
+                        }`}
+                      >
+                        <span className="text-sm truncate max-w-[200px]">
+                          {member.address === client?.address ? `${member.address} (自分)` : member.address}
+                        </span>
+                        {!member.isOnXMTP && (
+                          <span className="text-yellow-600 text-xs">未参加</span>
+                        )}
+                        {member.address !== client?.address && (
+                          <button
+                            onClick={() => handleRemoveMember(member.address)}
+                            className="text-red-500 hover:text-red-700"
+                          >
+                            ✕
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </>
+          )}
 
-      <form onSubmit={handleSend} className="flex gap-2">
-        <input
-          type="text"
-          value={messageContent}
-          onChange={(e) => setMessageContent(e.target.value)}
-          placeholder="メッセージを入力..."
-          className="flex-1 p-2 border rounded"
-          disabled={loading || !isXMTPReady || groupMembers.length === 0}
-        />
-        <button
-          type="submit"
-          disabled={!messageContent.trim() || !isXMTPReady || groupMembers.length === 0 || loading}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400"
-        >
-          送信
-        </button>
-      </form>
+          {/* メッセージ表示エリア */}
+          <div className="flex-1 overflow-auto bg-white rounded-lg shadow-sm p-4 mb-4 min-h-[400px]">
+            {loading ? (
+              <div className="text-center">メッセージを読み込み中...</div>
+            ) : error ? (
+              <div className="text-red-500 text-center whitespace-pre-line">{error}</div>
+            ) : getAllMessages().length === 0 ? (
+              <div className="text-center text-gray-500">
+                メッセージはありません
+              </div>
+            ) : (
+              <div className="space-y-4">
+                {getAllMessages().map((msg) => (
+                  <div
+                    key={msg.id}
+                    className={`p-3 rounded-lg max-w-[90%] ${
+                      msg.sent
+                        ? 'ml-auto bg-blue-500 text-white'
+                        : 'bg-gray-100 text-gray-900'
+                    }`}
+                  >
+                    <div className="text-sm break-words">{msg.content}</div>
+                    <div className="text-xs opacity-75 mt-1">
+                      送信者: {msg.senderAddress.slice(0, 6)}...{msg.senderAddress.slice(-4)}
+                    </div>
+                    <div className="text-xs opacity-75">
+                      {msg.timestamp.toLocaleTimeString()}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* メッセージ入力エリア */}
+          <form onSubmit={handleSend} className="flex gap-2 bg-white p-4 rounded-lg shadow-sm">
+            <input
+              type="text"
+              value={messageContent}
+              onChange={(e) => setMessageContent(e.target.value)}
+              placeholder="メッセージを入力..."
+              className="flex-1 p-2 border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              disabled={loading || !isXMTPReady || groupMembers.length === 0}
+            />
+            <button
+              type="submit"
+              disabled={!messageContent.trim() || !isXMTPReady || groupMembers.length === 0 || loading}
+              className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              送信
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 }

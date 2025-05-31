@@ -499,7 +499,18 @@ export function TestChat() {
         conversation: null
       };
 
-      setGroups(prev => [...prev, newGroup]);
+      console.log('新しいグループを作成:', {
+        groupId: newGroup.id,
+        groupName: newGroup.name,
+        members: newGroup.members,
+        clientAddress: client.address
+      });
+
+      setGroups(prev => {
+        const updatedGroups = [...prev, newGroup];
+        console.log('更新後のグループ一覧:', updatedGroups);
+        return updatedGroups;
+      });
       setSelectedGroup(newGroup);
       setShowGroupManagement(true);
     } catch (err) {
@@ -510,14 +521,32 @@ export function TestChat() {
 
   // グループの更新
   const handleUpdateGroup = (updatedGroup: Group) => {
-    setGroups(prev => prev.map(group => 
-      group.id === updatedGroup.id ? updatedGroup : group
-    ));
+    console.log('グループを更新:', {
+      groupId: updatedGroup.id,
+      groupName: updatedGroup.name,
+      members: updatedGroup.members,
+      conversation: updatedGroup.conversation
+    });
+
+    setGroups(prev => {
+      const updatedGroups = prev.map(group => 
+        group.id === updatedGroup.id ? updatedGroup : group
+      );
+      console.log('更新後のグループ一覧:', updatedGroups);
+      return updatedGroups;
+    });
     setSelectedGroup(updatedGroup);
   };
 
   // グループの選択
   const handleGroupSelect = (group: Group) => {
+    console.log('グループを選択:', {
+      groupId: group.id,
+      groupName: group.name,
+      members: group.members,
+      conversation: group.conversation
+    });
+
     setSelectedGroup(group);
     setShowGroupManagement(true);
     // グループのメンバーを設定
@@ -680,7 +709,10 @@ export function TestChat() {
                       送信者: {msg.senderAddress.slice(0, 6)}...{msg.senderAddress.slice(-4)}
                     </div>
                     <div className="text-xs opacity-75">
-                      {msg.timestamp.toLocaleTimeString()}
+                      受信者: {msg.sent ? '自分' : msg.senderAddress.slice(0, 6)}...{msg.senderAddress.slice(-4)}
+                    </div>
+                    <div className="text-xs opacity-75">
+                      {msg.timestamp.toLocaleDateString()} {msg.timestamp.toLocaleTimeString()}
                     </div>
                   </div>
                 ))}

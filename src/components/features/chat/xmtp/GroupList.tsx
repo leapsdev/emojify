@@ -1,6 +1,6 @@
+import type { Client } from '@xmtp/browser-sdk';
 import { useState } from 'react';
-import { Client } from '@xmtp/xmtp-js';
-import { Group } from './types';
+import type { Group } from './types';
 
 type GroupListProps = {
   client: Client | null;
@@ -9,7 +9,12 @@ type GroupListProps = {
   onSelectGroup: (group: Group) => void;
 };
 
-export function GroupList({ client, groups, onCreateGroup, onSelectGroup }: GroupListProps) {
+export function GroupList({
+  client,
+  groups,
+  onCreateGroup,
+  onSelectGroup,
+}: GroupListProps) {
   const [newGroupName, setNewGroupName] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,7 +29,9 @@ export function GroupList({ client, groups, onCreateGroup, onSelectGroup }: Grou
       setNewGroupName('');
     } catch (err) {
       console.error('グループの作成に失敗:', err);
-      setError(err instanceof Error ? err.message : 'グループの作成に失敗しました');
+      setError(
+        err instanceof Error ? err.message : 'グループの作成に失敗しました',
+      );
     } finally {
       setLoading(false);
     }
@@ -43,6 +50,7 @@ export function GroupList({ client, groups, onCreateGroup, onSelectGroup }: Grou
             className="w-full p-1.5 text-sm border rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
           <button
+            type="button"
             onClick={handleCreateGroup}
             disabled={!newGroupName.trim() || loading}
             className="w-full bg-blue-500 text-white px-3 py-1.5 text-sm rounded hover:bg-blue-600 disabled:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors duration-150"
@@ -72,7 +80,9 @@ export function GroupList({ client, groups, onCreateGroup, onSelectGroup }: Grou
                 onClick={() => onSelectGroup(group)}
                 className="p-2 bg-white rounded shadow-sm cursor-pointer hover:bg-gray-50 transition-colors duration-150 border border-gray-100"
               >
-                <h3 className="font-bold text-gray-900 mb-1 text-sm truncate">{group.name}</h3>
+                <h3 className="font-bold text-gray-900 mb-1 text-sm truncate">
+                  {group.name}
+                </h3>
                 <div className="flex items-center text-xs text-gray-600">
                   <span className="mr-1">👥</span>
                   <span>{group.members.length}人のメンバー</span>
@@ -84,4 +94,4 @@ export function GroupList({ client, groups, onCreateGroup, onSelectGroup }: Grou
       </div>
     </div>
   );
-} 
+}

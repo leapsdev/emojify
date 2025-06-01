@@ -1,5 +1,5 @@
-import type { Signer } from '@ethersproject/abstract-signer';
-import { Client } from '@xmtp/xmtp-js';
+import type { Identifier, IdentifierKind, Signer } from '@xmtp/browser-sdk';
+import { Client } from '@xmtp/browser-sdk';
 import type { XMTPClient, XMTPClientOptions } from './types';
 
 /**
@@ -15,10 +15,14 @@ export async function initializeClient(
   signer: Signer,
   options?: XMTPClientOptions,
 ): Promise<XMTPClient> {
-  const address = await signer.getAddress();
+  const identifierObj = await signer.getIdentifier();
+  const addressString =
+    typeof identifierObj === 'string'
+      ? identifierObj
+      : identifierObj.identifier;
 
   // すでにクライアントが存在し、同じアドレスの場合は再利用
-  if (client && currentAddress === address) {
+  if (client && currentAddress && currentAddress === addressString) {
     return client;
   }
 
@@ -27,7 +31,7 @@ export async function initializeClient(
     client = await Client.create(signer, {
       env: options?.env || 'production',
     });
-    currentAddress = address;
+    currentAddress = addressString;
     return client;
   } catch (error) {
     console.error('Failed to initialize XMTP client:', error);
@@ -54,7 +58,21 @@ export async function isXMTPEnabled(address: string): Promise<boolean> {
   }
 
   try {
-    return await Client.canMessage(address);
+    // アドレスの形式を正規化（0xプリフィックスを確保）
+    const normalizedAddress = address.startsWith('0x')
+      ? address.toLowerCase()
+      : `0x${address.toLowerCase()}`;
+
+    console.log('Checking XMTP for normalized address:', normalizedAddress);
+
+    // 正しいIdentifier構造を使用
+    const identifier: Identifier = {
+      identifier: normalizedAddress,
+      identifierKind: 'Ethereum' as IdentifierKind,
+    };
+
+    const result = await client.canMessage([identifier]);
+    return result.get(identifier.identifier) || false;
   } catch (error) {
     console.error('Failed to check XMTP status:', error);
     return false;

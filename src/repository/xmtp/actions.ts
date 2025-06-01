@@ -1,23 +1,26 @@
+import type { DecodedMessage } from '@xmtp/browser-sdk';
 import { getClient } from './client';
 import type {
-  Conversation,
-  DecodedMessage,
   ReceivedMessage,
   SendMessageResponse,
+  XMTPConversation,
+  XMTPDecodedMessage,
+  XMTPMessage,
 } from './types';
+import { convertToXMTPMessage } from './types';
 
 /**
  * 特定のアドレスとの会話を開始または取得
  */
 export async function startConversation(
   peerAddress: string,
-): Promise<Conversation> {
+): Promise<XMTPConversation> {
   const client = getClient();
 
   try {
-    const conversation =
-      await client.conversations.newConversation(peerAddress);
-    return conversation;
+    // V3では、アドレスをinbox IDとして使用
+    const conversation = await client.conversations.newDm(peerAddress);
+    return conversation as XMTPConversation;
   } catch (error) {
     console.error('Failed to start conversation:', error);
     throw new Error('会話の開始に失敗しました');
@@ -28,18 +31,21 @@ export async function startConversation(
  * メッセージを送信
  */
 export async function sendMessage(
-  conversation: Conversation,
+  conversation: XMTPConversation,
   messageContent: string,
 ): Promise<SendMessageResponse> {
   try {
-    const message = await conversation.send(messageContent);
+    const message = (await conversation.send(
+      messageContent,
+    )) as unknown as DecodedMessage<string>;
+    const xmtpMessage = convertToXMTPMessage(message);
 
     return {
-      id: message.id,
-      messageContent: message.content,
-      senderAddress: message.senderAddress,
+      id: xmtpMessage.id,
+      messageContent: xmtpMessage.content,
+      senderAddress: xmtpMessage.senderAddress,
       sent: true,
-      timestamp: message.sent,
+      timestamp: xmtpMessage.sent,
     };
   } catch (error) {
     console.error('Failed to send message:', error);
@@ -51,17 +57,22 @@ export async function sendMessage(
  * 最新のメッセージを取得
  */
 export async function getMessages(
-  conversation: Conversation,
+  conversation: XMTPConversation,
 ): Promise<ReceivedMessage[]> {
   try {
     const messages = await conversation.messages();
 
-    return messages.map((message: DecodedMessage) => ({
-      id: message.id,
-      messageContent: message.content,
-      senderAddress: message.senderAddress,
-      timestamp: message.sent,
-    }));
+    return messages.map((message) => {
+      const xmtpMessage = convertToXMTPMessage(
+        message as DecodedMessage<string>,
+      );
+      return {
+        id: xmtpMessage.id,
+        messageContent: xmtpMessage.content,
+        senderAddress: xmtpMessage.senderAddress,
+        timestamp: xmtpMessage.sent,
+      };
+    });
   } catch (error) {
     console.error('Failed to get messages:', error);
     throw new Error('メッセージの取得に失敗しました');
@@ -72,20 +83,25 @@ export async function getMessages(
  * メッセージをストリーミング受信
  */
 export async function streamMessages(
-  conversation: Conversation,
+  conversation: XMTPConversation,
   onMessage: (message: ReceivedMessage) => void,
 ): Promise<() => void> {
   try {
     // メッセージストリームを開始
-    // メッセージストリームを開始し、受信時のハンドラを設定
-    for await (const message of await conversation.streamMessages()) {
-      const receivedMessage: ReceivedMessage = {
-        id: message.id,
-        messageContent: message.content,
-        senderAddress: message.senderAddress,
-        timestamp: message.sent,
-      };
-      onMessage(receivedMessage);
+    const stream = await conversation.stream();
+    for await (const message of stream) {
+      if (message) {
+        const xmtpMessage = convertToXMTPMessage(
+          message as DecodedMessage<string>,
+        );
+        const receivedMessage: ReceivedMessage = {
+          id: xmtpMessage.id,
+          messageContent: xmtpMessage.content,
+          senderAddress: xmtpMessage.senderAddress,
+          timestamp: xmtpMessage.sent,
+        };
+        onMessage(receivedMessage);
+      }
     }
 
     // クリーンアップ関数を返す
@@ -99,11 +115,12 @@ export async function streamMessages(
 /**
  * 全ての会話リストを取得
  */
-export async function listConversations(): Promise<Conversation[]> {
+export async function listConversations(): Promise<XMTPConversation[]> {
   const client = getClient();
 
   try {
-    return await client.conversations.list();
+    const conversations = await client.conversations.list();
+    return conversations as XMTPConversation[];
   } catch (error) {
     console.error('Failed to list conversations:', error);
     throw new Error('会話リストの取得に失敗しました');

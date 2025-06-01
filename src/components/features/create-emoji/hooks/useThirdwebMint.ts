@@ -39,7 +39,9 @@ export const useThirdwebMint = () => {
     getEthereumProvider: () => Promise<{
       request: (params: {
         method: string;
-        params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown>>;
+        params?: Array<
+          string | number | boolean | Record<string, unknown> | Array<unknown>
+        >;
       }) => Promise<string>;
     }>,
     metadataUrl: string,

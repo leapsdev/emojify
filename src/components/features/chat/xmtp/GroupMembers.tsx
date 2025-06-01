@@ -1,16 +1,21 @@
+import type { Identifier, IdentifierKind } from '@xmtp/browser-sdk';
 import { useState } from 'react';
-import { Client } from '@xmtp/xmtp-js';
-import { Group, GroupMember } from './types';
 import { isAddress } from 'viem';
+import type { Group, GroupMember, XMTPClient } from './types';
 
 type GroupMembersProps = {
-  client: Client | null;
+  client: XMTPClient | null;
   group: Group | null;
   onUpdateGroup: (group: Group) => void;
   onClose: () => void;
 };
 
-export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMembersProps) {
+export function GroupMembers({
+  client,
+  group,
+  onUpdateGroup,
+  onClose,
+}: GroupMembersProps) {
   const [newMemberAddress, setNewMemberAddress] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -24,46 +29,77 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
 
       console.log('メンバー追加処理開始:', {
         newMemberAddress,
-        clientAddress: client.address
+        clientAddress: client.address,
       });
 
       // メンバーが既に存在するか確認
-      if (group.members.some(member => member.address.toLowerCase() === newMemberAddress.toLowerCase())) {
+      if (
+        group.members.some(
+          (member) =>
+            member.address.toLowerCase() === newMemberAddress.toLowerCase(),
+        )
+      ) {
         throw new Error('このアドレスは既にメンバーとして追加されています');
       }
 
-      // XMTP初期化状態を確認
+      // XMTP初期化状態を確認 - 正しいIdentifier構造を使用
       console.log('XMTP初期化状態を確認中:', newMemberAddress);
-      const canMessage = await client.canMessage(newMemberAddress);
-      console.log('XMTP初期化状態の結果:', {
-        address: newMemberAddress,
-        canMessage
-      });
+
+      // アドレスの形式を正規化（0xプリフィックスを確保）
+      const normalizedAddress = newMemberAddress.startsWith('0x')
+        ? newMemberAddress.toLowerCase()
+        : `0x${newMemberAddress.toLowerCase()}`;
+
+      console.log('Normalized member address:', normalizedAddress);
+
+      const memberIdentifier: Identifier = {
+        identifier: normalizedAddress,
+        identifierKind: 'Ethereum' as IdentifierKind,
+      };
+
+      let isOnXMTP = false;
+      try {
+        const canMessageMap = await client.canMessage([memberIdentifier]);
+        isOnXMTP = canMessageMap.get(memberIdentifier.identifier) || false;
+        console.log('XMTP初期化状態の結果:', {
+          address: normalizedAddress,
+          isOnXMTP,
+        });
+      } catch (canMessageError) {
+        console.warn(
+          'XMTP状態確認に失敗（メンバーは追加されますが、XMTP状態は不明）:',
+          canMessageError,
+        );
+        // canMessage が失敗してもメンバー追加は続行する
+        isOnXMTP = false;
+      }
 
       // メンバーを追加
       const newMember: GroupMember = {
-        address: newMemberAddress.toLowerCase(),
-        isOnXMTP: canMessage
+        address: normalizedAddress,
+        isOnXMTP,
       };
 
       console.log('新しいメンバー情報:', newMember);
 
       const updatedGroup = {
         ...group,
-        members: [...group.members, newMember]
+        members: [...group.members, newMember],
       };
 
       console.log('更新後のグループ情報:', {
         groupId: updatedGroup.id,
         memberCount: updatedGroup.members.length,
-        members: updatedGroup.members
+        members: updatedGroup.members,
       });
 
       onUpdateGroup(updatedGroup);
       setNewMemberAddress('');
     } catch (err) {
       console.error('メンバーの追加に失敗:', err);
-      setError(err instanceof Error ? err.message : 'メンバーの追加に失敗しました');
+      setError(
+        err instanceof Error ? err.message : 'メンバーの追加に失敗しました',
+      );
     } finally {
       setLoading(false);
     }
@@ -80,7 +116,9 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
 
     const updatedGroup = {
       ...group,
-      members: group.members.filter(member => member.address !== address.toLowerCase())
+      members: group.members.filter(
+        (member) => member.address !== address.toLowerCase(),
+      ),
     };
 
     onUpdateGroup(updatedGroup);
@@ -100,6 +138,7 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
         <div className="flex justify-between items-center mb-2">
           <h2 className="text-xl font-bold">{group.name} - メンバー管理</h2>
           <button
+            type="button"
             onClick={onClose}
             className="text-gray-500 hover:text-gray-700"
           >
@@ -113,10 +152,13 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
             onChange={(e) => setNewMemberAddress(e.target.value)}
             placeholder="メンバーのウォレットアドレス"
             className={`flex-1 p-2 border rounded ${
-              newMemberAddress && !isAddress(newMemberAddress) ? 'border-red-500' : ''
+              newMemberAddress && !isAddress(newMemberAddress)
+                ? 'border-red-500'
+                : ''
             }`}
           />
           <button
+            type="button"
             onClick={handleAddMember}
             disabled={!isAddress(newMemberAddress) || loading}
             className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 disabled:bg-gray-400"
@@ -131,9 +173,7 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
         )}
       </div>
 
-      {error && (
-        <div className="text-red-500 mb-4">{error}</div>
-      )}
+      {error && <div className="text-red-500 mb-4">{error}</div>}
 
       <div className="flex-1 overflow-auto">
         <div className="space-y-2">
@@ -144,7 +184,9 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm truncate max-w-[200px]">
-                  {member.address === client?.address ? `${member.address} (自分)` : member.address}
+                  {member.address === client?.address
+                    ? `${member.address} (自分)`
+                    : member.address}
                 </span>
                 {!member.isOnXMTP && (
                   <span className="text-yellow-600 text-xs">未参加</span>
@@ -152,6 +194,7 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
               </div>
               {member.address !== client?.address && (
                 <button
+                  type="button"
                   onClick={() => handleRemoveMember(member.address)}
                   className="text-red-500 hover:text-red-700"
                 >
@@ -164,4 +207,4 @@ export function GroupMembers({ client, group, onUpdateGroup, onClose }: GroupMem
       </div>
     </div>
   );
-} 
+}

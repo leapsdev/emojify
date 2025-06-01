@@ -23,10 +23,19 @@ declare module '@privy-io/react-auth' {
   }
 
   export interface EthereumProvider {
-    request: (args: { 
-      method: string; 
-      params?: Array<string | number | boolean | Record<string, unknown> | Array<unknown> | TypedData>; 
-    }) => Promise<string | number | boolean | Record<string, unknown> | Array<unknown>>;
+    request: (args: {
+      method: string;
+      params?: Array<
+        | string
+        | number
+        | boolean
+        | Record<string, unknown>
+        | Array<unknown>
+        | TypedData
+      >;
+    }) => Promise<
+      string | number | boolean | Record<string, unknown> | Array<unknown>
+    >;
   }
 
   export interface Wallet {

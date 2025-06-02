@@ -84,7 +84,9 @@ export function UserItem({
             {user.displayName}
           </span>
           <span className="text-sm text-gray-500 truncate">
-            {addresses[0] && <Name address={addresses[0]} chain={base} />}
+            {addresses[0] && (
+              <Name address={addresses[0] as `0x${string}`} chain={base} />
+            )}
           </span>
         </div>
       </div>

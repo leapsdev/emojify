@@ -5,10 +5,10 @@ export async function createGroup(
   client: Client,
   name: string,
   members: string[],
-) {
+): Promise<Group<string>> {
   try {
     const group = await client.conversations.newGroup(members, { name });
-    return group;
+    return group as Group<string>;
   } catch (error) {
     console.error('グループの作成に失敗しました:', error);
     throw error;
@@ -16,9 +16,12 @@ export async function createGroup(
 }
 
 // メンバー追加
-export async function addMember(group: Group, memberAddress: string) {
+export async function addMember(
+  group: Group<string>,
+  address: string,
+): Promise<void> {
   try {
-    await group.addMembers([memberAddress]);
+    await group.addMembers([address]);
   } catch (error) {
     console.error('メンバーの追加に失敗しました:', error);
     throw error;
@@ -26,9 +29,12 @@ export async function addMember(group: Group, memberAddress: string) {
 }
 
 // メンバー削除
-export async function removeMember(group: Group, memberAddress: string) {
+export async function removeMember(
+  group: Group<string>,
+  address: string,
+): Promise<void> {
   try {
-    await group.removeMembers([memberAddress]);
+    await group.removeMembers([address]);
   } catch (error) {
     console.error('メンバーの削除に失敗しました:', error);
     throw error;

@@ -1,15 +1,20 @@
+import type { Wallet } from '@privy-io/react-auth';
 import { Client, type Signer } from '@xmtp/browser-sdk';
 import { ethers } from 'ethers';
 import type { providers } from 'ethers';
 
+interface PrivyWallet extends Wallet {
+  provider: providers.ExternalProvider;
+}
+
 // XMTPクライアントの初期化
 export async function initializeXMTPClient(
-  provider: providers.ExternalProvider,
-) {
+  wallet: PrivyWallet,
+): Promise<Client> {
   try {
-    const ethersProvider = new ethers.providers.Web3Provider(provider);
-    const signer = ethersProvider.getSigner();
-    const address = (await signer.getAddress()) as `0x${string}`;
+    const provider = new ethers.providers.Web3Provider(wallet.provider);
+    const signer = provider.getSigner();
+    const address = await signer.getAddress();
 
     const xmtpSigner: Signer = {
       type: 'EOA',
@@ -23,7 +28,7 @@ export async function initializeXMTPClient(
       },
     };
 
-    const client = await Client.create(xmtpSigner, { env: 'production' });
+    const client = await Client.create(xmtpSigner, { env: 'dev' });
     return client;
   } catch (error) {
     console.error('XMTPクライアントの初期化に失敗しました:', error);

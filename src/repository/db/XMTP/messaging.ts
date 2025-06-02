@@ -1,4 +1,9 @@
-import type { Client, Conversation, DecodedMessage } from '@xmtp/browser-sdk';
+import type {
+  Client,
+  DecodedMessage,
+  Group,
+  StreamCallback,
+} from '@xmtp/browser-sdk';
 
 // 1対1のDM作成
 export async function createDirectMessage(
@@ -15,9 +20,12 @@ export async function createDirectMessage(
 }
 
 // メッセージ送信
-export async function sendMessage(conversation: Conversation, content: string) {
+export async function sendMessage(
+  group: Group<string>,
+  content: string,
+): Promise<void> {
   try {
-    await conversation.send(content);
+    await group.send(content);
   } catch (error) {
     console.error('メッセージの送信に失敗しました:', error);
     throw error;
@@ -25,28 +33,40 @@ export async function sendMessage(conversation: Conversation, content: string) {
 }
 
 // メッセージ履歴取得
-export async function getMessages(conversation: Conversation) {
+export async function getMessages(
+  group: Group<string>,
+): Promise<DecodedMessage<string>[]> {
   try {
-    const messages = await conversation.messages();
+    const messages = await group.messages();
     return messages;
   } catch (error) {
-    console.error('メッセージ履歴の取得に失敗しました:', error);
+    console.error('メッセージの取得に失敗しました:', error);
     throw error;
   }
 }
 
 // メッセージのストリーミング
-export async function streamMessages(
-  conversation: Conversation,
-  callback: (message: DecodedMessage) => void,
-) {
+export function streamMessages(
+  group: Group<string>,
+  callback: (message: DecodedMessage<string>) => void,
+): void {
   try {
-    const stream = await conversation.stream();
-    for await (const message of stream) {
-      if (message) {
-        callback(message);
+    const streamCallback: StreamCallback<DecodedMessage<string>> = (
+      message,
+      err,
+    ) => {
+      if (err) {
+        console.error(
+          'メッセージのストリーミング中にエラーが発生しました:',
+          err,
+        );
+        return;
       }
-    }
+      if (message) {
+        callback(message as unknown as DecodedMessage<string>);
+      }
+    };
+    group.stream(streamCallback);
   } catch (error) {
     console.error('メッセージのストリーミングに失敗しました:', error);
     throw error;

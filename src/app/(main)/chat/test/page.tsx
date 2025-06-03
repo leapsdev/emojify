@@ -127,22 +127,20 @@ export default function TestChatPage() {
         throw new Error('XMTPクライアントが準備できていません');
       }
 
-      // アドレスを正しい16進数形式に変換（0xプレフィックスを削除）
+      // アドレスから0xプレフィックスを除去
       const myAddress = wallets[0].address.toLowerCase().replace('0x', '');
-      if (!/^[0-9a-f]{40}$/.test(myAddress)) {
-        throw new Error('無効なウォレットアドレス形式です');
-      }
+      const members = [myAddress];
 
       console.log('グループ作成を開始します...');
       // グループを作成
-      const group = await createGroup(client, newGroupName, [myAddress]);
+      const group = await createGroup(client, newGroupName, members);
       console.log('グループが作成されました:', group);
 
       const newGroupData: GroupData = {
         id: group.id,
         name: newGroupName,
-        members: [myAddress],
         group,
+        members,
       };
       setGroups((prev) => [...prev, newGroupData]);
       setNewGroupName('');
@@ -158,12 +156,14 @@ export default function TestChatPage() {
   const handleAddMember = async () => {
     if (!selectedGroup?.group || !newMemberAddress) return;
     try {
-      await addMember(selectedGroup.group, newMemberAddress);
+      // アドレスから0xプレフィックスを除去
+      const normalizedAddress = newMemberAddress.toLowerCase().replace('0x', '');
+      await addMember(selectedGroup.group, normalizedAddress);
       const updatedGroups = groups.map((group) => {
         if (group.id === selectedGroup.id) {
           return {
             ...group,
-            members: [...group.members, newMemberAddress],
+            members: [...group.members, normalizedAddress],
           };
         }
         return group;

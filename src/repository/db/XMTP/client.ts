@@ -16,8 +16,9 @@ export async function initializeXMTPClient(
     const signer = provider.getSigner();
     const address = await signer.getAddress();
 
+    // SCW signerの作成
     const xmtpSigner: Signer = {
-      type: 'EOA',
+      type: 'SCW',
       getIdentifier: () => ({
         identifier: address.toLowerCase() as `0x${string}`,
         identifierKind: 'Ethereum',
@@ -26,9 +27,20 @@ export async function initializeXMTPClient(
         const signature = await signer.signMessage(message);
         return new Uint8Array(Buffer.from(signature.slice(2), 'hex'));
       },
+      getChainId: () => {
+        return BigInt(1); // Ethereum mainnet
+      },
     };
 
-    const client = await Client.create(xmtpSigner, { env: 'dev' });
+    // データベース暗号化キーの生成
+    const dbEncryptionKey = window.crypto.getRandomValues(new Uint8Array(32));
+
+    // クライアントの作成
+    const client = await Client.create(xmtpSigner, {
+      env: 'dev',
+      dbEncryptionKey,
+    });
+
     return client;
   } catch (error) {
     console.error('XMTPクライアントの初期化に失敗しました:', error);

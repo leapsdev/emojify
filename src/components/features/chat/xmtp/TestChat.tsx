@@ -121,7 +121,7 @@ export function TestChat() {
   useEffect(() => {
     if (client) {
       import('./actions').then(({ setXMTPClient }) => {
-        setXMTPClient(client);
+        setXMTPClient(client).catch(console.error);
       });
     }
   }, [client]);

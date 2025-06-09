@@ -4,7 +4,7 @@ import { Client } from '@xmtp/xmtp-js';
 
 let xmtpClientInstance: Client | null = null;
 
-export function setXMTPClient(client: Client) {
+export async function setXMTPClient(client: Client) {
   xmtpClientInstance = client;
 }
 
@@ -18,14 +18,21 @@ export async function sendMessageAction(
       throw new Error('XMTPクライアントが初期化されていません');
     }
 
-    // 既存の会話があれば取得
+    // すべてのアクティブな会話にメッセージを送信
     const conversations = await xmtpClientInstance.conversations.list();
+    let success = false;
+
     for (const conversation of conversations) {
       try {
         await conversation.send(content);
+        success = true;
       } catch (err) {
-        console.error('メッセージの送信に失敗:', err);
+        console.error(`会話 ${conversation.peerAddress} へのメッセージ送信に失敗:`, err);
       }
+    }
+
+    if (!success) {
+      throw new Error('どの会話にもメッセージを送信できませんでした');
     }
 
     return { success: true };

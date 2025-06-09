@@ -1,23 +1,11 @@
 'use client';
 
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
-import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
 import { Categories } from 'emoji-picker-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { EmojiPicker } from './EmojiPicker';
 import { sendMessageAction } from './actions';
 import { useEmojiInput } from './hooks/useEmojiInput';
-
-interface NFT {
-  tokenId: string;
-  owner: string;
-  uri: string;
-  imageUrl?: string;
-  name?: string;
-  description?: string;
-}
 
 type ChatRoomInputProps = {
   roomId: string;
@@ -27,17 +15,6 @@ type ChatRoomInputProps = {
 function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { selectedWalletAddress } = useWallet();
-  const { nfts } = useProfileNFTs(selectedWalletAddress);
-
-  // NFTをカスタム絵文字として変換
-  const customEmojis = nfts
-    .filter((nft: NFT) => nft.name && nft.imageUrl) // nullやundefinedを除外
-    .map((nft: NFT) => ({
-      id: `nft-${nft.tokenId}`, // プレフィックスを追加して一意のIDを生成
-      names: [nft.name || `NFT #${nft.tokenId}`, `nft-${nft.tokenId}`],
-      imgUrl: nft.imageUrl || '',
-    }));
 
   const {
     message,
@@ -55,12 +32,6 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
     e.preventDefault();
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isLoading) return;
-
-    console.log('Sending message with:', {
-      roomId,
-      userId,
-      message: trimmedMessage,
-    });
 
     try {
       setIsLoading(true);
@@ -89,9 +60,8 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
             onEmojiClick={handleEmojiClick}
             onDeleteLastEmoji={handleDeleteLastEmoji}
             onToggleEmojiPicker={toggleEmojiPicker}
-            customEmojis={customEmojis}
+            customEmojis={[]}
             categories={[
-              { category: Categories.CUSTOM, name: 'My NFTs' },
               { category: Categories.SMILEYS_PEOPLE, name: 'Faces' },
               { category: Categories.ANIMALS_NATURE, name: 'Animals & Nature' },
               { category: Categories.FOOD_DRINK, name: 'Food & Drink' },
@@ -125,13 +95,5 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
 }
 
 export function ChatRoomInput(props: ChatRoomInputProps) {
-  return (
-    <ThirdwebProvider
-      activeChain="base"
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-      supportedWallets={[]}
-    >
-      <ChatRoomInputContent {...props} />
-    </ThirdwebProvider>
-  );
+  return <ChatRoomInputContent {...props} />;
 }

@@ -9,8 +9,6 @@ import { Address, isAddress } from 'viem';
 import { MessageList } from '@/components/features/chat/chat-room/MessageList';
 import { ChatRoomInput } from '@/components/features/chat/chat-room/ChatInput';
 import type { Message as DBMessage } from '@/repository/db/database';
-import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
-
 type XMTPMessage = {
   id: string;
   senderAddress: string;
@@ -225,9 +223,5 @@ function TestChatContent() {
 }
 
 export function TestChat() {
-  return (
-    <OnchainProvider>
-      <TestChatContent />
-    </OnchainProvider>
-  );
+  return <TestChatContent />;
 }

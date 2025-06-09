@@ -9,6 +9,7 @@ import { Address, isAddress } from 'viem';
 import { MessageList } from '@/components/features/chat/chat-room/MessageList';
 import { ChatRoomInput } from '@/components/features/chat/chat-room/ChatInput';
 import type { Message as DBMessage } from '@/repository/db/database';
+import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 
 type XMTPMessage = {
   id: string;
@@ -23,7 +24,7 @@ type ConversationMap = Map<string, Conversation>;
 
 let xmtpClient: Client | null = null;
 
-export function TestChat() {
+function TestChatContent() {
   const { ready, authenticated, login, user } = usePrivy();
   const { address } = useAccount();
   const { signMessage: viemSignMessage } = useViemWallet();
@@ -220,5 +221,13 @@ export function TestChat() {
         )}
       </div>
     </main>
+  );
+}
+
+export function TestChat() {
+  return (
+    <OnchainProvider>
+      <TestChatContent />
+    </OnchainProvider>
   );
 }

@@ -16,7 +16,12 @@ export function CreatorInfo({ creator, name }: CreatorInfoProps) {
             <span className="text-xl">👤</span>
           </div>
           <div className="font-semibold truncate max-w-[200px]">
-            {creator.id && <Name address={creator.id} chain={base} />}
+            {creator.id && (
+              <Name
+                address={`0x${creator.id.replace('0x', '')}` as `0x${string}`}
+                chain={base}
+              />
+            )}
           </div>
         </div>
       </div>

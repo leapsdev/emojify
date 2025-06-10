@@ -31,7 +31,7 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   devIndicators: false,
   images: {
-    domains: ['res.cloudinary.com'],
+    domains: ['res.cloudinary.com', 'ipfs.io'],
     remotePatterns: [
       {
         protocol: 'https',
@@ -46,6 +46,11 @@ const nextConfig: NextConfig = {
       {
         protocol: 'https',
         hostname: 'gateway.pinata.cloud',
+        pathname: '/ipfs/**',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dweb.link',
         pathname: '/ipfs/**',
       },
     ],

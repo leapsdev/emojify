@@ -26,7 +26,9 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
       if (!addresses || addresses.length === 0) {
         return;
       }
-      const result = await getBasename(`0x${addresses[0].replace('0x', '')}` as `0x${string}`);
+      const result = await getBasename(
+        `0x${addresses[0].replace('0x', '')}` as `0x${string}`,
+      );
       if (result) {
         setBasename(result);
       }

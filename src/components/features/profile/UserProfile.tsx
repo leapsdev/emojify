@@ -109,7 +109,9 @@ export const UserProfile = ({
               <div className="text-[13px] text-gray-600 font-bold truncate">
                 {addresses[0] && (
                   <Name
-                    address={`0x${addresses[0].replace('0x', '')}` as `0x${string}`}
+                    address={
+                      `0x${addresses[0].replace('0x', '')}` as `0x${string}`
+                    }
                     chain={base}
                   />
                 )}

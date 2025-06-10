@@ -107,7 +107,14 @@ export const UserProfile = ({
             <div className="pt-3 min-w-0">
               <h2 className="text-2xl font-black truncate">{username}</h2>
               <div className="text-[13px] text-gray-600 font-bold truncate">
-                {addresses[0] && <Name address={addresses[0]} chain={base} />}
+                {addresses[0] && (
+                  <Name
+                    address={
+                      `0x${addresses[0].replace('0x', '')}` as `0x${string}`
+                    }
+                    chain={base}
+                  />
+                )}
               </div>
             </div>
             <RightButton />

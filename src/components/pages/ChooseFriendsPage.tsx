@@ -10,7 +10,7 @@ import {
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { usePrivyId } from '@/lib/usePrivy';
-import type { User } from '@/types/database';
+import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 
 interface ClientChooseFriendsPageProps {

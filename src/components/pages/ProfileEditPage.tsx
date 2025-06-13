@@ -2,7 +2,7 @@
 
 import { ProfileEditForm } from '@/components/features/profile/edit/ProfileEditForm';
 import { ProfileImage } from '@/components/features/profile/edit/ProfileImage';
-import type { User } from '@/types/database';
+import type { User } from '@/repository/db/database';
 import { useRef } from 'react';
 
 interface ProfileEditPageProps {

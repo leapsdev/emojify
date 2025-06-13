@@ -3,12 +3,13 @@
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { useBasename } from '@/lib/basename/useBasename';
-import { profileFormSchema } from '@/repository/user/schema';
+import { getBasename } from '@/lib/basename/basename';
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
+import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
 import { usePrivy } from '@privy-io/react-auth';
-import { forwardRef } from 'react';
+import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
@@ -18,7 +19,28 @@ const initialState: ProfileFormState = null;
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
     const { user } = usePrivy();
-    const basename = useBasename(undefined);
+    const [basename, setBasename] = useState<string>('');
+
+    const getAddress = useCallback(async () => {
+      const addresses = await getWalletAddressesByUserId(user?.id || '');
+      if (!addresses || addresses.length === 0) {
+        return;
+      }
+      const result = await getBasename(
+        `0x${addresses[0].replace('0x', '')}` as `0x${string}`,
+      );
+      if (result) {
+        setBasename(result);
+      }
+      return result;
+    }, [user?.id]);
+
+    useEffect(() => {
+      if (user?.id) {
+        getAddress();
+      }
+    }, [getAddress, user?.id]);
+
     const [state, formAction, isPending] = useActionState(
       handleProfileFormAction,
       initialState,
@@ -72,7 +94,7 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
             className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
               fields.username.errors ? 'border-red-500' : ''
             }`}
-            defaultValue={basename ?? ''}
+            defaultValue={basename}
             required
           />
           {fields.username.errors && (

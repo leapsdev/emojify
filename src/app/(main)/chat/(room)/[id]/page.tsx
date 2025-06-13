@@ -1,7 +1,7 @@
 import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
 import { getUserId } from '@/lib/auth';
-import { getChatRoomAction } from '@/repository/chat/actions';
+import { getChatRoomAction } from '@/repository/db/chat/actions';
 import { notFound } from 'next/navigation';
 
 type Props = {

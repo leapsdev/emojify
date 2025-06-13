@@ -2,7 +2,7 @@ name: PR Check
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ main, develop ]
     types: [opened, synchronize, reopened]
 
 jobs:
@@ -26,6 +26,7 @@ jobs:
       CLOUDINARY_CLOUD_NAME: ${{ secrets.CLOUDINARY_CLOUD_NAME }}
       CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
       CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+      NEXT_PUBLIC_ONCHAINKIT_API_KEY: ${{ secrets.NEXT_PUBLIC_ONCHAINKIT_API_KEY }}
 
     steps:
       - name: Checkout code

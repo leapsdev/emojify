@@ -1,8 +1,11 @@
 'use server';
 
 import { getPrivyId } from '@/lib/auth';
-import { updateUser } from '@/repository/user/actions';
-import { type ProfileForm, profileFormSchema } from '@/repository/user/schema';
+import { updateUser } from '@/repository/db/user/actions';
+import {
+  type ProfileForm,
+  profileFormSchema,
+} from '@/repository/db/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 

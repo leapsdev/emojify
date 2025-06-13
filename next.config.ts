@@ -31,8 +31,13 @@ const withPWA = withPWAInit({
 const nextConfig: NextConfig = {
   devIndicators: false,
   images: {
-    domains: ['res.cloudinary.com'],
+    unoptimized: true,
     remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'res.cloudinary.com',
+        pathname: '/**',
+      },
       {
         protocol: 'https',
         hostname: 'ipfs.io',

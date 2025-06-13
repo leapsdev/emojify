@@ -1,4 +1,4 @@
-import { getUser } from '@/repository/user/actions';
+import { getUser } from '@/repository/db/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 

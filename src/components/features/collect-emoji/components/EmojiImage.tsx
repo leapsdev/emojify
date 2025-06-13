@@ -13,6 +13,7 @@ export function EmojiImage({ image }: Props) {
         width={400}
         height={600}
         className="max-w-full max-h-[55vh] object-contain rounded-md"
+        unoptimized={image?.endsWith('.gif')}
       />
     </div>
   );

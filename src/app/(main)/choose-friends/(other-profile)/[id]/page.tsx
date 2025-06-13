@@ -1,7 +1,7 @@
 import { ProfilePage } from '@/components/pages/ProfilePage';
 export const dynamic = 'force-dynamic';
 import { getPrivyId } from '@/lib/auth';
-import { getUserById } from '@/repository/user/actions';
+import { getUserById } from '@/repository/db/user/actions';
 import { redirect } from 'next/navigation';
 
 interface PageProps {

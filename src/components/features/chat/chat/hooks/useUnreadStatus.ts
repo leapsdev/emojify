@@ -1,8 +1,8 @@
 'use client';
 
-import { db } from '@/lib/firebase/client';
-import type { ChatRoom } from '@/types/database';
-import { DB_PATHS } from '@/types/database';
+import { db } from '@/repository/db/config/client';
+import type { ChatRoom } from '@/repository/db/database';
+import { DB_PATHS } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 

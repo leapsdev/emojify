@@ -1,8 +1,19 @@
-import { useBasename } from '@/lib/basename/useBasename';
-import type { DisplayUser } from '@/types/display';
+import { getWalletAddressesByUserId } from '@/lib/usePrivy';
+import type { User } from '@/repository/db/database';
+import { Name } from '@coinbase/onchainkit/identity';
 import { MessageCircle, UserPlus } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import { base } from 'viem/chains';
+
+interface DisplayUser extends Pick<User, 'id' | 'username'> {
+  displayName: string;
+  userId: string;
+  avatar: string;
+  section: 'friend' | 'other';
+}
+
 interface UserItemProps {
   user: DisplayUser;
   selected: boolean;
@@ -16,7 +27,16 @@ export function UserItem({
   onSelect,
   onAddFriend,
 }: UserItemProps) {
-  const basename = useBasename(user.id);
+  const [addresses, setAddresses] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchAddresses = async () => {
+      if (!user?.id) return;
+      const addresses = await getWalletAddressesByUserId(user.id);
+      setAddresses(addresses);
+    };
+    fetchAddresses();
+  }, [user?.id]);
+
   const RightButton = () => {
     if (user.section === 'friend') {
       return (
@@ -63,7 +83,14 @@ export function UserItem({
           <span className="font-semibold text-base truncate">
             {user.displayName}
           </span>
-          <span className="text-sm text-gray-500 truncate">{basename}</span>
+          <span className="text-sm text-gray-500 truncate">
+            {addresses[0] && (
+              <Name
+                address={`0x${addresses[0].replace('0x', '')}` as `0x${string}`}
+                chain={base}
+              />
+            )}
+          </span>
         </div>
       </div>
       <div className="flex items-center flex-shrink-0">

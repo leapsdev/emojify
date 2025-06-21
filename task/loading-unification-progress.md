@@ -20,6 +20,11 @@ Emoji-Chatアプリケーション全体で統一されたローディングシ�
 - [ ] **タスク4**: ページ固有ローディングの実装（チャット）
 - [ ] **タスク5**: ページ固有ローディングの実装（エクスプローラー）
 - [ ] **タスク6**: ページ固有ローディングの実装（プロフィール）
+- [ ] **タスク11**: 認証ページのローディング実装
+- [ ] **タスク12**: フレンド選択ページのローディング実装
+- [ ] **タスク13**: 絵文字作成ページのローディング実装
+- [ ] **タスク14**: プロフィール管理ページのローディング実装
+- [ ] **タスク15**: 静的ページのローディング実装
 
 ### Phase 3: 既存コンポーネント更新
 - [ ] **タスク7**: 高優先度コンポーネントの更新（ProfilePage）
@@ -112,4 +117,9 @@ Emoji-Chatアプリケーション全体で統一されたローディングシ�
 - [タスク7: 高優先度コンポーネントの更新（ProfilePage）](./task-07-profile-page-update.md)
 - [タスク8: 高優先度コンポーネントの更新（EmojiList）](./task-08-emoji-list-update.md)
 - [タスク9: 高優先度コンポーネントの更新（CollectEmojiPage）](./task-09-collect-emoji-page-update.md)
-- [タスク10: 高優先度コンポーネントの更新（CollectButton）](./task-10-collect-button-update.md) 
+- [タスク10: 高優先度コンポーネントの更新（CollectButton）](./task-10-collect-button-update.md)
+- [タスク11: 認証ページのローディング実装](./task-11-auth-loading.md)
+- [タスク12: フレンド選択ページのローディング実装](./task-12-choose-friends-loading.md)
+- [タスク13: 絵文字作成ページのローディング実装](./task-13-create-emoji-loading.md)
+- [タスク14: プロフィール管理ページのローディング実装](./task-14-profile-management-loading.md)
+- [タスク15: 静的ページのローディング実装](./task-15-static-pages-loading.md) 

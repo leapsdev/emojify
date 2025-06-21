@@ -1,12 +1,13 @@
 import Image from 'next/image';
 import Link from 'next/link';
+import { memo } from 'react';
 import type { EmojiItemData } from '../types';
 
 interface EmojiItemProps {
   item: EmojiItemData;
 }
 
-export function EmojiItem({ item }: EmojiItemProps) {
+export const EmojiItem = memo(function EmojiItem({ item }: EmojiItemProps) {
   return (
     <Link href={`/explore/${item.tokenId}`} className="block">
       <div className="relative aspect-square bg-white rounded-lg overflow-hidden">
@@ -20,4 +21,4 @@ export function EmojiItem({ item }: EmojiItemProps) {
       </div>
     </Link>
   );
-}
+});

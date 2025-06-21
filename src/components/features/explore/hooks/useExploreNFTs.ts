@@ -1,6 +1,6 @@
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
-import { useEffect, useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 interface NFT {
   tokenId: string;
@@ -39,8 +39,9 @@ const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
 // メタデータを取得する関数（キャッシュ付き）
 const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
   // キャッシュをチェック
-  if (metadataCache.has(url)) {
-    return metadataCache.get(url)!;
+  const cached = metadataCache.get(url);
+  if (cached) {
+    return cached;
   }
 
   for (const gateway of IPFS_GATEWAYS) {
@@ -58,7 +59,7 @@ const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
         throw new Error('Invalid content type');
       }
       const metadata = await response.json();
-      
+
       // キャッシュに保存
       metadataCache.set(url, metadata);
       return metadata;
@@ -109,7 +110,10 @@ export const useExploreNFTs = () => {
                 try {
                   uri = await contract.call('uri', [tokenId]);
                 } catch (err) {
-                  console.error(`Error fetching URI for token ${tokenId}:`, err);
+                  console.error(
+                    `Error fetching URI for token ${tokenId}:`,
+                    err,
+                  );
                   throw new Error(`Failed to fetch URI for token ${tokenId}`);
                 }
 
@@ -138,7 +142,8 @@ export const useExploreNFTs = () => {
                   uri: await convertIpfsToGatewayUrl(uri),
                   imageUrl,
                   name: metadata.name || `NFT #${tokenId}`,
-                  description: metadata.description || 'No description available',
+                  description:
+                    metadata.description || 'No description available',
                 };
               } catch (err) {
                 console.error(`Error fetching NFT #${tokenId}:`, err);
@@ -161,7 +166,7 @@ export const useExploreNFTs = () => {
 
           // バッチ間で少し待機してリソースを節約
           if (batch < batches - 1) {
-            await new Promise(resolve => setTimeout(resolve, 100));
+            await new Promise((resolve) => setTimeout(resolve, 100));
           }
         }
 

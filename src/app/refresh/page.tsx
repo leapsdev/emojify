@@ -2,9 +2,8 @@
 
 import { usePrivy } from '@privy-io/react-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 
-function RefreshContent() {
+export default function RefreshPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { getAccessToken } = usePrivy();
@@ -23,23 +22,5 @@ function RefreshContent() {
   // 即時実行
   handleRefresh();
 
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <p className="text-gray-600">authenticating...</p>
-    </div>
-  );
-}
-
-export default function RefreshPage() {
-  return (
-    <Suspense
-      fallback={
-        <div className="flex items-center justify-center min-h-screen">
-          <p className="text-gray-600">loading...</p>
-        </div>
-      }
-    >
-      <RefreshContent />
-    </Suspense>
-  );
+  return null;
 }

@@ -20,7 +20,7 @@ Emoji-Chatアプリケーション全体で統一されたローディングシ�
 
 ### Phase 2: Next.js 15 loading.tsx実装
 - [x] **タスク2**: アプリケーション全体のローディングファイル実装 ✅ **完了**
-- [x] **タスク3**: 認証ページのローディング実装 ✅ **完了**
+- [ ] **タスク3**: 認証ページのローディング実装
 - [ ] **タスク4**: チャットページのローディング実装
 - [ ] **タスク5**: エクスプローラーページのローディング実装
 - [ ] **タスク6**: プロフィールページのローディング実装
@@ -112,71 +112,6 @@ export default function AppLoading() {
 - **Next.js 15対応**: loading.tsxファイルとして正しく認識
 - **Suspense境界対応**: アプリケーション全体のローディング状態を管理
 
-### ✅ タスク3: 認証ページのローディング実装
-**実装ファイル**: 
-- `src/app/(auth)/loading.tsx`
-- `src/app/(auth)/signup/loading.tsx`
-
-#### 実装内容
-- **認証レイアウトローディング**: 認証フロー全体のローディング状態管理
-- **サインアップページローディング**: アカウント作成処理のローディング状態管理
-- **統一ローディングコンポーネント使用**: タスク1で作成したLoading.tsxを活用
-- **英語統一**: コメント以外のテキストは英語で統一
-- **アクセシビリティ対応**: 適切なARIA属性とスクリーンリーダー対応
-
-#### 技術仕様
-- **レイアウト**: `min-h-screen`でフルスクリーン表示
-- **配置**: `flex items-center justify-center`で中央配置
-- **サイズ**: lgサイズ（64px）のローディングスピナー
-- **テキスト**: 英語でのローディングメッセージ
-- **背景**: 白色背景で統一感を保持
-
-#### 実装例
-```tsx
-// 認証レイアウトローディング
-export default function AuthLoading() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="text-center">
-        <Loading 
-          size="lg" 
-          text="Checking authentication..." 
-          className="mb-4"
-        />
-        <p className="text-gray-600 text-sm">
-          Please wait a moment...
-        </p>
-      </div>
-    </div>
-  );
-}
-
-// サインアップページローディング
-export default function SignUpLoading() {
-  return (
-    <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="text-center">
-        <Loading 
-          size="lg" 
-          text="Creating your account..." 
-          className="mb-4"
-        />
-        <p className="text-gray-600 text-sm">
-          Please wait while we set up your account...
-        </p>
-      </div>
-    </div>
-  );
-}
-```
-
-#### 動作確認
-- **ビルド成功**: `pnpm build`でエラーなし
-- **TypeScript対応**: 型安全性を確保
-- **Next.js 15対応**: loading.tsxファイルとして正しく認識
-- **英語統一**: ユーザー向けテキストが英語で統一
-- **認証フロー対応**: 認証処理中のローディング状態を適切に管理
-
 ## 技術仕様
 
 ### Next.js 15 機能の活用
@@ -221,7 +156,7 @@ export default function SignUpLoading() {
 
 - [タスク1: 統一ローディングコンポーネントの作成](./task-01-loading-component.md) ✅ **完了**
 - [タスク2: アプリケーション全体のローディングファイル実装](./task-02-app-loading.md) ✅ **完了**
-- [タスク3: 認証ページのローディング実装](./task-03-auth-loading.md) ✅ **完了**
+- [タスク3: 認証ページのローディング実装](./task-03-auth-loading.md)
 - [タスク4: チャットページのローディング実装](./task-04-chat-loading.md)
 - [タスク5: エクスプローラーページのローディング実装](./task-05-explore-loading.md)
 - [タスク6: プロフィールページのローディング実装](./task-06-profile-loading.md)

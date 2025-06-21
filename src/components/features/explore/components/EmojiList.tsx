@@ -3,6 +3,7 @@
 import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
+import { Loading } from '@/components/ui/Loading';
 
 export function EmojiList() {
   return (
@@ -21,7 +22,10 @@ function EmojiListContent() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500" />
+        <Loading 
+          size="xl" 
+          className="mb-4"
+        />
       </div>
     );
   }

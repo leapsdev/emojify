@@ -1,4 +1,4 @@
-# タスク9: 高優先度コンポーネントの更新（CollectEmojiPage）
+# タスク13: 高優先度コンポーネントの更新（CollectEmojiPage）
 
 ## 目的
 CollectEmojiPageコンポーネントで統一ローディングコンポーネントを使用するように更新する。
@@ -10,6 +10,7 @@ CollectEmojiPageコンポーネントで統一ローディングコンポーネ�
 - 既存のスピナー実装を統一ローディングコンポーネントに置き換え
 - ローディングフックの使用
 - アクセシビリティ対応
+- **コメント以外のテキストは英語で統一**
 
 ## 実装手順
 
@@ -18,7 +19,7 @@ CollectEmojiPageコンポーネントで統一ローディングコンポーネ�
 - ローディング状態の判定箇所を特定
 
 ### 2. 統一ローディングコンポーネントへの置き換え
-- `<Loading size="lg" text="絵文字詳細を読み込み中..." />` などに置き換え
+- `<Loading size="lg" text="Loading emoji details..." />` などに置き換え
 - 必要に応じてpropsを調整
 
 ### 3. ローディングフックの導入
@@ -31,6 +32,7 @@ CollectEmojiPageコンポーネントで統一ローディングコンポーネ�
 - [ ] 既存スピナーの完全な置き換え
 - [ ] ローディングフックの導入
 - [ ] アクセシビリティ属性の追加
+- [ ] 英語統一の実装
 - [ ] 動作確認
 
 ## テスト項目
@@ -52,7 +54,7 @@ import { useLoading } from '@/lib/hooks/useLoading';
 if (loading) {
   return (
     <div className="flex justify-center items-center min-h-screen">
-      <Loading size="lg" text="絵文字詳細を読み込み中..." />
+      <Loading size="lg" text="Loading emoji details..." />
     </div>
   );
 } 

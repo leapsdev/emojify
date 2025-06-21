@@ -1,4 +1,4 @@
-# タスク14: プロフィール管理ページのローディング実装
+# タスク9: プロフィール管理ページのローディング実装
 
 ## 目的
 プロフィール管理関連ページ（作成・編集）で統一ローディングコンポーネントを使用し、プロフィール処理のローディング状態を適切に表示する。
@@ -16,6 +16,7 @@
 - プロフィール保存処理時のローディング表示
 - 画像アップロード時のローディング表示
 - 適切なサイズとスタイリング
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -24,12 +25,18 @@
 // src/app/(main)/profile/create/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * プロフィール作成ページのローディングコンポーネント
+ * 
+ * プロフィール作成フロー全体のローディング状態を管理します。
+ * プロフィール作成処理中に表示されます。
+ */
 export default function ProfileCreateLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="lg" 
-        text="プロフィールを作成中..." 
+        text="Creating profile..." 
       />
     </div>
   );
@@ -41,12 +48,18 @@ export default function ProfileCreateLoading() {
 // src/app/(main)/profile/edit/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * プロフィール編集ページのローディングコンポーネント
+ * 
+ * プロフィール編集フロー全体のローディング状態を管理します。
+ * プロフィール更新処理中に表示されます。
+ */
 export default function ProfileEditLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="lg" 
-        text="プロフィールを更新中..." 
+        text="Updating profile..." 
       />
     </div>
   );
@@ -115,20 +128,20 @@ const profileManagementLoadingStyle = {
 // プロフィール作成専用のローディングスタイル
 const profileCreateLoadingStyle = {
   ...profileManagementLoadingStyle,
-  message: "プロフィールを作成中..."
+  message: "Creating profile..."
 };
 
 // プロフィール編集専用のローディングスタイル
 const profileEditLoadingStyle = {
   ...profileManagementLoadingStyle,
-  message: "プロフィールを更新中..."
+  message: "Updating profile..."
 };
 
 // 処理段階別のメッセージ
 const processingMessages = {
-  imageUpload: "画像をアップロード中...",
-  save: "プロフィールを保存中...",
-  complete: "保存完了！"
+  imageUpload: "Uploading image...",
+  save: "Saving profile...",
+  complete: "Save complete!"
 };
 ```
 

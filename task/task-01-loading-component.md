@@ -12,6 +12,7 @@
 - アクセシビリティ対応（aria-label, role属性）
 - カスタマイズ可能なテキスト表示
 - アニメーションの最適化
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -71,6 +72,7 @@ interface LoadingProps {
 - [ ] アクセシビリティ属性の設定
 - [ ] アニメーションの最適化
 - [ ] テキスト表示機能の動作確認
+- [ ] 英語統一の実装
 
 ## テスト項目
 - 各サイズでの表示確認
@@ -87,13 +89,13 @@ interface LoadingProps {
 ## 参考実装例
 ```typescript
 // 基本的な使用例
-<Loading size="md" text="読み込み中..." />
+<Loading size="md" text="Loading..." />
 
 // カスタムスタイル
 <Loading 
   size="lg" 
   variant="dots" 
   className="text-purple-600" 
-  text="データを取得中..." 
+  text="Fetching data..." 
 />
 ``` 

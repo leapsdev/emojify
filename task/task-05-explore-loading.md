@@ -10,6 +10,7 @@
 - エクスプローラーページ固有のローディングUI
 - 既存の統一ローディングコンポーネントの使用
 - エクスプローラーページのレイアウトに合わせたデザイン
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -20,8 +21,7 @@ export default function ExploreLoading() {
     <div className="flex items-center justify-center min-h-screen">
       <Loading 
         size="lg" 
-        variant="spinner" 
-        text="絵文字を探索中..." 
+        text="Exploring emojis..." 
       />
     </div>
   );
@@ -73,18 +73,23 @@ export default function ExploreLoading() {
 ```typescript
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * エクスプローラーページのローディングコンポーネント
+ * 
+ * エクスプローラーページのローディング状態を管理します。
+ * NFTデータの取得中に表示されます。
+ */
 export default function ExploreLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
       <div className="text-center">
         <Loading 
           size="lg" 
-          variant="spinner" 
-          text="絵文字を探索中..." 
+          text="Exploring emojis..." 
           className="mb-4"
         />
         <p className="text-gray-600 text-sm">
-          新しい絵文字を検索しています...
+          Searching for new emojis...
         </p>
       </div>
     </div>

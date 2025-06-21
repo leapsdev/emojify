@@ -1,4 +1,4 @@
-# タスク15: 静的ページのローディング実装
+# タスク10: 静的ページのローディング実装
 
 ## 目的
 静的ページ（利用規約、プライバシーポリシー、リフレッシュページ）で統一ローディングコンポーネントを使用し、ページ読み込み状態を適切に表示する。
@@ -19,6 +19,7 @@
 - コンテンツ読み込み時のローディング表示
 - 適切なサイズとスタイリング
 - 軽量なローディング表示
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -27,12 +28,18 @@
 // src/app/(main)/(static)/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * 静的ページレイアウトのローディングコンポーネント
+ * 
+ * 静的ページ全体のローディング状態を管理します。
+ * ページ読み込み中に表示されます。
+ */
 export default function StaticPagesLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="md" 
-        text="ページを読み込み中..." 
+        text="Loading page..." 
       />
     </div>
   );
@@ -44,12 +51,18 @@ export default function StaticPagesLoading() {
 // src/app/(main)/(static)/terms/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * 利用規約ページのローディングコンポーネント
+ * 
+ * 利用規約コンテンツの読み込み状態を管理します。
+ * 利用規約読み込み中に表示されます。
+ */
 export default function TermsLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="md" 
-        text="利用規約を読み込み中..." 
+        text="Loading terms of service..." 
       />
     </div>
   );
@@ -61,12 +74,18 @@ export default function TermsLoading() {
 // src/app/(main)/(static)/privacy-policy/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * プライバシーポリシーページのローディングコンポーネント
+ * 
+ * プライバシーポリシーコンテンツの読み込み状態を管理します。
+ * プライバシーポリシー読み込み中に表示されます。
+ */
 export default function PrivacyPolicyLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="md" 
-        text="プライバシーポリシーを読み込み中..." 
+        text="Loading privacy policy..." 
       />
     </div>
   );
@@ -78,12 +97,18 @@ export default function PrivacyPolicyLoading() {
 // src/app/refresh/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * リフレッシュページのローディングコンポーネント
+ * 
+ * ページ更新処理のローディング状態を管理します。
+ * ページ更新中に表示されます。
+ */
 export default function RefreshLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="md" 
-        text="ページを更新中..." 
+        text="Refreshing page..." 
       />
     </div>
   );
@@ -157,19 +182,19 @@ const staticPagesLoadingStyle = {
 // 利用規約専用のローディングスタイル
 const termsLoadingStyle = {
   ...staticPagesLoadingStyle,
-  message: "利用規約を読み込み中..."
+  message: "Loading terms of service..."
 };
 
 // プライバシーポリシー専用のローディングスタイル
 const privacyPolicyLoadingStyle = {
   ...staticPagesLoadingStyle,
-  message: "プライバシーポリシーを読み込み中..."
+  message: "Loading privacy policy..."
 };
 
 // リフレッシュ専用のローディングスタイル
 const refreshLoadingStyle = {
   ...staticPagesLoadingStyle,
-  message: "ページを更新中..."
+  message: "Refreshing page..."
 };
 ```
 

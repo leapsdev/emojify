@@ -10,6 +10,7 @@
 - チャットページ固有のローディングUI
 - 既存の統一ローディングコンポーネントの使用
 - チャットページのレイアウトに合わせたデザイン
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -20,8 +21,7 @@ export default function ChatLoading() {
     <div className="flex items-center justify-center min-h-screen">
       <Loading 
         size="lg" 
-        variant="spinner" 
-        text="チャットを読み込み中..." 
+        text="Loading chat..." 
       />
     </div>
   );
@@ -73,18 +73,23 @@ export default function ChatLoading() {
 ```typescript
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * チャットページのローディングコンポーネント
+ * 
+ * チャットページのローディング状態を管理します。
+ * チャットデータの取得中に表示されます。
+ */
 export default function ChatLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="text-center">
         <Loading 
           size="lg" 
-          variant="spinner" 
-          text="チャットを読み込み中..." 
+          text="Loading chat..." 
           className="mb-4"
         />
         <p className="text-gray-600 text-sm">
-          メッセージを取得しています...
+          Fetching messages...
         </p>
       </div>
     </div>

@@ -10,6 +10,7 @@
 - プロフィールページ固有のローディングUI
 - 既存の統一ローディングコンポーネントの使用
 - プロフィールページのレイアウトに合わせたデザイン
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -20,8 +21,7 @@ export default function ProfileLoading() {
     <div className="flex items-center justify-center min-h-screen">
       <Loading 
         size="lg" 
-        variant="spinner" 
-        text="プロフィールを読み込み中..." 
+        text="Loading profile..." 
       />
     </div>
   );
@@ -73,18 +73,23 @@ export default function ProfileLoading() {
 ```typescript
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * プロフィールページのローディングコンポーネント
+ * 
+ * プロフィールページのローディング状態を管理します。
+ * ユーザー情報の取得中に表示されます。
+ */
 export default function ProfileLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="text-center">
         <Loading 
           size="lg" 
-          variant="spinner" 
-          text="プロフィールを読み込み中..." 
+          text="Loading profile..." 
           className="mb-4"
         />
         <p className="text-gray-600 text-sm">
-          ユーザー情報を取得しています...
+          Fetching user information...
         </p>
       </div>
     </div>

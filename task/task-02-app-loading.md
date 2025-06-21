@@ -1,4 +1,4 @@
-# タスク3: アプリケーション全体のローディングファイル実装
+# タスク2: アプリケーション全体のローディングファイル実装
 
 ## 目的
 Next.js 15のloading.tsxファイルを使用して、アプリケーション全体のローディング状態を管理する。
@@ -11,6 +11,7 @@ Next.js 15のloading.tsxファイルを使用して、アプリケーション�
 - Suspense境界での使用
 - 適切なフォールバックUI
 - 統一ローディングコンポーネントの使用
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -22,7 +23,7 @@ export default function Loading() {
       <Loading 
         size="lg" 
         variant="spinner" 
-        text="アプリケーションを読み込み中..." 
+        text="Loading application..." 
       />
     </div>
   );
@@ -68,6 +69,7 @@ export default function Loading() {
 - [ ] レスポンシブ対応
 - [ ] Suspense境界での動作確認
 - [ ] フォールバックUIの表示確認
+- [ ] 英語統一の実装
 
 ## テスト項目
 - ページ遷移時のローディング表示
@@ -85,6 +87,12 @@ export default function Loading() {
 ```typescript
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * アプリケーション全体のローディングコンポーネント
+ * 
+ * アプリケーション全体のローディング状態を管理します。
+ * ページ遷移時やデータ取得時に表示されます。
+ */
 export default function Loading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
@@ -92,11 +100,11 @@ export default function Loading() {
         <Loading 
           size="xl" 
           variant="spinner" 
-          text="アプリケーションを読み込み中..." 
+          text="Loading application..." 
           className="mb-4"
         />
         <p className="text-gray-600 text-sm">
-          しばらくお待ちください...
+          Please wait a moment...
         </p>
       </div>
     </div>

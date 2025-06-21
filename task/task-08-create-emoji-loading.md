@@ -1,4 +1,4 @@
-# タスク13: 絵文字作成ページのローディング実装
+# タスク8: 絵文字作成ページのローディング実装
 
 ## 目的
 絵文字作成ページで統一ローディングコンポーネントを使用し、NFT作成処理のローディング状態を適切に表示する。
@@ -14,6 +14,7 @@
 - NFT作成処理時のローディング表示
 - IPFSアップロード時のローディング表示
 - 適切なサイズとスタイリング
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -22,12 +23,18 @@
 // src/app/(main)/create-emoji/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * 絵文字作成ページのローディングコンポーネント
+ * 
+ * 絵文字作成フロー全体のローディング状態を管理します。
+ * NFT作成処理中に表示されます。
+ */
 export default function CreateEmojiLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="lg" 
-        text="絵文字を作成中..." 
+        text="Creating emoji..." 
       />
     </div>
   );
@@ -84,16 +91,16 @@ export default function CreateEmojiLoading() {
 // 絵文字作成ページのローディングスタイル
 const createEmojiLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-background",
-  message: "絵文字を作成中...",
+  message: "Creating emoji...",
   size: "lg" as const
 };
 
 // 処理段階別のメッセージ
 const processingMessages = {
-  upload: "ファイルをアップロード中...",
-  ipfs: "IPFSに保存中...",
-  nft: "NFTを作成中...",
-  complete: "作成完了！"
+  upload: "Uploading file...",
+  ipfs: "Saving to IPFS...",
+  nft: "Creating NFT...",
+  complete: "Creation complete!"
 };
 ```
 

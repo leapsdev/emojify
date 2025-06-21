@@ -1,4 +1,4 @@
-# タスク12: フレンド選択ページのローディング実装
+# タスク7: フレンド選択ページのローディング実装
 
 ## 目的
 フレンド選択関連ページで統一ローディングコンポーネントを使用し、ユーザーリストの読み込み状態を適切に表示する。
@@ -17,6 +17,7 @@
 - ユーザーリスト取得時のローディング表示
 - プロフィール詳細取得時のローディング表示
 - 適切なサイズとスタイリング
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -25,12 +26,18 @@
 // src/app/(main)/choose-friends/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * フレンド選択レイアウトのローディングコンポーネント
+ * 
+ * フレンド選択フロー全体のローディング状態を管理します。
+ * フレンド検索中に表示されます。
+ */
 export default function ChooseFriendsLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="lg" 
-        text="フレンドを検索中..." 
+        text="Searching for friends..." 
       />
     </div>
   );
@@ -42,12 +49,18 @@ export default function ChooseFriendsLoading() {
 // src/app/(main)/choose-friends/(list)/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * フレンドリストのローディングコンポーネント
+ * 
+ * ユーザーリスト取得時のローディング状態を管理します。
+ * リスト表示中に表示されます。
+ */
 export default function FriendsListLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="md" 
-        text="ユーザーリストを読み込み中..." 
+        text="Loading user list..." 
       />
     </div>
   );
@@ -59,12 +72,18 @@ export default function FriendsListLoading() {
 // src/app/(main)/choose-friends/(other-profile)/[id]/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * 他のユーザープロフィールのローディングコンポーネント
+ * 
+ * プロフィール詳細取得時のローディング状態を管理します。
+ * プロフィール読み込み中に表示されます。
+ */
 export default function OtherProfileLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-background">
       <Loading 
         size="lg" 
-        text="プロフィールを読み込み中..." 
+        text="Loading profile..." 
       />
     </div>
   );
@@ -125,21 +144,21 @@ export default function OtherProfileLoading() {
 // フレンド選択ページ共通のローディングスタイル
 const chooseFriendsLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-background",
-  message: "フレンドを検索中...",
+  message: "Searching for friends...",
   size: "lg" as const
 };
 
 // ユーザーリスト専用のローディングスタイル
 const friendsListLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-background",
-  message: "ユーザーリストを読み込み中...",
+  message: "Loading user list...",
   size: "md" as const
 };
 
 // プロフィール詳細専用のローディングスタイル
 const profileLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-background",
-  message: "プロフィールを読み込み中...",
+  message: "Loading profile...",
   size: "lg" as const
 };
 ```

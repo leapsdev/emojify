@@ -1,4 +1,4 @@
-# タスク11: 認証ページのローディング実装
+# タスク3: 認証ページのローディング実装
 
 ## 目的
 認証関連ページ（GetStartedPage、SignUpPage）で統一ローディングコンポーネントを使用し、ユーザーエクスペリエンスを向上させる。
@@ -14,8 +14,9 @@
 ## 要件
 - 認証フローのローディング状態管理
 - 統一ローディングコンポーネントの使用
-- 認証特有のローディングメッセージ
+- 認証特有のローディングメッセージ（英語）
 - 適切なサイズとスタイリング
+- **コメント以外のテキストは英語で統一**
 
 ## 実装内容
 
@@ -24,13 +25,25 @@
 // src/app/(auth)/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * 認証レイアウトのローディングコンポーネント
+ * 
+ * 認証関連ページ全体のローディング状態を管理します。
+ * 認証情報の確認中やページ遷移時に表示されます。
+ */
 export default function AuthLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
-      <Loading 
-        size="lg" 
-        text="認証情報を確認中..." 
-      />
+      <div className="text-center">
+        <Loading 
+          size="lg" 
+          text="Checking authentication..." 
+          className="mb-4"
+        />
+        <p className="text-gray-600 text-sm">
+          Please wait a moment...
+        </p>
+      </div>
     </div>
   );
 }
@@ -41,13 +54,25 @@ export default function AuthLoading() {
 // src/app/(auth)/signup/loading.tsx
 import { Loading } from '@/components/ui/Loading';
 
+/**
+ * サインアップページのローディングコンポーネント
+ * 
+ * サインアップ処理中のローディング状態を管理します。
+ * アカウント作成処理中に表示されます。
+ */
 export default function SignUpLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
-      <Loading 
-        size="lg" 
-        text="アカウントを作成中..." 
-      />
+      <div className="text-center">
+        <Loading 
+          size="lg" 
+          text="Creating your account..." 
+          className="mb-4"
+        />
+        <p className="text-gray-600 text-sm">
+          Please wait while we set up your account...
+        </p>
+      </div>
     </div>
   );
 }
@@ -101,14 +126,14 @@ export default function SignUpLoading() {
 // 認証ページ共通のローディングスタイル
 const authLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-white",
-  message: "認証情報を確認中...",
+  message: "Checking authentication...",
   size: "lg" as const
 };
 
 // サインアップ専用のローディングスタイル
 const signUpLoadingStyle = {
   container: "flex items-center justify-center min-h-screen bg-white",
-  message: "アカウントを作成中...",
+  message: "Creating your account...",
   size: "lg" as const
 };
 ```

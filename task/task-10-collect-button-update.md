@@ -1,0 +1,62 @@
+# タスク10: 高優先度コンポーネントの更新（CollectButton）
+
+## 目的
+CollectButtonコンポーネントで統一ローディングコンポーネントを使用するように更新する。
+
+## 更新ファイル
+- `src/components/features/collect-emoji/components/CollectButton.tsx`
+
+## 変更内容
+- 既存のスピナー実装を統一ローディングコンポーネントに置き換え
+- ローディングフックの使用
+- アクセシビリティ対応
+
+## 実装手順
+
+### 1. 既存ローディング部分の特定
+- `animate-spin`や`border-white`などの既存スピナーを検索
+- ローディング状態の判定箇所を特定
+
+### 2. 統一ローディングコンポーネントへの置き換え
+- `<Loading size="sm" text="送信中..." />` などに置き換え
+- 必要に応じてpropsを調整
+
+### 3. ローディングフックの導入
+- `useLoading`フックを導入し、状態管理を統一
+
+### 4. アクセシビリティ対応
+- `role="status"`や`aria-label`の追加
+
+## 完了条件
+- [ ] 既存スピナーの完全な置き換え
+- [ ] ローディングフックの導入
+- [ ] アクセシビリティ属性の追加
+- [ ] 動作確認
+
+## テスト項目
+- ローディング時の表示確認
+- エラー時の表示確認
+- スクリーンリーダーでの読み上げ確認
+
+## 注意事項
+- 既存のCollectButtonのUI・ロジックを壊さないこと
+- 他のコンポーネントへの影響がないこと
+- パフォーマンスを考慮した実装
+
+## 参考実装例
+```typescript
+import { Loading } from '@/components/ui/Loading';
+import { useLoading } from '@/lib/hooks/useLoading';
+
+// ...
+<Button ...>
+  {isLoading ? (
+    <Loading size="sm" text="送信中..." />
+  ) : (
+    <>
+      <Plus className="w-5 h-5 mr-2" />
+      Collect
+    </>
+  )}
+</Button>
+``` 

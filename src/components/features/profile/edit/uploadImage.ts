@@ -9,9 +9,10 @@ cloudinary.config({
 });
 
 // 環境に応じたフォルダ名を設定
-const CLOUDINARY_FOLDER = process.env.NODE_ENV === 'production' 
-  ? 'emoji-chat/profiles' 
-  : 'emoji-chat-dev/profiles';
+const CLOUDINARY_FOLDER =
+  process.env.NODE_ENV === 'production'
+    ? 'emoji-chat/profiles'
+    : 'emoji-chat-dev/profiles';
 
 export type UploadResult = {
   status: 'success' | 'error';

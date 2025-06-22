@@ -1,5 +1,4 @@
 'use server';
-
 import { type UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
@@ -7,6 +6,11 @@ cloudinary.config({
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
+
+const CLOUDINARY_FOLDER =
+  process.env.NODE_ENV === 'production'
+    ? 'emoji-chat/profiles'
+    : 'emoji-chat-dev/profiles';
 
 export type UploadResult = {
   status: 'success' | 'error';
@@ -32,7 +36,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
         .upload_stream(
           {
             resource_type: 'image',
-            folder: 'emoji-chat/profiles',
+            folder: CLOUDINARY_FOLDER,
             transformation: [
               { width: 256, height: 256, crop: 'fill' },
               { quality: 'auto' },

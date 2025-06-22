@@ -8,6 +8,11 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
+const CLOUDINARY_FOLDER =
+  process.env.NODE_ENV === 'production'
+    ? 'emoji-chat/profiles'
+    : 'emoji-chat-dev/profiles';
+
 export type UploadResult = {
   status: 'success' | 'error';
   message: string;
@@ -32,7 +37,7 @@ export async function uploadImage(formData: FormData): Promise<UploadResult> {
         .upload_stream(
           {
             resource_type: 'image',
-            folder: 'emoji-chat/profiles',
+            folder: CLOUDINARY_FOLDER,
             transformation: [
               { width: 256, height: 256, crop: 'fill' },
               { quality: 'auto' },

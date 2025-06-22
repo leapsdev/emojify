@@ -1,5 +1,4 @@
 'use server';
-
 import { type UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({

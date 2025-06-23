@@ -31,7 +31,7 @@ function ProfilePageContent({
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   const { selectedWalletAddress, noWalletWarning } = useWallet();
-  const { nfts, loading, error } = useGlobalNFTs();
+  const { nfts, error } = useGlobalNFTs();
   const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
@@ -77,12 +77,6 @@ function ProfilePageContent({
     fetchNFTs();
   }, [contract, selectedWalletAddress, nfts]);
 
-  // デバッグ情報
-  console.log('Wallet Address:', selectedWalletAddress);
-  console.log('Loading State:', loading);
-  console.log('Error State:', error);
-  console.log('No Wallet Warning:', noWalletWarning);
-
   if (noWalletWarning) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen gap-4">
@@ -90,14 +84,6 @@ function ProfilePageContent({
         <div className="text-gray-500">
           Please restart the app to connect your wallet and view NFTs
         </div>
-      </div>
-    );
-  }
-
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500" />
       </div>
     );
   }

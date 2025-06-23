@@ -1,7 +1,6 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import type { FC } from 'react';
 
 const EMOJIS = [
   '😊',
@@ -18,7 +17,7 @@ const EMOJIS = [
   '🍦',
 ];
 
-const FloatingEmojis: FC = () => {
+const FloatingEmojis = () => {
   const positions = EMOJIS.map(() => ({
     top: Math.random() * 80 + 10,
     left: Math.random() * 80 + 10,

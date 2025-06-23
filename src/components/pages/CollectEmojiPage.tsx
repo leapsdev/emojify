@@ -38,7 +38,6 @@ function CollectEmojiPageContent() {
   const tokenId = params?.id as string;
   const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [emojiData, setEmojiData] = useState<EmojiData | null>(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const { data: uri } = useContractRead(contract, 'uri', [tokenId]);
@@ -48,7 +47,6 @@ function CollectEmojiPageContent() {
       if (!uri) return;
 
       try {
-        setLoading(true);
         const gatewayUrl = convertIpfsToGatewayUrl(uri);
         console.log('Fetching metadata from:', gatewayUrl);
 
@@ -90,8 +88,6 @@ function CollectEmojiPageContent() {
       } catch (err) {
         console.error('Error fetching emoji data:', err);
         setError('An error occurred while fetching NFT data.');
-      } finally {
-        setLoading(false);
       }
     };
 
@@ -100,18 +96,10 @@ function CollectEmojiPageContent() {
     }
   }, [uri, tokenId]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500" />
-      </div>
-    );
-  }
-
   if (error || !emojiData) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="text-red-500 text-xl">{error || 'NFT not found.'}</div>
+        <div className="text-red-500 text-xl">{error}</div>
       </div>
     );
   }

@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
+import { Loading } from '@/components/ui/Loading';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import {
   CLIENT_ID,
@@ -212,7 +213,7 @@ export function CollectButton({ tokenId }: Props) {
           disabled={isLoading || wallets.length === 0}
         >
           {isLoading ? (
-            <div className="animate-spin rounded-full h-5 w-5 border-t-2 border-b-2 border-white" />
+            <Loading size="sm" className="text-white" />
           ) : (
             <>
               <Plus className="w-5 h-5 mr-2" />

@@ -1,6 +1,8 @@
 'use client';
 
+import { Loading } from '@/components/ui/Loading';
 import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
+import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
 
@@ -18,10 +20,15 @@ export function EmojiList() {
 function EmojiListContent() {
   const { nfts, loading, error } = useExploreNFTs();
 
+  // フィルタリングとメモ化
+  const filteredNFTs = useMemo(() => {
+    return nfts.filter((nft) => nft.imageUrl);
+  }, [nfts]);
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <div className="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-purple-500" />
+        <Loading size="xl" className="mb-4" />
       </div>
     );
   }
@@ -46,28 +53,26 @@ function EmojiListContent() {
   return (
     <div className="p-2 flex-1">
       <div className="grid grid-cols-2 gap-2">
-        {nfts
-          .filter((nft) => nft.imageUrl)
-          .map((nft) => (
-            <EmojiItem
-              key={nft.tokenId}
-              item={{
-                tokenId: nft.tokenId,
-                name: nft.name || `Emoji #${nft.tokenId}`,
-                imageUrl: nft.imageUrl || '/placeholder.svg',
-                creator: nft.owner
-                  ? {
-                      id: nft.owner,
-                      username: `${nft.owner.slice(0, 6)}...${nft.owner.slice(-4)}`,
-                    }
-                  : undefined,
-                details: {
-                  token: 'ETH',
-                  network: 'Base',
-                },
-              }}
-            />
-          ))}
+        {filteredNFTs.map((nft) => (
+          <EmojiItem
+            key={nft.tokenId}
+            item={{
+              tokenId: nft.tokenId,
+              name: nft.name || `Emoji #${nft.tokenId}`,
+              imageUrl: nft.imageUrl || '/placeholder.svg',
+              creator: nft.owner
+                ? {
+                    id: nft.owner,
+                    username: `${nft.owner.slice(0, 6)}...${nft.owner.slice(-4)}`,
+                  }
+                : undefined,
+              details: {
+                token: 'ETH',
+                network: 'Base',
+              },
+            }}
+          />
+        ))}
       </div>
     </div>
   );

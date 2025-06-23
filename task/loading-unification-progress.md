@@ -431,6 +431,6 @@ export default function AppLoading() {
 - [タスク9: プロフィール管理ページのローディング実装](./task-09-profile-management-loading.md) ✅ **完了**
 - [タスク10: 静的ページのローディング実装](./task-10-static-pages-loading.md) ✅ **完了**
 - [タスク11: 高優先度コンポーネントの更新（ProfilePage）](./task-11-profile-page-update.md) ✅ **完了**
-- [タスク12: 高優先度コンポーネントの更新（EmojiList）](./task-12-emoji-list-update.md)
-- [タスク13: 高優先度コンポーネントの更新（CollectEmojiPage）](./task-13-collect-emoji-page-update.md)
-- [タスク14: 高優先度コンポーネントの更新（CollectButton）](./task-14-collect-button-update.md) 
+- [タスク12: 高優先度コンポーネントの更新（EmojiList）](./task-12-emoji-list-update.md) ✅ **完了**
+- [タスク13: 高優先度コンポーネントの更新（CollectEmojiPage）](./task-13-collect-emoji-page-update.md) ✅ **完了**
+- [タスク14: 高優先度コンポーネントの更新（CollectButton）](./task-14-collect-button-update.md)  ✅ **完了**

@@ -6,6 +6,7 @@ Emoji-Chatアプリケーション全体で統一されたローディングシ�
 ## 重要要件
 - **コメント以外のテキストは英語で統一**: ユーザーに表示されるローディングメッセージやUIテキストは全て英語で実装する
 - **コメントは日本語**: 開発者向けのコメントは日本語で記述し、可読性を保つ
+- **統一ローディングシステム**: アプリケーション全体のloading.tsxを使用し、ページ固有のローディングは最小限に
 
 ## 現状の問題点
 1. **ローディングコンポーネントの重複**: 複数の場所で同じようなスピナーが実装されている
@@ -83,7 +84,6 @@ Emoji-Chatアプリケーション全体で統一されたローディングシ�
 - **レイアウト**: `min-h-screen`でフルスクリーン表示
 - **配置**: `flex items-center justify-center`で中央配置
 - **サイズ**: xlサイズ（128px）のローディングスピナー
-- **テキスト**: 「アプリケーションを読み込み中...」メッセージ
 - **背景**: 白色背景で統一感を保持
 
 #### 実装例
@@ -92,14 +92,7 @@ export default function AppLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
       <div className="text-center">
-        <Loading 
-          size="xl" 
-          text="Loading application..." 
-          className="mb-4"
-        />
-        <p className="text-gray-600 text-sm">
-          Please wait a moment...
-        </p>
+        <Loading size="xl" className="mb-4" />
       </div>
     </div>
   );
@@ -139,7 +132,7 @@ export default function AppLoading() {
 - シンプルで保守しやすい実装に変更
 
 ### ✅ タスク4: チャットページのローディング実装
-**実装状況**: 統一ローディングシステムを使用
+**実装状況**: アプリケーション全体のローディングを使用
 
 #### 実装内容
 - **独自ローディング不要**: チャットページはアプリケーション全体のローディングを使用
@@ -164,7 +157,7 @@ export default function AppLoading() {
 - チャット機能への影響なし
 
 ### ✅ タスク5: エクスプローラーページのローディング実装
-**実装状況**: 統一ローディングシステムを使用
+**実装状況**: アプリケーション全体のローディングを使用
 
 #### 実装内容
 - **独自ローディング不要**: エクスプローラーページはアプリケーション全体のローディングを使用

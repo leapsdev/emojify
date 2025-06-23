@@ -1,5 +1,4 @@
 'use server';
-
 import { type UploadApiResponse, v2 as cloudinary } from 'cloudinary';
 
 cloudinary.config({
@@ -8,7 +7,6 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-// 環境に応じたフォルダ名を設定
 const CLOUDINARY_FOLDER =
   process.env.NODE_ENV === 'production'
     ? 'emoji-chat/profiles'

@@ -1,6 +1,7 @@
 import { getUser } from '@/repository/db/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
+import { createFirebaseCustomToken } from './firebase-auth';
 
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
   throw new Error('Privy environment variables are not set');
@@ -39,6 +40,28 @@ export async function getPrivyId(): Promise<string | null> {
  * ユーザーIDを取得する（エイリアス）
  */
 export const getUserId = getPrivyId;
+
+/**
+ * PrivyユーザーIDを使用してFirebaseカスタムトークンを取得する
+ * @returns Firebaseカスタムトークン
+ * @throws {Error} 認証エラー時
+ */
+export async function getFirebaseCustomToken(): Promise<string | null> {
+  try {
+    const privyUserId = await getPrivyId();
+
+    if (!privyUserId) {
+      return null;
+    }
+
+    // Firebaseカスタムトークンを生成
+    const customToken = await createFirebaseCustomToken(privyUserId);
+    return customToken;
+  } catch (error) {
+    console.error('Firebase custom token generation error:', error);
+    return null;
+  }
+}
 
 /**
  * ユーザーのメールアドレスを取得する

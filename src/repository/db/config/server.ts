@@ -10,7 +10,7 @@ if (!getApps().length) {
       // private_keyはJSONからの読み込み時に\nが文字列として保存されるため、実際の改行に置換
       privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY?.replace(/\\n/g, '\n'),
     }),
-    databaseURL: 'https://emoji-chat-1f3b3-default-rtdb.firebaseio.com',
+    databaseURL: process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL,
   });
 }
 

@@ -1,12 +1,13 @@
 'use client';
 
+import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { TransactionResult } from '@/components/ui/TransactionResult';
+import { useCollectWallet } from '@/hooks/useCollectWallet';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
-import { NoWalletWarning } from './components/NoWalletWarning';
 import { useFileUpload } from './hooks/useFileUpload';
 import { useIPFS } from './hooks/useIPFS';
 import { useThirdwebMint } from './hooks/useThirdwebMint';
@@ -21,10 +22,14 @@ export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const [mintResult, setMintResult] = useState<MintResult>(null);
-  const { selectedWalletAddress, noWalletWarning, getSelectedWallet } =
-    useWallet();
+  const { selectedWalletAddress, getSelectedWallet } = useWallet();
   const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
   const { mintNFT } = useThirdwebMint();
+  const { isConnected } = useCollectWallet();
+
+  if (!isConnected) {
+    return <WalletConnectButton />;
+  }
 
   const handleCreate = async () => {
     if (!selectedFile || !selectedWalletAddress) return;
@@ -91,7 +96,6 @@ export function CreateEmojiForm() {
   return (
     <div className="pt-14 max-w-md mx-auto px-4 space-y-4">
       <FileUpload preview={preview} onFileSelect={handleFileSelect} />
-      <NoWalletWarning show={noWalletWarning} />
 
       {mintResult && (
         <TransactionResult
@@ -123,7 +127,7 @@ export function CreateEmojiForm() {
         />
       ) : (
         <CreateButton
-          disabled={!selectedFile || noWalletWarning}
+          disabled={!selectedFile}
           onClick={handleCreate}
           loading={loading}
         />

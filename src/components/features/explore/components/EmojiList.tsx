@@ -1,7 +1,9 @@
 'use client';
 
+import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
-import { ConnectWallet, ThirdwebProvider } from '@thirdweb-dev/react';
+import { useCollectWallet } from '@/hooks/useCollectWallet';
+import { ThirdwebProvider } from '@thirdweb-dev/react';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
@@ -19,6 +21,7 @@ export function EmojiList() {
 
 function EmojiListContent() {
   const { nfts, loading, error } = useExploreNFTs();
+  const { isConnected } = useCollectWallet();
 
   // フィルタリングとメモ化
   const filteredNFTs = useMemo(() => {
@@ -33,19 +36,14 @@ function EmojiListContent() {
     );
   }
 
+  if (!isConnected) {
+    return <WalletConnectButton />;
+  }
+
   if (error) {
     return (
       <div className="flex flex-col justify-center items-center min-h-screen gap-4">
         <div className="text-red-500 text-xl">{error}</div>
-        <ConnectWallet
-          theme="dark"
-          modalSize="wide"
-          welcomeScreen={{
-            title: 'Welcome to Emoji Chat',
-            subtitle: 'Connect your wallet to explore NFTs',
-          }}
-          modalTitleIconUrl=""
-        />
       </div>
     );
   }

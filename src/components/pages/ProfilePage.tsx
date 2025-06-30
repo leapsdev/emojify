@@ -7,10 +7,8 @@ import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
-import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { useCollectWallet } from '@/hooks/useCollectWallet';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import type { User } from '@/repository/db/database';
@@ -32,12 +30,11 @@ function ProfilePageContent({
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
-  const { selectedWalletAddress } = useWallet();
+  const { selectedWalletAddress, noWalletWarning } = useWallet();
   const { nfts, error } = useGlobalNFTs();
   const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
-  const { isConnected } = useCollectWallet();
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -80,8 +77,15 @@ function ProfilePageContent({
     fetchNFTs();
   }, [contract, selectedWalletAddress, nfts]);
 
-  if (!isConnected) {
-    return <WalletConnectButton />;
+  if (noWalletWarning) {
+    return (
+      <div className="flex flex-col justify-center items-center min-h-screen gap-4">
+        <div className="text-xl">No wallet connected</div>
+        <div className="text-gray-500">
+          Please restart the app to connect your wallet and view NFTs
+        </div>
+      </div>
+    );
   }
 
   if (error) {

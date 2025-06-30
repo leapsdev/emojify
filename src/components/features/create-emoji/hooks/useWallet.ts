@@ -5,12 +5,15 @@ export const useWallet = () => {
   const { wallets } = useWallets();
   const [selectedWalletAddress, setSelectedWalletAddress] =
     useState<string>('');
+  const [noWalletWarning, setNoWalletWarning] = useState(false);
 
   useEffect(() => {
     if (wallets.length > 0) {
       setSelectedWalletAddress(wallets[0].address);
+      setNoWalletWarning(false);
     } else {
       setSelectedWalletAddress('');
+      setNoWalletWarning(true);
     }
   }, [wallets]);
 
@@ -20,6 +23,7 @@ export const useWallet = () => {
 
   return {
     selectedWalletAddress,
+    noWalletWarning,
     getSelectedWallet,
     wallets,
   };

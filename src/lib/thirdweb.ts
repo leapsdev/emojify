@@ -7,7 +7,9 @@ export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8';
+  process.env.NODE_ENV === 'production'
+    ? '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8'
+    : '0xB54E5BfFaDBF798b6f3f92920E64fd1f3f59377C';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [

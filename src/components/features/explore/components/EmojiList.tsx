@@ -3,6 +3,7 @@
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
+import { activeChain } from '@/lib/thirdweb';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
@@ -11,7 +12,7 @@ import { EmojiItem } from './EmojiItem';
 export function EmojiList() {
   return (
     <ThirdwebProvider
-      activeChain="base"
+      activeChain={activeChain}
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
     >
       <EmojiListContent />

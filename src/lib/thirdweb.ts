@@ -8,6 +8,9 @@ export const baseMainnet =
 
 export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
+export const activeChain =
+  process.env.NODE_ENV === 'production' ? 'base' : 'base-sepolia-testnet';
+
 // コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
   process.env.NODE_ENV === 'production'

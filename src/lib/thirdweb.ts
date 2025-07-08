@@ -1,7 +1,10 @@
 import { defineChain } from 'thirdweb/chains';
 
 // Base Mainnet
-export const baseMainnet = defineChain(8453);
+export const baseMainnet =
+  process.env.NODE_ENV === 'production'
+    ? defineChain(8453)
+    : defineChain(84532);
 
 export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 
@@ -9,7 +12,7 @@ export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
 export const EMOJI_CONTRACT_ADDRESS =
   process.env.NODE_ENV === 'production'
     ? '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8'
-    : '0x10f12BC253e4833834CeA5a5B78c6b85c96F3e9b';
+    : '0xB54E5BfFaDBF798b6f3f92920E64fd1f3f59377C';
 
 // コントラクトABI
 export const EMOJI_CONTRACT_ABI = [

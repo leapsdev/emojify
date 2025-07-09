@@ -1,6 +1,7 @@
 'use client';
 
 import type { NFTData } from '@/components/features/explore/types';
+import { activeChain } from '@/lib/thirdweb';
 import { formatDateToYYYYMMDD } from '@/lib/utils';
 import type { Message } from '@/repository/db/database';
 import { ThirdwebProvider } from '@thirdweb-dev/react';
@@ -202,7 +203,7 @@ function MessageListContent({
 export function MessageList(props: MessageListProps) {
   return (
     <ThirdwebProvider
-      activeChain="base"
+      activeChain={activeChain}
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
       supportedWallets={[]}
     >

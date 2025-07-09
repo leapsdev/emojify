@@ -5,7 +5,7 @@ import { CreatorInfo } from '@/components/features/collect-emoji/components/Crea
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
 import type { EmojiData } from '@/components/features/collect-emoji/types';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
+import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
 import {
   ThirdwebProvider,
   useContract,
@@ -123,7 +123,7 @@ function CollectEmojiPageContent() {
 export function CollectEmojiPage() {
   return (
     <ThirdwebProvider
-      activeChain="base"
+      activeChain={activeChain}
       clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
     >
       <CollectEmojiPageContent />

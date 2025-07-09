@@ -12,7 +12,7 @@ import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
+import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
 import type { User } from '@/repository/db/database';
 import { ThirdwebProvider, useContract } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
@@ -135,7 +135,7 @@ export const ProfilePage = (props: ProfilePageProps) => {
   return (
     <EthereumProviders>
       <ThirdwebProvider
-        activeChain="base"
+        activeChain={activeChain}
         clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
         supportedWallets={[]}
       >

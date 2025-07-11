@@ -9,7 +9,7 @@ import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
-import { useIPFS } from './hooks/useIPFS';
+import { uploadMetadataToIPFS, uploadToIPFS } from './hooks/useIPFS';
 import { useThirdwebMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
 
@@ -23,7 +23,6 @@ export function CreateEmojiForm() {
   const [loading, setLoading] = useState(false);
   const [mintResult, setMintResult] = useState<MintResult>(null);
   const { selectedWalletAddress, getSelectedWallet } = useWallet();
-  const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
   const { mintNFT } = useThirdwebMint();
   const { isConnected } = useCollectWallet();
 
@@ -43,18 +42,18 @@ export function CreateEmojiForm() {
 
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
-      const imageHttpUrl = ipfsToHttp(imageUrl);
-      console.log(
-        `Image upload completed.\nYou can check it at:\n${imageHttpUrl}\n${imageUrl}`,
-      );
+      console.log(`Image upload completed.\nYou can check it at:\n${imageUrl}`);
 
       // Step 2: メタデータを作成してIPFSにアップロード
-      const metadataUrl = await uploadMetadataToIPFS(
-        imageUrl,
-        selectedWalletAddress,
-      );
+      const metadata = {
+        name: '',
+        description: '',
+        image: imageUrl,
+        attributes: [{ trait_type: 'creator', value: selectedWalletAddress }],
+      };
+      const metadataUrl = await uploadMetadataToIPFS(metadata);
       console.log(`metadataUrl: ${metadataUrl}`);
-      const metadataHttpUrl = ipfsToHttp(metadataUrl);
+      const metadataHttpUrl = metadataUrl;
       console.log(
         `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
       );

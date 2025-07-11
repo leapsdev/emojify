@@ -1,3 +1,4 @@
+import { convertIpfsToGatewayUrl } from '@/lib/ipfs-utils';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
@@ -16,15 +17,6 @@ interface NFTMetadata {
   description?: string;
   image?: string;
   [key: string]: unknown;
-}
-
-async function convertIpfsToGatewayUrl(ipfsUrl: string): Promise<string> {
-  if (!ipfsUrl) return '';
-  if (ipfsUrl.startsWith('ipfs://')) {
-    const ipfsHash = ipfsUrl.replace('ipfs://', '');
-    return `https://ipfs.io/ipfs/${ipfsHash}`;
-  }
-  return ipfsUrl;
 }
 
 async function fetchMetadata(uri: string): Promise<NFTMetadata> {

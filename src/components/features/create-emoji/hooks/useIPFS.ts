@@ -1,48 +1,24 @@
-import { CLIENT_ID } from '@/lib/thirdweb';
-import { ThirdwebStorage } from '@thirdweb-dev/storage';
+export async function uploadToIPFS(file: File): Promise<string> {
+  const formData = new FormData();
+  formData.append('file', file);
 
-// ThirdwebStorageインスタンスの初期化
-const storage = new ThirdwebStorage({
-  clientId: CLIENT_ID,
-});
+  const res = await fetch('https://api.nft.storage/upload', {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${process.env.NFT_STORAGE_API_KEY}`,
+    },
+    body: formData,
+  });
 
-export const useIPFS = () => {
-  // IPFSアップロード関数
-  const uploadToIPFS = async (file: File): Promise<string> => {
-    const uri = await storage.upload(file);
-    return uri;
-  };
+  if (!res.ok) throw new Error('Upload failed');
+  const data = await res.json();
+  return `ipfs://${data.value.cid}`;
+}
 
-  // IPFSのURLをhttpsに変換する関数
-  const ipfsToHttp = (ipfsUrl: string) => {
-    const hash = ipfsUrl.replace('ipfs://', '');
-    return `https://ipfs.io/ipfs/${hash}`;
-  };
-
-  // メタデータをIPFSにアップロード
-  const uploadMetadataToIPFS = async (
-    imageUrl: string,
-    creatorAddress: string,
-  ) => {
-    const metadata = {
-      name: '',
-      description: '',
-      image: imageUrl,
-      attributes: [
-        {
-          trait_type: 'creator',
-          value: creatorAddress,
-        },
-      ],
-    };
-
-    const metadataUrl = await storage.upload(metadata);
-    return metadataUrl;
-  };
-
-  return {
-    uploadToIPFS,
-    ipfsToHttp,
-    uploadMetadataToIPFS,
-  };
-};
+export async function uploadMetadataToIPFS(metadata: object): Promise<string> {
+  const blob = new Blob([JSON.stringify(metadata)], {
+    type: 'application/json',
+  });
+  const file = new File([blob], 'metadata.json');
+  return await uploadToIPFS(file);
+}

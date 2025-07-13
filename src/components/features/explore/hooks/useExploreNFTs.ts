@@ -1,3 +1,4 @@
+import { ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -18,23 +19,20 @@ interface NFTMetadata {
   [key: string]: unknown;
 }
 
-// IPFSゲートウェイのURLを定義
-const IPFS_GATEWAYS = ['https://ipfs.io/ipfs/'];
-
 // メタデータキャッシュ
 const metadataCache = new Map<string, NFTMetadata>();
 
 // IPFSのURLをゲートウェイURLに変換する関数
-const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
-  if (!ipfsUrl) return '';
+// const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
+//   if (!ipfsUrl) return '';
 
-  if (ipfsUrl.startsWith('ipfs://')) {
-    const ipfsHash = ipfsUrl.replace('ipfs://', '');
-    // 最初のゲートウェイで試す
-    return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
-  }
-  return ipfsUrl;
-};
+//   if (ipfsUrl.startsWith('ipfs://')) {
+//     const ipfsHash = ipfsUrl.replace('ipfs://', '');
+//     // 最初のゲートウェイで試す
+//     return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
+//   }
+//   return ipfsUrl;
+// };
 
 // メタデータを取得する関数（キャッシュ付き）
 const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
@@ -44,30 +42,25 @@ const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
     return cached;
   }
 
-  for (const gateway of IPFS_GATEWAYS) {
-    try {
-      const gatewayUrl = url.startsWith('ipfs://')
-        ? `${gateway}${url.replace('ipfs://', '')}`
-        : url;
-
-      const response = await fetch(gatewayUrl);
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Invalid content type');
-      }
-      const metadata = await response.json();
-
-      // キャッシュに保存
-      metadataCache.set(url, metadata);
-      return metadata;
-    } catch (error) {
-      console.warn(`Failed to fetch from ${gateway}:`, error);
+  try {
+    const gatewayUrl = ipfsToHttp(url);
+    const response = await fetch(gatewayUrl);
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const contentType = response.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Invalid content type');
+    }
+    const metadata = await response.json();
+
+    // キャッシュに保存
+    metadataCache.set(url, metadata);
+    return metadata;
+  } catch (error) {
+    console.warn('Failed to fetch from Pinata gateway:', error);
   }
-  throw new Error('Failed to fetch metadata from all gateways');
+  throw new Error('Failed to fetch metadata from Pinata gateway');
 };
 
 export const useExploreNFTs = () => {
@@ -133,13 +126,13 @@ export const useExploreNFTs = () => {
 
                 // 画像URLもIPFSゲートウェイを使用するように変換
                 const imageUrl = metadata.image
-                  ? await convertIpfsToGatewayUrl(metadata.image)
+                  ? ipfsToHttp(metadata.image)
                   : undefined;
 
                 return {
                   tokenId: tokenId.toString(),
                   owner: 'Unknown',
-                  uri: await convertIpfsToGatewayUrl(uri),
+                  uri: ipfsToHttp(uri),
                   imageUrl,
                   name: metadata.name || `NFT #${tokenId}`,
                   description:

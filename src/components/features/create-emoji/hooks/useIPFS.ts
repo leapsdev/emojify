@@ -1,25 +1,25 @@
-import { CLIENT_ID } from '@/lib/thirdweb';
-import { ThirdwebStorage } from '@thirdweb-dev/storage';
+import { PinataSDK } from 'pinata';
 
-// ThirdwebStorageインスタンスの初期化
-const storage = new ThirdwebStorage({
-  clientId: CLIENT_ID,
+// PinataSDKインスタンスの初期化
+const pinata = new PinataSDK({
+  pinataJwt: process.env.PINATA_JWT!,
+  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL!,
 });
 
 export const useIPFS = () => {
-  // IPFSアップロード関数
+  // IPFSアップロード関数（Pinata経由）
   const uploadToIPFS = async (file: File): Promise<string> => {
-    const uri = await storage.upload(file);
-    return uri;
+    const result = await pinata.upload.public.file(file);
+    return `ipfs://${result.cid}`;
   };
 
-  // IPFSのURLをhttpsに変換する関数
+  // IPFSのURLをhttpsに変換する関数（Pinataゲートウェイ優先）
   const ipfsToHttp = (ipfsUrl: string) => {
     const hash = ipfsUrl.replace('ipfs://', '');
-    return `https://ipfs.io/ipfs/${hash}`;
+    return `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${hash}`;
   };
 
-  // メタデータをIPFSにアップロード
+  // メタデータをIPFSにアップロード（Pinata経由）
   const uploadMetadataToIPFS = async (
     imageUrl: string,
     creatorAddress: string,
@@ -35,9 +35,8 @@ export const useIPFS = () => {
         },
       ],
     };
-
-    const metadataUrl = await storage.upload(metadata);
-    return metadataUrl;
+    const result = await pinata.upload.public.json(metadata);
+    return `ipfs://${result.cid}`;
   };
 
   return {

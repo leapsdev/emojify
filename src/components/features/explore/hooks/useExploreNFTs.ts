@@ -1,4 +1,4 @@
-import { ipfsToHttp } from '@/lib/ipfsGateway';
+import { fetchFromIpfsGateways, ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useMemo, useState } from 'react';
@@ -43,24 +43,19 @@ const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
   }
 
   try {
-    const gatewayUrl = ipfsToHttp(url);
-    const response = await fetch(gatewayUrl);
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const contentType = response.headers.get('content-type');
+    const res = await fetchFromIpfsGateways(url);
+    const contentType = res.headers.get('content-type');
     if (!contentType || !contentType.includes('application/json')) {
       throw new Error('Invalid content type');
     }
-    const metadata = await response.json();
-
+    const metadata = await res.json();
     // キャッシュに保存
     metadataCache.set(url, metadata);
     return metadata;
   } catch (error) {
-    console.warn('Failed to fetch from Pinata gateway:', error);
+    console.warn('Failed to fetch from all IPFS gateways:', error);
   }
-  throw new Error('Failed to fetch metadata from Pinata gateway');
+  throw new Error('Failed to fetch metadata from all IPFS gateways');
 };
 
 export const useExploreNFTs = () => {

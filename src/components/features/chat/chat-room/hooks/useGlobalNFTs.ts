@@ -1,5 +1,5 @@
 import type { NFTData } from '@/components/features/explore/types';
-import { ipfsToHttp } from '@/lib/ipfsGateway';
+import { fetchFromIpfsGateways, ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
@@ -19,15 +19,11 @@ interface NFTMetadata {
 
 async function fetchMetadata(uri: string): Promise<NFTMetadata> {
   try {
-    const httpUrl = ipfsToHttp(uri);
-    const response = await fetch(httpUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
-    }
-    const metadata = await response.json();
+    const res = await fetchFromIpfsGateways(uri);
+    const metadata = await res.json();
     return metadata;
   } catch (error) {
-    console.error('Error fetching metadata:', error);
+    console.error('Error fetching metadata from all IPFS gateways:', error);
     return {};
   }
 }

@@ -1,4 +1,4 @@
-import { ipfsToHttp } from '@/lib/ipfsGateway';
+import { fetchFromIpfsGateways, ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
@@ -21,17 +21,16 @@ interface NFTMetadata {
 
 async function fetchMetadata(uri: string): Promise<NFTMetadata> {
   try {
-    const httpUrl = ipfsToHttp(uri);
-    console.log('Fetching metadata from:', httpUrl);
-    const response = await fetch(httpUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+    const res = await fetchFromIpfsGateways(uri);
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Invalid content type');
     }
-    const metadata = await response.json();
+    const metadata = await res.json();
     console.log('Fetched metadata:', metadata);
     return metadata;
   } catch (error) {
-    console.error('Error fetching metadata:', error);
+    console.error('Error fetching metadata from all IPFS gateways:', error);
     return {};
   }
 }

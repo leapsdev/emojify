@@ -1,3 +1,4 @@
+import { fetchFromIpfsGateways, ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
 import { useContract, useContractRead } from '@thirdweb-dev/react';
 import { useEffect, useState } from 'react';
@@ -18,28 +19,18 @@ interface NFTMetadata {
   [key: string]: unknown;
 }
 
-async function convertIpfsToGatewayUrl(ipfsUrl: string): Promise<string> {
-  if (!ipfsUrl) return '';
-  if (ipfsUrl.startsWith('ipfs://')) {
-    const ipfsHash = ipfsUrl.replace('ipfs://', '');
-    return `https://ipfs.io/ipfs/${ipfsHash}`;
-  }
-  return ipfsUrl;
-}
-
 async function fetchMetadata(uri: string): Promise<NFTMetadata> {
   try {
-    const httpUrl = await convertIpfsToGatewayUrl(uri);
-    console.log('Fetching metadata from:', httpUrl);
-    const response = await fetch(httpUrl);
-    if (!response.ok) {
-      throw new Error(`Failed to fetch metadata: ${response.statusText}`);
+    const res = await fetchFromIpfsGateways(uri);
+    const contentType = res.headers.get('content-type');
+    if (!contentType || !contentType.includes('application/json')) {
+      throw new Error('Invalid content type');
     }
-    const metadata = await response.json();
+    const metadata = await res.json();
     console.log('Fetched metadata:', metadata);
     return metadata;
   } catch (error) {
-    console.error('Error fetching metadata:', error);
+    console.error('Error fetching metadata from all IPFS gateways:', error);
     return {};
   }
 }
@@ -98,14 +89,14 @@ export function useProfileNFTs(address?: string) {
 
               // 画像URLもIPFSゲートウェイを使用するように変換
               const imageUrl = metadata.image
-                ? await convertIpfsToGatewayUrl(metadata.image)
+                ? ipfsToHttp(metadata.image)
                 : undefined;
               console.log(`Token ${tokenId} image URL:`, imageUrl);
 
               return {
                 tokenId: tokenId.toString(),
                 owner: address,
-                uri: await convertIpfsToGatewayUrl(uri),
+                uri: ipfsToHttp(uri),
                 imageUrl,
                 name: metadata.name || `NFT #${tokenId}`,
                 description: metadata.description || 'No description available',

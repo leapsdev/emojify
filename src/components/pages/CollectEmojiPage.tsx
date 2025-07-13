@@ -5,6 +5,7 @@ import { CreatorInfo } from '@/components/features/collect-emoji/components/Crea
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
 import type { EmojiData } from '@/components/features/collect-emoji/types';
+import { ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
 import {
   ThirdwebProvider,
@@ -13,25 +14,6 @@ import {
 } from '@thirdweb-dev/react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-
-// IPFSゲートウェイのURLを定義
-const IPFS_GATEWAYS = [
-  'https://ipfs.io/ipfs/',
-  'https://gateway.pinata.cloud/ipfs/',
-  'https://cloudflare-ipfs.com/ipfs/',
-  'https://dweb.link/ipfs/',
-];
-
-// IPFSのURLをゲートウェイURLに変換する関数
-const convertIpfsToGatewayUrl = (ipfsUrl: string): string => {
-  if (!ipfsUrl) return '';
-
-  if (ipfsUrl.startsWith('ipfs://')) {
-    const ipfsHash = ipfsUrl.replace('ipfs://', '');
-    return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
-  }
-  return ipfsUrl;
-};
 
 function CollectEmojiPageContent() {
   const params = useParams();
@@ -47,7 +29,7 @@ function CollectEmojiPageContent() {
       if (!uri) return;
 
       try {
-        const gatewayUrl = convertIpfsToGatewayUrl(uri);
+        const gatewayUrl = ipfsToHttp(uri);
         console.log('Fetching metadata from:', gatewayUrl);
 
         const response = await fetch(gatewayUrl);
@@ -60,7 +42,7 @@ function CollectEmojiPageContent() {
 
         // 画像URLをIPFSゲートウェイを使用するように変換
         const imageUrl = metadata.image
-          ? convertIpfsToGatewayUrl(metadata.image)
+          ? ipfsToHttp(metadata.image)
           : '/placeholder.svg';
 
         // クリエイター情報をメタデータから取得

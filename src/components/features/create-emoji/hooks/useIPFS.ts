@@ -1,16 +1,15 @@
-import { PinataSDK } from 'pinata';
-
-// PinataSDKインスタンスの初期化
-const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT || '',
-  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL || '',
-});
-
 export const useIPFS = () => {
-  // IPFSアップロード関数（Pinata経由）
+  // IPFSアップロード関数（API Route経由）
   const uploadToIPFS = async (file: File): Promise<string> => {
-    const result = await pinata.upload.public.file(file);
-    return `ipfs://${result.cid}`;
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch('/api/pinata-upload', {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) throw new Error('ファイルのアップロードに失敗しました');
+    const data = await res.json();
+    return `ipfs://${data.cid}`;
   };
 
   // IPFSのURLをhttpsに変換する関数（Pinataゲートウェイ優先）
@@ -19,7 +18,7 @@ export const useIPFS = () => {
     return `https://${process.env.NEXT_PUBLIC_GATEWAY_URL}/ipfs/${hash}`;
   };
 
-  // メタデータをIPFSにアップロード（Pinata経由）
+  // メタデータをIPFSにアップロード（API Route経由）
   const uploadMetadataToIPFS = async (
     imageUrl: string,
     creatorAddress: string,
@@ -35,8 +34,14 @@ export const useIPFS = () => {
         },
       ],
     };
-    const result = await pinata.upload.public.json(metadata);
-    return `ipfs://${result.cid}`;
+    const res = await fetch('/api/pinata-upload', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(metadata),
+    });
+    if (!res.ok) throw new Error('メタデータのアップロードに失敗しました');
+    const data = await res.json();
+    return `ipfs://${data.cid}`;
   };
 
   return {

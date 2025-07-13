@@ -2,8 +2,8 @@ import { PinataSDK } from 'pinata';
 
 // PinataSDKインスタンスの初期化
 const pinata = new PinataSDK({
-  pinataJwt: process.env.PINATA_JWT!,
-  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL!,
+  pinataJwt: process.env.PINATA_JWT || '',
+  pinataGateway: process.env.NEXT_PUBLIC_GATEWAY_URL || '',
 });
 
 export const useIPFS = () => {

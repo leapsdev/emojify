@@ -4,13 +4,13 @@ import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
+import { EMOJI_CONTRACT_ADDRESS } from '@/lib/contracts';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
 import { useFileUpload } from './hooks/useFileUpload';
 import { useIPFS } from './hooks/useIPFS';
-import { useThirdwebMint } from './hooks/useThirdwebMint';
+import { useWagmiMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
 
 type MintResult = {
@@ -24,7 +24,7 @@ export function CreateEmojiForm() {
   const [mintResult, setMintResult] = useState<MintResult>(null);
   const { selectedWalletAddress, getSelectedWallet } = useWallet();
   const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
-  const { mintNFT } = useThirdwebMint();
+  const { mintNFT } = useWagmiMint();
   const { isConnected } = useCollectWallet();
 
   if (!isConnected) {

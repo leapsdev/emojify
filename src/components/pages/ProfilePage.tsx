@@ -12,9 +12,10 @@ import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
-import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
+import { config } from '@/lib/basename/wagmi';
+import { emojiContract } from '@/lib/contracts';
 import type { User } from '@/repository/db/database';
-import { ThirdwebProvider, useContract } from '@thirdweb-dev/react';
+import { readContract } from '@wagmi/core';
 import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
@@ -34,14 +35,13 @@ function ProfilePageContent({
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   const { selectedWalletAddress } = useWallet();
   const { nfts, error } = useGlobalNFTs();
-  const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const { isConnected } = useCollectWallet();
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!contract || !selectedWalletAddress || !nfts.length) return;
+      if (!selectedWalletAddress || !nfts.length) return;
 
       try {
         const created: NFT[] = [];
@@ -49,13 +49,21 @@ function ProfilePageContent({
 
         for (const nft of nfts) {
           try {
-            const balance = await contract.call('balanceOf', [
-              selectedWalletAddress,
-              nft.tokenId,
-            ]);
+            const balance = (await readContract(config, {
+              ...emojiContract,
+              functionName: 'balanceOf',
+              args: [
+                selectedWalletAddress as `0x${string}`,
+                BigInt(nft.tokenId),
+              ],
+            })) as bigint;
 
             if (Number(balance) > 0) {
-              const minter = await contract.call('firstMinter', [nft.tokenId]);
+              const minter = (await readContract(config, {
+                ...emojiContract,
+                functionName: 'firstMinter',
+                args: [BigInt(nft.tokenId)],
+              })) as string;
               const isCreator =
                 minter.toLowerCase() === selectedWalletAddress.toLowerCase();
 
@@ -78,7 +86,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [contract, selectedWalletAddress, nfts]);
+  }, [selectedWalletAddress, nfts]);
 
   if (!isConnected) {
     return <WalletConnectButton />;

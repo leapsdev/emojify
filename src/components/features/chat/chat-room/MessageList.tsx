@@ -1,14 +1,13 @@
 'use client';
 
 import type { NFTData } from '@/components/features/explore/types';
-import { activeChain } from '@/lib/thirdweb';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { formatDateToYYYYMMDD } from '@/lib/utils';
 import type { Message } from '@/repository/db/database';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 type MessageListProps = {
   roomId: string;

@@ -2,14 +2,13 @@
 
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import { activeChain } from '@/lib/thirdweb';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { Categories } from 'emoji-picker-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { EmojiPicker } from './EmojiPicker';
 import { sendMessageAction } from './actions';
 import { useEmojiInput } from './hooks/useEmojiInput';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 interface NFT {
   tokenId: string;

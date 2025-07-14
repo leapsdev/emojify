@@ -3,11 +3,10 @@
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
-import { activeChain } from '@/lib/thirdweb';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 export function EmojiList() {
   return (

@@ -1,6 +1,7 @@
-import { fetchFromIpfsGateways, ipfsToHttp } from '@/lib/ipfsGateway';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/thirdweb';
-import { useContract, useContractRead } from '@thirdweb-dev/react';
+import { config } from '@/lib/basename/wagmi';
+import { emojiContract } from '@/lib/contracts';
+import { ipfsToHttp } from '@/lib/ipfsGateway';
+import { readContract } from '@wagmi/core';
 import { useEffect, useState } from 'react';
 
 interface NFT {
@@ -12,68 +13,52 @@ interface NFT {
   description?: string;
 }
 
-interface NFTMetadata {
-  name?: string;
-  description?: string;
-  image?: string;
-  [key: string]: unknown;
-}
-
-async function fetchMetadata(uri: string): Promise<NFTMetadata> {
-  try {
-    const res = await fetchFromIpfsGateways(uri);
-    const contentType = res.headers.get('content-type');
-    if (!contentType || !contentType.includes('application/json')) {
-      throw new Error('Invalid content type');
-    }
-    const metadata = await res.json();
-    console.log('Fetched metadata:', metadata);
-    return metadata;
-  } catch (error) {
-    console.error('Error fetching metadata from all IPFS gateways:', error);
-    return {};
-  }
+async function fetchMetadata(uri: string) {
+  const url = ipfsToHttp(uri);
+  const res = await fetch(url);
+  if (!res.ok) throw new Error('Failed to fetch metadata');
+  return res.json();
 }
 
 export function useProfileNFTs(address?: string) {
   const [nfts, setNFTs] = useState<NFT[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
-
-  const { data: totalSupply } = useContractRead(contract, 'totalSupply');
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!contract || !totalSupply || !address) return;
-
+      if (!address) return;
       try {
         setLoading(true);
+        setError(null);
+        const totalSupply = (await readContract(config, {
+          ...emojiContract,
+          functionName: 'totalSupply',
+        })) as bigint;
         const nftPromises: Promise<NFT | null>[] = [];
-
-        // 各NFTの情報を取得
         for (let i = 0; i < Number(totalSupply); i++) {
           const tokenId = i + 1;
           const promise = (async () => {
             try {
               // balanceOfをチェックして、アドレスがNFTを所有しているか確認
-              const balance = await contract.call('balanceOf', [
-                address,
-                tokenId,
-              ]);
+              const balance = (await readContract(config, {
+                ...emojiContract,
+                functionName: 'balanceOf',
+                args: [address as `0x${string}`, BigInt(tokenId)],
+              })) as bigint;
               if (Number(balance) === 0) return null;
-
               let uri: string;
               try {
-                uri = await contract.call('uri', [tokenId]);
-                console.log(`Token ${tokenId} URI:`, uri);
+                uri = (await readContract(config, {
+                  ...emojiContract,
+                  functionName: 'uri',
+                  args: [BigInt(tokenId)],
+                })) as string;
               } catch (err) {
                 console.error(`Error fetching URI for token ${tokenId}:`, err);
                 throw new Error(`Failed to fetch URI for token ${tokenId}`);
               }
-
               if (!uri) {
-                console.warn(`Empty URI for token ${tokenId}`);
                 return {
                   tokenId: tokenId.toString(),
                   owner: address,
@@ -82,55 +67,37 @@ export function useProfileNFTs(address?: string) {
                   description: 'URIが設定されていません',
                 } as NFT;
               }
-
               // メタデータを取得
               const metadata = await fetchMetadata(uri);
-              console.log(`Token ${tokenId} metadata:`, metadata);
-
-              // 画像URLもIPFSゲートウェイを使用するように変換
               const imageUrl = metadata.image
                 ? ipfsToHttp(metadata.image)
-                : undefined;
-              console.log(`Token ${tokenId} image URL:`, imageUrl);
-
+                : '/placeholder.svg';
               return {
                 tokenId: tokenId.toString(),
                 owner: address,
                 uri: ipfsToHttp(uri),
                 imageUrl,
                 name: metadata.name || `NFT #${tokenId}`,
-                description: metadata.description || 'No description available',
+                description: metadata.description || '',
               } as NFT;
             } catch (err) {
-              console.error(`Error fetching NFT #${tokenId}:`, err);
+              console.error(`Error processing NFT ${tokenId}:`, err);
               return null;
             }
           })();
-
           nftPromises.push(promise);
         }
-
-        const nftResults = await Promise.all(nftPromises);
-        const filteredNFTs = nftResults.filter(
-          (nft): nft is NFT => nft !== null,
-        );
-        console.log('Filtered NFTs:', filteredNFTs);
-        setNFTs(filteredNFTs);
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching NFTs:', err);
-        setError('NFTの取得中にエラーが発生しました。');
+        const results = await Promise.all(nftPromises);
+        setNFTs(results.filter(Boolean) as NFT[]);
+      } catch {
+        setError('NFTの取得に失敗しました');
+        setNFTs([]);
       } finally {
         setLoading(false);
       }
     };
-
     fetchNFTs();
-  }, [contract, totalSupply, address]);
+  }, [address]);
 
-  return {
-    nfts,
-    loading,
-    error,
-  };
+  return { nfts, loading, error };
 }

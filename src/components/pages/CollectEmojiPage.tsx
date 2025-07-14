@@ -5,11 +5,9 @@ import { CreatorInfo } from '@/components/features/collect-emoji/components/Crea
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
 import type { EmojiData } from '@/components/features/collect-emoji/types';
-import { ipfsToHttp } from '@/lib/ipfsGateway';
-import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 function CollectEmojiPageContent() {
   const params = useParams();

@@ -7,12 +7,12 @@
 
 ## タスク一覧
 
-- **[pending] [id:remove-thirdweb-add-wagmi] thirdwebの依存パッケージをアンインストールし、wagmi関連パッケージをpnpmでインストールする**
+- **[completed] [id:remove-thirdweb-add-wagmi] thirdwebの依存パッケージをアンインストールし、wagmi関連パッケージをpnpmでインストールする**
   - @thirdweb-dev/react, @thirdweb-dev/sdk, thirdweb などを削除
   - wagmi, @wagmi/core, @wagmi/connectors, viem などを追加
   - 依存なし
 
-- **[pending] [id:replace-provider] 全コンポーネントからThirdwebProviderを削除し、EthereumProviders（WagmiProvider/QueryClientProvider）に統一する**
+- **[in_progress] [id:replace-provider] 全コンポーネントからThirdwebProviderを削除し、EthereumProviders（WagmiProvider/QueryClientProvider）に統一する**
   - src/lib/basename/EthereumProviders.tsx を全体のProviderとして利用
   - 依存: remove-thirdweb-add-wagmi
 

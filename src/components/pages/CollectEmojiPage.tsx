@@ -7,64 +7,63 @@ import { EmojiImage } from '@/components/features/collect-emoji/components/Emoji
 import type { EmojiData } from '@/components/features/collect-emoji/types';
 import { ipfsToHttp } from '@/lib/ipfsGateway';
 import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
-import {
-  ThirdwebProvider,
-  useContract,
-  useContractRead,
-} from '@thirdweb-dev/react';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 function CollectEmojiPageContent() {
   const params = useParams();
   const tokenId = params?.id as string;
-  const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
+  // const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [emojiData, setEmojiData] = useState<EmojiData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const { data: uri } = useContractRead(contract, 'uri', [tokenId]);
+  // const { data: uri } = useContractRead(contract, 'uri', [tokenId]);
 
   useEffect(() => {
+    // if (!contract || !tokenId) return;
+    // if (!uri) return;
+    // setEmojiData(null);
+    // setError(null);
+
     const fetchEmojiData = async () => {
-      if (!uri) return;
+      // if (!uri) return;
 
       try {
-        const gatewayUrl = ipfsToHttp(uri);
-        console.log('Fetching metadata from:', gatewayUrl);
+        // const gatewayUrl = ipfsToHttp(uri);
+        // console.log('Fetching metadata from:', gatewayUrl);
 
-        const response = await fetch(gatewayUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
+        // const response = await fetch(gatewayUrl);
+        // if (!response.ok) {
+        //   throw new Error(`HTTP error! status: ${response.status}`);
+        // }
 
-        const metadata = await response.json();
-        console.log('Fetched metadata:', metadata);
+        // const metadata = await response.json();
+        // console.log('Fetched metadata:', metadata);
 
         // 画像URLをIPFSゲートウェイを使用するように変換
-        const imageUrl = metadata.image
-          ? ipfsToHttp(metadata.image)
-          : '/placeholder.svg';
+        // const imageUrl = metadata.image
+        //   ? ipfsToHttp(metadata.image)
+        //   : '/placeholder.svg';
 
         // クリエイター情報をメタデータから取得
-        const creatorAddress = metadata.attributes?.find(
-          (attr: { trait_type: string; value: string }) =>
-            attr.trait_type === 'creator',
-        )?.value;
+        // const creatorAddress = metadata.attributes?.find(
+        //   (attr: { trait_type: string; value: string }) =>
+        //     attr.trait_type === 'creator',
+        // )?.value;
 
         setEmojiData({
           id: tokenId,
-          image: imageUrl,
+          image: '/placeholder.svg',
           creator: {
-            id: creatorAddress || 'Unknown',
-            username: creatorAddress
-              ? `${creatorAddress.slice(0, 6)}...${creatorAddress.slice(-4)}`
-              : 'Unknown',
+            id: 'Unknown',
+            username: 'Unknown',
           },
           details: {
             token: 'ETH',
             network: 'Base',
           },
-          name: metadata.name,
+          name: 'Unknown Emoji',
         });
         setError(null);
       } catch (err) {
@@ -73,10 +72,10 @@ function CollectEmojiPageContent() {
       }
     };
 
-    if (uri) {
-      fetchEmojiData();
-    }
-  }, [uri, tokenId]);
+    // if (uri) {
+    fetchEmojiData();
+    // }
+  }, [tokenId]); // uri依存を削除
 
   if (error || !emojiData) {
     return (
@@ -104,11 +103,8 @@ function CollectEmojiPageContent() {
 
 export function CollectEmojiPage() {
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-    >
+    <EthereumProviders>
       <CollectEmojiPageContent />
-    </ThirdwebProvider>
+    </EthereumProviders>
   );
 }

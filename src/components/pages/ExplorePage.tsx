@@ -2,17 +2,14 @@
 
 import { EmojiList } from '@/components/features/explore/components/EmojiList';
 import { activeChain } from '@/lib/thirdweb';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 export function ExplorePage() {
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-    >
+    <EthereumProviders>
       <main className="flex flex-col">
         <EmojiList />
       </main>
-    </ThirdwebProvider>
+    </EthereumProviders>
   );
 }

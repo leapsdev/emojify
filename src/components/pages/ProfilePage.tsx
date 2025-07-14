@@ -134,13 +134,7 @@ function ProfilePageContent({
 export const ProfilePage = (props: ProfilePageProps) => {
   return (
     <EthereumProviders>
-      <ThirdwebProvider
-        activeChain={activeChain}
-        clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-        supportedWallets={[]}
-      >
-        <ProfilePageContent {...props} />
-      </ThirdwebProvider>
+      <ProfilePageContent {...props} />
     </EthereumProviders>
   );
 };

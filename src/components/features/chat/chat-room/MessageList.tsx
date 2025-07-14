@@ -4,11 +4,11 @@ import type { NFTData } from '@/components/features/explore/types';
 import { activeChain } from '@/lib/thirdweb';
 import { formatDateToYYYYMMDD } from '@/lib/utils';
 import type { Message } from '@/repository/db/database';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
 import { useGlobalNFTs } from './hooks/useGlobalNFTs';
 import { useRoomMessages } from './hooks/useRoomMessages';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 type MessageListProps = {
   roomId: string;
@@ -202,12 +202,8 @@ function MessageListContent({
 
 export function MessageList(props: MessageListProps) {
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-      supportedWallets={[]}
-    >
+    <EthereumProviders>
       <MessageListContent {...props} />
-    </ThirdwebProvider>
+    </EthereumProviders>
   );
 }

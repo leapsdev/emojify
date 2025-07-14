@@ -22,18 +22,6 @@ interface NFTMetadata {
 // メタデータキャッシュ
 const metadataCache = new Map<string, NFTMetadata>();
 
-// IPFSのURLをゲートウェイURLに変換する関数
-// const convertIpfsToGatewayUrl = async (ipfsUrl: string): Promise<string> => {
-//   if (!ipfsUrl) return '';
-
-//   if (ipfsUrl.startsWith('ipfs://')) {
-//     const ipfsHash = ipfsUrl.replace('ipfs://', '');
-//     // 最初のゲートウェイで試す
-//     return `${IPFS_GATEWAYS[0]}${ipfsHash}`;
-//   }
-//   return ipfsUrl;
-// };
-
 // メタデータを取得する関数（キャッシュ付き）
 const fetchMetadata = async (url: string): Promise<NFTMetadata> => {
   // キャッシュをチェック

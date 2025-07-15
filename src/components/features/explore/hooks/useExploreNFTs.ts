@@ -63,7 +63,8 @@ export const useExploreNFTs = () => {
         // 新しい順にソート
         nftResults.sort((a, b) => Number(b.tokenId) - Number(a.tokenId));
         setNFTs(nftResults);
-      } catch {
+      } catch (err) {
+        console.error('NFT取得エラー:', err);
         setError('NFTの取得に失敗しました');
         setNFTs([]);
       } finally {

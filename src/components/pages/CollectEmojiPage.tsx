@@ -12,44 +12,12 @@ import { useEffect, useState } from 'react';
 function CollectEmojiPageContent() {
   const params = useParams();
   const tokenId = params?.id as string;
-  // const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
   const [emojiData, setEmojiData] = useState<EmojiData | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // const { data: uri } = useContractRead(contract, 'uri', [tokenId]);
-
   useEffect(() => {
-    // if (!contract || !tokenId) return;
-    // if (!uri) return;
-    // setEmojiData(null);
-    // setError(null);
-
     const fetchEmojiData = async () => {
-      // if (!uri) return;
-
       try {
-        // const gatewayUrl = ipfsToHttp(uri);
-        // console.log('Fetching metadata from:', gatewayUrl);
-
-        // const response = await fetch(gatewayUrl);
-        // if (!response.ok) {
-        //   throw new Error(`HTTP error! status: ${response.status}`);
-        // }
-
-        // const metadata = await response.json();
-        // console.log('Fetched metadata:', metadata);
-
-        // 画像URLをIPFSゲートウェイを使用するように変換
-        // const imageUrl = metadata.image
-        //   ? ipfsToHttp(metadata.image)
-        //   : '/placeholder.svg';
-
-        // クリエイター情報をメタデータから取得
-        // const creatorAddress = metadata.attributes?.find(
-        //   (attr: { trait_type: string; value: string }) =>
-        //     attr.trait_type === 'creator',
-        // )?.value;
-
         setEmojiData({
           id: tokenId,
           image: '/placeholder.svg',
@@ -70,10 +38,8 @@ function CollectEmojiPageContent() {
       }
     };
 
-    // if (uri) {
     fetchEmojiData();
-    // }
-  }, [tokenId]); // uri依存を削除
+  }, [tokenId]);
 
   if (error || !emojiData) {
     return (

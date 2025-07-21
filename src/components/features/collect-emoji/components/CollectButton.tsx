@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/Button';
+import { LinkButton } from '@/components/ui/LinkButton';
 import { Loading } from '@/components/ui/Loading';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { config } from '@/lib/basename/wagmi';
@@ -69,30 +70,55 @@ export function CollectButton({ tokenId }: Props) {
     }
   };
 
-  if (collectResult) {
-    return (
-      <TransactionResult
-        result={collectResult.result}
-        title={collectResult.result === 'success' ? '収集成功' : '収集失敗'}
-        message={
-          collectResult.result === 'success'
-            ? 'NFTの収集に成功しました。'
-            : 'NFTの収集に失敗しました。'
-        }
-        transactionHash={collectResult.transactionHash}
-        explorerUrl={
-          collectResult.transactionHash
-            ? `https://basescan.org/tx/${collectResult.transactionHash}`
-            : undefined
-        }
-      />
-    );
-  }
+  const buttonStyles =
+    'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
 
   return (
-    <Button onClick={handleCollect} disabled={isLoading} className="w-full">
-      {isLoading ? <Loading size="sm" /> : <Plus className="mr-2 h-4 w-4" />}{' '}
-      収集する
-    </Button>
+    <div className="space-y-4">
+      {collectResult && (
+        <TransactionResult
+          result={collectResult.result}
+          title={
+            collectResult.result === 'success'
+              ? 'Successfully collected!'
+              : 'Failed to collect NFT'
+          }
+          message={
+            collectResult.result === 'error'
+              ? 'The transaction was rejected. Please try again.'
+              : undefined
+          }
+          transactionHash={collectResult.transactionHash}
+          explorerUrl={
+            collectResult.transactionHash
+              ? `https://basescan.org/tx/${collectResult.transactionHash}`
+              : undefined
+          }
+        />
+      )}
+
+      {collectResult ? (
+        <LinkButton
+          href="/explore"
+          content="Back to Explore"
+          className={buttonStyles}
+        />
+      ) : (
+        <Button
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold mt-8"
+          onClick={handleCollect}
+          disabled={isLoading || wallets.length === 0}
+        >
+          {isLoading ? (
+            <Loading size="sm" className="text-white" />
+          ) : (
+            <>
+              <Plus className="w-5 h-5 mr-2" />
+              Collect
+            </>
+          )}
+        </Button>
+      )}
+    </div>
   );
 }

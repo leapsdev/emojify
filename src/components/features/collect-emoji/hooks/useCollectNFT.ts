@@ -92,4 +92,4 @@ export const useCollectNFT = (tokenId: string) => {
   }, [tokenId]);
 
   return { emojiData, loading, error };
-}; 
+};

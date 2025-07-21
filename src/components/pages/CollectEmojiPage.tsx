@@ -5,9 +5,9 @@ import { CreatorInfo } from '@/components/features/collect-emoji/components/Crea
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
 import { useCollectNFT } from '@/components/features/collect-emoji/hooks/useCollectNFT';
-import { useCollectWallet } from '@/hooks/useCollectWallet';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
+import { useCollectWallet } from '@/hooks/useCollectWallet';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { useParams } from 'next/navigation';
 

@@ -4,79 +4,30 @@ import { CollectButton } from '@/components/features/collect-emoji/components/Co
 import { CreatorInfo } from '@/components/features/collect-emoji/components/CreatorInfo';
 import { EmojiDetails } from '@/components/features/collect-emoji/components/EmojiDetails';
 import { EmojiImage } from '@/components/features/collect-emoji/components/EmojiImage';
-import type { EmojiData } from '@/components/features/collect-emoji/types';
-import { ipfsToHttp } from '@/lib/ipfsGateway';
-import { EMOJI_CONTRACT_ADDRESS, activeChain } from '@/lib/thirdweb';
-import {
-  ThirdwebProvider,
-  useContract,
-  useContractRead,
-} from '@thirdweb-dev/react';
+import { useCollectNFT } from '@/components/features/collect-emoji/hooks/useCollectNFT';
+import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
+import { Loading } from '@/components/ui/Loading';
+import { useCollectWallet } from '@/hooks/useCollectWallet';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
 
 function CollectEmojiPageContent() {
   const params = useParams();
   const tokenId = params?.id as string;
-  const { contract } = useContract(EMOJI_CONTRACT_ADDRESS);
-  const [emojiData, setEmojiData] = useState<EmojiData | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const { emojiData, loading, error } = useCollectNFT(tokenId);
+  const { isConnected } = useCollectWallet();
 
-  const { data: uri } = useContractRead(contract, 'uri', [tokenId]);
+  if (!isConnected) {
+    return <WalletConnectButton />;
+  }
 
-  useEffect(() => {
-    const fetchEmojiData = async () => {
-      if (!uri) return;
-
-      try {
-        const gatewayUrl = ipfsToHttp(uri);
-        console.log('Fetching metadata from:', gatewayUrl);
-
-        const response = await fetch(gatewayUrl);
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-
-        const metadata = await response.json();
-        console.log('Fetched metadata:', metadata);
-
-        // 画像URLをIPFSゲートウェイを使用するように変換
-        const imageUrl = metadata.image
-          ? ipfsToHttp(metadata.image)
-          : '/placeholder.svg';
-
-        // クリエイター情報をメタデータから取得
-        const creatorAddress = metadata.attributes?.find(
-          (attr: { trait_type: string; value: string }) =>
-            attr.trait_type === 'creator',
-        )?.value;
-
-        setEmojiData({
-          id: tokenId,
-          image: imageUrl,
-          creator: {
-            id: creatorAddress || 'Unknown',
-            username: creatorAddress
-              ? `${creatorAddress.slice(0, 6)}...${creatorAddress.slice(-4)}`
-              : 'Unknown',
-          },
-          details: {
-            token: 'ETH',
-            network: 'Base',
-          },
-          name: metadata.name,
-        });
-        setError(null);
-      } catch (err) {
-        console.error('Error fetching emoji data:', err);
-        setError('An error occurred while fetching NFT data.');
-      }
-    };
-
-    if (uri) {
-      fetchEmojiData();
-    }
-  }, [uri, tokenId]);
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loading size="xl" className="mb-4" />
+      </div>
+    );
+  }
 
   if (error || !emojiData) {
     return (
@@ -104,11 +55,8 @@ function CollectEmojiPageContent() {
 
 export function CollectEmojiPage() {
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-    >
+    <EthereumProviders>
       <CollectEmojiPageContent />
-    </ThirdwebProvider>
+    </EthereumProviders>
   );
 }

@@ -8,7 +8,7 @@ cloudinary.config({
 });
 
 const CLOUDINARY_FOLDER =
-  process.env.NODE_ENV === 'production'
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
     ? 'emoji-chat/profiles'
     : 'emoji-chat-dev/profiles';
 

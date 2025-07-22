@@ -1,7 +1,7 @@
 // thirdweb.tsから移植したコントラクト情報
 
 export const EMOJI_CONTRACT_ADDRESS =
-  process.env.NODE_ENV === 'production'
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
     ? '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8'
     : '0xB54E5BfFaDBF798b6f3f92920E64fd1f3f59377C';
 

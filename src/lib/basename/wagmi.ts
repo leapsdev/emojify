@@ -1,12 +1,14 @@
 'use client';
-
 import { http, createConfig } from 'wagmi';
-import { base } from 'wagmi/chains';
+import { base, baseSepolia } from 'wagmi/chains';
+
+const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
 
 export const config = createConfig({
-  chains: [base],
+  chains: [isProd ? base : baseSepolia],
   transports: {
     [base.id]: http(),
+    [baseSepolia.id]: http(),
   },
   ssr: true,
 });

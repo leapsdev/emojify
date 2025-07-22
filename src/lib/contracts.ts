@@ -1,23 +1,10 @@
-import { defineChain } from 'thirdweb/chains';
+// thirdweb.tsから移植したコントラクト情報
 
-// Base Mainnet
-export const baseMainnet =
-  process.env.NODE_ENV === 'production'
-    ? defineChain(8453)
-    : defineChain(84532);
-
-export const CLIENT_ID = 'af87b9c2acce067efa781dc3ea43644d';
-
-export const activeChain =
-  process.env.NODE_ENV === 'production' ? 'base' : 'base-sepolia-testnet';
-
-// コントラクトアドレス
 export const EMOJI_CONTRACT_ADDRESS =
-  process.env.NODE_ENV === 'production'
+  process.env.NEXT_PUBLIC_ENVIRONMENT === 'production'
     ? '0x7B94d514d87426A23d7B1D3E13e98DF6c79C3Fe8'
     : '0xB54E5BfFaDBF798b6f3f92920E64fd1f3f59377C';
 
-// コントラクトABI
 export const EMOJI_CONTRACT_ABI = [
   {
     inputs: [],
@@ -1065,3 +1052,8 @@ export const EMOJI_CONTRACT_ABI = [
     type: 'function',
   },
 ] as const;
+
+export const emojiContract = {
+  address: EMOJI_CONTRACT_ADDRESS as `0x${string}`,
+  abi: EMOJI_CONTRACT_ABI,
+} as const;

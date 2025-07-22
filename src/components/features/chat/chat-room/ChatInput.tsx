@@ -2,8 +2,7 @@
 
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import { activeChain } from '@/lib/thirdweb';
-import { ThirdwebProvider } from '@thirdweb-dev/react';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 import { Categories } from 'emoji-picker-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -127,12 +126,8 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
 
 export function ChatRoomInput(props: ChatRoomInputProps) {
   return (
-    <ThirdwebProvider
-      activeChain={activeChain}
-      clientId={process.env.NEXT_PUBLIC_THIRDWEB_CLIENT_ID}
-      supportedWallets={[]}
-    >
+    <EthereumProviders>
       <ChatRoomInputContent {...props} />
-    </ThirdwebProvider>
+    </EthereumProviders>
   );
 }

@@ -115,8 +115,8 @@ CLOUDINARY_API_SECRET=
 # Onchainkit Configuration
 NEXT_PUBLIC_ONCHAINKIT_API_KEY=
 
-# Neynar API Configuration
-NEYNAR_API_KEY=
+# Neynar API Configuration (Required for Farcaster Mini App)
+NEYNAR_API_KEY=your_neynar_api_key_here
 
 # Pinata
 PINATA_API_KEY=

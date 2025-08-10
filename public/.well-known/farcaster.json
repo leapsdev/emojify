@@ -1,0 +1,26 @@
+{
+  "accountAssociation": {
+    "header": "eyJhbGciOiJFZERTQSIsInR5cCI6IkpXVCJ9",
+    "payload": "eyJkb21haW4iOiJlbW9qaS1jaGF0LWxlYXBzLnZlcmNlbC5hcHAiLCJ0cyI6MTczOTIwNzEwMH0",
+    "signature": "your_signature_here"
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Emoji Chat",
+    "iconUrl": "https://emoji-chat-leaps.vercel.app/favicon.ico",
+    "homeUrl": "https://emoji-chat-leaps.vercel.app",
+    "imageUrl": "https://emoji-chat-leaps.vercel.app/smiling-faces.png",
+    "splashImageUrl": "https://emoji-chat-leaps.vercel.app/smiling-faces.png",
+    "splashBackgroundColor": "#FFFFFF",
+    "webhookUrl": "https://emoji-chat-leaps.vercel.app/api/webhook",
+    "subtitle": "Web3 emoji-only chat",
+    "description": "A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.",
+    "screenshotUrls": [
+      "https://emoji-chat-leaps.vercel.app/smiling-faces.png",
+      "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png"
+    ],
+    "primaryCategory": "social",
+    "tags": ["chat", "emoji", "web3", "nft", "social"],
+    "heroImageUrl": "https://emoji-chat-leaps.vercel.app/smiling-faces.png"
+  }
+}

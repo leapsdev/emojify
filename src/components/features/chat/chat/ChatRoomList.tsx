@@ -31,10 +31,10 @@ const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
   const getAvatarUrl = () => {
     if (otherMembers.length === 1) {
       // 1対1のチャットの場合、相手のアバターを使用
-      return otherMembers[0][1].imageUrl || '/icons/icon-192x192.png';
+      return otherMembers[0][1].imageUrl || '/icons/faceIcon-192x192.png';
     }
     // グループチャットまたはその他の場合、デフォルトアイコンを使用
-    return '/icons/icon-192x192.png';
+    return '/icons/faceIcon-192x192.png';
   };
 
   return (

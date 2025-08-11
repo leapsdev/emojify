@@ -109,7 +109,7 @@ function ProfilePageContent({
             <UserProfile
               username={user.username}
               bio={user.bio || ''}
-              avatar={user.imageUrl || '/icons/icon-192x192.png'}
+              avatar={user.imageUrl || '/icons/faceIcon-192x192.png'}
               userId={user.id}
               isOwnProfile={isOwnProfile}
               currentUserId={currentUserId}
@@ -120,14 +120,14 @@ function ProfilePageContent({
                 id: nft.tokenId,
                 image: nft.imageUrl || '',
                 creator: {
-                  avatar: '/icons/icon-192x192.png',
+                  avatar: '/icons/faceIcon-192x192.png',
                 },
               }))}
               collectedEmojis={collectedNFTs.map((nft) => ({
                 id: nft.tokenId,
                 image: nft.imageUrl || '',
                 creator: {
-                  avatar: '/icons/icon-192x192.png',
+                  avatar: '/icons/faceIcon-192x192.png',
                 },
               }))}
             />

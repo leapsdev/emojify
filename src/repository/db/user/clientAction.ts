@@ -92,7 +92,7 @@ export const convertToDisplayUser = (
     username: user.username,
     displayName: user.username,
     userId: user.id,
-    avatar: user.imageUrl || '/icons/icon-192x192.png',
+    avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };
 };

@@ -1,0 +1,28 @@
+{
+  "functions": {
+    "public/.well-known/farcaster.json": {
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/.well-known/farcaster.json",
+      "destination": "/public/.well-known/farcaster.json"
+    }
+  ]
+}

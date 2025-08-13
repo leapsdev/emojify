@@ -1,0 +1,20 @@
+{
+  "frame": {
+    "name": "Test Emoji Chat",
+    "version": "1",
+    "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "homeUrl": "https://emoji-chat-env-develop-leaps.vercel.app/",
+    "imageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "splashBackgroundColor": "#FFFFFF",
+    "webhookUrl": "https://emoji-chat-env-develop-leaps.vercel.app/api/webhook",
+    "subtitle": "test",
+    "description": "test",
+    "primaryCategory": "social"
+  },
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI0NTI2MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQ5RmY2QTQxMDU5ZTc3NENmMTlhRTEzNDZDMkZkQjAwYmE5OUFmZDQifQ",
+    "payload": "eyJkb21haW4iOiJodHRwcyJ9",
+    "signature": "hDibr8+8PkFaLTOGB8eeubqak4SvOkc2xFYJLGgFqqoo+qi/rLi5NdVbFROmo26ev6Ivzmz7qALuMGgrKoWzlxs="
+  }
+}

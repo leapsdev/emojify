@@ -19,7 +19,8 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL('https://emoji-chat-leaps.vercel.app'),
   title: 'Emoji-Chat',
-  description: 'A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.',
+  description:
+    'A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.',
   manifest: '/manifest.json',
   openGraph: {
     title: 'Emoji Chat',
@@ -34,11 +35,11 @@ export const metadata: Metadata = {
         title: 'Open Emoji Chat',
         action: {
           type: 'launch_mini_app',
-          url: 'https://emoji-chat-leaps.vercel.app'
-        }
-      }
-    })
-  }
+          url: 'https://emoji-chat-leaps.vercel.app',
+        },
+      },
+    }),
+  },
 };
 
 export const viewport: Viewport = {

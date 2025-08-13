@@ -1,7 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { sdk } from '@farcaster/frame-sdk';
+import { useEffect, useState } from 'react';
 
 /**
  * Farcaster Mini App用のカスタムフック
@@ -20,7 +20,7 @@ export function useFarcasterMiniApp() {
           await sdk.actions.ready();
           setIsSDKLoaded(true);
           setIsReady(true);
-          
+
           // コンテキストを取得
           const ctx = await sdk.context;
           setContext(ctx);

@@ -1,9 +1,4 @@
 {
-  "functions": {
-    "public/.well-known/farcaster.json": {
-      "maxDuration": 10
-    }
-  },
   "headers": [
     {
       "source": "/.well-known/farcaster.json",
@@ -15,6 +10,10 @@
         {
           "key": "Cache-Control",
           "value": "public, max-age=3600"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/json"
         }
       ]
     }
@@ -24,5 +23,6 @@
       "source": "/.well-known/farcaster.json",
       "destination": "/public/.well-known/farcaster.json"
     }
-  ]
+  ],
+  "public": true
 }

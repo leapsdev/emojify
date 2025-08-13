@@ -20,6 +20,12 @@ A Web3 chat application that uses only emojis. Users can create and sell their o
 - Marketplace for buying and selling
 - Emoji search functionality
 
+### Farcaster Integration
+- **Farcaster Mini App** - Native integration with Farcaster ecosystem
+- **Frame Support** - Compatible with Farcaster Frames
+- **Account Association** - Verified domain ownership on Farcaster
+- **Webhook Support** - Real-time notifications and events
+
 ## Tech Stack 🛠
 
 ### Frontend
@@ -39,6 +45,11 @@ A Web3 chat application that uses only emojis. Users can create and sell their o
 - [Privy](https://docs.privy.io/) - Web3 authentication & wallet management
 - [Wagmi](https://wagmi.sh/) - React Hooks for Ethereum
 - [Viem](https://viem.sh/) - TypeScript Ethereum client
+
+### Farcaster Integration
+- [Farcaster Mini Apps](https://miniapps.farcaster.xyz/) - Native Farcaster integration
+- [Farcaster Frame SDK](https://docs-farcaster-xyz.vercel.app/developers/frames/) - Frame development tools
+- [Neynar](https://neynar.com/) - Farcaster API and development tools
 
 ### Development Tools
 - [pnpm](https://pnpm.io/) - Package manager
@@ -66,9 +77,36 @@ A Web3 chat application that uses only emojis. Users can create and sell their o
 │ ├── styles/ # Global styles
 │ └── middleware.ts # Next.js middleware
 ├── public/ # Static files
+│ └── .well-known/ # Farcaster manifest and verification files
+│   └── farcaster.json # Farcaster Mini App manifest
 ├── contract/ # Smart contracts
 └── README.md        
 ```
+
+## Farcaster Mini App Setup 🚀
+
+This application is configured as a **Farcaster Mini App** with the following features:
+
+### Manifest File
+The `public/.well-known/farcaster.json` file contains the Mini App manifest with:
+- **Frame Configuration** - App metadata and display settings
+- **Account Association** - Verified domain ownership on Farcaster
+- **Webhook Integration** - Real-time event handling
+
+### Key Features
+- **Native Farcaster Integration** - Runs within Farcaster clients
+- **Frame Support** - Compatible with Farcaster Frames ecosystem
+- **Verified Domain** - Cryptographically signed domain ownership
+- **Real-time Events** - Webhook-based notification system
+
+### Development Environment
+- **Production URL**: `https://emoji-chat-leaps.vercel.app`
+- **Development URL**: `https://emoji-chat-env-develop-leaps.vercel.app/`
+- **Webhook Endpoint**: `/api/webhook`
+
+For more information about Farcaster Mini Apps, visit:
+- [Farcaster Mini Apps Documentation](https://miniapps.farcaster.xyz/docs/specification)
+- [Frames Introduction](https://docs-farcaster-xyz.vercel.app/developers/frames/)
 
 ## Setup 🔧
 

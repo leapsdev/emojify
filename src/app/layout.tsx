@@ -4,6 +4,7 @@ import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
+import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -17,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  metadataBase: new URL('https://emoji-chat-leaps.vercel.app'),
+  metadataBase: new URL('https://emoji-chat-develop.vercel.app'),
   title: 'Emoji-Chat',
   description:
     'A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.',
@@ -28,14 +29,17 @@ export const metadata: Metadata = {
     images: ['/smiling-faces.png'],
   },
   other: {
-    'fc:frame': JSON.stringify({
+    'fc:miniapp': JSON.stringify({
       version: '1',
-      imageUrl: 'https://emoji-chat-leaps.vercel.app/smiling-faces.png',
+      imageUrl: 'https://emoji-chat-develop.vercel.app/smiling-faces.png',
       button: {
         title: 'Open Emoji Chat',
         action: {
-          type: 'launch_mini_app',
-          url: 'https://emoji-chat-leaps.vercel.app',
+          type: 'launch_frame',
+          name: 'Emoji Chat',
+          url: 'https://emoji-chat-develop.vercel.app',
+          splashImageUrl: 'https://emoji-chat-develop.vercel.app/icon-192x192.png',
+          splashBackgroundColor: '#FFFFFF'
         },
       },
     }),
@@ -58,6 +62,7 @@ export default function RootLayout({
       >
         <PrivyProvider>
           <OnchainProvider>
+            <FarcasterMiniAppInitializer />
             {children}
             <Toaster />
           </OnchainProvider>

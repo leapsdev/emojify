@@ -19,6 +19,7 @@
     "@conform-to/zod": "^1.2.2",
     "@ducanh2912/next-pwa": "^10.2.9",
     "@farcaster/frame-sdk": "^0.1.8",
+    "@farcaster/miniapp-sdk": "^0.1.8",
     "@farcaster/miniapp-wagmi-connector": "^1.0.0",
     "@neynar/nodejs-sdk": "^3.34.0",
     "@privy-io/react-auth": "^2.13.1",

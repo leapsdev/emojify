@@ -1,6 +1,6 @@
 'use client';
 
-import { sdk } from '@farcaster/frame-sdk';
+import { sdk } from '@farcaster/miniapp-sdk';
 import { useEffect, useState } from 'react';
 
 /**
@@ -16,14 +16,19 @@ export function useFarcasterMiniApp() {
     const initializeMiniApp = async () => {
       try {
         if (sdk && !isSDKLoaded) {
+          console.log('Initializing Farcaster Mini App...');
+          
           // SDKの初期化を待つ
           await sdk.actions.ready();
+          console.log('Farcaster Mini App is ready!');
+          
           setIsSDKLoaded(true);
           setIsReady(true);
 
           // コンテキストを取得
           const ctx = await sdk.context;
           setContext(ctx);
+          console.log('Farcaster context:', ctx);
         }
       } catch (error) {
         console.error('Mini App initialization error:', error);

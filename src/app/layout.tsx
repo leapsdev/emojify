@@ -26,19 +26,19 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Emoji Chat',
     description: 'Web3 emoji-only chat app',
-    images: ['/smiling-faces.png'],
+    images: ['/icons/icon-512x512.png'],
   },
   other: {
     'fc:miniapp': JSON.stringify({
       version: '1',
-      imageUrl: 'https://emoji-chat-develop.vercel.app/smiling-faces.png',
+      imageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
       button: {
         title: 'Open Emoji Chat',
         action: {
           type: 'launch_frame',
           name: 'Emoji Chat',
           url: 'https://emoji-chat-develop.vercel.app',
-          splashImageUrl: 'https://emoji-chat-develop.vercel.app/icon-192x192.png',
+          splashImageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
           splashBackgroundColor: '#FFFFFF'
         },
       },

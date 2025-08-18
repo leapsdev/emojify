@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
+import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
-import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -38,8 +38,9 @@ export const metadata: Metadata = {
           type: 'launch_frame',
           name: 'Emoji Chat',
           url: 'https://emoji-chat-develop.vercel.app',
-          splashImageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
-          splashBackgroundColor: '#FFFFFF'
+          splashImageUrl:
+            'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
+          splashBackgroundColor: '#FFFFFF',
         },
       },
     }),

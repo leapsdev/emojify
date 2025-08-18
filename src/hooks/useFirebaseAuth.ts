@@ -18,7 +18,11 @@ interface FirebaseAuthState {
 }
 
 export function useFirebaseAuth() {
-  const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
+  const {
+    authenticated: isPrivyAuthenticated,
+    user: privyUser,
+    getAccessToken,
+  } = usePrivy();
   const [state, setState] = useState<FirebaseAuthState>({
     isFirebaseAuthenticated: false,
     isLoading: true,
@@ -43,16 +47,26 @@ export function useFirebaseAuth() {
           return;
         }
 
+        // Privyアクセストークンを取得
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          throw new Error('Privyアクセストークンの取得に失敗しました');
+        }
+
         // Firebaseカスタムトークンを取得
         const response = await fetch('/api/auth/firebase-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
         if (!response.ok) {
-          throw new Error('Firebaseトークンの取得に失敗しました');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error || 'Firebaseトークンの取得に失敗しました',
+          );
         }
 
         const { token } = await response.json();
@@ -86,7 +100,7 @@ export function useFirebaseAuth() {
     return () => {
       unsubscribe();
     };
-  }, [isPrivyAuthenticated, privyUser?.id]);
+  }, [isPrivyAuthenticated, privyUser?.id, getAccessToken]);
 
   const signOutFromFirebase = async () => {
     try {

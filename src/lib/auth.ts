@@ -42,14 +42,26 @@ export async function getPrivyId(): Promise<string | null> {
 export const getUserId = getPrivyId;
 
 /**
- * PrivyユーザーIDを使用してFirebaseカスタムトークンを取得する
+ * Privyトークンを使用してFirebaseカスタムトークンを取得する
+ * @param privyToken Privy認証トークン
  * @returns Firebaseカスタムトークン
  * @throws {Error} 認証エラー時
  */
-export async function getFirebaseCustomToken(): Promise<string | null> {
+export async function getFirebaseCustomToken(
+  privyToken: string,
+): Promise<string | null> {
   try {
-    const privyUserId = await getPrivyId();
+    if (!privyToken) {
+      return null;
+    }
 
+    // トークンの検証
+    const verifiedUser = await privy.verifyAuthToken(privyToken);
+    if (!verifiedUser) {
+      return null;
+    }
+
+    const privyUserId = verifiedUser.userId;
     if (!privyUserId) {
       return null;
     }

@@ -17,11 +17,11 @@ export function useFarcasterMiniApp() {
       try {
         if (sdk && !isSDKLoaded) {
           console.log('Initializing Farcaster Mini App...');
-          
+
           // SDKの初期化を待つ
           await sdk.actions.ready();
           console.log('Farcaster Mini App is ready!');
-          
+
           setIsSDKLoaded(true);
           setIsReady(true);
 

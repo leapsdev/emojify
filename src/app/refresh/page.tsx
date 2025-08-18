@@ -12,18 +12,14 @@ export default function RefreshPage() {
   useEffect(() => {
     const handleRefresh = async () => {
       try {
-        console.log('Token refresh started...');
         const token = await getAccessToken();
         const redirectUrl = searchParams.get('redirect_uri') || '/';
 
         if (token) {
-          console.log('Token obtained, setting cookie...');
           // トークンをクッキーに設定
           document.cookie = `privy-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
-          console.log('Cookie set, redirecting...');
           router.push(redirectUrl);
         } else {
-          console.log('No token obtained, redirecting to home...');
           router.push('/');
         }
       } catch (error) {

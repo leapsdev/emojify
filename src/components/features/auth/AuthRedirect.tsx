@@ -21,73 +21,17 @@ export const AuthRedirect = ({ mode }: Props) => {
     (path: string) => {
       if (context) {
         console.log('Farcaster context detected, using mini app navigation');
-
-        // Farcaster環境では複数のナビゲーション方法を試行
-        let navigationAttempted = false;
-
-        const attemptNavigation = () => {
-          if (navigationAttempted) return;
-          navigationAttempted = true;
-
+        // Farcaster環境ではより長い遅延を入れてからナビゲーション
+        setTimeout(() => {
           try {
-            console.log(`Attempting navigation to: ${path}`);
-
-            // まずrouter.pushを試行
+            console.log(`Navigating to: ${path}`);
             router.push(path);
-
-            // ナビゲーションが成功したかどうかを確認するため、少し待ってから現在のパスをチェック
-            setTimeout(() => {
-              const currentPath = window.location.pathname;
-              console.log(`Current path after navigation: ${currentPath}`);
-
-              // パスが変わっていない場合は、router.replaceを試行
-              if (currentPath !== path) {
-                console.log('Navigation failed, trying router.replace...');
-                try {
-                  router.replace(path);
-
-                  // 再度チェック
-                  setTimeout(() => {
-                    const currentPathAfterReplace = window.location.pathname;
-                    console.log(
-                      `Current path after replace: ${currentPathAfterReplace}`,
-                    );
-
-                    // それでもパスが変わっていない場合は、強制的にリロード
-                    if (currentPathAfterReplace !== path) {
-                      console.log(
-                        'Replace also failed, using window.location.href as final fallback',
-                      );
-                      window.location.href = path;
-                    }
-                  }, 300);
-                } catch (replaceError) {
-                  console.error('Replace error:', replaceError);
-                  console.log(
-                    'Using window.location.href due to replace error',
-                  );
-                  window.location.href = path;
-                }
-              }
-            }, 500);
           } catch (error) {
             console.error('Navigation error:', error);
             // エラーが発生した場合は強制的にリロード
-            console.log('Using window.location.href due to error');
             window.location.href = path;
           }
-        };
-
-        // 300ms後にナビゲーションを試行
-        setTimeout(attemptNavigation, 300);
-
-        // 安全のため、1秒後に強制的にリロード
-        setTimeout(() => {
-          if (!navigationAttempted) {
-            console.log('Navigation timeout, using window.location.href');
-            window.location.href = path;
-          }
-        }, 1000);
+        }, 300);
       } else {
         console.log(`Regular navigation to: ${path}`);
         router.push(path);

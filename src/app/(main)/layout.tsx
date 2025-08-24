@@ -7,7 +7,7 @@ export default function MainLayout({
 }) {
   return (
     <main className="pt-14">
-      {/* <AuthRedirect mode="auth" /> */}
+      <AuthRedirect mode="auth" />
       {children}
     </main>
   );

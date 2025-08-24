@@ -27,7 +27,7 @@ export function CreateProfilePage() {
   return (
     <EthereumProviders>
       <main className="max-w-2xl mx-auto w-full px-4 py-8">
-        {/* <AuthRedirect mode="profile" /> */}
+        <AuthRedirect mode="profile" />
         <ProfileImage onImageUpload={handleImageUpload} />
         <ProfileForm ref={formRef} />
       </main>

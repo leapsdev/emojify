@@ -5,7 +5,12 @@ import { isIdExists } from '@/repository/db/user/actions';
 
 export async function checkUserExists(): Promise<boolean> {
   const id = await getPrivyId();
-  if (!id) return false;
+  console.log('checkUserExists: getPrivyId returned:', id);
+  if (!id) {
+    console.log('checkUserExists: no privy ID found');
+    return false;
+  }
   const exists = await isIdExists(id);
+  console.log('checkUserExists: isIdExists returned:', exists);
   return exists;
 }

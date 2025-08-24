@@ -11,6 +11,7 @@ export function useFarcasterMiniApp() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [context, setContext] = useState<unknown>(null);
+  const [isFarcasterEnvironment, setIsFarcasterEnvironment] = useState(false);
 
   useEffect(() => {
     const initializeMiniApp = async () => {
@@ -28,13 +29,20 @@ export function useFarcasterMiniApp() {
           // コンテキストを取得
           const ctx = await sdk.context;
           setContext(ctx);
+
+          // Farcaster環境かどうかを判定
+          const isFarcaster = Boolean(ctx);
+          setIsFarcasterEnvironment(isFarcaster);
+
           console.log('Farcaster context:', ctx);
+          console.log('Is Farcaster environment:', isFarcaster);
         }
       } catch (error) {
         console.error('Mini App initialization error:', error);
         // エラーがあってもアプリは動作させる
         setIsSDKLoaded(true);
         setIsReady(true);
+        setIsFarcasterEnvironment(false);
       }
     };
 
@@ -45,5 +53,6 @@ export function useFarcasterMiniApp() {
     isSDKLoaded,
     isReady,
     context,
+    isFarcasterEnvironment,
   };
 }

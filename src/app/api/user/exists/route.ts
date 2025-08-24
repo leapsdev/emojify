@@ -1,8 +1,9 @@
 import { getPrivyId } from '@/lib/auth';
 import { isIdExists } from '@/repository/db/user/actions';
+import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
     const userId = await getPrivyId();
 

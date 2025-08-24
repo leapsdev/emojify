@@ -4,7 +4,7 @@ import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
-import { checkUserExists, checkUserExistsByUserId } from './action';
+import { checkUserExists } from './action';
 
 type Props = {
   mode: 'auth' | 'profile';
@@ -35,11 +35,7 @@ export const AuthRedirect = ({ mode }: Props) => {
       // プロフィール作成ページの場合
       if (mode === 'profile') {
         console.log('AuthRedirect: profile mode');
-        // Farcaster Mini App環境ではCookieの問題でサーバーサイド認証が失敗するため
-        // クライアントサイドで取得したユーザーIDを使用
-        const exists = user?.id 
-          ? await checkUserExistsByUserId(user.id)
-          : await checkUserExists();
+        const exists = await checkUserExists();
         console.log('AuthRedirect: user exists?', exists);
         if (exists) {
           console.log('AuthRedirect: redirecting to /chat from profile mode');
@@ -51,24 +47,17 @@ export const AuthRedirect = ({ mode }: Props) => {
       // 認証関連のページの場合
       if (mode === 'auth') {
         console.log('AuthRedirect: auth mode');
-        
-        // プロフィール作成ページは除外
-        if (pathname === '/profile/create') {
-          console.log('AuthRedirect: skipping redirect for profile/create page');
+        if (pathname === '/' || pathname === '/profile/create') {
+          console.log('AuthRedirect: skipping redirect for root or profile/create page');
           return;
         }
-        
         if (!authenticated || !user) {
           console.log('AuthRedirect: not authenticated or no user');
           return;
         }
 
         console.log('AuthRedirect: checking if user exists...');
-        // Farcaster Mini App環境ではCookieの問題でサーバーサイド認証が失敗するため
-        // クライアントサイドで取得したユーザーIDを使用
-        const exists = user?.id 
-          ? await checkUserExistsByUserId(user.id)
-          : await checkUserExists();
+        const exists = await checkUserExists();
         console.log('AuthRedirect: user exists?', exists);
         if (!exists) {
           console.log('AuthRedirect: redirecting to /profile/create');

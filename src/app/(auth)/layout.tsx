@@ -7,7 +7,7 @@ export default function AuthLayout({
 }) {
   return (
     <main>
-      <AuthRedirect mode="auth" />
+      {/* <AuthRedirect mode="auth" /> */}
       {children}
     </main>
   );

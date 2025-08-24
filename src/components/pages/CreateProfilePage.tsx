@@ -1,5 +1,5 @@
 'use client';
-// import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
+import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
 import { ProfileForm } from '@/components/features/create-profile/ProfileForm';
 import { ProfileImage } from '@/components/features/create-profile/ProfileImage';
 import EthereumProviders from '@/lib/basename/EthereumProviders';

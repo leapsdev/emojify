@@ -4,7 +4,7 @@ import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
-import { checkUserExistsClient } from './action';
+import { checkUserExists } from './action';
 
 type Props = {
   mode: 'auth' | 'profile';
@@ -115,16 +115,9 @@ export const AuthRedirect = ({ mode }: Props) => {
 
       // プロフィール作成ページの場合
       if (mode === 'profile') {
-        try {
-          console.log('Checking if user profile exists (profile mode)...');
-          const exists = await checkUserExistsClient();
-          console.log('Profile check result (profile mode):', exists);
-
-          if (exists) {
-            navigateWithFarcaster('/chat');
-          }
-        } catch (error) {
-          console.error('Error checking user profile (profile mode):', error);
+        const exists = await checkUserExists();
+        if (exists) {
+          navigateWithFarcaster('/chat');
         }
         return;
       }
@@ -137,25 +130,13 @@ export const AuthRedirect = ({ mode }: Props) => {
 
           // サインアップページやサインインページにいる場合は、プロフィール確認後に適切なページにリダイレクト
           if (pathname === '/signup' || pathname === '/signin') {
-            try {
-              console.log('Checking if user profile exists...');
-              const exists = await checkUserExistsClient();
-              console.log('Profile check result:', exists);
-
-              if (exists) {
-                console.log('Profile exists, redirecting to chat...');
-                navigateWithFarcaster('/chat');
-              } else {
-                console.log(
-                  'Profile does not exist, redirecting to profile creation...',
-                );
-                navigateWithFarcaster('/profile/create');
-              }
-            } catch (error) {
-              console.error('Error checking user profile:', error);
-              // エラーが発生した場合は、プロフィール作成ページにリダイレクト
+            const exists = await checkUserExists();
+            if (exists) {
+              console.log('Profile exists, redirecting to chat...');
+              navigateWithFarcaster('/chat');
+            } else {
               console.log(
-                'Profile check failed, redirecting to profile creation as fallback...',
+                'Profile does not exist, redirecting to profile creation...',
               );
               navigateWithFarcaster('/profile/create');
             }
@@ -165,20 +146,8 @@ export const AuthRedirect = ({ mode }: Props) => {
           // その他の認証が必要なページの場合
           if (pathname === '/' || pathname === '/profile/create') return;
 
-          try {
-            console.log('Checking if user profile exists (other pages)...');
-            const exists = await checkUserExistsClient();
-            console.log('Profile check result (other pages):', exists);
-
-            if (!exists) {
-              navigateWithFarcaster('/profile/create');
-            }
-          } catch (error) {
-            console.error('Error checking user profile (other pages):', error);
-            // エラーが発生した場合は、プロフィール作成ページにリダイレクト
-            console.log(
-              'Profile check failed, redirecting to profile creation as fallback...',
-            );
+          const exists = await checkUserExists();
+          if (!exists) {
             navigateWithFarcaster('/profile/create');
           }
         }

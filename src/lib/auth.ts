@@ -23,16 +23,12 @@ export async function getPrivyId(): Promise<string | null> {
     const requestCookies = await cookies();
     const privyToken = requestCookies.get('privy-token')?.value;
 
-    console.log('getPrivyId: privy-token found:', !!privyToken);
-    
     if (!privyToken) {
-      console.log('getPrivyId: no privy-token cookie found');
       return null;
     }
 
     // トークンの検証
     const verifiedUser = await privy.verifyAuthToken(privyToken);
-    console.log('getPrivyId: verifiedUser:', !!verifiedUser, verifiedUser?.userId);
     return verifiedUser ? verifiedUser.userId : null;
   } catch (error) {
     console.error('Privy authentication error:', error);

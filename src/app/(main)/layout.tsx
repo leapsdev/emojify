@@ -1,4 +1,4 @@
-import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
+// import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
 
 export default function MainLayout({
   children,

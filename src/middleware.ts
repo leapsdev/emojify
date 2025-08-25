@@ -129,9 +129,9 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  if (!definitelyAuthenticated) {
-    return NextResponse.redirect(new URL('/signup', req.url));
-  }
+  // if (!definitelyAuthenticated) {
+  //   return NextResponse.redirect(new URL('/signup', req.url));
+  // }
 
   return response;
 }

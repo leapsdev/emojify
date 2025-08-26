@@ -1,9 +1,5 @@
 'use client';
 
-import {
-  isFarcasterMiniAppEnvironment,
-  waitForFarcasterAuth,
-} from '@/lib/farcaster-utils';
 import { auth } from '@/repository/db/config/client';
 import { usePrivy } from '@privy-io/react-auth';
 import {
@@ -39,9 +35,6 @@ export function useFirebaseAuth() {
       try {
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
-        const isFarcaster = isFarcasterMiniAppEnvironment();
-        console.log('Firebase auth sync - Farcaster environment:', isFarcaster);
-
         if (!isPrivyAuthenticated || !privyUser?.id) {
           // Privyが未認証の場合、Firebaseからサインアウト
           await signOut(auth);
@@ -54,21 +47,11 @@ export function useFirebaseAuth() {
           return;
         }
 
-        // Farcaster環境では追加の待機時間を設ける
-        if (isFarcaster) {
-          console.log(
-            'Waiting for Farcaster authentication in Firebase sync...',
-          );
-          await waitForFarcasterAuth();
-        }
-
         // Privyアクセストークンを取得
         const accessToken = await getAccessToken();
         if (!accessToken) {
           throw new Error('Privyアクセストークンの取得に失敗しました');
         }
-
-        console.log('Access token obtained for Firebase auth');
 
         // Firebaseカスタムトークンを取得
         const response = await fetch('/api/auth/firebase-token', {

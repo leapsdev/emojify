@@ -1,6 +1,5 @@
 'use client';
 
-import { setStoredToken } from '@/lib/token-storage';
 import { usePrivy } from '@privy-io/react-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -17,8 +16,8 @@ export default function RefreshPage() {
         const redirectUrl = searchParams.get('redirect_uri') || '/';
 
         if (token) {
-          // トークンをlocalStorageに保存
-          setStoredToken(token);
+          // トークンをクッキーに設定
+          document.cookie = `privy-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
           router.push(redirectUrl);
         } else {
           router.push('/');

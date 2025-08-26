@@ -20,9 +20,6 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // AuthorizationヘッダーまたはCookieからトークンを取得
-  const authHeader = req.headers.get('authorization');
-  const hasAuthHeader = authHeader?.startsWith('Bearer ');
   const cookieAuthToken = req.cookies.get('privy-token');
   const cookieSession = req.cookies.get('privy-session');
 
@@ -45,8 +42,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // AuthorizationヘッダーまたはCookieでトークンがある場合は認証済み
-  const definitelyAuthenticated = Boolean(hasAuthHeader || cookieAuthToken);
+  // privy-tokenがある場合は認証済み
+  const definitelyAuthenticated = Boolean(cookieAuthToken);
   // privy-sessionがある場合は認証が必要かもしれない
   const maybeAuthenticated = Boolean(cookieSession);
 

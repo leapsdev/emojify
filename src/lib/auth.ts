@@ -1,7 +1,6 @@
 import { getUser } from '@/repository/db/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
-import { headers } from 'next/headers';
 import { createFirebaseCustomToken } from './firebase-auth';
 
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
@@ -20,18 +19,9 @@ const privy = new PrivyClient(
  */
 export async function getPrivyId(): Promise<string | null> {
   try {
-    // AuthorizationヘッダーまたはCookieからトークンを取得
-    const requestHeaders = await headers();
-    const authHeader = requestHeaders.get('authorization');
-    let privyToken: string | undefined;
-
-    if (authHeader?.startsWith('Bearer ')) {
-      privyToken = authHeader.slice(7);
-    } else {
-      // フォールバック: Cookieからトークンを取得
-      const requestCookies = await cookies();
-      privyToken = requestCookies.get('privy-token')?.value;
-    }
+    // Cookieからトークンを取得
+    const requestCookies = await cookies();
+    const privyToken = requestCookies.get('privy-token')?.value;
 
     if (!privyToken) {
       return null;
@@ -58,30 +48,15 @@ export const getUserId = getPrivyId;
  * @throws {Error} 認証エラー時
  */
 export async function getFirebaseCustomToken(
-  privyToken?: string,
+  privyToken: string,
 ): Promise<string | null> {
   try {
-    let token = privyToken;
-
-    if (!token) {
-      // トークンが提供されていない場合、ヘッダーまたはCookieから取得
-      const requestHeaders = await headers();
-      const authHeader = requestHeaders.get('authorization');
-
-      if (authHeader?.startsWith('Bearer ')) {
-        token = authHeader.slice(7);
-      } else {
-        const requestCookies = await cookies();
-        token = requestCookies.get('privy-token')?.value;
-      }
-    }
-
-    if (!token) {
+    if (!privyToken) {
       return null;
     }
 
     // トークンの検証
-    const verifiedUser = await privy.verifyAuthToken(token);
+    const verifiedUser = await privy.verifyAuthToken(privyToken);
     if (!verifiedUser) {
       return null;
     }
@@ -107,18 +82,9 @@ export async function getFirebaseCustomToken(
  */
 export async function getPrivyEmail(): Promise<string | null> {
   try {
-    // AuthorizationヘッダーまたはCookieからトークンを取得
-    const requestHeaders = await headers();
-    const authHeader = requestHeaders.get('authorization');
-    let privyToken: string | undefined;
-
-    if (authHeader?.startsWith('Bearer ')) {
-      privyToken = authHeader.slice(7);
-    } else {
-      // フォールバック: Cookieからトークンを取得
-      const requestCookies = await cookies();
-      privyToken = requestCookies.get('privy-token')?.value;
-    }
+    // Cookieからトークンを取得
+    const requestCookies = await cookies();
+    const privyToken = requestCookies.get('privy-token')?.value;
 
     if (!privyToken) {
       return null;

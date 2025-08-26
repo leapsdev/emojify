@@ -57,14 +57,9 @@ export async function middleware(req: NextRequest) {
   logFarcasterDebugInfo(req, definitelyAuthenticated);
 
   // Farcaster環境での特別な認証処理
-  if (isFarcaster) {
-    if (shouldBypassAuthForFarcaster(req)) {
-      console.log('[Middleware] Bypassing auth check for Farcaster environment');
-      return NextResponse.next();
-    } else {
-      // Farcaster環境で認証情報がない場合は、少し時間を与えてからリダイレクト
-      console.log('[Middleware] Farcaster environment detected, but no auth info found');
-    }
+  if (isFarcaster && shouldBypassAuthForFarcaster(req)) {
+    console.log('[Middleware] Bypassing auth check for Farcaster environment');
+    return NextResponse.next();
   }
 
   if (!definitelyAuthenticated && maybeAuthenticated) {

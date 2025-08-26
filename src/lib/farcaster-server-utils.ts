@@ -43,17 +43,22 @@ export function isFarcasterMiniAppRequest(req: NextRequest): boolean {
  */
 export function shouldBypassAuthForFarcaster(req: NextRequest): boolean {
   const isFarcaster = isFarcasterMiniAppRequest(req);
-
+  
   if (!isFarcaster) {
     return false;
   }
 
-  // Farcaster環境では初回アクセス時の認証チェックを緩和
+  // Farcaster環境では認証チェックを大幅に緩和
   const cookieSession = req.cookies.get('privy-session');
-  const hasSomeAuth = Boolean(cookieSession);
-
-  // セッションクッキーがある場合は認証処理中と判断
-  return hasSomeAuth;
+  const cookieAuthToken = req.cookies.get('privy-token');
+  
+  // セッションクッキーがある、またはリフレッシュから戻ってきた場合はバイパス
+  const hasSession = Boolean(cookieSession);
+  const hasAuthToken = Boolean(cookieAuthToken);
+  const isFromRefresh = req.nextUrl.searchParams.has('redirect_uri');
+  
+  // Farcaster環境では、いずれかの条件でバイパス
+  return hasSession || hasAuthToken || isFromRefresh;
 }
 
 /**

@@ -1,5 +1,10 @@
 'use client';
 
+import {
+  getFarcasterCookieAttributes,
+  isFarcasterMiniAppEnvironment,
+  waitForFarcasterAuth,
+} from '@/lib/farcaster-utils';
 import { usePrivy } from '@privy-io/react-auth';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect } from 'react';
@@ -12,14 +17,32 @@ export default function RefreshPage() {
   useEffect(() => {
     const handleRefresh = async () => {
       try {
+        const isFarcaster = isFarcasterMiniAppEnvironment();
+        console.log('Refresh page - Farcaster environment:', isFarcaster);
+
+        // Farcaster環境では認証完了を待機
+        if (isFarcaster) {
+          console.log('Waiting for Farcaster authentication...');
+          await waitForFarcasterAuth();
+        }
+
         const token = await getAccessToken();
         const redirectUrl = searchParams.get('redirect_uri') || '/';
 
+        console.log('Token obtained:', !!token);
+
         if (token) {
-          // トークンをクッキーに設定
-          document.cookie = `privy-token=${token}; path=/; max-age=3600; secure; samesite=strict`;
-          router.push(redirectUrl);
+          // 環境に応じたクッキー属性を使用
+          const cookieAttributes = getFarcasterCookieAttributes();
+          document.cookie = `privy-token=${token}; ${cookieAttributes}`;
+          console.log('Token set in cookie with attributes:', cookieAttributes);
+
+          // 少し待ってからリダイレクト（クッキー設定の確実な反映のため）
+          setTimeout(() => {
+            router.push(redirectUrl);
+          }, 100);
         } else {
+          console.log('No token available, redirecting to home');
           router.push('/');
         }
       } catch (error) {

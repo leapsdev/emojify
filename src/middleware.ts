@@ -1,3 +1,8 @@
+import {
+  isFarcasterMiniAppRequest,
+  logFarcasterDebugInfo,
+  shouldBypassAuthForFarcaster,
+} from '@/lib/farcaster-server-utils';
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
@@ -47,16 +52,47 @@ export async function middleware(req: NextRequest) {
   // privy-sessionがある場合は認証が必要かもしれない
   const maybeAuthenticated = Boolean(cookieSession);
 
+  // Farcaster環境の検出とデバッグ情報出力
+  const isFarcaster = isFarcasterMiniAppRequest(req);
+  logFarcasterDebugInfo(req, definitelyAuthenticated);
+
+  // Farcaster環境での特別な認証処理
+  if (isFarcaster && shouldBypassAuthForFarcaster(req)) {
+    console.log('[Middleware] Bypassing auth check for Farcaster environment');
+    return NextResponse.next();
+  }
+
   if (!definitelyAuthenticated && maybeAuthenticated) {
     // 認証されていないが、認証が必要かもしれない場合は
     // /refreshページにリダイレクトしてクライアントサイドでリフレッシュを実行
     const redirectUrl = new URL('/refresh', req.url);
     redirectUrl.searchParams.set('redirect_uri', req.nextUrl.pathname);
+
+    // Farcaster環境の場合は追加のパラメータを付与
+    if (isFarcaster) {
+      redirectUrl.searchParams.set('farcaster', '1');
+    }
+
+    console.log(
+      '[Middleware] Redirecting to refresh page:',
+      redirectUrl.toString(),
+    );
     return NextResponse.redirect(redirectUrl);
   }
 
   if (!definitelyAuthenticated) {
-    return NextResponse.redirect(new URL('/signup', req.url));
+    const signupUrl = new URL('/signup', req.url);
+
+    // Farcaster環境の場合は追加のパラメータを付与
+    if (isFarcaster) {
+      signupUrl.searchParams.set('farcaster', '1');
+    }
+
+    console.log(
+      '[Middleware] Redirecting to signup page:',
+      signupUrl.toString(),
+    );
+    return NextResponse.redirect(signupUrl);
   }
 
   return NextResponse.next();

@@ -73,6 +73,7 @@ interface FarcasterWindow extends Window {
 export function isFarcasterMiniApp(): boolean {
   // クライアントサイドでのみ実行
   if (typeof window === 'undefined') {
+    console.log('Farcaster detection: Server-side, returning false');
     return false;
   }
 
@@ -80,11 +81,14 @@ export function isFarcasterMiniApp(): boolean {
   // 1. window.location !== window.parent.location (iframe内)
   // 2. Farcaster特有のプロパティ
   // 3. User-Agentの確認
-
+  
   try {
+    console.log('=== Farcaster Environment Detection ===');
+    
     // iframe内で動作しているかチェック
     const isInIframe = window.location !== window.parent.location;
-
+    console.log('Is in iframe:', isInIframe);
+    
     // Farcaster特有のプロパティをチェック
     const farcasterWindow = window as FarcasterWindow;
     const hasFarcasterProps = !!(
@@ -92,6 +96,12 @@ export function isFarcasterMiniApp(): boolean {
       farcasterWindow.fc ||
       farcasterWindow.miniApp
     );
+    console.log('Has Farcaster properties:', hasFarcasterProps);
+    console.log('Farcaster properties:', {
+      farcaster: !!farcasterWindow.farcaster,
+      fc: !!farcasterWindow.fc,
+      miniApp: !!farcasterWindow.miniApp
+    });
 
     // User-AgentでFarcasterを検出
     const userAgent = navigator.userAgent.toLowerCase();
@@ -99,8 +109,13 @@ export function isFarcasterMiniApp(): boolean {
       userAgent.includes('farcaster') ||
       userAgent.includes('fc') ||
       userAgent.includes('mini-app');
+    console.log('Is Farcaster User-Agent:', isFarcasterUserAgent);
+    console.log('User-Agent:', userAgent);
 
-    return isInIframe || hasFarcasterProps || isFarcasterUserAgent;
+    const result = isInIframe || hasFarcasterProps || isFarcasterUserAgent;
+    console.log('Final Farcaster detection result:', result);
+    
+    return result;
   } catch (error) {
     // エラーが発生した場合は通常のブラウザ環境とみなす
     console.warn('Farcaster Mini App detection failed:', error);
@@ -162,7 +177,7 @@ export function getTokenStorage() {
     return {
       setToken: (token: string) => {
         try {
-          localStorage.setItem('privy-token', token);
+          localStorage.setItem('privy-token-custom', token);
           localStorage.setItem(
             'privy-token-expiry',
             (Date.now() + 3600000).toString(),
@@ -173,16 +188,30 @@ export function getTokenStorage() {
       },
       getToken: () => {
         try {
+          console.log('=== Token Retrieval Debug ===');
+          
           // まず、既存のPrivyトークンを確認
           const privyToken = localStorage.getItem('privy:token');
+          console.log('Privy token found:', !!privyToken);
+          
           if (privyToken && isPrivyTokenValid()) {
             console.log('Found valid Privy token in localStorage');
             return privyToken;
           }
 
           // カスタム保存されたトークンを確認
-          const customToken = localStorage.getItem('privy-token');
+          const customToken = localStorage.getItem('privy-token-custom');
           const expiry = localStorage.getItem('privy-token-expiry');
+          
+          console.log('Custom token found:', !!customToken);
+          console.log('Expiry found:', !!expiry);
+          
+          if (expiry) {
+            const expiryTime = Number.parseInt(expiry, 10);
+            const currentTime = Date.now();
+            const isValid = currentTime < expiryTime;
+            console.log('Token expiry check:', { currentTime, expiryTime, isValid });
+          }
 
           if (
             customToken &&
@@ -195,10 +224,12 @@ export function getTokenStorage() {
 
           // 期限切れの場合は削除
           if (customToken) {
-            localStorage.removeItem('privy-token');
+            localStorage.removeItem('privy-token-custom');
             localStorage.removeItem('privy-token-expiry');
+            console.log('Removed expired custom token');
           }
 
+          console.log('No valid token found');
           return null;
         } catch (error) {
           console.error('Failed to get token from localStorage:', error);
@@ -208,7 +239,7 @@ export function getTokenStorage() {
       removeToken: () => {
         try {
           // カスタム保存されたトークンを削除
-          localStorage.removeItem('privy-token');
+          localStorage.removeItem('privy-token-custom');
           localStorage.removeItem('privy-token-expiry');
 
           // Privyのトークンも削除（オプション）

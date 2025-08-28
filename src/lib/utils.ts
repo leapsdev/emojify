@@ -109,48 +109,6 @@ export function isFarcasterMiniApp(): boolean {
 }
 
 /**
- * Farcaster環境でのPrivyトークンの有効性をチェックする
- * @returns トークンが有効な場合はtrue
- */
-export function isPrivyTokenValid(): boolean {
-  if (typeof window === 'undefined') {
-    return false;
-  }
-
-  try {
-    const privyToken = localStorage.getItem('privy:token');
-    if (!privyToken) {
-      return false;
-    }
-
-    // JWTトークンの構造をチェック（基本的な検証）
-    const parts = privyToken.split('.');
-    if (parts.length !== 3) {
-      return false;
-    }
-
-    // ペイロード部分をデコードして有効期限をチェック
-    try {
-      const payload = JSON.parse(atob(parts[1]));
-      const currentTime = Math.floor(Date.now() / 1000);
-
-      if (payload.exp && payload.exp < currentTime) {
-        console.log('Privy token has expired');
-        return false;
-      }
-
-      return true;
-    } catch (decodeError) {
-      console.warn('Failed to decode Privy token payload:', decodeError);
-      return false;
-    }
-  } catch (error) {
-    console.error('Error checking Privy token validity:', error);
-    return false;
-  }
-}
-
-/**
  * 環境に応じたトークン保存方法を取得する
  * @returns トークン保存用のオブジェクト
  */
@@ -173,28 +131,15 @@ export function getTokenStorage() {
       },
       getToken: () => {
         try {
-          // まず、既存のPrivyトークンを確認
-          const privyToken = localStorage.getItem('privy:token');
-          if (privyToken && isPrivyTokenValid()) {
-            console.log('Found valid Privy token in localStorage');
-            return privyToken;
-          }
-
-          // カスタム保存されたトークンを確認
-          const customToken = localStorage.getItem('privy-token');
+          const token = localStorage.getItem('privy-token');
           const expiry = localStorage.getItem('privy-token-expiry');
 
-          if (
-            customToken &&
-            expiry &&
-            Date.now() < Number.parseInt(expiry, 10)
-          ) {
-            console.log('Found custom saved token in localStorage');
-            return customToken;
+          if (token && expiry && Date.now() < Number.parseInt(expiry, 10)) {
+            return token;
           }
 
           // 期限切れの場合は削除
-          if (customToken) {
+          if (token) {
             localStorage.removeItem('privy-token');
             localStorage.removeItem('privy-token-expiry');
           }
@@ -207,12 +152,8 @@ export function getTokenStorage() {
       },
       removeToken: () => {
         try {
-          // カスタム保存されたトークンを削除
           localStorage.removeItem('privy-token');
           localStorage.removeItem('privy-token-expiry');
-
-          // Privyのトークンも削除（オプション）
-          // localStorage.removeItem('privy:token');
         } catch (error) {
           console.error('Failed to remove token from localStorage:', error);
         }

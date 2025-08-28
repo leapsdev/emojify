@@ -95,14 +95,11 @@ export function useFirebaseAuth() {
         let accessToken: string | null = null;
 
         if (isFarcasterEnv) {
-          // Farcaster環境では保存されたトークンを優先使用
+          // Farcaster環境では保存されたトークンを使用
           accessToken = getStoredToken();
           if (!accessToken) {
             // 保存されたトークンがない場合は新しく取得
-            console.log('No stored token found, getting new token from Privy');
             accessToken = await getAccessToken();
-          } else {
-            console.log('Using stored token from localStorage');
           }
         } else {
           // 通常のブラウザ環境ではPrivyから直接取得

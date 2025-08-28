@@ -8,8 +8,7 @@ import {
   signInWithCustomToken,
   signOut,
 } from 'firebase/auth';
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { useFarcasterMiniApp } from './useFarcasterMiniApp';
+import { useEffect, useState } from 'react';
 
 interface FirebaseAuthState {
   isFirebaseAuthenticated: boolean;
@@ -24,7 +23,6 @@ export function useFirebaseAuth() {
     user: privyUser,
     getAccessToken,
   } = usePrivy();
-  const { isFarcasterEnv } = useFarcasterMiniApp();
   const [state, setState] = useState<FirebaseAuthState>({
     isFirebaseAuthenticated: false,
     isLoading: true,
@@ -32,52 +30,9 @@ export function useFirebaseAuth() {
     user: null,
   });
 
-  // 認証処理の重複実行を防ぐためのフラグ
-  const isAuthenticating = useRef(false);
-  const lastPrivyUserId = useRef<string | null>(null);
-
-  // トークン取得をメモ化して無限ループを防ぐ
-  const getStoredToken = useCallback(() => {
-    if (isFarcasterEnv) {
-      try {
-        const token = localStorage.getItem('privy-token');
-        const expiry = localStorage.getItem('privy-token-expiry');
-
-        if (token && expiry && Date.now() < Number.parseInt(expiry, 10)) {
-          return token;
-        }
-
-        // 期限切れの場合は削除
-        if (token) {
-          localStorage.removeItem('privy-token');
-          localStorage.removeItem('privy-token-expiry');
-        }
-
-        return null;
-      } catch (error) {
-        console.error('Failed to get token from localStorage:', error);
-        return null;
-      }
-    }
-    return null;
-  }, [isFarcasterEnv]);
-
   useEffect(() => {
     const syncFirebaseAuth = async () => {
-      // 既に認証処理中の場合はスキップ
-      if (isAuthenticating.current) {
-        return;
-      }
-
-      // PrivyユーザーIDが変更されていない場合はスキップ
-      if (lastPrivyUserId.current === privyUser?.id) {
-        return;
-      }
-
       try {
-        isAuthenticating.current = true;
-        lastPrivyUserId.current = privyUser?.id || null;
-
         setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
         if (!isPrivyAuthenticated || !privyUser?.id) {
@@ -92,20 +47,8 @@ export function useFirebaseAuth() {
           return;
         }
 
-        let accessToken: string | null = null;
-
-        if (isFarcasterEnv) {
-          // Farcaster環境では保存されたトークンを使用
-          accessToken = getStoredToken();
-          if (!accessToken) {
-            // 保存されたトークンがない場合は新しく取得
-            accessToken = await getAccessToken();
-          }
-        } else {
-          // 通常のブラウザ環境ではPrivyから直接取得
-          accessToken = await getAccessToken();
-        }
-
+        // Privyアクセストークンを取得
+        const accessToken = await getAccessToken();
         if (!accessToken) {
           throw new Error('Privyアクセストークンの取得に失敗しました');
         }
@@ -138,8 +81,6 @@ export function useFirebaseAuth() {
           error:
             error instanceof Error ? error.message : '認証エラーが発生しました',
         }));
-      } finally {
-        isAuthenticating.current = false;
       }
     };
 
@@ -159,20 +100,11 @@ export function useFirebaseAuth() {
     return () => {
       unsubscribe();
     };
-  }, [
-    isPrivyAuthenticated,
-    privyUser?.id,
-    getAccessToken,
-    isFarcasterEnv,
-    getStoredToken,
-  ]);
+  }, [isPrivyAuthenticated, privyUser?.id, getAccessToken]);
 
   const signOutFromFirebase = async () => {
     try {
       await signOut(auth);
-      // サインアウト時にフラグをリセット
-      isAuthenticating.current = false;
-      lastPrivyUserId.current = null;
     } catch (error) {
       console.error('Firebaseサインアウトエラー:', error);
     }

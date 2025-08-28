@@ -20,15 +20,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // クッキーからトークンを取得
-  const cookieAuthToken = req.cookies.get('privy-token')?.value;
-  const cookieSession = req.cookies.get('privy-session')?.value;
-
-  // Authorizationヘッダーからトークンを取得（Farcaster Mini App環境用）
-  const authHeader = req.headers.get('authorization');
-  const headerToken = authHeader?.startsWith('Bearer ')
-    ? authHeader.replace('Bearer ', '')
-    : null;
+  const cookieAuthToken = req.cookies.get('privy-token');
+  const cookieSession = req.cookies.get('privy-session');
 
   // 未認証ページへのアクセスは許可
   if (UNAUTHENTICATED_PAGES.includes(req.nextUrl.pathname)) {
@@ -49,11 +42,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.next();
   }
 
-  // トークンの存在確認（クッキーまたはヘッダー）
-  const hasValidToken = Boolean(cookieAuthToken || headerToken);
-
   // privy-tokenがある場合は認証済み
-  const definitelyAuthenticated = hasValidToken;
+  const definitelyAuthenticated = Boolean(cookieAuthToken);
   // privy-sessionがある場合は認証が必要かもしれない
   const maybeAuthenticated = Boolean(cookieSession);
 

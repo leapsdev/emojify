@@ -14,15 +14,11 @@ export const AuthRedirect = ({ mode }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
-  console.log('authenticated', authenticated);
-  console.log('user', user);
-  console.log('pathname', pathname);
-
   useEffect(() => {
     const handleAuthRedirect = async () => {
       // プロフィール作成ページの場合
       if (mode === 'profile') {
-        const exists = await checkUserExists();
+        const exists = await checkUserExists(user?.id || '');
         if (exists) {
           router.push('/chat');
         }
@@ -34,7 +30,7 @@ export const AuthRedirect = ({ mode }: Props) => {
         if (pathname === '/' || pathname === '/profile/create') return;
         if (!authenticated || !user) return;
 
-        const exists = await checkUserExists();
+        const exists = await checkUserExists(user?.id || '');
         if (!exists) {
           router.push('/profile/create');
         }

@@ -10,6 +10,7 @@ export const runtime = 'nodejs';
 export default async function Page() {
   const userId = await getPrivyId();
   if (!userId) {
+    console.log('userId not found');
     redirect('/');
   }
 

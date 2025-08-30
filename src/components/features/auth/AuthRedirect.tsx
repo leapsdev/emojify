@@ -19,7 +19,6 @@ export const AuthRedirect = ({ mode }: Props) => {
       // プロフィール作成ページの場合
       if (mode === 'profile') {
         const exists = await checkUserExists(user?.id || '');
-        console.log('exists', exists);
         if (exists) {
           router.push('/chat');
         }
@@ -32,7 +31,6 @@ export const AuthRedirect = ({ mode }: Props) => {
         if (!authenticated || !user) return;
 
         const exists = await checkUserExists(user?.id || '');
-        console.log('exists', exists);
         if (!exists) {
           router.push('/profile/create');
         }

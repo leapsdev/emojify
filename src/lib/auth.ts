@@ -1,6 +1,7 @@
 import { getUser } from '@/repository/db/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
+import { headers } from 'next/headers';
 import { createFirebaseCustomToken } from './firebase-auth';
 
 if (!process.env.NEXT_PUBLIC_PRIVY_APP_ID || !process.env.PRIVY_APP_SECRET) {
@@ -13,15 +14,101 @@ const privy = new PrivyClient(
 );
 
 /**
+ * Farcasterのminiapp環境かどうかを判定する
+ * @returns miniapp環境の場合true
+ */
+async function isFarcasterMiniApp(): Promise<boolean> {
+  try {
+    // User-Agentヘッダーからminiapp環境を検出
+    const headersList = await headers();
+    const userAgent = headersList.get('user-agent') || '';
+    const referer = headersList.get('referer') || '';
+
+    // Farcaster関連のヘッダーやUser-Agentをチェック
+    return (
+      userAgent.includes('Farcaster') ||
+      userAgent.includes('miniapp') ||
+      referer.includes('farcaster.xyz') ||
+      referer.includes('warpcast.com') ||
+      // カスタムヘッダーでminiapp環境を検出
+      (headersList.get('x-farcaster-miniapp')?.includes('true') ?? false)
+    );
+  } catch {
+    // ヘッダー取得に失敗した場合はfalseを返す
+    return false;
+  }
+}
+
+/**
+ * miniapp環境でのCookie取得を試行する
+ * @returns Privyトークン
+ */
+async function getPrivyTokenForMiniApp(): Promise<string | null> {
+  try {
+    const headersList = await headers();
+
+    // 1. カスタムヘッダーからトークンを取得（miniapp環境用）
+    const customToken = headersList.get('x-privy-token');
+    if (customToken) {
+      return customToken;
+    }
+
+    // 2. Authorizationヘッダーからトークンを取得
+    const authHeader = headersList.get('authorization');
+    if (authHeader?.startsWith('Bearer ')) {
+      return authHeader.substring(7);
+    }
+
+    // 3. クエリパラメータからトークンを取得（miniapp環境用）
+    const xUrl = headersList.get('x-url');
+    if (xUrl) {
+      try {
+        const url = new URL(xUrl);
+        const queryToken = url.searchParams.get('privy_token');
+        if (queryToken) {
+          return queryToken;
+        }
+      } catch (urlError) {
+        console.warn('Invalid URL in x-url header:', urlError);
+      }
+    }
+
+    return null;
+  } catch (error) {
+    console.error('MiniApp token extraction error:', error);
+    return null;
+  }
+}
+
+/**
  * ユーザーIDを取得する
  * @returns ユーザーID
  * @throws {Error} 認証エラー時
  */
 export async function getPrivyId(): Promise<string | null> {
   try {
-    // Cookieからトークンを取得
-    const requestCookies = await cookies();
-    const privyToken = requestCookies.get('privy-token')?.value;
+    let privyToken: string | null = null;
+
+    // miniapp環境の場合は専用の方法でトークンを取得
+    if (await isFarcasterMiniApp()) {
+      privyToken = await getPrivyTokenForMiniApp();
+    }
+
+    // miniapp環境でトークンが取得できない場合、または通常環境の場合はCookieから取得
+    if (!privyToken) {
+      try {
+        const requestCookies = await cookies();
+        const cookieValue = requestCookies.get('privy-token')?.value;
+        privyToken = cookieValue || null;
+      } catch (cookieError) {
+        console.warn(
+          'Cookie access failed, trying alternative methods:',
+          cookieError,
+        );
+        // Cookieアクセスに失敗した場合、miniapp環境用の方法を試行
+        privyToken = await getPrivyTokenForMiniApp();
+      }
+    }
 
     if (!privyToken) {
       return null;
@@ -82,9 +169,28 @@ export async function getFirebaseCustomToken(
  */
 export async function getPrivyEmail(): Promise<string | null> {
   try {
-    // Cookieからトークンを取得
-    const requestCookies = await cookies();
-    const privyToken = requestCookies.get('privy-token')?.value;
+    let privyToken: string | null = null;
+
+    // miniapp環境の場合は専用の方法でトークンを取得
+    if (await isFarcasterMiniApp()) {
+      privyToken = await getPrivyTokenForMiniApp();
+    }
+
+    // miniapp環境でトークンが取得できない場合、または通常環境の場合はCookieから取得
+    if (!privyToken) {
+      try {
+        const requestCookies = await cookies();
+        const cookieValue = requestCookies.get('privy-token')?.value;
+        privyToken = cookieValue || null;
+      } catch (cookieError) {
+        console.warn(
+          'Cookie access failed, trying alternative methods:',
+          cookieError,
+        );
+        // Cookieアクセスに失敗した場合、miniapp環境用の方法を試行
+        privyToken = await getPrivyTokenForMiniApp();
+      }
+    }
 
     if (!privyToken) {
       return null;

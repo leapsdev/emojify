@@ -2,13 +2,73 @@
 
 import { auth } from '@/repository/db/config/client';
 import { usePrivy } from '@privy-io/react-auth';
-import {
-  type User,
-  onAuthStateChanged,
-  signInWithCustomToken,
-  signOut,
-} from 'firebase/auth';
+import { signInWithCustomToken, signOut } from 'firebase/auth';
+import type { User } from 'firebase/auth';
 import { useEffect, useState } from 'react';
+
+// Farcaster miniapp環境用のwindow拡張の型定義
+interface FarcasterWindow extends Window {
+  farcasterMiniApp?: boolean;
+  privyToken?: string;
+}
+
+/**
+ * Farcasterのminiapp環境かどうかを判定する
+ * @returns miniapp環境の場合true
+ */
+function isFarcasterMiniApp(): boolean {
+  try {
+    // User-Agentからminiapp環境を検出
+    const userAgent = navigator.userAgent || '';
+    const referer = document.referrer || '';
+
+    // Farcaster関連のUser-AgentやRefererをチェック
+    return (
+      userAgent.includes('Farcaster') ||
+      userAgent.includes('miniapp') ||
+      referer.includes('farcaster.xyz') ||
+      referer.includes('warpcast.com') ||
+      // カスタムプロパティでminiapp環境を検出
+      (window as FarcasterWindow).farcasterMiniApp === true ||
+      // URLパラメータでminiapp環境を検出
+      new URLSearchParams(window.location.search).get('miniapp') === 'true'
+    );
+  } catch (error) {
+    console.warn('MiniApp detection failed:', error);
+    return false;
+  }
+}
+
+/**
+ * miniapp環境でのトークン取得を試行する
+ * @returns Privyトークン
+ */
+async function getPrivyTokenForMiniApp(): Promise<string | null> {
+  try {
+    // 1. カスタムプロパティからトークンを取得
+    const windowToken = (window as FarcasterWindow).privyToken;
+    if (windowToken) {
+      return windowToken;
+    }
+
+    // 2. localStorageからトークンを取得
+    const localToken = localStorage.getItem('privy-token');
+    if (localToken) {
+      return localToken;
+    }
+
+    // 3. sessionStorageからトークンを取得
+    const sessionToken = sessionStorage.getItem('privy-token');
+    if (sessionToken) {
+      return sessionToken;
+    }
+
+    return null;
+  } catch (error) {
+    console.error('MiniApp token extraction error:', error);
+    return null;
+  }
+}
 
 interface FirebaseAuthState {
   isFirebaseAuthenticated: boolean;
@@ -47,10 +107,30 @@ export function useFirebaseAuth() {
           return;
         }
 
-        // Privyアクセストークンを取得
-        const accessToken = await getAccessToken();
+        let accessToken: string | null = null;
+
+        // miniapp環境の場合は専用の方法でトークンを取得
+        if (isFarcasterMiniApp()) {
+          accessToken = await getPrivyTokenForMiniApp();
+        }
+
+        // miniapp環境でトークンが取得できない場合は通常の方法を使用
+        if (!accessToken) {
+          accessToken = await getAccessToken();
+        }
+
         if (!accessToken) {
           throw new Error('Privyアクセストークンの取得に失敗しました');
+        }
+
+        // miniapp環境の場合はトークンを保存
+        if (isFarcasterMiniApp()) {
+          try {
+            localStorage.setItem('privy-token', accessToken);
+            (window as FarcasterWindow).privyToken = accessToken;
+          } catch (error) {
+            console.warn('Failed to save token to storage:', error);
+          }
         }
 
         // Firebaseカスタムトークンを取得
@@ -73,45 +153,26 @@ export function useFirebaseAuth() {
 
         // Firebaseにカスタムトークンでサインイン
         await signInWithCustomToken(auth, token);
+
+        setState({
+          isFirebaseAuthenticated: true,
+          isLoading: false,
+          error: null,
+          user: auth.currentUser,
+        });
       } catch (error) {
         console.error('Firebase認証同期エラー:', error);
-        setState((prev) => ({
-          ...prev,
+        setState({
+          isFirebaseAuthenticated: false,
           isLoading: false,
-          error:
-            error instanceof Error ? error.message : '認証エラーが発生しました',
-        }));
+          error: error instanceof Error ? error.message : '不明なエラー',
+          user: null,
+        });
       }
     };
 
-    // Firebase認証状態の監視
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setState((prev) => ({
-        ...prev,
-        isFirebaseAuthenticated: !!user,
-        isLoading: false,
-        user,
-      }));
-    });
-
-    // Privy認証状態が変更されたときにFirebase認証を同期
     syncFirebaseAuth();
-
-    return () => {
-      unsubscribe();
-    };
   }, [isPrivyAuthenticated, privyUser?.id, getAccessToken]);
 
-  const signOutFromFirebase = async () => {
-    try {
-      await signOut(auth);
-    } catch (error) {
-      console.error('Firebaseサインアウトエラー:', error);
-    }
-  };
-
-  return {
-    ...state,
-    signOutFromFirebase,
-  };
+  return state;
 }

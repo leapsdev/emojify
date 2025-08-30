@@ -14,6 +14,10 @@ export const AuthRedirect = ({ mode }: Props) => {
   const router = useRouter();
   const pathname = usePathname();
 
+  console.log('authenticated', authenticated);
+  console.log('user', user);
+  console.log('pathname', pathname);
+
   useEffect(() => {
     const handleAuthRedirect = async () => {
       // プロフィール作成ページの場合

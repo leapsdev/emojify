@@ -32,7 +32,7 @@ export interface LoadingProps
  * @example
  * ```tsx
  * // 基本的な使用
- * <Loading size="md" text="読み込み中..." />
+ * <Loading size="md" text="Loading..." />
  *
  * // テキストなし
  * <Loading size="lg" />
@@ -48,7 +48,7 @@ export interface LoadingProps
  * <Loading size="sm" />
  *
  * // 大きなサイズ（ページ全体のローディング）
- * <Loading size="xl" text="ページを読み込み中..." />
+ * <Loading size="xl" text="Loading..." />
  * ```
  *
  * @param size - スピナーのサイズ ('sm' | 'md' | 'lg' | 'xl')
@@ -63,7 +63,7 @@ const Loading = React.forwardRef<HTMLDivElement, LoadingProps>(
       <div
         ref={ref}
         aria-live="polite"
-        aria-label={text || '読み込み中'}
+        aria-label={text || 'Loading...'}
         className={cn(
           'flex flex-col items-center justify-center gap-2',
           className,

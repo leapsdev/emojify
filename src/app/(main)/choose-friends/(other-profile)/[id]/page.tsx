@@ -55,7 +55,7 @@ export default function Page({ params }: PageProps) {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>読み込み中...</p>
+          <p>Loading...</p>
         </div>
       </div>
     );
@@ -65,7 +65,7 @@ export default function Page({ params }: PageProps) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <p>認証が必要です</p>
+          <p>Authentication is required</p>
         </div>
       </div>
     );

@@ -1,17 +1,60 @@
+'use client';
+
 import { ClientChooseFriendsPage } from '@/components/pages/ChooseFriendsPage';
-import { getPrivyId } from '@/lib/auth';
+import type { User } from '@/repository/db/database';
 import { getUsersWithFriendship } from '@/repository/db/user/actions';
+import { usePrivy } from '@privy-io/react-auth';
+import { useEffect, useState } from 'react';
 
-export const dynamic = 'force-dynamic';
+export default function ChooseFriendsPage() {
+  const { user, authenticated } = usePrivy();
+  const [friendshipData, setFriendshipData] = useState<{
+    friends: User[];
+    others: User[];
+  }>({ friends: [], others: [] });
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function ChooseFriendsPage() {
-  const userId = await getPrivyId();
-  if (!userId) {
-    return null;
+  useEffect(() => {
+    const fetchFriendshipData = async () => {
+      if (authenticated && user?.id) {
+        try {
+          const data = await getUsersWithFriendship(user.id);
+          setFriendshipData(data);
+        } catch (error) {
+          console.error('Failed to fetch friendship data:', error);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchFriendshipData();
+  }, [authenticated, user?.id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p>読み込み中...</p>
+        </div>
+      </div>
+    );
   }
 
-  const { friends, others } = await getUsersWithFriendship(userId);
+  if (!authenticated || !user?.id) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>認証が必要です</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <ClientChooseFriendsPage initialFriends={friends} initialOthers={others} />
+    <ClientChooseFriendsPage
+      initialFriends={friendshipData.friends}
+      initialOthers={friendshipData.others}
+    />
   );
 }

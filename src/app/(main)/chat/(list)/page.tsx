@@ -1,23 +1,53 @@
+'use client';
+
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
-import { getPrivyId } from '@/lib/auth';
 import { getUserRooms } from '@/repository/db/chat/actions';
-// import { redirect } from 'next/navigation';
+import type { ChatRoom } from '@/repository/db/database';
+import { usePrivy } from '@privy-io/react-auth';
+import { useEffect, useState } from 'react';
 
-export const dynamic = 'force-dynamic';
-export const revalidate = 0;
-export const runtime = 'nodejs';
+export default function Page() {
+  const { user, authenticated } = usePrivy();
+  const [rooms, setRooms] = useState<ChatRoom[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-export default async function Page() {
-  const userId = await getPrivyId();
-  if (!userId) {
-    console.log('userId not found');
-    // redirect('/');
+  useEffect(() => {
+    const fetchRooms = async () => {
+      if (authenticated && user?.id) {
+        try {
+          const userRooms = await getUserRooms(user.id);
+          setRooms(userRooms || []);
+        } catch (error) {
+          console.error('Failed to fetch rooms:', error);
+          setRooms([]);
+        }
+      }
+      setIsLoading(false);
+    };
+
+    fetchRooms();
+  }, [authenticated, user?.id]);
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p>読み込み中...</p>
+        </div>
+      </div>
+    );
   }
 
-  const rooms = await getUserRooms(userId || '');
-  if (!rooms) {
-    // redirect('/');
+  if (!authenticated || !user?.id) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>認証が必要です</p>
+        </div>
+      </div>
+    );
   }
 
-  return <ChatRoomListPage userId={userId || ''} initialRooms={rooms} />;
+  return <ChatRoomListPage userId={user.id} initialRooms={rooms} />;
 }

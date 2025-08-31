@@ -1,31 +1,72 @@
+'use client';
+
 import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
-import { getUserId } from '@/lib/auth';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
+import type { ChatRoom, Message } from '@/repository/db/database';
+import { usePrivy } from '@privy-io/react-auth';
 import { notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-type Props = {
-  params: Promise<{
-    id: string;
-  }>;
-};
+export default function Page() {
+  const { user, authenticated } = usePrivy();
+  const [roomData, setRoomData] = useState<ChatRoom | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const params = useParams();
+  const roomId = params.id as string;
 
-export default async function Page({ params }: Props) {
-  const roomId = (await params).id;
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      if (authenticated && user?.id && roomId) {
+        try {
+          const { room, messages: roomMessages } =
+            await getChatRoomAction(roomId);
+          if (!room) {
+            notFound();
+          }
+          setRoomData(room);
+          setMessages(roomMessages);
+        } catch (error) {
+          console.error('Failed to fetch room data:', error);
+        }
+      }
+      setIsLoading(false);
+    };
 
-  const userId = await getUserId();
-  if (!userId) throw new Error('Authentication required');
+    fetchRoomData();
+  }, [authenticated, user?.id, roomId]);
 
-  // チャットルームの情報とメッセージを取得
-  const { room, messages } = await getChatRoomAction(roomId);
-  if (!room) notFound();
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p>読み込み中...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!authenticated || !user?.id || !roomData) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>認証が必要です</p>
+        </div>
+      </div>
+    );
+  }
 
   // 相手のユーザー情報を取得
-  const otherMembers = Object.entries(room.members)
-    .filter(([id]) => id !== userId)
+  const otherMembers = Object.entries(roomData.members)
+    .filter(([id]) => id !== user.id)
     .map(([, member]) => member);
 
-  if (otherMembers.length === 0) notFound();
+  if (otherMembers.length === 0) {
+    notFound();
+  }
 
   // ヘッダーに表示するユーザー名を生成
   const headerTitle = otherMembers.map((member) => member.username).join(', ');
@@ -42,7 +83,7 @@ export default async function Page({ params }: Props) {
       />
       <ChatRoomPage
         roomId={roomId}
-        userId={userId}
+        userId={user.id}
         initialMessages={messages}
       />
     </>

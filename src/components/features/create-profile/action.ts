@@ -1,6 +1,5 @@
 'use server';
 
-import { getPrivyId } from '@/lib/auth';
 import { createUser } from '@/repository/db/user/actions';
 import {
   type ProfileForm,
@@ -17,8 +16,17 @@ export type ProfileFormState = {
 export async function handleProfileFormAction(
   _state: ProfileFormState,
   formData?: FormData,
+  privyUserId?: string,
 ): Promise<ProfileFormState> {
   if (!formData) return null;
+
+  if (!privyUserId) {
+    return {
+      message: '認証情報が不足しています',
+      status: 'error' as const,
+    };
+  }
+
   const submission = parseWithZod(formData, {
     schema: profileFormSchema,
   });
@@ -51,15 +59,7 @@ export async function handleProfileFormAction(
   };
 
   try {
-    const privyId = await getPrivyId();
-    if (!privyId) {
-      return {
-        message: 'Failed to get authentication information',
-        status: 'error' as const,
-      };
-    }
-
-    await createUser(profileData, privyId);
+    await createUser(profileData, privyUserId);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'An error has occurred',

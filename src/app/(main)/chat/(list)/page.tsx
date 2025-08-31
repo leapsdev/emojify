@@ -11,13 +11,13 @@ export default async function Page() {
   const userId = await getPrivyId();
   if (!userId) {
     console.log('userId not found');
-    redirect('/');
+    // redirect('/');
   }
 
-  const rooms = await getUserRooms(userId);
+  const rooms = await getUserRooms(userId || '');
   if (!rooms) {
-    redirect('/');
+    // redirect('/');
   }
 
-  return <ChatRoomListPage userId={userId} initialRooms={rooms} />;
+  return <ChatRoomListPage userId={userId || ''} initialRooms={rooms} />;
 }

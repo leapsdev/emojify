@@ -6,7 +6,7 @@ export default function AuthLayout({
   children: React.ReactNode;
 }) {
   return (
-    <main>
+    <main className="bg-white min-h-screen">
       <AuthRedirect mode="auth" />
       {children}
     </main>

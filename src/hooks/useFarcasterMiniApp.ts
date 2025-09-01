@@ -45,5 +45,6 @@ export function useFarcasterMiniApp() {
     isSDKLoaded,
     isReady,
     context,
+    sdk,
   };
 }

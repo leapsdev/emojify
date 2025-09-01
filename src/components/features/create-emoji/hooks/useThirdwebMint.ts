@@ -5,7 +5,7 @@ import { writeContract } from '@wagmi/core';
 export const useWagmiMint = () => {
   const mintNFT = async (
     walletAddress: string,
-    _getEthereumProvider: () => Promise<unknown>, // 未使用
+    getEthereumProvider: () => Promise<unknown>,
     metadataUrl: string,
   ) => {
     try {
@@ -17,7 +17,6 @@ export const useWagmiMint = () => {
           metadataUrl,
           '0x' as `0x${string}`,
         ],
-        // value: BigInt('500000000000000'), // 必要に応じて有効化
       });
       return { transactionHash: transactionHash as string };
     } catch (error: unknown) {

@@ -1,11 +1,16 @@
+import { usePrivy } from '@privy-io/react-auth';
 import { useAccount } from 'wagmi';
 
 export const useCollectWallet = () => {
-  const { address, isConnected, isConnecting } = useAccount();
+  const { address, isConnecting } = useAccount();
+  const { authenticated, user } = usePrivy();
+
+  // Privyのウォレットアドレスを取得
+  const privyAddress = user?.wallet?.address;
 
   return {
-    isConnected,
-    walletAddress: address,
+    isConnected: authenticated,
+    walletAddress: address || privyAddress,
     isLoading: isConnecting,
   };
 };

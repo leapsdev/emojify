@@ -2,7 +2,7 @@
 
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { Categories } from 'emoji-picker-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -125,9 +125,5 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
 }
 
 export function ChatRoomInput(props: ChatRoomInputProps) {
-  return (
-    <EthereumProviders>
-      <ChatRoomInputContent {...props} />
-    </EthereumProviders>
-  );
+  return <ChatRoomInputContent {...props} />;
 }

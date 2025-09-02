@@ -10,8 +10,8 @@ import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { useCollectWallet } from '@/hooks/useCollectWallet';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+import { usePrivy } from '@privy-io/react-auth';
+
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
 import type { User } from '@/repository/db/database';
@@ -37,7 +37,7 @@ function ProfilePageContent({
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
-  const { isConnected } = useCollectWallet();
+  const { authenticated } = usePrivy();
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -84,7 +84,7 @@ function ProfilePageContent({
     fetchNFTs();
   }, [address, nfts]);
 
-  if (!isConnected) {
+  if (!authenticated) {
     return <WalletConnectButton />;
   }
 
@@ -136,9 +136,5 @@ function ProfilePageContent({
 }
 
 export const ProfilePage = (props: ProfilePageProps) => {
-  return (
-    <EthereumProviders>
-      <ProfilePageContent {...props} />
-    </EthereumProviders>
-  );
+  return <ProfilePageContent {...props} />;
 };

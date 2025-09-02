@@ -10,8 +10,8 @@ import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { useCollectWallet } from '@/hooks/useCollectWallet';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+import { usePrivy } from '@privy-io/react-auth';
+
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
 import type { User } from '@/repository/db/database';
@@ -33,15 +33,15 @@ function ProfilePageContent({
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
-  const { selectedWalletAddress } = useWallet();
+  const { address } = useWallet();
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
-  const { isConnected } = useCollectWallet();
+  const { authenticated } = usePrivy();
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!selectedWalletAddress || !nfts.length) return;
+      if (!address || !nfts.length) return;
 
       try {
         const created: NFT[] = [];
@@ -52,10 +52,7 @@ function ProfilePageContent({
             const balance = (await readContract(config, {
               ...emojiContract,
               functionName: 'balanceOf',
-              args: [
-                selectedWalletAddress as `0x${string}`,
-                BigInt(nft.tokenId),
-              ],
+              args: [address as `0x${string}`, BigInt(nft.tokenId)],
             })) as bigint;
 
             if (Number(balance) > 0) {
@@ -64,8 +61,7 @@ function ProfilePageContent({
                 functionName: 'firstMinter',
                 args: [BigInt(nft.tokenId)],
               })) as string;
-              const isCreator =
-                minter.toLowerCase() === selectedWalletAddress.toLowerCase();
+              const isCreator = minter.toLowerCase() === address.toLowerCase();
 
               if (isCreator) {
                 created.push(nft);
@@ -86,9 +82,9 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [selectedWalletAddress, nfts]);
+  }, [address, nfts]);
 
-  if (!isConnected) {
+  if (!authenticated) {
     return <WalletConnectButton />;
   }
 
@@ -140,9 +136,5 @@ function ProfilePageContent({
 }
 
 export const ProfilePage = (props: ProfilePageProps) => {
-  return (
-    <EthereumProviders>
-      <ProfilePageContent {...props} />
-    </EthereumProviders>
-  );
+  return <ProfilePageContent {...props} />;
 };

@@ -4,10 +4,10 @@ import { Loading } from '@/components/ui/Loading';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
-import { useWallets } from '@privy-io/react-auth';
-import { readContract, writeContract } from '@wagmi/core';
+import { readContract } from '@wagmi/core';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { useAccount, useWalletClient } from 'wagmi';
 
 interface Props {
   tokenId: string;
@@ -23,10 +23,11 @@ export function CollectButton({ tokenId }: Props) {
   const [collectResult, setCollectResult] = useState<CollectResult | null>(
     null,
   );
-  const { wallets } = useWallets();
+  const { address } = useAccount();
+  const { data: walletClient } = useWalletClient({ config });
 
   const handleCollect = async () => {
-    if (wallets.length === 0) {
+    if (!walletClient || !address) {
       console.error('No wallet connected');
       return;
     }
@@ -34,7 +35,6 @@ export function CollectButton({ tokenId }: Props) {
     try {
       setIsLoading(true);
       setCollectResult(null);
-      const walletAddress = wallets[0].address;
 
       // Check if the current user is the first minter
       const firstMinterAddress = (await readContract(config, {
@@ -44,16 +44,16 @@ export function CollectButton({ tokenId }: Props) {
       })) as unknown as string;
 
       const isFirstMinter =
-        firstMinterAddress.toLowerCase() === walletAddress.toLowerCase();
+        firstMinterAddress.toLowerCase() === address.toLowerCase();
 
       const valueToSend = isFirstMinter ? BigInt(0) : BigInt('500000000000000'); // 0.0005 ETH in wei
 
       // NFTを取得
-      const hash = await writeContract(config, {
+      const hash = await walletClient.writeContract({
         ...emojiContract,
         functionName: 'addEmojiSupply',
         args: [
-          walletAddress as `0x${string}`,
+          address as `0x${string}`,
           BigInt(tokenId),
           BigInt(1),
           '0x' as `0x${string}`,
@@ -107,7 +107,7 @@ export function CollectButton({ tokenId }: Props) {
         <Button
           className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold mt-8"
           onClick={handleCollect}
-          disabled={isLoading || wallets.length === 0}
+          disabled={isLoading || !walletClient}
         >
           {isLoading ? (
             <Loading size="sm" className="text-white" />

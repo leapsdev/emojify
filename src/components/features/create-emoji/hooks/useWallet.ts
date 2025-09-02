@@ -1,26 +1,18 @@
-import { useWallets } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
+import { config } from '@/lib/basename/wagmi';
+import { usePrivy } from '@privy-io/react-auth';
+import { useAccount, useWalletClient } from 'wagmi';
 
 export const useWallet = () => {
-  const { wallets } = useWallets();
-  const [selectedWalletAddress, setSelectedWalletAddress] =
-    useState<string>('');
+  const { address } = useAccount();
+  const { data: walletClient } = useWalletClient({ config });
+  const { authenticated, user } = usePrivy();
 
-  useEffect(() => {
-    if (wallets.length > 0) {
-      setSelectedWalletAddress(wallets[0].address);
-    } else {
-      setSelectedWalletAddress('');
-    }
-  }, [wallets]);
-
-  const getSelectedWallet = () => {
-    return wallets.find((wallet) => wallet.address === selectedWalletAddress);
-  };
+  // Privyのウォレットアドレスを取得
+  const privyAddress = user?.wallet?.address;
 
   return {
-    selectedWalletAddress,
-    getSelectedWallet,
-    wallets,
+    address: address || privyAddress,
+    isConnected: authenticated,
+    walletClient,
   };
 };

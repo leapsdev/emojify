@@ -2,23 +2,18 @@
 
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
-import { useCollectWallet } from '@/hooks/useCollectWallet';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+import { usePrivy } from '@privy-io/react-auth';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
 
 export function EmojiList() {
-  return (
-    <EthereumProviders>
-      <EmojiListContent />
-    </EthereumProviders>
-  );
+  return <EmojiListContent />;
 }
 
 function EmojiListContent() {
   const { nfts, loading, error } = useExploreNFTs();
-  const { isConnected } = useCollectWallet();
+  const { authenticated } = usePrivy();
 
   // フィルタリングとメモ化
   const filteredNFTs = useMemo(() => {
@@ -33,7 +28,7 @@ function EmojiListContent() {
     );
   }
 
-  if (!isConnected) {
+  if (!authenticated) {
     return <WalletConnectButton />;
   }
 

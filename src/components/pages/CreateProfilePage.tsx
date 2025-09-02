@@ -2,7 +2,7 @@
 import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
 import { ProfileForm } from '@/components/features/create-profile/ProfileForm';
 import { ProfileImage } from '@/components/features/create-profile/ProfileImage';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { useRef } from 'react';
 
 export function CreateProfilePage() {
@@ -25,12 +25,10 @@ export function CreateProfilePage() {
   };
 
   return (
-    <EthereumProviders>
-      <main className="max-w-2xl mx-auto w-full px-4 py-8">
-        <AuthRedirect mode="profile" />
-        <ProfileImage onImageUpload={handleImageUpload} />
-        <ProfileForm ref={formRef} />
-      </main>
-    </EthereumProviders>
+    <main className="max-w-2xl mx-auto w-full px-4 py-8">
+      <AuthRedirect mode="profile" />
+      <ProfileImage onImageUpload={handleImageUpload} />
+      <ProfileForm ref={formRef} />
+    </main>
   );
 }

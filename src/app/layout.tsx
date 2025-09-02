@@ -5,6 +5,7 @@ import '@/styles/globals.css';
 import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
+import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -62,11 +63,13 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <PrivyProvider>
-          <OnchainProvider>
-            <FarcasterMiniAppInitializer />
-            {children}
-            <Toaster />
-          </OnchainProvider>
+          <EthereumProviders>
+            <OnchainProvider>
+              <FarcasterMiniAppInitializer />
+              {children}
+              <Toaster />
+            </OnchainProvider>
+          </EthereumProviders>
         </PrivyProvider>
       </body>
     </html>

@@ -14,7 +14,7 @@ export function FarcasterMiniAppInitializer() {
     // 初期化状態をログ出力
     if (isSDKLoaded) {
       console.log('Farcaster Mini App SDK loaded:', isReady);
-      
+
       // SDKが準備できている場合はready()を呼び出す
       if (sdk && !isReady) {
         sdk.actions

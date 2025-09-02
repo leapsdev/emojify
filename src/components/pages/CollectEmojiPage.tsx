@@ -8,7 +8,7 @@ import { useCollectNFT } from '@/components/features/collect-emoji/hooks/useColl
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { useParams } from 'next/navigation';
 
 function CollectEmojiPageContent() {
@@ -54,9 +54,5 @@ function CollectEmojiPageContent() {
 }
 
 export function CollectEmojiPage() {
-  return (
-    <EthereumProviders>
-      <CollectEmojiPageContent />
-    </EthereumProviders>
-  );
+  return <CollectEmojiPageContent />;
 }

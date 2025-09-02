@@ -1,7 +1,7 @@
 'use client';
 
 import type { NFTData } from '@/components/features/explore/types';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { formatDateToYYYYMMDD } from '@/lib/utils';
 import type { Message } from '@/repository/db/database';
 import Image from 'next/image';
@@ -200,9 +200,5 @@ function MessageListContent({
 }
 
 export function MessageList(props: MessageListProps) {
-  return (
-    <EthereumProviders>
-      <MessageListContent {...props} />
-    </EthereumProviders>
-  );
+  return <MessageListContent {...props} />;
 }

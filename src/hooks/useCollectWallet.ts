@@ -1,24 +1,16 @@
-import { useWallets } from '@privy-io/react-auth';
-import { useEffect, useState } from 'react';
+import { usePrivy } from '@privy-io/react-auth';
+import { useAccount } from 'wagmi';
 
 export const useCollectWallet = () => {
-  const { wallets } = useWallets();
-  const [isConnected, setIsConnected] = useState(false);
-  const [walletAddress, setWalletAddress] = useState<string | null>(null);
+  const { address, isConnecting } = useAccount();
+  const { authenticated, user } = usePrivy();
 
-  useEffect(() => {
-    if (wallets.length > 0) {
-      setIsConnected(true);
-      setWalletAddress(wallets[0].address);
-    } else {
-      setIsConnected(false);
-      setWalletAddress(null);
-    }
-  }, [wallets]);
+  // Privyのウォレットアドレスを取得
+  const privyAddress = user?.wallet?.address;
 
   return {
-    isConnected,
-    walletAddress,
-    isLoading: false,
+    isConnected: authenticated,
+    walletAddress: address || privyAddress,
+    isLoading: isConnecting,
   };
 };

@@ -33,7 +33,7 @@ function ProfilePageContent({
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
-  const { selectedWalletAddress } = useWallet();
+  const { address } = useWallet();
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
@@ -41,7 +41,7 @@ function ProfilePageContent({
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      if (!selectedWalletAddress || !nfts.length) return;
+      if (!address || !nfts.length) return;
 
       try {
         const created: NFT[] = [];
@@ -52,10 +52,7 @@ function ProfilePageContent({
             const balance = (await readContract(config, {
               ...emojiContract,
               functionName: 'balanceOf',
-              args: [
-                selectedWalletAddress as `0x${string}`,
-                BigInt(nft.tokenId),
-              ],
+              args: [address as `0x${string}`, BigInt(nft.tokenId)],
             })) as bigint;
 
             if (Number(balance) > 0) {
@@ -64,8 +61,7 @@ function ProfilePageContent({
                 functionName: 'firstMinter',
                 args: [BigInt(nft.tokenId)],
               })) as string;
-              const isCreator =
-                minter.toLowerCase() === selectedWalletAddress.toLowerCase();
+              const isCreator = minter.toLowerCase() === address.toLowerCase();
 
               if (isCreator) {
                 created.push(nft);
@@ -86,7 +82,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [selectedWalletAddress, nfts]);
+  }, [address, nfts]);
 
   if (!isConnected) {
     return <WalletConnectButton />;

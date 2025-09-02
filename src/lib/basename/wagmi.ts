@@ -8,10 +8,7 @@ const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
 
 export const config = createConfig({
   chains: [isProd ? base : baseSepolia],
-  connectors: [
-    farcasterMiniApp(),
-    injected(),
-  ],
+  connectors: [farcasterMiniApp(), injected()],
   transports: {
     [base.id]: http(),
     [baseSepolia.id]: http(),

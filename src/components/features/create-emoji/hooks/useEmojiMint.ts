@@ -1,22 +1,44 @@
+import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
 import { usePrivy } from '@privy-io/react-auth';
 import { type EIP1193Provider, createWalletClient, custom } from 'viem';
 import { base, baseSepolia } from 'viem/chains';
+import { useAccount, useWalletClient } from 'wagmi';
 
 export const useEmojiMint = () => {
+  const { data: walletClient } = useWalletClient({ config });
+  const { address } = useAccount();
   const { authenticated, user } = usePrivy();
 
   const mintNFT = async (metadataUrl: string) => {
-    // Privyの認証状態をチェック
+    // まずWagmiのウォレットクライアントを試す
+    if (walletClient && address) {
+      try {
+        const transactionHash = await walletClient.writeContract({
+          ...emojiContract,
+          functionName: 'registerNewEmoji',
+          args: [address as `0x${string}`, metadataUrl, '0x' as `0x${string}`],
+        });
+
+        return { transactionHash: transactionHash as string };
+      } catch (error: unknown) {
+        const e = error as { code?: number; message?: string };
+        if (e.code === 4001) {
+          throw new Error('Transaction cancelled.');
+        }
+        console.error('Wagmi transaction error:', error);
+        throw new Error(e.message || 'Transaction failed with unknown error');
+      }
+    }
+
+    // フォールバック: Privyから直接Viemクライアントを作成
     if (!authenticated || !user?.wallet) {
       throw new Error('Wallet not connected');
     }
 
     try {
-      // Privyのウォレットアドレスを取得
       const privyAddress = user.wallet.address;
 
-      // PrivyのウォレットからEthereum Providerを取得
       const provider = await (
         user.wallet as unknown as {
           getEthereumProvider: () => Promise<unknown>;
@@ -31,7 +53,6 @@ export const useEmojiMint = () => {
         throw new Error('Ethereum provider not available from Privy wallet');
       }
 
-      // Privyプロバイダーを使ってViemのWalletClientを作成
       const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
       const chain = isProd ? base : baseSepolia;
 
@@ -41,7 +62,6 @@ export const useEmojiMint = () => {
         transport: custom(provider as EIP1193Provider),
       });
 
-      // WalletClientを使って直接コントラクトを実行
       const transactionHash = await privyWalletClient.writeContract({
         ...emojiContract,
         functionName: 'registerNewEmoji',
@@ -58,7 +78,7 @@ export const useEmojiMint = () => {
       if (e.code === 4001) {
         throw new Error('Transaction cancelled.');
       }
-      console.error('Transaction error:', error);
+      console.error('Privy transaction error:', error);
       throw new Error(e.message || 'Transaction failed with unknown error');
     }
   };

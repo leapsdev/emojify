@@ -14,5 +14,5 @@ export const config = createConfig({
     [baseSepolia.id]: http(),
   },
   ssr: true,
-  multiInjectedProviderDiscovery: false,
+  multiInjectedProviderDiscovery: true,
 });

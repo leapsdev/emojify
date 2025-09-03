@@ -1,6 +1,6 @@
+/* eslint-disable @next/next/no-img-element */
 'use client';
 
-import Image from 'next/image';
 import { useRef } from 'react';
 import { ResetButton } from './ResetButton';
 
@@ -51,12 +51,10 @@ const PreviewArea = ({
   if (preview) {
     return (
       <div className="relative w-full h-full">
-        <Image
+        <img
           src={preview}
           alt="Preview"
-          fill
-          className="object-cover"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          className="w-full h-full object-fill"
         />
         <ResetButton onClick={handleReset} />
       </div>
@@ -65,11 +63,9 @@ const PreviewArea = ({
 
   return (
     <>
-      <Image
+      <img
         src="/image-icon.png"
         alt="画像アイコン"
-        width={48}
-        height={48}
         className="mb-8"
         style={{ width: '4rem', height: '4rem', color: '#9ca3af' }}
       />

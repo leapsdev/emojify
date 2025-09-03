@@ -74,7 +74,7 @@ export function CollectButton({ tokenId }: Props) {
     'w-full bg-gray-900 text-white rounded-full py-2 text-lg font-bold hover:bg-gray-800';
 
   return (
-    <div className="space-y-4">
+    <>
       {collectResult && (
         <TransactionResult
           result={collectResult.result}
@@ -105,7 +105,7 @@ export function CollectButton({ tokenId }: Props) {
         />
       ) : (
         <Button
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold mt-8"
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold "
           onClick={handleCollect}
           disabled={isLoading || !walletClient}
         >
@@ -119,6 +119,6 @@ export function CollectButton({ tokenId }: Props) {
           )}
         </Button>
       )}
-    </div>
+    </>
   );
 }

@@ -16,8 +16,6 @@ export function useFarcasterMiniApp() {
     const initializeMiniApp = async () => {
       try {
         if (sdk && !isSDKLoaded) {
-          console.log('Initializing Farcaster Mini App...');
-
           // SDKの初期化を待つ
           await sdk.actions.ready();
           console.log('Farcaster Mini App is ready!');

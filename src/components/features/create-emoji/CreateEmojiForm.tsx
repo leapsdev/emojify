@@ -57,10 +57,6 @@ export function CreateEmojiForm() {
       const { transactionHash } = await mintNFT(metadataUrl);
       console.log('NFT minted successfully!');
       console.log('Transaction Hash:', transactionHash);
-      console.log(
-        'View on OpenSea:',
-        `https://testnets.opensea.io/ja/${EMOJI_CONTRACT_ADDRESS}/${address}`,
-      );
       setMintResult({
         result: 'success',
         transactionHash,

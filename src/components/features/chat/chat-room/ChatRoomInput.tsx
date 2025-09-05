@@ -31,12 +31,6 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isLoading) return;
 
-    console.log('Sending message with:', {
-      roomId,
-      userId,
-      message: trimmedMessage,
-    });
-
     try {
       setIsLoading(true);
       setError(null);

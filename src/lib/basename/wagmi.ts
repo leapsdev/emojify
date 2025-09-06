@@ -10,16 +10,8 @@ export const config = createConfig({
   chains: [isProd ? base : baseSepolia],
   connectors: [farcasterMiniApp()],
   transports: {
-    [base.id]: http('https://mainnet.base.org', {
-      timeout: 10_000,
-      retryCount: 3,
-      retryDelay: 1000,
-    }),
-    [baseSepolia.id]: http('https://sepolia.base.org', {
-      timeout: 10_000,
-      retryCount: 3,
-      retryDelay: 1000,
-    }),
+    [base.id]: http(),
+    [baseSepolia.id]: http(),
   },
   ssr: true,
 });

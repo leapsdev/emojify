@@ -4,7 +4,6 @@ import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/contracts';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';

@@ -74,6 +74,7 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
         },
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
+          showWalletUIs: true,
         },
       }}
     >

@@ -1,6 +1,7 @@
 'use client';
 
 import type { EmojiProps } from '@/components/features/profile/types';
+import { Loading } from '@/components/ui/Loading';
 import { cn } from '@/lib/utils';
 import * as TabsPrimitive from '@radix-ui/react-tabs';
 import * as React from 'react';
@@ -9,11 +10,15 @@ import { EmojiGrid } from './EmojiGrid';
 interface ProfileTabsProps {
   createdEmojis: EmojiProps[];
   collectedEmojis: EmojiProps[];
+  isLoadingCreated?: boolean;
+  isLoadingCollected?: boolean;
 }
 
 export const ProfileTabs = ({
   createdEmojis,
   collectedEmojis,
+  isLoadingCreated = false,
+  isLoadingCollected = false,
 }: ProfileTabsProps) => {
   const [activeTab, setActiveTab] = React.useState('created');
 
@@ -48,11 +53,23 @@ export const ProfileTabs = ({
       </div>
 
       <TabsPrimitive.Content value="created" className="p-2">
-        <EmojiGrid emojis={createdEmojis} />
+        {isLoadingCreated ? (
+          <div className="flex justify-center py-8">
+            <Loading size="lg" text="Loading created emojis..." />
+          </div>
+        ) : (
+          <EmojiGrid emojis={createdEmojis} />
+        )}
       </TabsPrimitive.Content>
 
       <TabsPrimitive.Content value="collected" className="p-2">
-        <EmojiGrid emojis={collectedEmojis} />
+        {isLoadingCollected ? (
+          <div className="flex justify-center py-8">
+            <Loading size="lg" text="Loading collected emojis..." />
+          </div>
+        ) : (
+          <EmojiGrid emojis={collectedEmojis} />
+        )}
       </TabsPrimitive.Content>
     </TabsPrimitive.Root>
   );

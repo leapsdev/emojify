@@ -37,11 +37,16 @@ function ProfilePageContent({
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
+  const [isLoadingCreated, setIsLoadingCreated] = useState(false);
+  const [isLoadingCollected, setIsLoadingCollected] = useState(false);
   const { authenticated } = usePrivy();
 
   useEffect(() => {
     const fetchNFTs = async () => {
       if (!address || !nfts.length) return;
+
+      setIsLoadingCreated(true);
+      setIsLoadingCollected(true);
 
       try {
         const created: NFT[] = [];
@@ -78,6 +83,9 @@ function ProfilePageContent({
         setCollectedNFTs(collected);
       } catch (err) {
         console.error('Error fetching NFTs:', err);
+      } finally {
+        setIsLoadingCreated(false);
+        setIsLoadingCollected(false);
       }
     };
 
@@ -126,6 +134,8 @@ function ProfilePageContent({
                   avatar: '/icons/faceIcon-192x192.png',
                 },
               }))}
+              isLoadingCreated={isLoadingCreated}
+              isLoadingCollected={isLoadingCollected}
             />
           </div>
         </div>

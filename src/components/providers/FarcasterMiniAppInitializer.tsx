@@ -15,8 +15,15 @@ export function FarcasterMiniAppInitializer() {
     if (isSDKLoaded) {
       console.log('Farcaster Mini App SDK loaded:', isReady);
 
+      // 既に初期化済みの場合は何もしない
+      if (isReady) {
+        console.log('Farcaster Mini App SDK は既に初期化済みです');
+        return;
+      }
+
       // SDKが準備できている場合はready()を呼び出す
-      if (sdk && !isReady) {
+      if (sdk) {
+        console.log('Farcaster Mini App SDK ready()を呼び出し中...');
         sdk.actions
           .ready()
           .then(() => {

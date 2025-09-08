@@ -13,6 +13,8 @@ export const config = createConfig({
     [base.id]: http(),
     [baseSepolia.id]: http(),
   },
+  // WalletConnectの重複初期化を防ぐ設定
+  multiInjectedProviderDiscovery: false,
 });
 
 declare module 'wagmi' {

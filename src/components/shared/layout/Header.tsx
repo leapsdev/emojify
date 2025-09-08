@@ -2,7 +2,7 @@
 
 import { LinkButton } from '@/components/ui/LinkButton';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
@@ -102,7 +102,7 @@ export const Header = ({
  * チェーン切替ボタンコンポーネント（ウォレットの状態を反映）
  */
 const ChainSwitchButton = () => {
-  const { chain } = useAccount();
+  const { chain, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -114,6 +114,30 @@ const ChainSwitchButton = () => {
   // 現在のチェーン名を取得（ウォレットの状態を反映）
   const currentChain = availableChains.find((c) => c.id === chain?.id);
   const currentChainName = currentChain?.name || 'Unknown';
+
+  // 自動チェーン切り替え機能
+  useEffect(() => {
+    const autoSwitchChain = async () => {
+      // ウォレットが接続されていない場合は何もしない
+      if (!isConnected || !chain) return;
+
+      // 現在のチェーンが環境に適したチェーンでない場合、自動切り替え
+      const targetChain = isProd ? base : baseSepolia;
+      console.log('chain', chain);
+      if (chain.id !== targetChain.id) {
+        try {
+          console.log(
+            `チェーンを自動切り替え中: ${chain.name} → ${targetChain.name}`,
+          );
+          await switchChain({ chainId: targetChain.id });
+        } catch (error) {
+          console.error('自動チェーン切り替えに失敗しました:', error);
+        }
+      }
+    };
+
+    autoSwitchChain();
+  }, [isConnected, chain, isProd, switchChain]);
 
   // チェーン切替処理
   const handleChainSwitch = async (chainId: 8453 | 84532) => {

@@ -103,6 +103,7 @@ export const Header = ({
  */
 const ChainSwitchButton = () => {
   const { chain, isConnected } = useAccount();
+  console.log('chain', chain);
   const { switchChain } = useSwitchChain();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
@@ -123,7 +124,6 @@ const ChainSwitchButton = () => {
 
       // 現在のチェーンが環境に適したチェーンでない場合、自動切り替え
       const targetChain = isProd ? base : baseSepolia;
-      console.log('chain', chain);
       if (chain.id !== targetChain.id) {
         try {
           console.log(

@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
+import { usePrivy } from '@privy-io/react-auth';
 
 /**
  * 共通ヘッダーコンポーネント
@@ -102,33 +103,47 @@ export const Header = ({
  * チェーン切替ボタンコンポーネント（ウォレットの状態を反映）
  */
 const ChainSwitchButton = () => {
+  const { user } = usePrivy();
   const { chain, isConnected } = useAccount();
-  console.log('chain', chain);
   const { switchChain } = useSwitchChain();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
+  // Privyの接続状態も考慮
+  const isPrivyConnected = !!user?.wallet?.address;
+  const actualIsConnected = isConnected || isPrivyConnected;
   const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
+  const defaultChain = isProd ? base : baseSepolia;
   const availableChains = isProd
     ? [{ id: base.id, name: 'Base', symbol: 'ETH' }]
     : [{ id: baseSepolia.id, name: 'Base Sepolia', symbol: 'ETH' }];
 
-  // 現在のチェーン名を取得（ウォレットの状態を反映）
-  const currentChain = availableChains.find((c) => c.id === chain?.id);
+  // チェーン情報が取得できない場合はデフォルトチェーンを使用
+  const currentChain = chain 
+    ? availableChains.find((c) => c.id === chain.id)
+    : availableChains.find((c) => c.id === defaultChain.id) || availableChains[0];
+
   const currentChainName = currentChain?.name || 'Unknown';
 
   // 自動チェーン切り替え機能
   useEffect(() => {
     const autoSwitchChain = async () => {
       // ウォレットが接続されていない場合は何もしない
-      if (!isConnected || !chain) return;
+      if (!actualIsConnected) return;
+
+      // チェーン情報が取得できない場合は、デフォルトチェーンに切り替え
+      if (!chain) {
+        try {
+          await switchChain({ chainId: defaultChain.id });
+        } catch (error) {
+          console.error('デフォルトチェーン切り替えに失敗しました:', error);
+        }
+        return;
+      }
 
       // 現在のチェーンが環境に適したチェーンでない場合、自動切り替え
       const targetChain = isProd ? base : baseSepolia;
       if (chain.id !== targetChain.id) {
         try {
-          console.log(
-            `チェーンを自動切り替え中: ${chain.name} → ${targetChain.name}`,
-          );
           await switchChain({ chainId: targetChain.id });
         } catch (error) {
           console.error('自動チェーン切り替えに失敗しました:', error);
@@ -137,7 +152,7 @@ const ChainSwitchButton = () => {
     };
 
     autoSwitchChain();
-  }, [isConnected, chain, isProd, switchChain]);
+  }, [actualIsConnected, chain, isProd, switchChain, defaultChain]);
 
   // チェーン切替処理
   const handleChainSwitch = async (chainId: 8453 | 84532) => {
@@ -148,6 +163,11 @@ const ChainSwitchButton = () => {
       console.error('チェーン切替に失敗しました:', error);
     }
   };
+
+  // ウォレットが接続されていない場合は何も表示しない
+  if (!actualIsConnected) {
+    return null;
+  }
 
   return (
     <div className="relative">

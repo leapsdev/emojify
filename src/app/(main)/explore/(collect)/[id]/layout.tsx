@@ -7,7 +7,7 @@ export default function CollectEmojiLayout({
 }) {
   return (
     <>
-      <Header backHref="/explore" className="mb-6" />
+      <Header backHref="/explore" className="mb-6" isShowChainSwitch />
       {children}
     </>
   );

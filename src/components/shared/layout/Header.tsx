@@ -48,6 +48,8 @@ type HeaderProps = {
   onBack?: () => void;
   /** 追加のスタイルクラス */
   className?: string;
+  /** チェーン切替ボタンを表示するかどうか */
+  isShowChainSwitch?: boolean;
 };
 
 export const Header = ({
@@ -57,6 +59,7 @@ export const Header = ({
   backHref,
   onBack,
   className,
+  isShowChainSwitch = false,
 }: HeaderProps) => {
   const backButton =
     (backHref || onBack) &&
@@ -92,7 +95,7 @@ export const Header = ({
 
       {/* 右エリア - 絶対位置で配置 */}
       <div className="absolute right-4 h-full flex items-center space-x-2">
-        <ChainSwitchButton />
+        {isShowChainSwitch && <ChainSwitchButton />}
         {rightContent}
       </div>
     </div>

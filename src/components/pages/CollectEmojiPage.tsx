@@ -37,9 +37,9 @@ function CollectEmojiPageContent() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 space-y-8">
       <EmojiImage image={emojiData.image} />
-      <CreatorInfo creator={emojiData.creator} name={emojiData.name} />
+      <CreatorInfo creator={emojiData.creator} />
       <CollectButton tokenId={emojiData.id} />
     </div>
   );

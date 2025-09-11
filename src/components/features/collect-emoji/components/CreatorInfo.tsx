@@ -4,10 +4,9 @@ import type { CreatorData } from '../types';
 
 interface CreatorInfoProps {
   creator: CreatorData;
-  name: string;
 }
 
-export function CreatorInfo({ creator, name }: CreatorInfoProps) {
+export function CreatorInfo({ creator }: CreatorInfoProps) {
   return (
     <div className="px-4 pt-3">
       <div className="flex items-center justify-between mb-3">
@@ -25,8 +24,6 @@ export function CreatorInfo({ creator, name }: CreatorInfoProps) {
           </div>
         </div>
       </div>
-
-      <h1 className="text-4xl font-bold mb-6">{name}</h1>
     </div>
   );
 }

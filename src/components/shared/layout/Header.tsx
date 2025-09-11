@@ -2,11 +2,11 @@
 
 import { LinkButton } from '@/components/ui/LinkButton';
 import { cn } from '@/lib/utils';
+import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
-import { usePrivy } from '@privy-io/react-auth';
 
 /**
  * 共通ヘッダーコンポーネント
@@ -118,9 +118,10 @@ const ChainSwitchButton = () => {
     : [{ id: baseSepolia.id, name: 'Base Sepolia', symbol: 'ETH' }];
 
   // チェーン情報が取得できない場合はデフォルトチェーンを使用
-  const currentChain = chain 
+  const currentChain = chain
     ? availableChains.find((c) => c.id === chain.id)
-    : availableChains.find((c) => c.id === defaultChain.id) || availableChains[0];
+    : availableChains.find((c) => c.id === defaultChain.id) ||
+      availableChains[0];
 
   const currentChainName = currentChain?.name || 'Unknown';
 

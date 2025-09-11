@@ -21,9 +21,9 @@ Farcasterのminiappで開いた際に、Farcasterのアカウントで自動ロ�
 
 ## 実装タスク
 
-### 1. Farcaster Mini App コンテキスト検出機能の実装
+### 1. Farcaster Mini App SDK を使用した自動ログイン実装
 
-#### 1.1 Farcaster環境検出フックの作成
+#### 1.1 Farcaster環境検出とコンテキスト取得フックの作成
 **ファイル**: `src/hooks/useFarcasterEnvironment.ts`
 
 ```typescript
@@ -96,13 +96,14 @@ export function useFarcasterEnvironment(): FarcasterEnvironment {
 }
 ```
 
-#### 1.2 Farcaster認証フックの作成
+#### 1.2 Farcaster SDK を使用した自動認証フックの作成
 **ファイル**: `src/hooks/useFarcasterAuth.ts`
 
 ```typescript
 'use client';
 
 import { useFarcasterEnvironment } from './useFarcasterEnvironment';
+import { useFarcasterMiniApp } from './useFarcasterMiniApp';
 import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 
@@ -110,46 +111,66 @@ interface FarcasterAuthState {
   isAuthenticating: boolean;
   isAuthenticated: boolean;
   error: string | null;
+  farcasterToken: string | null;
 }
 
 export function useFarcasterAuth() {
   const { isInFarcasterApp, userContext, isLoading } = useFarcasterEnvironment();
+  const { sdk } = useFarcasterMiniApp();
   const { authenticated: isPrivyAuthenticated, login } = usePrivy();
   const [authState, setAuthState] = useState<FarcasterAuthState>({
     isAuthenticating: false,
     isAuthenticated: false,
     error: null,
+    farcasterToken: null,
   });
 
   useEffect(() => {
     const handleFarcasterAutoLogin = async () => {
-      if (isLoading || !isInFarcasterApp || !userContext || isPrivyAuthenticated) {
+      if (isLoading || !isInFarcasterApp || !userContext || isPrivyAuthenticated || !sdk) {
         return;
       }
 
       setAuthState(prev => ({ ...prev, isAuthenticating: true, error: null }));
 
       try {
-        // Farcasterで自動ログインを実行
-        await login('farcaster');
+        // Quick Authを使用した自動ログイン
+        const { token } = await sdk.quickAuth.getToken();
         
-        setAuthState({
-          isAuthenticating: false,
-          isAuthenticated: true,
-          error: null,
-        });
+        if (token) {
+          console.log('Farcaster Quick Auth token取得成功:', token);
+          
+          // PrivyでFarcasterログインを実行
+          await login('farcaster');
+          
+          setAuthState({
+            isAuthenticating: false,
+            isAuthenticated: true,
+            error: null,
+            farcasterToken: token,
+          });
+        } else {
+          throw new Error('Farcasterトークンの取得に失敗しました');
+        }
       } catch (error) {
         console.error('Farcaster自動ログインエラー:', error);
+        
+        let errorMessage = '認証に失敗しました';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+
         setAuthState({
           isAuthenticating: false,
           isAuthenticated: false,
-          error: error instanceof Error ? error.message : '認証に失敗しました',
+          error: errorMessage,
+          farcasterToken: null,
         });
       }
     };
 
     handleFarcasterAutoLogin();
-  }, [isLoading, isInFarcasterApp, userContext, isPrivyAuthenticated, login]);
+  }, [isLoading, isInFarcasterApp, userContext, isPrivyAuthenticated, login, sdk]);
 
   return {
     ...authState,
@@ -171,7 +192,7 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
     <PrivyProviderClient
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
-        loginMethods: ['wallet', 'farcaster', 'email'],
+        loginMethods: ['farcaster', 'wallet', 'email'], // Farcasterを最初に配置
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
@@ -180,11 +201,6 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
           showWalletUIs: true,
-        },
-        // Farcaster設定を追加
-        farcaster: {
-          enabled: true,
-          autoConnect: true, // 自動接続を有効化
         },
       }}
     >
@@ -215,7 +231,8 @@ export function FarcasterAutoLogin({ children }: FarcasterAutoLoginProps) {
     isAuthenticated, 
     error, 
     userContext, 
-    isInFarcasterApp 
+    isInFarcasterApp,
+    farcasterToken
   } = useFarcasterAuth();
 
   // Farcaster Mini App内でない場合は通常の子コンポーネントを表示
@@ -232,6 +249,11 @@ export function FarcasterAutoLogin({ children }: FarcasterAutoLoginProps) {
           <p className="mt-4 text-gray-600">
             Farcasterアカウントでログイン中...
           </p>
+          {userContext && (
+            <p className="mt-2 text-sm text-gray-500">
+              {userContext.displayName || userContext.username} としてログイン中
+            </p>
+          )}
         </div>
       </div>
     );
@@ -258,8 +280,52 @@ export function FarcasterAutoLogin({ children }: FarcasterAutoLoginProps) {
     );
   }
 
+  // 認証成功時のデバッグ情報（開発時のみ）
+  if (process.env.NODE_ENV === 'development' && farcasterToken) {
+    console.log('Farcaster認証成功:', {
+      userContext,
+      token: farcasterToken.substring(0, 20) + '...',
+    });
+  }
+
   // 認証成功または通常の表示
   return <>{children}</>;
+}
+```
+
+#### 3.2 Farcaster認証状態表示コンポーネント（オプション）
+**ファイル**: `src/components/features/auth/FarcasterAuthStatus.tsx`
+
+```typescript
+'use client';
+
+import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+
+export function FarcasterAuthStatus() {
+  const { 
+    isInFarcasterApp, 
+    userContext, 
+    isAuthenticated, 
+    isAuthenticating 
+  } = useFarcasterAuth();
+
+  if (!isInFarcasterApp) {
+    return null;
+  }
+
+  return (
+    <div className="fixed top-4 right-4 bg-white border rounded-lg p-3 shadow-lg text-sm">
+      <div className="font-semibold text-gray-800">Farcaster Mini App</div>
+      {isAuthenticating && (
+        <div className="text-blue-600">認証中...</div>
+      )}
+      {isAuthenticated && userContext && (
+        <div className="text-green-600">
+          {userContext.displayName || userContext.username} としてログイン済み
+        </div>
+      )}
+    </div>
+  );
 }
 ```
 
@@ -299,16 +365,15 @@ export default function RootLayout({
 }
 ```
 
-### 5. 環境変数の設定
+### 5. Privyダッシュボードでの設定
 
-#### 5.1 環境変数の追加
-**ファイル**: `.env.local`
+#### 5.1 Farcasterログインの有効化
+1. [Privyダッシュボード](https://dashboard.privy.io/)にアクセス
+2. アプリを選択
+3. **User management > Authentication > Socials** に移動
+4. **Farcaster** を有効化
 
-```bash
-# 既存の環境変数に追加
-NEXT_PUBLIC_FARCASTER_APP_ID=your_farcaster_app_id
-NEXT_PUBLIC_FARCASTER_APP_SECRET=your_farcaster_app_secret
-```
+**注意**: 特別な環境変数の設定は不要です。PrivyのダッシュボードでFarcasterを有効化するだけで、アプリケーションでFarcasterログインが利用できるようになります。
 
 ### 6. 型定義の追加
 
@@ -355,33 +420,6 @@ export interface FarcasterAuthState {
 }
 ```
 
-### 7. テストの実装
-
-#### 7.1 Farcaster認証テストの作成
-**ファイル**: `src/__tests__/hooks/useFarcasterAuth.test.ts`
-
-```typescript
-import { renderHook } from '@testing-library/react';
-import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
-
-// モックの実装
-jest.mock('@/hooks/useFarcasterEnvironment');
-jest.mock('@privy-io/react-auth');
-
-describe('useFarcasterAuth', () => {
-  it('should handle Farcaster environment detection', () => {
-    // テストの実装
-  });
-
-  it('should trigger auto login when in Farcaster app', () => {
-    // テストの実装
-  });
-
-  it('should handle authentication errors', () => {
-    // テストの実装
-  });
-});
-```
 
 ### 8. ドキュメントの更新
 
@@ -400,29 +438,49 @@ describe('useFarcasterAuth', () => {
 - エラーハンドリングと再試行機能
 
 ### 設定
-環境変数に以下を設定してください：
-- `NEXT_PUBLIC_FARCASTER_APP_ID`: FarcasterアプリID
-- `NEXT_PUBLIC_FARCASTER_APP_SECRET`: Farcasterアプリシークレット
+1. **PrivyダッシュボードでFarcasterを有効化**
+   - [Privyダッシュボード](https://docs.privy.io/recipes/farcaster/login)にアクセス
+   - User management > Authentication > Socials でFarcasterを有効化
+
+2. **PrivyProviderでFarcasterログインを設定**
+   - `loginMethods`に`'farcaster'`を追加
+   - 特別な環境変数は不要
 ```
 
 ## 実装順序
 
-1. **Phase 1**: 基本的なFarcaster環境検出機能
+1. **Phase 1**: Farcaster Mini App SDK環境の検出
    - `useFarcasterEnvironment`フックの実装
-   - 基本的な環境検出ロジック
+   - Farcaster Mini App内でのコンテキスト取得
 
-2. **Phase 2**: 認証フローの実装
+2. **Phase 2**: Farcaster SDK認証フローの実装
    - `useFarcasterAuth`フックの実装
+   - Quick Authを使用した自動ログイン
    - Privyとの統合
 
 3. **Phase 3**: UIコンポーネントの実装
    - `FarcasterAutoLogin`コンポーネントの実装
    - ローディング状態とエラーハンドリング
+   - 認証状態表示コンポーネント（オプション）
 
-4. **Phase 4**: 統合とテスト
+4. **Phase 4**: 統合とドキュメント
    - レイアウトへの統合
-   - テストの実装
    - ドキュメントの更新
+
+## Farcaster Mini App SDK の主要機能
+
+### 1. **Quick Auth** - 自動ログイン
+```typescript
+// 自動的にJWTトークンを取得
+const { token } = await sdk.quickAuth.getToken();
+```
+
+### 2. **Context Access** - ユーザー情報取得
+```typescript
+// ユーザーのFID、ユーザー名、プロフィール画像等を取得
+const context = await sdk.context;
+const user = context.user;
+```
 
 ## 注意事項
 
@@ -430,10 +488,12 @@ describe('useFarcasterAuth', () => {
 2. **エラーハンドリング**: ネットワークエラーや認証失敗時の適切な処理
 3. **ユーザビリティ**: ローディング状態とエラーメッセージの分かりやすい表示
 4. **パフォーマンス**: 不要な再レンダリングを避ける
-5. **テスト**: 各種シナリオでのテスト実装
 
 ## 参考資料
 
+- [Farcaster Mini Apps SDK Documentation](https://miniapps.farcaster.xyz/docs/sdk/actions/sign-in)
+- [Farcaster Quick Auth Documentation](https://miniapps.farcaster.xyz/docs/sdk/quick-auth)
+- [Privy Farcaster Login Documentation](https://docs.privy.io/recipes/farcaster/login)
 - [Farcaster Mini Apps Documentation](https://miniapps.farcaster.xyz/)
 - [Privy React Auth Documentation](https://docs.privy.io/guide/react/overview)
 - [Wagmi Connectors Documentation](https://wagmi.sh/core/api/connectors)

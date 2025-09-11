@@ -1,19 +1,19 @@
 'use client';
 
-import { useFarcasterDirectAuth } from '@/hooks/useFarcasterDirectAuth';
 import { Loading } from '@/components/ui/Loading';
+import { useFarcasterDirectAuth } from '@/hooks/useFarcasterDirectAuth';
 
 interface FarcasterDirectAuthProps {
   children: React.ReactNode;
 }
 
 export function FarcasterDirectAuth({ children }: FarcasterDirectAuthProps) {
-  const { 
-    isAuthenticating, 
-    error, 
-    userContext, 
+  const {
+    isAuthenticating,
+    error,
+    userContext,
     isInFarcasterApp,
-    farcasterToken
+    farcasterToken,
   } = useFarcasterDirectAuth();
 
   // Farcaster Mini App内でない場合は通常の子コンポーネントを表示

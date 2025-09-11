@@ -54,7 +54,7 @@ export function useFarcasterAuth() {
           try {
             // PrivyのFarcasterログインを実行（モーダル表示なし）
             await login();
-            
+
             setAuthState({
               isAuthenticating: false,
               isAuthenticated: true,
@@ -62,8 +62,11 @@ export function useFarcasterAuth() {
               farcasterToken: token,
             });
           } catch (privyError) {
-            console.warn('Privyログインに失敗しましたが、Farcaster認証は成功:', privyError);
-            
+            console.warn(
+              'Privyログインに失敗しましたが、Farcaster認証は成功:',
+              privyError,
+            );
+
             // Privyログインに失敗してもFarcaster認証は成功として扱う
             setAuthState({
               isAuthenticating: false,

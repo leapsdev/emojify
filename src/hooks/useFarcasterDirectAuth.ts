@@ -1,8 +1,8 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useFarcasterEnvironment } from './useFarcasterEnvironment';
 import { useFarcasterMiniApp } from './useFarcasterMiniApp';
-import { useEffect, useState } from 'react';
 
 interface FarcasterDirectAuthState {
   isAuthenticating: boolean;
@@ -18,7 +18,8 @@ interface FarcasterDirectAuthState {
 }
 
 export function useFarcasterDirectAuth() {
-  const { isInFarcasterApp, userContext, isLoading } = useFarcasterEnvironment();
+  const { isInFarcasterApp, userContext, isLoading } =
+    useFarcasterEnvironment();
   const { sdk } = useFarcasterMiniApp();
   const [authState, setAuthState] = useState<FarcasterDirectAuthState>({
     isAuthenticating: false,
@@ -34,7 +35,11 @@ export function useFarcasterDirectAuth() {
         return;
       }
 
-      setAuthState(prev => ({ ...prev, isAuthenticating: true, error: null }));
+      setAuthState((prev) => ({
+        ...prev,
+        isAuthenticating: true,
+        error: null,
+      }));
 
       try {
         // Farcaster Mini App SDKのquickAuthを使用してトークンを取得
@@ -58,7 +63,7 @@ export function useFarcasterDirectAuth() {
         }
       } catch (error) {
         console.error('Farcaster Direct Authエラー:', error);
-        
+
         let errorMessage = '認証に失敗しました';
         if (error instanceof Error) {
           errorMessage = error.message;

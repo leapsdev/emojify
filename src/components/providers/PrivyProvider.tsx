@@ -66,11 +66,11 @@ export function PrivyProvider({ children }: { children: React.ReactNode }) {
     <PrivyProviderClient
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
-        loginMethods: ['farcaster', 'wallet', 'email'], // Farcasterを最初に配置
+        loginMethods: ['wallet', 'farcaster', 'email'],
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
-          showWalletLoginFirst: false, // Farcasterを優先
+          showWalletLoginFirst: true,
         },
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',

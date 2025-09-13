@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
-import { FarcasterDirectAuth } from '@/components/features/auth/FarcasterDirectAuth';
 import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
@@ -67,7 +66,7 @@ export default function RootLayout({
           <EthereumProviders>
             <OnchainProvider>
               <FarcasterMiniAppInitializer />
-              <FarcasterDirectAuth>{children}</FarcasterDirectAuth>
+              {children}
               <Toaster />
             </OnchainProvider>
           </EthereumProviders>

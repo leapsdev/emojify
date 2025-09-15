@@ -1,5 +1,6 @@
 'use client';
 
+import { isFarcasterMiniApp } from '@/lib/farcaster-detection';
 import { sdk } from '@farcaster/miniapp-sdk';
 import { useEffect, useState } from 'react';
 
@@ -11,8 +12,14 @@ export function useFarcasterMiniApp() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [isReady, setIsReady] = useState(false);
   const [context, setContext] = useState<unknown>(null);
+  const [isMiniApp, setIsMiniApp] = useState(false);
 
   useEffect(() => {
+    // MiniApp環境かどうかをチェック
+    const miniAppDetected = isFarcasterMiniApp();
+    setIsMiniApp(miniAppDetected);
+    console.log('Farcaster MiniApp detected:', miniAppDetected);
+
     const initializeMiniApp = async () => {
       try {
         if (sdk && !isSDKLoaded) {
@@ -54,5 +61,6 @@ export function useFarcasterMiniApp() {
     isReady,
     context,
     sdk,
+    isMiniApp,
   };
 }

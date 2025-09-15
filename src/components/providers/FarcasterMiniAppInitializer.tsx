@@ -8,13 +8,13 @@ import { useEffect } from 'react';
  * アプリケーション起動時にsdk.actions.ready()を呼び出す
  */
 export function FarcasterMiniAppInitializer() {
-  const { isSDKLoaded, isReady, sdk } = useFarcasterMiniApp();
+  const { isSDKLoaded, isReady, sdk, isMiniApp } = useFarcasterMiniApp();
 
   useEffect(() => {
     // 初期化状態をログ出力
     if (isSDKLoaded) {
       console.log('Farcaster Mini App SDK loaded:', isReady);
-
+      console.log('Farcaster Mini App detected:', isMiniApp);
       // 既に初期化済みの場合は何もしない
       if (isReady) {
         console.log('Farcaster Mini App SDK は既に初期化済みです');
@@ -37,7 +37,7 @@ export function FarcasterMiniAppInitializer() {
           });
       }
     }
-  }, [isSDKLoaded, isReady, sdk]);
+  }, [isSDKLoaded, isReady, sdk, isMiniApp]);
 
   // このコンポーネントは何も表示しない
   return null;

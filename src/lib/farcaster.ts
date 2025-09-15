@@ -17,7 +17,7 @@ export interface FarcasterInitializationResult {
  */
 async function initializeFarcasterSDK(): Promise<void> {
   if (!sdk) {
-    throw new Error('Farcaster SDKが利用できません');
+    throw new Error('Farcaster SDK is not available');
   }
 
   await sdk.actions.ready();
@@ -49,7 +49,7 @@ async function initializeFarcasterContext(): Promise<{
   isMiniApp: boolean;
 }> {
   if (!sdk) {
-    throw new Error('Farcaster SDKが利用できません');
+    throw new Error('Farcaster SDK is not available');
   }
 
   const ctx = await sdk.context;
@@ -91,7 +91,7 @@ export async function initializeFarcasterMiniApp(): Promise<FarcasterInitializat
     };
   } catch (error) {
     const errorMessage =
-      error instanceof Error ? error.message : '不明なエラーが発生しました';
+      error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Farcaster Mini App initialization error:', error);
 
     return {

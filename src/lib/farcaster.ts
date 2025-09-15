@@ -55,9 +55,6 @@ async function initializeFarcasterContext(): Promise<{
   const ctx = await sdk.context;
   const isApp = checkIfMiniApp(ctx);
 
-  console.log('Farcaster context:', ctx);
-  console.log('Farcaster Mini App:', isApp);
-
   return {
     context: ctx as FarcasterContext | null,
     isMiniApp: isApp,

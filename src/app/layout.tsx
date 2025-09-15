@@ -62,10 +62,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <FarcasterInitializer />
         <PrivyProvider>
           <EthereumProviders>
             <OnchainProvider>
-              <FarcasterInitializer />
               {children}
               <Toaster />
             </OnchainProvider>

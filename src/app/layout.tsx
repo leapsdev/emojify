@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
-import { FarcasterMiniAppInitializer } from '@/components/providers/FarcasterMiniAppInitializer';
+import { FarcasterInitializer } from '@/components/providers/FarcasterInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import { PrivyProvider } from '@/components/providers/PrivyProvider';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
@@ -65,7 +65,7 @@ export default function RootLayout({
         <PrivyProvider>
           <EthereumProviders>
             <OnchainProvider>
-              <FarcasterMiniAppInitializer />
+              <FarcasterInitializer />
               {children}
               <Toaster />
             </OnchainProvider>

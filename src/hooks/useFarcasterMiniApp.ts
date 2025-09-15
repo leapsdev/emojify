@@ -1,66 +1,54 @@
 'use client';
 
-import { isFarcasterMiniApp } from '@/lib/farcaster-detection';
-import { sdk } from '@farcaster/miniapp-sdk';
-import { useEffect, useState } from 'react';
+import {
+  type FarcasterContext,
+  type FarcasterInitializationResult,
+  getFarcasterSDK,
+  initializeFarcasterMiniApp,
+} from '@/lib/farcaster';
+import { useCallback, useEffect, useState } from 'react';
+
+interface UseFarcasterMiniAppReturn {
+  isSDKLoaded: boolean;
+  isReady: boolean;
+  context: FarcasterContext | null;
+  sdk: ReturnType<typeof getFarcasterSDK>;
+  isMiniApp: boolean;
+  error: string | null;
+}
 
 /**
  * Farcaster Mini App用のカスタムフック
- * SDK初期化とready()呼び出しを管理
+ * SDK初期化、ready()呼び出し、Mini App検出を管理
  */
-export function useFarcasterMiniApp() {
-  const [isSDKLoaded, setIsSDKLoaded] = useState(false);
-  const [isReady, setIsReady] = useState(false);
-  const [context, setContext] = useState<unknown>(null);
-  const [isMiniApp, setIsMiniApp] = useState(false);
+export function useFarcasterMiniApp(): UseFarcasterMiniAppReturn {
+  const [state, setState] = useState<FarcasterInitializationResult>({
+    isSDKLoaded: false,
+    isReady: false,
+    context: null,
+    isMiniApp: false,
+    error: null,
+  });
+
+  const initializeMiniApp = useCallback(async () => {
+    if (state.isSDKLoaded) {
+      return;
+    }
+
+    const result = await initializeFarcasterMiniApp();
+    setState(result);
+  }, [state.isSDKLoaded]);
 
   useEffect(() => {
-    // MiniApp環境かどうかをチェック
-    const miniAppDetected = isFarcasterMiniApp();
-    setIsMiniApp(miniAppDetected);
-    console.log('Farcaster MiniApp detected:', miniAppDetected);
-
-    const initializeMiniApp = async () => {
-      try {
-        if (sdk && !isSDKLoaded) {
-          console.log('Farcaster Mini App SDK初期化開始...');
-
-          // SDKの初期化を待つ
-          await sdk.actions.ready();
-          console.log('Farcaster Mini App is ready!');
-
-          setIsSDKLoaded(true);
-          setIsReady(true);
-
-          // コンテキストを取得（非同期で実行）
-          try {
-            const ctx = await sdk.context;
-            setContext(ctx);
-            console.log('Farcaster context:', ctx);
-          } catch (contextError) {
-            console.warn('Farcaster context取得に失敗しました:', contextError);
-            // コンテキスト取得に失敗してもアプリは動作させる
-          }
-        }
-      } catch (error) {
-        console.error('Mini App initialization error:', error);
-        // エラーがあってもアプリは動作させる
-        setIsSDKLoaded(true);
-        setIsReady(true);
-      }
-    };
-
-    // 少し遅延させてから初期化（他のライブラリの初期化を待つ）
-    const timeoutId = setTimeout(initializeMiniApp, 500);
-
-    return () => clearTimeout(timeoutId);
-  }, [isSDKLoaded]);
+    initializeMiniApp();
+  }, [initializeMiniApp]);
 
   return {
-    isSDKLoaded,
-    isReady,
-    context,
-    sdk,
-    isMiniApp,
+    isSDKLoaded: state.isSDKLoaded,
+    isReady: state.isReady,
+    context: state.context,
+    sdk: getFarcasterSDK(),
+    isMiniApp: state.isMiniApp,
+    error: state.error,
   };
 }

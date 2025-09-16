@@ -37,18 +37,25 @@ export async function createFirebaseCustomToken(
     console.log('[Firebase Auth] 🔐 Auth provider:', authProvider);
 
     // Firebase Admin SDKを使用してカスタムトークンを生成
-    console.log('[Firebase Auth] 🔥 Creating custom token with Firebase Admin SDK...');
+    console.log(
+      '[Firebase Auth] 🔥 Creating custom token with Firebase Admin SDK...',
+    );
     const customToken = await getAuth().createCustomToken(
       userId,
       customClaims || {},
     );
 
-    console.log('[Firebase Auth] ✅ Firebase custom token created successfully');
+    console.log(
+      '[Firebase Auth] ✅ Firebase custom token created successfully',
+    );
     console.log('[Firebase Auth] 🎫 Token length:', customToken.length);
 
     return customToken;
   } catch (error) {
-    console.error('[Firebase Auth] ❌ Firebaseカスタムトークン生成エラー:', error);
+    console.error(
+      '[Firebase Auth] ❌ Firebaseカスタムトークン生成エラー:',
+      error,
+    );
 
     // より詳細なエラー情報をログ出力
     if (error instanceof Error) {

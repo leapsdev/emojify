@@ -76,6 +76,54 @@ export async function getFirebaseCustomToken(
 }
 
 /**
+ * Farcaster JWTを使用してFirebaseカスタムトークンを取得する
+ * @param farcasterToken Farcaster JWT
+ * @returns Firebaseカスタムトークン
+ */
+export async function getFirebaseCustomTokenFromFarcaster(
+  farcasterToken: string,
+): Promise<string | null> {
+  try {
+    if (!farcasterToken) {
+      return null;
+    }
+
+    // Farcaster JWTを検証
+    const { createClient } = await import('@farcaster/quick-auth');
+    const client = createClient();
+
+    const payload = await client.verifyJwt({
+      token: farcasterToken,
+      domain: process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000',
+    });
+
+    if (!payload || !payload.sub) {
+      return null;
+    }
+
+    // FIDをユーザーIDとして使用（プレフィックス付き）
+    const farcasterUserId = `farcaster_${payload.sub}`;
+
+    // Firebaseカスタムトークンを生成
+    const { createFirebaseCustomTokenForFarcaster } = await import(
+      './firebase-auth'
+    );
+    const customToken = await createFirebaseCustomTokenForFarcaster(
+      farcasterUserId,
+      {
+        farcasterFid: payload.sub,
+        authProvider: 'farcaster',
+      },
+    );
+
+    return customToken;
+  } catch (error) {
+    console.error('Farcaster Firebase custom token generation error:', error);
+    return null;
+  }
+}
+
+/**
  * ユーザーのメールアドレスを取得する
  * @returns メールアドレス
  * @throws {Error} 認証エラー時

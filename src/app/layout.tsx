@@ -2,9 +2,9 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
+import { AuthProvider } from '@/components/providers/AuthProvider';
 import { FarcasterInitializer } from '@/components/providers/FarcasterInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
-import { PrivyProvider } from '@/components/providers/PrivyProvider';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 
 import { Toaster } from 'sonner';
@@ -63,14 +63,14 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <FarcasterInitializer />
-        <PrivyProvider>
+        <AuthProvider>
           <EthereumProviders>
             <OnchainProvider>
               {children}
               <Toaster />
             </OnchainProvider>
           </EthereumProviders>
-        </PrivyProvider>
+        </AuthProvider>
       </body>
     </html>
   );

@@ -39,6 +39,37 @@ export async function createFirebaseCustomToken(
 }
 
 /**
+ * FarcasterユーザーIDを使用してFirebaseカスタムトークンを生成する
+ * @param farcasterUserId FarcasterユーザーID（farcaster_プレフィックス付き）
+ * @param customClaims カスタムクレーム（FIDやauthProviderなど）
+ * @returns Firebaseカスタムトークン
+ */
+export async function createFirebaseCustomTokenForFarcaster(
+  farcasterUserId: string,
+  customClaims?: {
+    farcasterFid?: number;
+    authProvider?: string;
+  },
+): Promise<string> {
+  try {
+    if (!farcasterUserId) {
+      throw new Error('FarcasterユーザーIDが必要です');
+    }
+
+    // Firebase Admin SDKを使用してカスタムトークンを生成
+    const customToken = await getAuth().createCustomToken(farcasterUserId, {
+      farcasterUserId: farcasterUserId,
+      ...customClaims,
+    });
+
+    return customToken;
+  } catch (error) {
+    console.error('Farcaster Firebaseカスタムトークン生成エラー:', error);
+    throw new Error('Farcaster Firebase認証トークンの生成に失敗しました');
+  }
+}
+
+/**
  * Firebaseカスタムトークンを検証する
  * @param customToken Firebaseカスタムトークン
  * @returns 検証されたユーザーID

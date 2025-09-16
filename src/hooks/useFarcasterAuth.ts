@@ -1,5 +1,6 @@
 'use client';
 
+import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
 import { getFarcasterSDK } from '@/lib/farcaster';
 import { auth } from '@/repository/db/config/client';
 import {
@@ -17,6 +18,7 @@ interface FarcasterAuthState {
   error: string | null;
   user: User | null;
   farcasterToken: string | null;
+  autoLoginAttempted: boolean;
 }
 
 /**
@@ -24,6 +26,7 @@ interface FarcasterAuthState {
  * Farcaster Mini App環境で使用される
  */
 export function useFarcasterAuth() {
+  const { isSDKLoaded, isReady, isMiniApp } = useFarcasterMiniApp();
   const [state, setState] = useState<FarcasterAuthState>({
     isFarcasterAuthenticated: false,
     isFirebaseAuthenticated: false,
@@ -31,16 +34,29 @@ export function useFarcasterAuth() {
     error: null,
     user: null,
     farcasterToken: null,
+    autoLoginAttempted: false,
   });
 
   const authenticateWithFarcaster = useCallback(async () => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
+      // Mini App環境でない場合はエラー
+      if (!isMiniApp) {
+        throw new Error('この機能はFarcaster Mini App環境でのみ利用可能です');
+      }
+
+      // SDKが準備完了していない場合はエラー
+      if (!isSDKLoaded || !isReady) {
+        throw new Error('Farcaster SDKが準備完了していません');
+      }
+
       const sdk = getFarcasterSDK();
       if (!sdk) {
         throw new Error('Farcaster SDKが初期化されていません');
       }
+
+      console.log('Farcaster認証開始: SDKとMini App環境が確認されました');
 
       // Farcaster Quick Authトークンを取得
       const { token } = await sdk.quickAuth.getToken();
@@ -48,6 +64,8 @@ export function useFarcasterAuth() {
       if (!token) {
         throw new Error('Farcasterトークンの取得に失敗しました');
       }
+
+      console.log('Farcasterトークン取得成功');
 
       setState((prev) => ({
         ...prev,
@@ -86,7 +104,7 @@ export function useFarcasterAuth() {
         farcasterToken: null,
       }));
     }
-  }, []);
+  }, [isMiniApp, isSDKLoaded, isReady]);
 
   const signOutFromFarcaster = useCallback(async () => {
     try {
@@ -98,6 +116,7 @@ export function useFarcasterAuth() {
         error: null,
         user: null,
         farcasterToken: null,
+        autoLoginAttempted: false,
       });
     } catch (error) {
       console.error('Farcasterサインアウトエラー:', error);
@@ -122,13 +141,32 @@ export function useFarcasterAuth() {
       }));
     });
 
-    // 初期認証を実行
-    authenticateWithFarcaster();
-
     return () => {
       unsubscribe();
     };
-  }, [authenticateWithFarcaster]);
+  }, []);
+
+  // SDKが準備完了した時点で自動認証を実行
+  useEffect(() => {
+    if (
+      isSDKLoaded &&
+      isReady &&
+      isMiniApp &&
+      !state.autoLoginAttempted &&
+      !state.isFarcasterAuthenticated
+    ) {
+      console.log('Farcaster SDK準備完了、自動ログインを開始します');
+      setState((prev) => ({ ...prev, autoLoginAttempted: true }));
+      authenticateWithFarcaster();
+    }
+  }, [
+    isSDKLoaded,
+    isReady,
+    isMiniApp,
+    state.autoLoginAttempted,
+    state.isFarcasterAuthenticated,
+    authenticateWithFarcaster,
+  ]);
 
   return {
     ...state,

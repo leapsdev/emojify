@@ -15,14 +15,27 @@ export function FarcasterAuthProvider({
     isFirebaseAuthenticated,
     isLoading,
     error,
+    autoLoginAttempted,
     authenticateWithFarcaster,
   } = useFarcasterAuth();
 
   // ローディング中の表示
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loading size="lg" />
+      <div className="flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md text-center">
+          <Loading size="lg" />
+          <h2 className="text-lg font-semibold text-blue-800 mt-4 mb-2">
+            {autoLoginAttempted
+              ? 'Farcaster認証を処理中...'
+              : 'Farcaster Mini Appを初期化中...'}
+          </h2>
+          <p className="text-sm text-blue-600">
+            {autoLoginAttempted
+              ? 'あなたのFarcasterアカウントで自動ログインしています'
+              : 'しばらくお待ちください'}
+          </p>
+        </div>
       </div>
     );
   }
@@ -34,12 +47,18 @@ export function FarcasterAuthProvider({
     let errorMessage = 'Farcaster認証エラーが発生しました';
     let errorDetails = '';
 
-    if (error.includes('Farcaster SDKが初期化されていません')) {
+    if (error.includes('この機能はFarcaster Mini App環境でのみ利用可能です')) {
+      errorMessage = 'Farcaster Mini App環境が必要です';
+      errorDetails = 'このアプリはFarcaster内で起動してください';
+    } else if (error.includes('Farcaster SDKが準備完了していません')) {
+      errorMessage = 'Farcaster SDKの初期化中です';
+      errorDetails = 'しばらく待ってから再試行してください';
+    } else if (error.includes('Farcaster SDKが初期化されていません')) {
       errorMessage = 'Farcaster Mini Appの初期化に失敗しました';
       errorDetails = 'このアプリはFarcaster Mini App環境で実行してください';
     } else if (error.includes('Farcasterトークンの取得に失敗しました')) {
-      errorMessage = 'Farcaster認証の初期化に失敗しました';
-      errorDetails = 'Farcaster認証を確認してください';
+      errorMessage = 'Farcaster認証の取得に失敗しました';
+      errorDetails = 'Farcasterアカウントでの認証を確認してください';
     } else if (error.includes('Firebaseトークンの取得に失敗しました')) {
       errorMessage = 'Firebase認証の初期化に失敗しました';
       errorDetails = 'ネットワーク接続または認証設定を確認してください';
@@ -81,10 +100,14 @@ export function FarcasterAuthProvider({
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md text-center">
           <h2 className="text-lg font-semibold text-blue-800 mb-2">
-            Farcaster認証が必要です
+            {autoLoginAttempted
+              ? 'Farcaster認証を完了してください'
+              : 'Farcaster認証が必要です'}
           </h2>
           <p className="text-sm text-blue-600 mb-4">
-            このアプリを使用するには、Farcaster認証が必要です。
+            {autoLoginAttempted
+              ? '自動ログインに失敗しました。手動でFarcaster認証を行ってください。'
+              : 'このアプリを使用するには、Farcaster認証が必要です。'}
           </p>
           <button
             type="button"

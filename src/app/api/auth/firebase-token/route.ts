@@ -3,38 +3,40 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    console.log('Firebase token API called');
+    console.log('[API] 🚀 Privy Firebase token API called');
 
     // AuthorizationヘッダーからPrivyトークンを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('No authorization header or invalid format');
+      console.log('[API] ❌ No authorization header or invalid format');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
     const privyToken = authHeader.replace('Bearer ', '');
     if (!privyToken) {
-      console.log('No privy token in authorization header');
+      console.log('[API] ❌ No privy token in authorization header');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
+    console.log('[API] 🔑 Privy token extracted from Authorization header');
+
     // Firebaseカスタムトークンを取得
-    console.log('Calling getFirebaseCustomTokenFromPrivy with token...');
+    console.log('[API] 🔄 Calling getFirebaseCustomTokenFromPrivy...');
     const customToken = await getFirebaseCustomTokenFromPrivy(privyToken);
     console.log(
-      'getFirebaseCustomTokenFromPrivy result:',
-      customToken ? 'Token received' : 'No token',
+      '[API] 📦 getFirebaseCustomTokenFromPrivy result:',
+      customToken ? '✅ Token received' : '❌ No token',
     );
 
     if (!customToken) {
-      console.log('No custom token, returning 401');
+      console.log('[API] ❌ No custom token generated, returning 401');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    console.log('Returning token successfully');
+    console.log('[API] ✅ Returning Firebase custom token successfully');
     return NextResponse.json({ token: customToken }, { status: 200 });
   } catch (error) {
-    console.error('Firebase token API error:', error);
+    console.error('[API] ❌ Privy Firebase token API error:', error);
     return NextResponse.json(
       {
         error: 'Firebaseトークンの取得に失敗しました',

@@ -3,42 +3,46 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    console.log('Farcaster Firebase token API called');
+    console.log('[API] 🚀 Farcaster Firebase token API called');
 
     // AuthorizationヘッダーからFarcaster JWTを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      console.log('No authorization header or invalid format');
+      console.log('[API] ❌ No authorization header or invalid format');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
     const farcasterToken = authHeader.replace('Bearer ', '');
     if (!farcasterToken) {
-      console.log('No farcaster token in authorization header');
+      console.log('[API] ❌ No farcaster token in authorization header');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
+    console.log('[API] 🔑 Farcaster JWT extracted from Authorization header');
+
     // Firebaseカスタムトークンを取得
-    console.log('Calling getFirebaseCustomTokenFromFarcaster with token...');
+    console.log('[API] 🔄 Calling getFirebaseCustomTokenFromFarcaster...');
     const customToken =
       await getFirebaseCustomTokenFromFarcaster(farcasterToken);
     console.log(
-      'getFirebaseCustomTokenFromFarcaster result:',
-      customToken ? 'Token received' : 'No token',
+      '[API] 📦 getFirebaseCustomTokenFromFarcaster result:',
+      customToken ? '✅ Token received' : '❌ No token',
     );
 
     if (!customToken) {
-      console.log('No custom token, returning 401');
+      console.log('[API] ❌ No custom token generated, returning 401');
       return NextResponse.json(
         { error: 'Farcaster認証に失敗しました' },
         { status: 401 },
       );
     }
 
-    console.log('Returning token successfully');
+    console.log(
+      '[API] ✅ Returning Farcaster Firebase custom token successfully',
+    );
     return NextResponse.json({ customToken }, { status: 200 });
   } catch (error) {
-    console.error('Farcaster Firebase token API error:', error);
+    console.error('[API] ❌ Farcaster Firebase token API error:', error);
     return NextResponse.json(
       {
         error: 'Farcaster Firebase認証トークンの取得に失敗しました',

@@ -37,17 +37,12 @@ export async function getPrivyId(): Promise<string | null> {
 }
 
 /**
- * ユーザーIDを取得する（エイリアス）
- */
-export const getUserId = getPrivyId;
-
-/**
  * Privyトークンを使用してFirebaseカスタムトークンを取得する
  * @param privyToken Privy認証トークン
  * @returns Firebaseカスタムトークン
  * @throws {Error} 認証エラー時
  */
-export async function getFirebaseCustomToken(
+export async function getFirebaseCustomTokenFromPrivy(
   privyToken: string,
 ): Promise<string | null> {
   try {
@@ -67,7 +62,10 @@ export async function getFirebaseCustomToken(
     }
 
     // Firebaseカスタムトークンを生成
-    const customToken = await createFirebaseCustomToken(privyUserId);
+    const customToken = await createFirebaseCustomToken(privyUserId, {
+      privyUserId: privyUserId,
+      authProvider: 'privy',
+    });
     return customToken;
   } catch (error) {
     console.error('Firebase custom token generation error:', error);
@@ -105,16 +103,12 @@ export async function getFirebaseCustomTokenFromFarcaster(
     const farcasterUserId = `farcaster_${payload.sub}`;
 
     // Firebaseカスタムトークンを生成
-    const { createFirebaseCustomTokenForFarcaster } = await import(
-      './firebase-auth'
-    );
-    const customToken = await createFirebaseCustomTokenForFarcaster(
-      farcasterUserId,
-      {
-        farcasterFid: payload.sub,
-        authProvider: 'farcaster',
-      },
-    );
+    const { createFirebaseCustomToken } = await import('./firebase-auth');
+    const customToken = await createFirebaseCustomToken(farcasterUserId, {
+      farcasterUserId: farcasterUserId,
+      farcasterFid: payload.sub,
+      authProvider: 'farcaster',
+    });
 
     return customToken;
   } catch (error) {

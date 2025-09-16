@@ -1,4 +1,4 @@
-import { getFirebaseCustomToken } from '@/lib/auth';
+import { getFirebaseCustomTokenFromPrivy } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
@@ -19,10 +19,10 @@ export async function POST(request: Request) {
     }
 
     // Firebaseカスタムトークンを取得
-    console.log('Calling getFirebaseCustomToken with token...');
-    const customToken = await getFirebaseCustomToken(privyToken);
+    console.log('Calling getFirebaseCustomTokenFromPrivy with token...');
+    const customToken = await getFirebaseCustomTokenFromPrivy(privyToken);
     console.log(
-      'getFirebaseCustomToken result:',
+      'getFirebaseCustomTokenFromPrivy result:',
       customToken ? 'Token received' : 'No token',
     );
 

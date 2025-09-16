@@ -37,40 +37,125 @@ export async function getPrivyId(): Promise<string | null> {
 }
 
 /**
- * ユーザーIDを取得する（エイリアス）
- */
-export const getUserId = getPrivyId;
-
-/**
  * Privyトークンを使用してFirebaseカスタムトークンを取得する
  * @param privyToken Privy認証トークン
  * @returns Firebaseカスタムトークン
  * @throws {Error} 認証エラー時
  */
-export async function getFirebaseCustomToken(
+export async function getFirebaseCustomTokenFromPrivy(
   privyToken: string,
 ): Promise<string | null> {
+  console.log('[Privy Auth] 🚀 Starting Privy authentication process');
+
   try {
     if (!privyToken) {
+      console.log('[Privy Auth] ❌ No Privy token provided');
       return null;
     }
+
+    console.log('[Privy Auth] 🔑 Privy token received, verifying...');
 
     // トークンの検証
     const verifiedUser = await privy.verifyAuthToken(privyToken);
     if (!verifiedUser) {
+      console.log('[Privy Auth] ❌ Privy token verification failed');
       return null;
     }
+
+    console.log('[Privy Auth] ✅ Privy token verified successfully');
 
     const privyUserId = verifiedUser.userId;
     if (!privyUserId) {
+      console.log('[Privy Auth] ❌ No user ID found in verified Privy token');
       return null;
     }
 
+    console.log('[Privy Auth] 👤 User ID extracted:', privyUserId);
+    console.log('[Privy Auth] 🔥 Generating Firebase custom token...');
+
     // Firebaseカスタムトークンを生成
-    const customToken = await createFirebaseCustomToken(privyUserId);
+    const customToken = await createFirebaseCustomToken(privyUserId, {
+      privyUserId: privyUserId,
+      authProvider: 'privy',
+    });
+
+    console.log('[Privy Auth] ✅ Firebase custom token generated successfully');
     return customToken;
   } catch (error) {
-    console.error('Firebase custom token generation error:', error);
+    console.error(
+      '[Privy Auth] ❌ Firebase custom token generation error:',
+      error,
+    );
+    return null;
+  }
+}
+
+/**
+ * Farcaster JWTを使用してFirebaseカスタムトークンを取得する
+ * @param farcasterToken Farcaster JWT
+ * @returns Firebaseカスタムトークン
+ */
+export async function getFirebaseCustomTokenFromFarcaster(
+  farcasterToken: string,
+): Promise<string | null> {
+  console.log('[Farcaster Auth] 🚀 Starting Farcaster authentication process');
+
+  try {
+    if (!farcasterToken) {
+      console.log('[Farcaster Auth] ❌ No Farcaster token provided');
+      return null;
+    }
+
+    console.log(
+      '[Farcaster Auth] 🔑 Farcaster JWT received, initializing client...',
+    );
+
+    // Farcaster JWTを検証
+    const { createClient } = await import('@farcaster/quick-auth');
+    const client = createClient();
+
+    const expectedDomain = process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
+    console.log(
+      '[Farcaster Auth] 🔍 Expected domain for verification:',
+      expectedDomain,
+    );
+
+    console.log('[Farcaster Auth] 🔄 Verifying JWT...');
+    const payload = await client.verifyJwt({
+      token: farcasterToken,
+      domain: expectedDomain,
+    });
+
+    if (!payload || !payload.sub) {
+      console.log('[Farcaster Auth] ❌ JWT verification failed');
+      return null;
+    }
+
+    console.log('[Farcaster Auth] ✅ JWT verified successfully');
+    console.log('[Farcaster Auth] 🆔 FID extracted:', payload.sub);
+
+    // FIDをユーザーIDとして使用（プレフィックス付き）
+    const farcasterUserId = `farcaster_${payload.sub}`;
+    console.log('[Farcaster Auth] 👤 Generated user ID:', farcasterUserId);
+    console.log('[Farcaster Auth] 🔥 Generating Firebase custom token...');
+
+    // Firebaseカスタムトークンを生成
+    const { createFirebaseCustomToken } = await import('./firebase-auth');
+    const customToken = await createFirebaseCustomToken(farcasterUserId, {
+      farcasterUserId: farcasterUserId,
+      farcasterFid: payload.sub,
+      authProvider: 'farcaster',
+    });
+
+    console.log(
+      '[Farcaster Auth] ✅ Firebase custom token generated successfully',
+    );
+    return customToken;
+  } catch (error) {
+    console.error(
+      '[Farcaster Auth] ❌ Farcaster Firebase custom token generation error:',
+      error,
+    );
     return null;
   }
 }

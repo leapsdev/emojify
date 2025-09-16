@@ -1,0 +1,176 @@
+'use client';
+
+import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
+import { getFarcasterSDK } from '@/lib/farcaster';
+import { auth } from '@/repository/db/config/client';
+import {
+  type User,
+  onAuthStateChanged,
+  signInWithCustomToken,
+  signOut,
+} from 'firebase/auth';
+import { useCallback, useEffect, useState } from 'react';
+
+interface FarcasterAuthState {
+  isFarcasterAuthenticated: boolean;
+  isFirebaseAuthenticated: boolean;
+  isLoading: boolean;
+  error: string | null;
+  user: User | null;
+  farcasterToken: string | null;
+  autoLoginAttempted: boolean;
+}
+
+/**
+ * Farcaster Quick Auth + Firebase認証を管理するカスタムフック
+ * Farcaster Mini App環境で使用される
+ */
+export function useFarcasterAuth() {
+  const { isSDKLoaded, isReady, isMiniApp } = useFarcasterMiniApp();
+  const [state, setState] = useState<FarcasterAuthState>({
+    isFarcasterAuthenticated: false,
+    isFirebaseAuthenticated: false,
+    isLoading: true,
+    error: null,
+    user: null,
+    farcasterToken: null,
+    autoLoginAttempted: false,
+  });
+
+  const authenticateWithFarcaster = useCallback(async () => {
+    try {
+      setState((prev) => ({ ...prev, isLoading: true, error: null }));
+
+      // Mini App環境でない場合はエラー
+      if (!isMiniApp) {
+        throw new Error('この機能はFarcaster Mini App環境でのみ利用可能です');
+      }
+
+      // SDKが準備完了していない場合はエラー
+      if (!isSDKLoaded || !isReady) {
+        throw new Error('Farcaster SDKが準備完了していません');
+      }
+
+      const sdk = getFarcasterSDK();
+      if (!sdk) {
+        throw new Error('Farcaster SDKが初期化されていません');
+      }
+
+      console.log('Farcaster認証開始: SDKとMini App環境が確認されました');
+
+      // Farcaster Quick Authトークンを取得
+      const { token } = await sdk.quickAuth.getToken();
+
+      if (!token) {
+        throw new Error('Farcasterトークンの取得に失敗しました');
+      }
+
+      console.log('Farcasterトークン取得成功');
+
+      setState((prev) => ({
+        ...prev,
+        isFarcasterAuthenticated: true,
+        farcasterToken: token,
+      }));
+
+      // サーバーサイドでFirebaseカスタムトークンを取得
+      const response = await fetch('/api/auth/farcaster-firebase-token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || 'Firebaseトークンの取得に失敗しました',
+        );
+      }
+
+      const { customToken } = await response.json();
+
+      // Firebaseにカスタムトークンでサインイン
+      await signInWithCustomToken(auth, customToken);
+    } catch (error) {
+      console.error('Farcaster認証エラー:', error);
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+        error:
+          error instanceof Error ? error.message : '認証エラーが発生しました',
+        isFarcasterAuthenticated: false,
+        farcasterToken: null,
+      }));
+    }
+  }, [isMiniApp, isSDKLoaded, isReady]);
+
+  const signOutFromFarcaster = useCallback(async () => {
+    try {
+      await signOut(auth);
+      setState({
+        isFarcasterAuthenticated: false,
+        isFirebaseAuthenticated: false,
+        isLoading: false,
+        error: null,
+        user: null,
+        farcasterToken: null,
+        autoLoginAttempted: false,
+      });
+    } catch (error) {
+      console.error('Farcasterサインアウトエラー:', error);
+      setState((prev) => ({
+        ...prev,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'サインアウトエラーが発生しました',
+      }));
+    }
+  }, []);
+
+  useEffect(() => {
+    // Firebase認証状態の監視
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      setState((prev) => ({
+        ...prev,
+        isFirebaseAuthenticated: !!user,
+        isLoading: prev.isFarcasterAuthenticated ? false : prev.isLoading,
+        user,
+      }));
+    });
+
+    return () => {
+      unsubscribe();
+    };
+  }, []);
+
+  // SDKが準備完了した時点で自動認証を実行
+  useEffect(() => {
+    if (
+      isSDKLoaded &&
+      isReady &&
+      isMiniApp &&
+      !state.autoLoginAttempted &&
+      !state.isFarcasterAuthenticated
+    ) {
+      console.log('Farcaster SDK準備完了、自動ログインを開始します');
+      setState((prev) => ({ ...prev, autoLoginAttempted: true }));
+      authenticateWithFarcaster();
+    }
+  }, [
+    isSDKLoaded,
+    isReady,
+    isMiniApp,
+    state.autoLoginAttempted,
+    state.isFarcasterAuthenticated,
+    authenticateWithFarcaster,
+  ]);
+
+  return {
+    ...state,
+    authenticateWithFarcaster,
+    signOutFromFarcaster,
+  };
+}

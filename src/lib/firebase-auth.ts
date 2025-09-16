@@ -14,26 +14,56 @@ if (!getApps().length) {
 }
 
 /**
- * PrivyユーザーIDを使用してFirebaseカスタムトークンを生成する
- * @param privyUserId PrivyユーザーID
+ * ユーザーIDを使用してFirebaseカスタムトークンを生成する
+ * @param userId ユーザーID
+ * @param customClaims カスタムクレーム（認証プロバイダー情報など）
  * @returns Firebaseカスタムトークン
  */
 export async function createFirebaseCustomToken(
-  privyUserId: string,
+  userId: string,
+  customClaims?: Record<string, unknown>,
 ): Promise<string> {
+  console.log('[Firebase Auth] 🚀 Starting Firebase custom token generation');
+  console.log('[Firebase Auth] 👤 User ID:', userId);
+  console.log('[Firebase Auth] 📝 Custom claims:', customClaims);
+
   try {
-    if (!privyUserId) {
-      throw new Error('PrivyユーザーIDが必要です');
+    if (!userId) {
+      console.log('[Firebase Auth] ❌ No user ID provided');
+      throw new Error('ユーザーIDが必要です');
     }
 
+    const authProvider = customClaims?.authProvider as string;
+    console.log('[Firebase Auth] 🔐 Auth provider:', authProvider);
+
     // Firebase Admin SDKを使用してカスタムトークンを生成
-    const customToken = await getAuth().createCustomToken(privyUserId, {
-      privyUserId: privyUserId,
-    });
+    console.log(
+      '[Firebase Auth] 🔥 Creating custom token with Firebase Admin SDK...',
+    );
+    const customToken = await getAuth().createCustomToken(
+      userId,
+      customClaims || {},
+    );
+
+    console.log(
+      '[Firebase Auth] ✅ Firebase custom token created successfully',
+    );
+    console.log('[Firebase Auth] 🎫 Token length:', customToken.length);
 
     return customToken;
   } catch (error) {
-    console.error('Firebaseカスタムトークン生成エラー:', error);
+    console.error(
+      '[Firebase Auth] ❌ Firebaseカスタムトークン生成エラー:',
+      error,
+    );
+
+    // より詳細なエラー情報をログ出力
+    if (error instanceof Error) {
+      console.error('[Firebase Auth] ❌ Error name:', error.name);
+      console.error('[Firebase Auth] ❌ Error message:', error.message);
+      console.error('[Firebase Auth] ❌ Error stack:', error.stack);
+    }
+
     throw new Error('Firebase認証トークンの生成に失敗しました');
   }
 }

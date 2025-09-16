@@ -21,6 +21,7 @@
     "@farcaster/frame-sdk": "^0.1.8",
     "@farcaster/miniapp-sdk": "^0.1.8",
     "@farcaster/miniapp-wagmi-connector": "^1.0.0",
+    "@farcaster/quick-auth": "^0.0.8",
     "@neynar/nodejs-sdk": "^3.34.0",
     "@privy-io/react-auth": "^2.13.1",
     "@privy-io/server-auth": "^1.18.11",

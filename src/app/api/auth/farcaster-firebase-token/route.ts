@@ -1,45 +1,51 @@
-import { getFirebaseCustomTokenFromPrivy } from '@/lib/auth';
+import { getFirebaseCustomTokenFromFarcaster } from '@/lib/auth';
 import { NextResponse } from 'next/server';
 
 export async function POST(request: Request) {
   try {
-    console.log('[API] 🚀 Privy Firebase token API called');
+    console.log('[API] 🚀 Farcaster Firebase token API called');
 
-    // AuthorizationヘッダーからPrivyトークンを取得
+    // AuthorizationヘッダーからFarcaster JWTを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       console.log('[API] ❌ No authorization header or invalid format');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    const privyToken = authHeader.replace('Bearer ', '');
-    if (!privyToken) {
-      console.log('[API] ❌ No privy token in authorization header');
+    const farcasterToken = authHeader.replace('Bearer ', '');
+    if (!farcasterToken) {
+      console.log('[API] ❌ No farcaster token in authorization header');
       return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
     }
 
-    console.log('[API] 🔑 Privy token extracted from Authorization header');
+    console.log('[API] 🔑 Farcaster JWT extracted from Authorization header');
 
     // Firebaseカスタムトークンを取得
-    console.log('[API] 🔄 Calling getFirebaseCustomTokenFromPrivy...');
-    const customToken = await getFirebaseCustomTokenFromPrivy(privyToken);
+    console.log('[API] 🔄 Calling getFirebaseCustomTokenFromFarcaster...');
+    const customToken =
+      await getFirebaseCustomTokenFromFarcaster(farcasterToken);
     console.log(
-      '[API] 📦 getFirebaseCustomTokenFromPrivy result:',
+      '[API] 📦 getFirebaseCustomTokenFromFarcaster result:',
       customToken ? '✅ Token received' : '❌ No token',
     );
 
     if (!customToken) {
       console.log('[API] ❌ No custom token generated, returning 401');
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Farcaster認証に失敗しました' },
+        { status: 401 },
+      );
     }
 
-    console.log('[API] ✅ Returning Firebase custom token successfully');
-    return NextResponse.json({ token: customToken }, { status: 200 });
+    console.log(
+      '[API] ✅ Returning Farcaster Firebase custom token successfully',
+    );
+    return NextResponse.json({ customToken }, { status: 200 });
   } catch (error) {
-    console.error('[API] ❌ Privy Firebase token API error:', error);
+    console.error('[API] ❌ Farcaster Firebase token API error:', error);
     return NextResponse.json(
       {
-        error: 'Firebaseトークンの取得に失敗しました',
+        error: 'Farcaster Firebase認証トークンの取得に失敗しました',
         details: error instanceof Error ? error.message : '不明なエラー',
       },
       { status: 500 },

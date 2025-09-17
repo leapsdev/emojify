@@ -4,7 +4,7 @@ import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
 import { AuthProvider } from '@/components/providers/AuthProvider';
 import { FarcasterInitializer } from '@/components/providers/FarcasterInitializer';
-import { FetchInterceptorInitializer } from '@/components/providers/FetchInterceptorInitializer';
+// FetchInterceptorInitializerは削除（AuthProviderで処理）
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 
@@ -63,7 +63,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <FetchInterceptorInitializer />
         <FarcasterInitializer />
         <AuthProvider>
           <EthereumProviders>

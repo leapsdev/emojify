@@ -1,6 +1,8 @@
 'use client';
 
 import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
+import { initializeFetchInterceptor } from '@/lib/fetch-interceptor';
+import { useEffect } from 'react';
 import { FarcasterAuthProvider } from './FarcasterAuthProvider';
 import { FarcasterProxyProvider } from './FarcasterProxyProvider';
 import { PrivyProvider } from './PrivyProvider';
@@ -16,6 +18,11 @@ interface AuthProviderProps {
  */
 export function AuthProvider({ children }: AuthProviderProps) {
   const { isMiniApp, isSDKLoaded, error } = useFarcasterMiniApp();
+
+  // Fetch interceptorを最優先で初期化
+  useEffect(() => {
+    initializeFetchInterceptor();
+  }, []);
 
   // SDK読み込み中は何も表示しない（親でローディングを処理）
   if (!isSDKLoaded) {

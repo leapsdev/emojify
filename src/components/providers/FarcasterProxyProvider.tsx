@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect } from 'react';
-import { initializeFetchInterceptor } from '@/lib/fetch-interceptor';
 
 /**
  * Farcaster SDK用のプロキシService Workerを登録するプロバイダー
@@ -13,13 +12,15 @@ export function FarcasterProxyProvider({
   children: React.ReactNode;
 }) {
   useEffect(() => {
-    // Fetch interceptorを即座に初期化（最優先）
-    initializeFetchInterceptor();
-    
+    // クライアントサイドでのみ実行
+    if (typeof window === 'undefined') {
+      return;
+    }
+
     // Service Workerがサポートされているかチェック
-    if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+    if ('serviceWorker' in navigator) {
       registerFarcasterProxy();
-      
+
       // デバッグ用: 現在のService Worker状況を確認
       setTimeout(checkServiceWorkerStatus, 2000);
     }
@@ -74,20 +75,23 @@ export function FarcasterProxyProvider({
     try {
       const registrations = await navigator.serviceWorker.getRegistrations();
       console.log('🔍 All Service Worker registrations:', registrations.length);
-      
+
       registrations.forEach((registration, index) => {
         console.log(`📋 Registration ${index + 1}:`, {
           scope: registration.scope,
           active: !!registration.active,
           installing: !!registration.installing,
           waiting: !!registration.waiting,
-          updateViaCache: registration.updateViaCache
+          updateViaCache: registration.updateViaCache,
         });
       });
 
       // 現在のページがService Workerに制御されているかチェック
       if (navigator.serviceWorker.controller) {
-        console.log('🎯 Current page is controlled by Service Worker:', navigator.serviceWorker.controller.scriptURL);
+        console.log(
+          '🎯 Current page is controlled by Service Worker:',
+          navigator.serviceWorker.controller.scriptURL,
+        );
       } else {
         console.warn('⚠️ Current page is NOT controlled by any Service Worker');
       }

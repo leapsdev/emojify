@@ -2,6 +2,7 @@
 
 import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
 import { FarcasterAuthProvider } from './FarcasterAuthProvider';
+import { FarcasterProxyProvider } from './FarcasterProxyProvider';
 import { PrivyProvider } from './PrivyProvider';
 
 interface AuthProviderProps {
@@ -32,7 +33,11 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   // Farcaster Mini App環境ではFarcaster認証を使用
   if (isMiniApp) {
-    return <FarcasterAuthProvider>{children}</FarcasterAuthProvider>;
+    return (
+      <FarcasterProxyProvider>
+        <FarcasterAuthProvider>{children}</FarcasterAuthProvider>
+      </FarcasterProxyProvider>
+    );
   }
 
   // 通常のWeb環境では既存のPrivy認証を使用

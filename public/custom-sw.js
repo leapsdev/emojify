@@ -10,9 +10,15 @@ const PROXY_ANALYTICS_URL = '/api/proxy/privy-farcaster/api/v1/analytics_events'
 self.addEventListener('fetch', (event) => {
   const requestUrl = event.request.url;
   
+  // すべてのPrivyリクエストをログ出力（デバッグ用）
+  if (requestUrl.includes('privy.farcaster.xyz')) {
+    console.log('🔍 Service Worker detected Privy request:', requestUrl);
+    console.log('🔍 Method:', event.request.method);
+  }
+  
   // Privy analytics eventsリクエストをインターセプト（URLパターンマッチングを改善）
   if (requestUrl.includes('privy.farcaster.xyz/api/v1/analytics_events')) {
-    console.log('🔄 Intercepting Privy analytics request:', requestUrl);
+    console.log('🔄 Service Worker intercepting Privy analytics request:', requestUrl);
     console.log('🔄 Redirecting to proxy:', PROXY_ANALYTICS_URL);
     
     // リクエストボディをクローンして処理

@@ -3,30 +3,34 @@ import { NextResponse } from 'next/server';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  return proxyRequest(request, params.path);
+  const resolvedParams = await params;
+  return proxyRequest(request, resolvedParams.path);
 }
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  return proxyRequest(request, params.path);
+  const resolvedParams = await params;
+  return proxyRequest(request, resolvedParams.path);
 }
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  return proxyRequest(request, params.path);
+  const resolvedParams = await params;
+  return proxyRequest(request, resolvedParams.path);
 }
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { path: string[] } }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
-  return proxyRequest(request, params.path);
+  const resolvedParams = await params;
+  return proxyRequest(request, resolvedParams.path);
 }
 
 export async function OPTIONS() {
@@ -44,7 +48,7 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
   try {
     const path = pathSegments.join('/');
     const url = `https://privy.farcaster.xyz/${path}`;
-    
+
     // リクエストの検索パラメータを保持
     const searchParams = request.nextUrl.searchParams.toString();
     const fullUrl = searchParams ? `${url}?${searchParams}` : url;
@@ -84,8 +88,14 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
 
     // CORSヘッダーを追加
     responseHeaders.set('Access-Control-Allow-Origin', '*');
-    responseHeaders.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    responseHeaders.set('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    responseHeaders.set(
+      'Access-Control-Allow-Methods',
+      'GET, POST, PUT, DELETE, OPTIONS',
+    );
+    responseHeaders.set(
+      'Access-Control-Allow-Headers',
+      'Content-Type, Authorization',
+    );
 
     return new NextResponse(responseBody, {
       status: response.status,
@@ -95,18 +105,18 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
   } catch (error) {
     console.error('Proxy request failed:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'プロキシリクエストが失敗しました',
-        details: error instanceof Error ? error.message : '不明なエラー'
+        details: error instanceof Error ? error.message : '不明なエラー',
       },
-      { 
+      {
         status: 500,
         headers: {
           'Access-Control-Allow-Origin': '*',
           'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
           'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-        }
-      }
+        },
+      },
     );
   }
 }

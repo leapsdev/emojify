@@ -58,7 +58,8 @@ export function FarcasterAuthProvider({
       errorDetails = 'このアプリはFarcaster Mini App環境で実行してください';
     } else if (error.includes('ネットワークエラーが発生しました')) {
       errorMessage = 'Farcaster認証でネットワークエラー';
-      errorDetails = 'CORS制限またはネットワークの問題です。しばらく待ってから再試行してください';
+      errorDetails =
+        'CORS制限またはネットワークの問題です。しばらく待ってから再試行してください';
     } else if (error.includes('認証リクエストに問題があります')) {
       errorMessage = 'Farcaster認証リクエストエラー';
       errorDetails = 'アプリを再読み込みしてから再試行してください';

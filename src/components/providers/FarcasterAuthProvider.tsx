@@ -56,6 +56,12 @@ export function FarcasterAuthProvider({
     } else if (error.includes('Farcaster SDKが初期化されていません')) {
       errorMessage = 'Farcaster Mini Appの初期化に失敗しました';
       errorDetails = 'このアプリはFarcaster Mini App環境で実行してください';
+    } else if (error.includes('ネットワークエラーが発生しました')) {
+      errorMessage = 'Farcaster認証でネットワークエラー';
+      errorDetails = 'CORS制限またはネットワークの問題です。しばらく待ってから再試行してください';
+    } else if (error.includes('認証リクエストに問題があります')) {
+      errorMessage = 'Farcaster認証リクエストエラー';
+      errorDetails = 'アプリを再読み込みしてから再試行してください';
     } else if (error.includes('Farcasterトークンの取得に失敗しました')) {
       errorMessage = 'Farcaster認証の取得に失敗しました';
       errorDetails = 'Farcasterアカウントでの認証を確認してください';

@@ -58,14 +58,35 @@ export function useFarcasterAuth() {
 
       console.log('Farcaster認証開始: SDKとMini App環境が確認されました');
 
-      // Farcaster Quick Authトークンを取得
-      const { token } = await sdk.quickAuth.getToken();
+      let token: string;
+      try {
+        // Farcaster Quick Authトークンを取得
+        const result = await sdk.quickAuth.getToken();
+        token = result.token;
 
-      if (!token) {
-        throw new Error('Farcasterトークンの取得に失敗しました');
+        if (!token) {
+          throw new Error('Farcasterトークンの取得に失敗しました');
+        }
+
+        console.log('Farcasterトークン取得成功');
+      } catch (tokenError) {
+        console.error('Farcaster SDK token取得エラー:', tokenError);
+        
+        // CORSエラーまたはネットワークエラーの場合の詳細なエラーメッセージ
+        if (tokenError instanceof Error) {
+          if (tokenError.message.includes('CORS') || 
+              tokenError.message.includes('blocked') ||
+              tokenError.message.includes('net::ERR_FAILED')) {
+            throw new Error('Farcaster認証でネットワークエラーが発生しました。しばらく待ってから再試行してください。');
+          }
+          if (tokenError.message.includes('400') || 
+              tokenError.message.includes('Bad Request')) {
+            throw new Error('Farcaster認証リクエストに問題があります。アプリを再読み込みして再試行してください。');
+          }
+        }
+        
+        throw new Error(`Farcasterトークンの取得に失敗しました: ${tokenError instanceof Error ? tokenError.message : '不明なエラー'}`);
       }
-
-      console.log('Farcasterトークン取得成功');
 
       setState((prev) => ({
         ...prev,
@@ -93,6 +114,8 @@ export function useFarcasterAuth() {
 
       // Firebaseにカスタムトークンでサインイン
       await signInWithCustomToken(auth, customToken);
+      
+      console.log('Farcaster認証完了: Firebase認証も成功しました');
     } catch (error) {
       console.error('Farcaster認証エラー:', error);
       setState((prev) => ({

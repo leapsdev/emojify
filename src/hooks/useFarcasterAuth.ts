@@ -128,7 +128,7 @@ export function useFarcasterAuth() {
       console.log('Farcaster認証完了: Firebase認証も成功しました');
 
       // 認証完了後に状態を明示的に更新 - 少し遅延を入れてFirebase認証の完了を待つ
-        setTimeout(() => {
+      setTimeout(() => {
         setState((prev) => {
           const newState = {
             ...prev,
@@ -138,7 +138,7 @@ export function useFarcasterAuth() {
           console.log('🎯 Farcaster認証完了後の状態更新:', newState);
           return newState;
         });
-        
+
         // 認証完了後、即座にリダイレクトを実行
         console.log('🚀 認証完了、即座にリダイレクト実行');
         window.location.href = '/chat';

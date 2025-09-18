@@ -24,15 +24,17 @@ export function FarcasterAuthProvider({
 
   // 認証が成功したら/chatにリダイレクト
   useEffect(() => {
-    console.log('認証状態チェック:', {
+    console.log('🔍 認証状態チェック:', {
       isFarcasterAuthenticated,
       isFirebaseAuthenticated,
       isLoading,
       autoLoginAttempted,
+      shouldRedirect:
+        isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading,
     });
 
     if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
-      console.log('✅ 認証完了、/chatにリダイレクトします');
+      console.log('✅ 全認証完了、/chatにリダイレクトします');
       router.push('/chat');
     }
   }, [

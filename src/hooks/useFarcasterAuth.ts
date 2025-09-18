@@ -127,16 +127,18 @@ export function useFarcasterAuth() {
 
       console.log('Farcaster認証完了: Firebase認証も成功しました');
 
-      // 認証完了後に状態を明示的に更新
-      setState((prev) => {
-        const newState = {
-          ...prev,
-          isLoading: false,
-          error: null,
-        };
-        console.log('Farcaster認証完了後の状態:', newState);
-        return newState;
-      });
+      // 認証完了後に状態を明示的に更新 - 少し遅延を入れてFirebase認証の完了を待つ
+      setTimeout(() => {
+        setState((prev) => {
+          const newState = {
+            ...prev,
+            isLoading: false,
+            error: null,
+          };
+          console.log('🎯 Farcaster認証完了後の状態更新:', newState);
+          return newState;
+        });
+      }, 100);
     } catch (error) {
       console.error('Farcaster認証エラー:', error);
       setState((prev) => ({
@@ -177,7 +179,7 @@ export function useFarcasterAuth() {
   useEffect(() => {
     // Firebase認証状態の監視
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Firebase認証状態変更:', { user: !!user, uid: user?.uid });
+      console.log('🔥 Firebase認証状態変更:', { user: !!user, uid: user?.uid });
       setState((prev) => {
         const newState = {
           ...prev,
@@ -188,9 +190,10 @@ export function useFarcasterAuth() {
         // 両方の認証が完了している場合はローディングを終了
         if (prev.isFarcasterAuthenticated && !!user) {
           newState.isLoading = false;
+          console.log('🎯 Firebase認証完了、ローディング終了');
         }
 
-        console.log('Firebase認証後の状態:', newState);
+        console.log('🔥 Firebase認証後の状態:', newState);
         return newState;
       });
     });

@@ -46,18 +46,32 @@ export function FarcasterAuthProvider({
     router,
   ]);
 
-  // 認証完了時の追加チェック
+  // 認証完了時の追加チェック - より積極的にリダイレクト
   useEffect(() => {
     if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
       console.log('🔄 認証完了状態を再確認、強制リダイレクト実行');
       const timer = setTimeout(() => {
         console.log('🚨 タイマー経由でリダイレクト実行');
         window.location.href = '/chat';
-      }, 1000);
+      }, 500); // より短い遅延
 
       return () => clearTimeout(timer);
     }
   }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading]);
+
+  // さらなる保険として、認証状態が変わったら即座にチェック
+  useEffect(() => {
+    console.log('⚡ 即座にリダイレクトチェック:', {
+      isFarcasterAuthenticated,
+      isFirebaseAuthenticated,
+      isLoading,
+    });
+
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('⚡ 即座にリダイレクト実行');
+      router.replace('/chat'); // pushではなくreplaceを使用
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading, router]);
 
   // ローディング中の表示
   if (isLoading) {

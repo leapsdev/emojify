@@ -15,20 +15,11 @@ interface AuthProviderProps {
  * 通常のWeb環境では既存のPrivy認証を使用
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { isMiniApp, isSDKLoaded, error } = useFarcasterMiniApp();
+  const { isMiniApp, isSDKLoaded } = useFarcasterMiniApp();
 
   // SDK読み込み中は何も表示しない（親でローディングを処理）
   if (!isSDKLoaded) {
     return null;
-  }
-
-  // SDK初期化エラーがある場合は通常のPrivy認証にフォールバック
-  if (error) {
-    console.warn(
-      'Farcaster SDK初期化エラー、Privy認証にフォールバック:',
-      error,
-    );
-    return <PrivyProvider>{children}</PrivyProvider>;
   }
 
   // Farcaster Mini App環境ではFarcaster認証を使用

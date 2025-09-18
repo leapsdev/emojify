@@ -2,6 +2,8 @@
 
 import { Loading } from '@/components/ui/Loading';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 interface FarcasterAuthProviderProps {
   children: React.ReactNode;
@@ -10,6 +12,7 @@ interface FarcasterAuthProviderProps {
 export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
+  const router = useRouter();
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated,
@@ -18,6 +21,14 @@ export function FarcasterAuthProvider({
     autoLoginAttempted,
     authenticateWithFarcaster,
   } = useFarcasterAuth();
+
+  // 認証が成功したら/chatにリダイレクト
+  useEffect(() => {
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('Farcaster認証完了、/chatにリダイレクトします');
+      router.push('/chat');
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading, router]);
 
   // ローディング中の表示
   if (isLoading) {

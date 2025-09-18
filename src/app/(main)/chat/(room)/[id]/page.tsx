@@ -4,13 +4,15 @@ import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
 import type { ChatRoom, Message } from '@/repository/db/database';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 import { notFound } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user, authenticated } = usePrivy();
+  // const { user, authenticated } = usePrivy(); // 一時的にコメントアウト
+  const user = { id: 'temp_user_id' }; // 一時的に固定値
+  const authenticated = true; // 一時的に固定値
   const [roomData, setRoomData] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,7 +38,7 @@ export default function Page() {
     };
 
     fetchRoomData();
-  }, [authenticated, user?.id, roomId]);
+  }, [roomId]); // authenticatedとuser.idは固定値のため削除
 
   if (isLoading) {
     return (

@@ -3,11 +3,13 @@
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
 import { getUserRooms } from '@/repository/db/chat/actions';
 import type { ChatRoom } from '@/repository/db/database';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user, authenticated } = usePrivy();
+  // const { user, authenticated } = usePrivy(); // 一時的にコメントアウト
+  const user = { id: 'temp_user_id' }; // 一時的に固定値
+  const authenticated = true; // 一時的に固定値
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -26,7 +28,7 @@ export default function Page() {
     };
 
     fetchRooms();
-  }, [authenticated, user?.id]);
+  }, []); // 固定値のため依存配列を空に
 
   if (isLoading) {
     return (

@@ -33,13 +33,15 @@ function ProfilePageContent({
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
-  const { address } = useWallet();
+  // const { address } = useWallet(); // 一時的にコメントアウト
+  const address = null; // 一時的にnullに設定
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
-  const { authenticated } = usePrivy();
+  // const { authenticated } = usePrivy(); // 一時的にコメントアウト
+  const authenticated = false; // 一時的にfalseに設定
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -90,7 +92,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [address, nfts]);
+  }, [nfts]); // addressは一時的にnullに固定されているため削除
 
   if (!authenticated) {
     return <WalletConnectButton />;

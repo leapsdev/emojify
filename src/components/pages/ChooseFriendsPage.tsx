@@ -22,7 +22,8 @@ export function ClientChooseFriendsPage({
   initialFriends = [],
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
-  const userId = usePrivyId();
+  // const userId = usePrivyId(); // 一時的にコメントアウト
+  const userId = 'temp_user_id'; // 一時的に固定値に設定
   const router = useRouter();
   const {
     selectedUsers,

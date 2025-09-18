@@ -13,8 +13,11 @@ export const WalletConnectButton = ({
   className = '',
   showIcon = true,
 }: WalletConnectButtonProps) => {
-  const { ready, authenticated } = usePrivy();
-  const { login } = useLogin();
+  // const { ready, authenticated } = usePrivy(); // 一時的にコメントアウト
+  // const { login } = useLogin(); // 一時的にコメントアウト
+  const ready = true; // 一時的に固定値
+  const authenticated = false; // 一時的に固定値
+  const login = () => console.log('Login disabled temporarily'); // 一時的に無効化
 
   if (authenticated) {
     return null;

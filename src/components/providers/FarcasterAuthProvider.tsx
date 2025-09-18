@@ -35,6 +35,7 @@ export function FarcasterAuthProvider({
 
     if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
       console.log('✅ 全認証完了、/chatにリダイレクトします');
+      console.log('🚀 router.push("/chat")を実行中...');
       router.push('/chat');
     }
   }, [
@@ -44,6 +45,19 @@ export function FarcasterAuthProvider({
     autoLoginAttempted,
     router,
   ]);
+
+  // 認証完了時の追加チェック
+  useEffect(() => {
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('🔄 認証完了状態を再確認、強制リダイレクト実行');
+      const timer = setTimeout(() => {
+        console.log('🚨 タイマー経由でリダイレクト実行');
+        window.location.href = '/chat';
+      }, 1000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading]);
 
   // ローディング中の表示
   if (isLoading) {

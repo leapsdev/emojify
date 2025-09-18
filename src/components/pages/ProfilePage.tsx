@@ -34,7 +34,7 @@ function ProfilePageContent({
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   // const { address } = useWallet(); // 一時的にコメントアウト
-  const address = null; // 一時的にnullに設定
+  const address: string | undefined = undefined; // 一時的にundefinedに設定（型を明示）
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
@@ -68,7 +68,9 @@ function ProfilePageContent({
                 functionName: 'firstMinter',
                 args: [BigInt(nft.tokenId)],
               })) as string;
-              const isCreator = minter.toLowerCase() === address.toLowerCase();
+              const isCreator = address
+                ? minter.toLowerCase() === (address as string).toLowerCase()
+                : false;
 
               if (isCreator) {
                 created.push(nft);
@@ -92,7 +94,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [nfts]); // addressは一時的にnullに固定されているため削除
+  }, [address, nfts]); // addressを依存配列に戻す
 
   if (!authenticated) {
     return <WalletConnectButton />;

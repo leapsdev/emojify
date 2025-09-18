@@ -28,7 +28,7 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   // const { address } = useWallet(); // 一時的にコメントアウト
-  const address = null; // 一時的にnullに設定
+  const address: string | undefined = undefined; // 一時的にundefinedに設定（型を明示）
   const { nfts } = useProfileNFTs(address);
 
   // NFTをカスタム絵文字として変換

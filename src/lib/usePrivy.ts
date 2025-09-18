@@ -1,13 +1,13 @@
 import { getWalletAddresses } from '@/repository/db/user/actions';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 
 /**
  * クライアントサイドでPrivyのユーザーIDを取得するためのカスタムフック
  * @returns ユーザーID
  */
 export function usePrivyId() {
-  const { user } = usePrivy();
-  return user?.id;
+  // const { user } = usePrivy(); // 一時的にコメントアウト
+  return 'temp_user_id'; // 一時的に固定値を返す
 }
 
 /**

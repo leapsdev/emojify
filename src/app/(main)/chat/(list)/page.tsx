@@ -1,7 +1,7 @@
 'use client';
 
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
-import { getUserRooms } from '@/repository/db/chat/actions';
+// import { getUserRooms } from '@/repository/db/chat/actions'; // 一時的にコメントアウト
 import type { ChatRoom } from '@/repository/db/database';
 // import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 import { useEffect, useState } from 'react';
@@ -14,22 +14,11 @@ export default function Page() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchRooms = async () => {
-      if (authenticated && user?.id) {
-        try {
-          const userRooms = await getUserRooms(user.id);
-          setRooms(userRooms || []);
-        } catch (error) {
-          console.error('Failed to fetch rooms:', error);
-          setRooms([]);
-        }
-      }
-      setIsLoading(false);
-    };
-
-    fetchRooms();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // 固定値のため依存配列を空に
+    // 一時的にローディングを即座に終了
+    console.log('🏁 チャットページローディング完了（一時的）');
+    setRooms([]); // 空のルーム配列
+    setIsLoading(false);
+  }, []);
 
   if (isLoading) {
     return (

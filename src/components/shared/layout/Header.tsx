@@ -107,7 +107,7 @@ export const Header = ({
  */
 const ChainSwitchButton = () => {
   // const { user } = usePrivy(); // 一時的にコメントアウト
-  const user = null; // 一時的にnullに設定
+  const user = null as { wallet?: { address?: string } } | null; // 一時的にnullに設定（型アサーション）
   const { chain, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

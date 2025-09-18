@@ -38,6 +38,7 @@ export default function Page() {
     };
 
     fetchRoomData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId]); // authenticatedとuser.idは固定値のため削除
 
   if (isLoading) {

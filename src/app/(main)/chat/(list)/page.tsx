@@ -28,6 +28,7 @@ export default function Page() {
     };
 
     fetchRooms();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []); // 固定値のため依存配列を空に
 
   if (isLoading) {

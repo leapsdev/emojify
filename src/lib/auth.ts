@@ -130,7 +130,6 @@ export async function getFirebaseCustomTokenFromFarcaster(
       console.log('[Farcaster Auth] ❌ JWT verification failed');
       return null;
     }
-
     console.log('[Farcaster Auth] ✅ JWT verified successfully');
     console.log('[Farcaster Auth] 🆔 FID extracted:', payload.sub);
 

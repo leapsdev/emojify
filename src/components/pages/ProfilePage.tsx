@@ -4,13 +4,13 @@ import {
   useGlobalNFTs,
 } from '@/components/features/chat/chat-room/hooks/useGlobalNFTs';
 import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+// import { useWallet } from '@/components/features/create-emoji/hooks/useWallet'; // 一時的にコメントアウト
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';

@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
-import { useLogin, usePrivy } from '@privy-io/react-auth';
+// import { useLogin, usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 import { LogIn } from 'lucide-react';
 
 interface WalletConnectButtonProps {

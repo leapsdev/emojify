@@ -9,7 +9,7 @@ import {
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 
-import { usePrivyId } from '@/lib/usePrivy';
+// import { usePrivyId } from '@/lib/usePrivy'; // 一時的にコメントアウト
 import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 

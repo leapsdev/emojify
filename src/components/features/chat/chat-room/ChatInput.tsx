@@ -1,6 +1,6 @@
 'use client';
 
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+// import { useWallet } from '@/components/features/create-emoji/hooks/useWallet'; // 一時的にコメントアウト
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 
 import { Categories } from 'emoji-picker-react';

@@ -2,6 +2,7 @@
 
 import { Loading } from '@/components/ui/Loading';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+import { usePathname } from 'next/navigation';
 import { useIsMiniApp } from './AuthProvider';
 
 interface FarcasterAuthProviderProps {
@@ -12,6 +13,7 @@ export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
   const { isMiniApp } = useIsMiniApp();
+  const pathname = usePathname();
 
   const {
     isFarcasterAuthenticated,
@@ -110,7 +112,11 @@ export function FarcasterAuthProvider({
   }
 
   // 認証されていない場合の表示
-  if (!isFarcasterAuthenticated || !isFirebaseAuthenticated) {
+  // ルートパス（/）では認証モーダルを表示せず、子コンポーネントを表示
+  if (
+    (!isFarcasterAuthenticated || !isFirebaseAuthenticated) &&
+    pathname !== '/'
+  ) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen p-4">
         <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 max-w-md text-center">

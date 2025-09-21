@@ -70,10 +70,16 @@ export const AuthRedirect = ({ mode }: Props) => {
 
       // 認証関連のページの場合
       if (mode === 'auth') {
-        if (pathname === '/' || pathname === '/profile/create') return;
-
         const userId = getUserId();
         const isAuthenticated = !!userId;
+
+        // ルートパス（/）の場合は何もしない
+        if (pathname === '/') {
+          return;
+        }
+
+        // その他の認証関連ページ
+        if (pathname === '/profile/create') return;
 
         if (isAuthenticated && userId) {
           const exists = await checkUserExists(userId);

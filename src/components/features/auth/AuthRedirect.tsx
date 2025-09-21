@@ -1,8 +1,11 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
+import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useCallback, useEffect } from 'react';
 import { checkUserExists } from './action';
 
 type Props = {
@@ -10,17 +13,57 @@ type Props = {
 };
 
 export const AuthRedirect = ({ mode }: Props) => {
-  const { authenticated, user } = usePrivy();
+  const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
+  const {
+    isFarcasterAuthenticated,
+    isFirebaseAuthenticated,
+    user: farcasterFirebaseUser,
+    isLoading: isFarcasterLoading,
+  } = useFarcasterAuth();
+  const {
+    isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
+    isLoading: isPrivyLoading,
+  } = useFirebaseAuth();
+  const { isMiniApp } = useIsMiniApp();
+
   const router = useRouter();
   const pathname = usePathname();
 
+  // 認証状態に基づいてユーザーIDを取得するヘルパー関数
+  const getUserId = useCallback((): string => {
+    if (isMiniApp && isFarcasterAuthenticated && isFirebaseAuthenticated) {
+      return farcasterFirebaseUser?.uid || '';
+    }
+    if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
+      return privyUser?.id || '';
+    }
+    return '';
+  }, [
+    isMiniApp,
+    isFarcasterAuthenticated,
+    isFirebaseAuthenticated,
+    farcasterFirebaseUser?.uid,
+    isPrivyAuthenticated,
+    isPrivyFirebaseAuthenticated,
+    privyUser?.id,
+  ]);
+
   useEffect(() => {
     const handleAuthRedirect = async () => {
+      // ローディング中は何もしない
+      if (isFarcasterLoading || isPrivyLoading) {
+        return;
+      }
+
       // プロフィール作成ページの場合
       if (mode === 'profile') {
-        const exists = await checkUserExists(user?.id || '');
-        if (exists) {
-          router.push('/chat');
+        const userId = getUserId();
+
+        if (userId) {
+          const exists = await checkUserExists(userId);
+          if (exists) {
+            router.push('/chat');
+          }
         }
         return;
       }
@@ -28,17 +71,21 @@ export const AuthRedirect = ({ mode }: Props) => {
       // 認証関連のページの場合
       if (mode === 'auth') {
         if (pathname === '/' || pathname === '/profile/create') return;
-        if (!authenticated || !user) return;
 
-        const exists = await checkUserExists(user?.id || '');
-        if (!exists) {
-          router.push('/profile/create');
+        const userId = getUserId();
+        const isAuthenticated = !!userId;
+
+        if (isAuthenticated && userId) {
+          const exists = await checkUserExists(userId);
+          if (!exists) {
+            router.push('/profile/create');
+          }
         }
       }
     };
 
     handleAuthRedirect();
-  }, [authenticated, user, router, pathname, mode]);
+  }, [getUserId, isFarcasterLoading, isPrivyLoading, router, pathname, mode]);
 
   return null;
 };

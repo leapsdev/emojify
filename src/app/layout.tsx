@@ -3,7 +3,6 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
 import { AuthProvider } from '@/components/providers/AuthProvider';
-import { FarcasterInitializer } from '@/components/providers/FarcasterInitializer';
 import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
 import EthereumProviders from '@/lib/basename/EthereumProviders';
 
@@ -62,7 +61,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <FarcasterInitializer />
         <AuthProvider>
           <EthereumProviders>
             <OnchainProvider>

@@ -105,6 +105,7 @@ export function useFarcasterAuth() {
       }));
 
       // サーバーサイドでFirebaseカスタムトークンを取得
+      console.log('Firebaseカスタムトークンの取得を開始します');
       const response = await fetch('/api/auth/farcaster-firebase-token', {
         method: 'POST',
         headers: {
@@ -121,11 +122,18 @@ export function useFarcasterAuth() {
       }
 
       const { customToken } = await response.json();
+      console.log('Firebaseカスタムトークンの取得が完了しました');
 
       // Firebaseにカスタムトークンでサインイン
       await signInWithCustomToken(auth, customToken);
 
       console.log('Farcaster認証完了: Firebase認証も成功しました');
+      
+      // 認証成功時はローディング状態を終了
+      setState((prev) => ({
+        ...prev,
+        isLoading: false,
+      }));
     } catch (error) {
       console.error('Farcaster認証エラー:', error);
       setState((prev) => ({
@@ -169,9 +177,9 @@ export function useFarcasterAuth() {
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,
-        // Farcaster認証が成功している場合、Firebase認証が完了するまでローディングを継続
-        // Firebase認証が完了した場合のみローディングを終了
-        isLoading: prev.isFarcasterAuthenticated ? !user : prev.isLoading,
+        // Farcaster認証が成功している場合、Firebase認証が完了したらローディングを終了
+        // ただし、既にisLoadingがfalseになっている場合は変更しない
+        isLoading: prev.isFarcasterAuthenticated && prev.isLoading ? !user : prev.isLoading,
         user,
       }));
     });

@@ -1,7 +1,6 @@
 'use client';
 
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
-import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
@@ -15,12 +14,6 @@ type Props = {
 export const AuthRedirect = ({ mode }: Props) => {
   const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
   const {
-    isFarcasterAuthenticated,
-    isFirebaseAuthenticated,
-    user: farcasterFirebaseUser,
-    isLoading: isFarcasterLoading,
-  } = useFarcasterAuth();
-  const {
     isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
     isLoading: isPrivyLoading,
   } = useFirebaseAuth();
@@ -31,18 +24,12 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   // 認証状態に基づいてユーザーIDを取得するヘルパー関数
   const getUserId = useCallback((): string => {
-    if (isMiniApp && isFarcasterAuthenticated && isFirebaseAuthenticated) {
-      return farcasterFirebaseUser?.uid || '';
-    }
     if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
       return privyUser?.id || '';
     }
     return '';
   }, [
     isMiniApp,
-    isFarcasterAuthenticated,
-    isFirebaseAuthenticated,
-    farcasterFirebaseUser?.uid,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
     privyUser?.id,
@@ -51,7 +38,7 @@ export const AuthRedirect = ({ mode }: Props) => {
   useEffect(() => {
     const handleAuthRedirect = async () => {
       // ローディング中は何もしない
-      if (isFarcasterLoading || isPrivyLoading) {
+      if (isPrivyLoading) {
         return;
       }
 
@@ -91,7 +78,7 @@ export const AuthRedirect = ({ mode }: Props) => {
     };
 
     handleAuthRedirect();
-  }, [getUserId, isFarcasterLoading, isPrivyLoading, router, pathname, mode]);
+  }, [getUserId, isPrivyLoading, router, pathname, mode]);
 
   return null;
 };

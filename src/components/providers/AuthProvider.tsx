@@ -1,7 +1,7 @@
 'use client';
 
-import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
-import { createContext, useContext } from 'react';
+import { getFarcasterSDK } from '@/lib/farcaster';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { FarcasterAuthProvider } from './FarcasterAuthProvider';
 import { FarcasterProxyProvider } from './FarcasterProxyProvider';
 import { PrivyProvider } from './PrivyProvider';
@@ -13,8 +13,6 @@ interface AuthProviderProps {
 // Mini App判定のためのコンテキスト
 interface MiniAppContextType {
   isMiniApp: boolean;
-  isSDKLoaded: boolean;
-  error: string | null;
 }
 
 const MiniAppContext = createContext<MiniAppContextType | null>(null);
@@ -33,13 +31,32 @@ export function useIsMiniApp(): MiniAppContextType {
  * isMiniApp判定メソッドも提供
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { isMiniApp, isSDKLoaded, error } = useFarcasterMiniApp();
+  const [isMiniApp, setIsMiniApp] = useState(false);
+
+  // Mini App環境の判定
+  useEffect(() => {
+    const checkMiniApp = async (): Promise<void> => {
+      try {
+        const sdk = getFarcasterSDK();
+        if (sdk) {
+          // SDKが存在する場合、コンテキストを取得してMini App判定
+          const context = await sdk.context;
+          setIsMiniApp(!!context && Object.keys(context).length > 0);
+        } else {
+          setIsMiniApp(false);
+        }
+      } catch {
+        console.log('Farcaster SDK not available, using web mode');
+        setIsMiniApp(false);
+      }
+    };
+    console.log('isMiniApp', isMiniApp);
+    checkMiniApp();
+  }, [isMiniApp]);
 
   // Mini App判定のコンテキスト値を提供
   const miniAppContextValue: MiniAppContextType = {
     isMiniApp,
-    isSDKLoaded,
-    error,
   };
 
   return (

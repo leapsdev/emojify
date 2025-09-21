@@ -2,7 +2,7 @@
 
 import { LinkButton } from '@/components/ui/LinkButton';
 import { cn } from '@/lib/utils';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
 import { useAccount, useSwitchChain } from 'wagmi';
@@ -106,7 +106,8 @@ export const Header = ({
  * チェーン切替ボタンコンポーネント（ウォレットの状態を反映）
  */
 const ChainSwitchButton = () => {
-  const { user } = usePrivy();
+  // const { user } = usePrivy(); // 一時的にコメントアウト
+  const user = null as { wallet?: { address?: string } } | null; // 一時的にnullに設定（型アサーション）
   const { chain, isConnected } = useAccount();
   const { switchChain } = useSwitchChain();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);

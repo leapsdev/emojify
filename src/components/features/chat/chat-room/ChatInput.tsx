@@ -1,6 +1,6 @@
 'use client';
 
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+// import { useWallet } from '@/components/features/create-emoji/hooks/useWallet'; // 一時的にコメントアウト
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
 
 import { Categories } from 'emoji-picker-react';
@@ -27,7 +27,8 @@ type ChatRoomInputProps = {
 function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { address } = useWallet();
+  // const { address } = useWallet(); // 一時的にコメントアウト
+  const address: string | undefined = undefined; // 一時的にundefinedに設定（型を明示）
   const { nfts } = useProfileNFTs(address);
 
   // NFTをカスタム絵文字として変換

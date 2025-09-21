@@ -2,6 +2,7 @@
 
 import { Loading } from '@/components/ui/Loading';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+
 import { useIsMiniApp } from './AuthProvider';
 
 interface FarcasterAuthProviderProps {
@@ -11,6 +12,7 @@ interface FarcasterAuthProviderProps {
 export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
+
   const { isMiniApp } = useIsMiniApp();
   
   // Mini App環境でない場合は子コンポーネントをそのまま返す
@@ -26,6 +28,72 @@ export function FarcasterAuthProvider({
     autoLoginAttempted,
     authenticateWithFarcaster,
   } = useFarcasterAuth();
+
+  // 認証が成功したら/chatにリダイレクト - シンプル版
+  useEffect(() => {
+    console.log('🔍 認証状態チェック:', {
+      isFarcasterAuthenticated,
+      isFirebaseAuthenticated,
+      isLoading,
+    });
+
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('✅ 認証完了、/chatにリダイレクトします');
+      router.push('/chat');
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading, router]);
+
+  /*
+  useEffect(() => {
+    console.log('🔍 認証状態チェック:', {
+      isFarcasterAuthenticated,
+      isFirebaseAuthenticated,
+      isLoading,
+      autoLoginAttempted,
+      shouldRedirect:
+        isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading,
+    });
+
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('✅ 全認証完了、/chatにリダイレクトします');
+      console.log('🚀 router.push("/chat")を実行中...');
+      router.push('/chat');
+    }
+  }, [
+    isFarcasterAuthenticated,
+    isFirebaseAuthenticated,
+    isLoading,
+    autoLoginAttempted,
+    router,
+  ]);
+
+  // 認証完了時の追加チェック - より積極的にリダイレクト
+  useEffect(() => {
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('🔄 認証完了状態を再確認、強制リダイレクト実行');
+      const timer = setTimeout(() => {
+        console.log('🚨 タイマー経由でリダイレクト実行');
+        window.location.href = '/chat';
+      }, 500); // より短い遅延
+
+      return () => clearTimeout(timer);
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading]);
+
+  // さらなる保険として、認証状態が変わったら即座にチェック
+  useEffect(() => {
+    console.log('⚡ 即座にリダイレクトチェック:', {
+      isFarcasterAuthenticated,
+      isFirebaseAuthenticated,
+      isLoading,
+    });
+
+    if (isFarcasterAuthenticated && isFirebaseAuthenticated && !isLoading) {
+      console.log('⚡ 即座にリダイレクト実行');
+      router.replace('/chat'); // pushではなくreplaceを使用
+    }
+  }, [isFarcasterAuthenticated, isFirebaseAuthenticated, isLoading, router]);
+  */
 
   // ローディング中の表示
   if (isLoading) {

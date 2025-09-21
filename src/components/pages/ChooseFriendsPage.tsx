@@ -9,7 +9,7 @@ import {
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 
-import { usePrivyId } from '@/lib/usePrivy';
+// import { usePrivyId } from '@/lib/usePrivy'; // 一時的にコメントアウト
 import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +22,8 @@ export function ClientChooseFriendsPage({
   initialFriends = [],
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
-  const userId = usePrivyId();
+  // const userId = usePrivyId(); // 一時的にコメントアウト
+  const userId = 'temp_user_id'; // 一時的に固定値に設定
   const router = useRouter();
   const {
     selectedUsers,

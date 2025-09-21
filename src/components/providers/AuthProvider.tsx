@@ -33,7 +33,7 @@ export function useIsMiniApp(): MiniAppContextType {
  * isMiniApp判定メソッドも提供
  */
 export function AuthProvider({ children }: AuthProviderProps) {
-  const { isMiniApp, isSDKLoaded, error } = useFarcasterMiniApp();
+  const { isMiniApp, isSDKLoaded } = useFarcasterMiniApp();
 
   // Mini App判定のコンテキスト値を提供
   const miniAppContextValue: MiniAppContextType = {

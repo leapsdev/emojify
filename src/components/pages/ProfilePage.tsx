@@ -4,13 +4,13 @@ import {
   useGlobalNFTs,
 } from '@/components/features/chat/chat-room/hooks/useGlobalNFTs';
 import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
-import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
+// import { useWallet } from '@/components/features/create-emoji/hooks/useWallet'; // 一時的にコメントアウト
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { usePrivy } from '@privy-io/react-auth';
+// import { usePrivy } from '@privy-io/react-auth'; // 一時的にコメントアウト
 
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
@@ -33,13 +33,15 @@ function ProfilePageContent({
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
-  const { address } = useWallet();
+  // const { address } = useWallet(); // 一時的にコメントアウト
+  const address: string | undefined = undefined; // 一時的にundefinedに設定（型を明示）
   const { nfts, error } = useGlobalNFTs();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
-  const { authenticated } = usePrivy();
+  // const { authenticated } = usePrivy(); // 一時的にコメントアウト
+  const authenticated = false; // 一時的にfalseに設定
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -66,7 +68,9 @@ function ProfilePageContent({
                 functionName: 'firstMinter',
                 args: [BigInt(nft.tokenId)],
               })) as string;
-              const isCreator = minter.toLowerCase() === address.toLowerCase();
+              const isCreator = address
+                ? minter.toLowerCase() === (address as string).toLowerCase()
+                : false;
 
               if (isCreator) {
                 created.push(nft);
@@ -90,7 +94,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [address, nfts]);
+  }, [address, nfts]); // addressを依存配列に戻す
 
   if (!authenticated) {
     return <WalletConnectButton />;

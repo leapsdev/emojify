@@ -13,11 +13,6 @@ export function FarcasterAuthProvider({
 }: FarcasterAuthProviderProps) {
   const { isMiniApp } = useIsMiniApp();
   
-  // Mini App環境でない場合は子コンポーネントをそのまま返す
-  if (!isMiniApp) {
-    return <>{children}</>;
-  }
-
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated,
@@ -26,6 +21,11 @@ export function FarcasterAuthProvider({
     autoLoginAttempted,
     authenticateWithFarcaster,
   } = useFarcasterAuth();
+
+  // Mini App環境でない場合は子コンポーネントをそのまま返す
+  if (!isMiniApp) {
+    return <>{children}</>;
+  }
 
   // ローディング中の表示
   if (isLoading) {

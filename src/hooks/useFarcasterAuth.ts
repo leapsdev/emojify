@@ -104,7 +104,7 @@ export function useFarcasterAuth() {
         }
 
         console.log('Farcasterトークン取得成功');
-        
+
         // SDKからユーザー情報を取得してログ出力
         try {
           const context = await sdk.context;
@@ -113,7 +113,6 @@ export function useFarcasterAuth() {
         } catch (userError) {
           console.log('ユーザー情報の取得に失敗:', userError);
         }
-
       } catch (tokenError) {
         console.error('Farcaster SDK token取得エラー:', tokenError);
 

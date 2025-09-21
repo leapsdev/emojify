@@ -52,16 +52,6 @@ export function useFarcasterAuth() {
 
     try {
       const result = await initializeFarcasterMiniApp();
-      console.log('Farcaster SDK初期化結果:', result);
-      
-      // コンテキスト情報を詳細にログ出力
-      if (result.context) {
-        console.log('Farcasterコンテキスト詳細:', {
-          keys: Object.keys(result.context),
-          values: result.context
-        });
-      }
-      
       setState((prev) => ({
         ...prev,
         isSDKLoaded: result.isSDKLoaded,
@@ -114,17 +104,6 @@ export function useFarcasterAuth() {
         }
 
         console.log('Farcasterトークン取得成功');
-        
-        // SDKからユーザー情報を取得してログ出力
-        try {
-          // Farcaster SDKでは、トークンからユーザー情報を取得する方法を確認
-          console.log('Farcasterトークン詳細:', {
-            token: `${token.substring(0, 20)}...`, // トークンの一部のみログ出力
-            length: token.length
-          });
-        } catch (userError) {
-          console.log('ユーザー情報の取得に失敗:', userError);
-        }
       } catch (tokenError) {
         console.error('Farcaster SDK token取得エラー:', tokenError);
 
@@ -181,15 +160,9 @@ export function useFarcasterAuth() {
       console.log('Firebaseカスタムトークンの取得が完了しました');
 
       // Firebaseにカスタムトークンでサインイン
-      const firebaseUser = await signInWithCustomToken(auth, customToken);
-      
+      await signInWithCustomToken(auth, customToken);
+
       console.log('Farcaster認証完了: Firebase認証も成功しました');
-      console.log('Firebaseユーザー情報:', {
-        uid: firebaseUser.user.uid,
-        email: firebaseUser.user.email,
-        displayName: firebaseUser.user.displayName,
-        photoURL: firebaseUser.user.photoURL,
-      });
 
       // 認証成功時はローディング状態を終了
       setState((prev) => ({

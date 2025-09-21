@@ -12,7 +12,7 @@ export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
   const { isMiniApp } = useIsMiniApp();
-  
+
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated,

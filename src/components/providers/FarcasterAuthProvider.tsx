@@ -2,6 +2,7 @@
 
 import { Loading } from '@/components/ui/Loading';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+import { useIsMiniApp } from './AuthProvider';
 
 interface FarcasterAuthProviderProps {
   children: React.ReactNode;
@@ -10,6 +11,13 @@ interface FarcasterAuthProviderProps {
 export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
+  const { isMiniApp } = useIsMiniApp();
+  
+  // Mini App環境でない場合は子コンポーネントをそのまま返す
+  if (!isMiniApp) {
+    return <>{children}</>;
+  }
+
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated,

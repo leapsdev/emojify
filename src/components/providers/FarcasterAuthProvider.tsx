@@ -1,5 +1,7 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
+import { Loading } from '@/components/ui/Loading';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { useEffect } from 'react';
 
@@ -16,7 +18,17 @@ export function FarcasterAuthProvider({
   children,
 }: FarcasterAuthProviderProps) {
   // Farcaster SDKの初期化と自動ログインを実行
-  useFarcasterAuth();
+  const { isLoading } = useFarcasterAuth();
+  const { isMiniApp } = useIsMiniApp();
+
+  // ローディング中の表示
+  if (isMiniApp && isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading size="lg" />
+      </div>
+    );
+  }
 
   // Service Worker登録（CORSエラー解決用）
   useEffect(() => {

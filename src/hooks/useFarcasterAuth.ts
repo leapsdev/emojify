@@ -239,6 +239,8 @@ export function useFarcasterAuth() {
     authenticateWithFarcaster,
   ]);
 
-  // SDK初期化と自動ログインのみを実行するため、戻り値は不要
-  return;
+  // ローディング状態を返す
+  return {
+    isLoading: state.isLoading,
+  };
 }

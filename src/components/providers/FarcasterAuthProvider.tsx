@@ -42,7 +42,6 @@ export function FarcasterAuthProvider({
     }
   };
 
-  // ローディング中の表示
   if (isMiniApp && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">

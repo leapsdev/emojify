@@ -54,8 +54,8 @@ export const ProfileTabs = ({
 
       <TabsPrimitive.Content value="created" className="p-2">
         {isLoadingCreated ? (
-          <div className="flex justify-center py-8">
-            <Loading size="lg" text="Loading created emojis..." />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Loading size="lg" />
           </div>
         ) : (
           <EmojiGrid emojis={createdEmojis} />
@@ -64,8 +64,8 @@ export const ProfileTabs = ({
 
       <TabsPrimitive.Content value="collected" className="p-2">
         {isLoadingCollected ? (
-          <div className="flex justify-center py-8">
-            <Loading size="lg" text="Loading collected emojis..." />
+          <div className="flex items-center justify-center min-h-[60vh]">
+            <Loading size="lg" />
           </div>
         ) : (
           <EmojiGrid emojis={collectedEmojis} />

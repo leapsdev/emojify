@@ -3,7 +3,6 @@
 import { getFarcasterSDK } from '@/lib/farcaster';
 import { createContext, useContext, useEffect, useState } from 'react';
 import { FarcasterAuthProvider } from './FarcasterAuthProvider';
-import { FarcasterProxyProvider } from './FarcasterProxyProvider';
 import { PrivyProvider } from './PrivyProvider';
 
 interface AuthProviderProps {
@@ -61,11 +60,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   return (
     <MiniAppContext.Provider value={miniAppContextValue}>
-      <FarcasterProxyProvider>
-        <FarcasterAuthProvider>
-          <PrivyProvider>{children}</PrivyProvider>
-        </FarcasterAuthProvider>
-      </FarcasterProxyProvider>
+      <FarcasterAuthProvider>
+        <PrivyProvider>{children}</PrivyProvider>
+      </FarcasterAuthProvider>
     </MiniAppContext.Provider>
   );
 }

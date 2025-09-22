@@ -21,15 +21,6 @@ export function FarcasterAuthProvider({
   const { isLoading } = useFarcasterAuth();
   const { isMiniApp } = useIsMiniApp();
 
-  // ローディング中の表示
-  if (isMiniApp && isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <Loading size="lg" />
-      </div>
-    );
-  }
-
   // Service Worker登録（CORSエラー解決用）
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
@@ -50,6 +41,15 @@ export function FarcasterAuthProvider({
       );
     }
   };
+
+  // ローディング中の表示
+  if (isMiniApp && isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading size="lg" />
+      </div>
+    );
+  }
 
   return <>{children}</>;
 }

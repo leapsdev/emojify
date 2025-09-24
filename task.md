@@ -31,7 +31,7 @@ interface User {
 **変更後:**
 ```typescript
 interface User {
-  id: string; // Privy ID または Farcaster ID (farcaster_${fid})
+  id: string; // Privy ID または Farcaster ID
   authProvider: 'privy' | 'farcaster'; // 認証プロバイダーを追加
   // ... その他のフィールド
 }

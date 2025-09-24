@@ -49,7 +49,7 @@ export async function createPrivyUser(data: ProfileForm, privyId: string) {
  * @param fid Farcaster ID
  * @returns 作成されたユーザー
  */
-export async function createFarcasterUser(data: ProfileForm, fid: number) {
+export async function createFarcasterUser(data: ProfileForm, fid: string) {
   const userId = fid.toString();
   return createUser(data, userId, 'farcaster');
 }
@@ -251,20 +251,9 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
 /**
  * ユーザーのウォレットアドレスを取得する
  * @param userId ユーザーID
- * @param authProvider 認証プロバイダー
  * @returns ウォレットアドレスの配列
  */
-export async function getWalletAddresses(
-  userId: string,
-  authProvider: AuthProvider,
-): Promise<string[]> {
-  if (authProvider === 'farcaster') {
-    // Farcasterユーザーの場合は、現在の実装ではウォレットアドレスを取得できない
-    // 将来的にFarcaster SDKからウォレットアドレスを取得する実装を追加
-    console.warn('Farcaster user wallet address retrieval not implemented yet');
-    return [];
-  }
-
+export async function getWalletAddresses(userId: string): Promise<string[]> {
   // Privyユーザーの場合
   const privy = new PrivyClient(
     process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',

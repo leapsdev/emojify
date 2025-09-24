@@ -13,12 +13,14 @@ import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 
 const initialState: ProfileFormState = null;
 
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
     const { user } = usePrivy();
+    const { isMiniApp } = useIsMiniApp();
     const [basename, setBasename] = useState<string>('');
 
     const getAddress = useCallback(async () => {
@@ -69,6 +71,8 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
           value={user?.email?.address || ''}
         />
         <input type="hidden" name={fields.imageUrl.name} />
+        <input type="hidden" name="userId" value={user?.id || ''} />
+        <input type="hidden" name="isMiniApp" value={isMiniApp ? 'true' : 'false'} />
 
         {state?.message && (
           <div

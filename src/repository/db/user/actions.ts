@@ -2,21 +2,25 @@
 
 import { getCurrentTimestamp } from '@/lib/utils';
 import { adminDbRef } from '@/repository/db/config/server';
-import { PrivyClient } from '@privy-io/server-auth';
-import { updateUserInChatRooms } from '../chat/actions';
-
 import type { User } from '@/repository/db/database';
+import { PrivyClient } from '@privy-io/server-auth';
 import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
-import type { ProfileForm } from './schema';
+import { updateUserInChatRooms } from '../chat/actions';
+import type { AuthProvider, ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
-export async function createUser(data: ProfileForm, privyId: string) {
+export async function createUser(
+  data: ProfileForm,
+  userId: string,
+  authProvider: AuthProvider,
+) {
   const timestamp = getCurrentTimestamp();
-  const userRef = adminDbRef(`${USERS_PATH}/${privyId}`);
+  const userRef = adminDbRef(`${USERS_PATH}/${userId}`);
 
   const user: User = {
-    id: privyId,
+    id: userId,
+    authProvider,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
@@ -27,6 +31,27 @@ export async function createUser(data: ProfileForm, privyId: string) {
 
   await userRef.set(user);
   return user;
+}
+
+/**
+ * Privyユーザーを作成
+ * @param data プロフィール情報
+ * @param privyId Privy ID
+ * @returns 作成されたユーザー
+ */
+export async function createPrivyUser(data: ProfileForm, privyId: string) {
+  return createUser(data, privyId, 'privy');
+}
+
+/**
+ * Farcasterユーザーを作成
+ * @param data プロフィール情報
+ * @param fid Farcaster ID
+ * @returns 作成されたユーザー
+ */
+export async function createFarcasterUser(data: ProfileForm, fid: number) {
+  const userId = fid.toString();
+  return createUser(data, userId, 'farcaster');
 }
 
 export async function getUser(userId: string) {
@@ -226,9 +251,21 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
 /**
  * ユーザーのウォレットアドレスを取得する
  * @param userId ユーザーID
+ * @param authProvider 認証プロバイダー
  * @returns ウォレットアドレスの配列
  */
-export async function getWalletAddresses(userId: string): Promise<string[]> {
+export async function getWalletAddresses(
+  userId: string,
+  authProvider: AuthProvider,
+): Promise<string[]> {
+  if (authProvider === 'farcaster') {
+    // Farcasterユーザーの場合は、現在の実装ではウォレットアドレスを取得できない
+    // 将来的にFarcaster SDKからウォレットアドレスを取得する実装を追加
+    console.warn('Farcaster user wallet address retrieval not implemented yet');
+    return [];
+  }
+
+  // Privyユーザーの場合
   const privy = new PrivyClient(
     process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
     process.env.PRIVY_APP_SECRET || '',

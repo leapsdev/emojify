@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -13,7 +14,6 @@ import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
-import { useIsMiniApp } from '@/components/providers/AuthProvider';
 
 const initialState: ProfileFormState = null;
 
@@ -72,7 +72,11 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         />
         <input type="hidden" name={fields.imageUrl.name} />
         <input type="hidden" name="userId" value={user?.id || ''} />
-        <input type="hidden" name="isMiniApp" value={isMiniApp ? 'true' : 'false'} />
+        <input
+          type="hidden"
+          name="isMiniApp"
+          value={isMiniApp ? 'true' : 'false'}
+        />
 
         {state?.message && (
           <div

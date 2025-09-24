@@ -1,5 +1,6 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
@@ -19,6 +20,7 @@ const initialState: ProfileFormState = null;
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
     const { user } = usePrivy();
+    const { isMiniApp } = useIsMiniApp();
     const [basename, setBasename] = useState<string>('');
 
     const getAddress = useCallback(async () => {
@@ -69,6 +71,12 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
           value={user?.email?.address || ''}
         />
         <input type="hidden" name={fields.imageUrl.name} />
+        <input type="hidden" name="userId" value={user?.id || ''} />
+        <input
+          type="hidden"
+          name="isMiniApp"
+          value={isMiniApp ? 'true' : 'false'}
+        />
 
         {state?.message && (
           <div

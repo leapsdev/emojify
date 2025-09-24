@@ -133,8 +133,8 @@ export async function getFirebaseCustomTokenFromFarcaster(
     console.log('[Farcaster Auth] ✅ JWT verified successfully');
     console.log('[Farcaster Auth] 🆔 FID extracted:', payload.sub);
 
-    // FIDをユーザーIDとして使用（プレフィックス付き）
-    const farcasterUserId = `farcaster_${payload.sub}`;
+    // FIDをユーザーIDとして使用
+    const farcasterUserId = String(payload.sub);
     console.log('[Farcaster Auth] 👤 Generated user ID:', farcasterUserId);
     console.log('[Farcaster Auth] 🔥 Generating Firebase custom token...');
 

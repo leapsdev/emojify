@@ -1,6 +1,9 @@
 'use server';
 
-import { createUser } from '@/repository/db/user/actions';
+import {
+  createFarcasterUser,
+  createPrivyUser,
+} from '@/repository/db/user/actions';
 import {
   type ProfileForm,
   profileFormSchema,
@@ -16,11 +19,14 @@ export type ProfileFormState = {
 export async function handleProfileFormAction(
   _state: ProfileFormState,
   formData?: FormData,
-  privyUserId?: string,
 ): Promise<ProfileFormState> {
   if (!formData) return null;
 
-  if (!privyUserId) {
+  const userId = formData.get('userId') as string;
+  const isMiniAppValue = formData.get('isMiniApp') as string;
+  const isMiniApp = isMiniAppValue === 'true';
+
+  if (!userId) {
     return {
       message: '認証情報が不足しています',
       status: 'error' as const,
@@ -59,7 +65,13 @@ export async function handleProfileFormAction(
   };
 
   try {
-    await createUser(profileData, privyUserId);
+    if (isMiniApp) {
+      // Farcasterユーザーの場合（数値文字列）
+      await createFarcasterUser(profileData, userId);
+    } else {
+      // Privyユーザーの場合
+      await createPrivyUser(profileData, userId);
+    }
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'An error has occurred',

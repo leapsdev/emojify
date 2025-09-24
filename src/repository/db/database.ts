@@ -12,10 +12,12 @@
 /**
  * ユーザー情報の型定義
  * - ユーザーの基本情報を管理
+ * - Privy ID または Farcaster ID（数値文字列）をユーザーIDとして使用
  * - フレンドリストはオプショナル
  */
 export interface User {
-  id: string;
+  id: string; // Privy ID または Farcaster ID（数値文字列）
+  authProvider: 'privy' | 'farcaster'; // 認証プロバイダー
   email?: string | null;
   username: string;
   bio?: string | null;

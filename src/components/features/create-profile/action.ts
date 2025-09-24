@@ -26,6 +26,7 @@ export async function handleProfileFormAction(
   const isMiniAppValue = formData.get('isMiniApp') as string;
   const isMiniApp = isMiniAppValue === 'true';
 
+  console.log('userId', userId);
   if (!userId) {
     return {
       message: '認証情報が不足しています',

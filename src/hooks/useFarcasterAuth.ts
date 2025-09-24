@@ -20,6 +20,7 @@ interface FarcasterAuthState extends FarcasterInitializationResult {
   error: string | null;
   user: User | null;
   farcasterToken: string | null;
+  farcasterUserId: string | null;
   autoLoginAttempted: boolean;
 }
 
@@ -41,6 +42,7 @@ export function useFarcasterAuth() {
     isLoading: true,
     user: null,
     farcasterToken: null,
+    farcasterUserId: null,
     autoLoginAttempted: false,
   });
 
@@ -110,6 +112,14 @@ export function useFarcasterAuth() {
           const context = await sdk.context;
           const userContext = context.user;
           console.log('Farcasterユーザー情報:', userContext);
+
+          // FarcasterユーザーIDを設定
+          if (userContext?.fid) {
+            setState((prev) => ({
+              ...prev,
+              farcasterUserId: userContext.fid.toString(),
+            }));
+          }
         } catch (userError) {
           console.log('ユーザー情報の取得に失敗:', userError);
         }
@@ -239,8 +249,9 @@ export function useFarcasterAuth() {
     authenticateWithFarcaster,
   ]);
 
-  // ローディング状態を返す
+  // ローディング状態とFarcasterユーザーIDを返す
   return {
     isLoading: state.isLoading,
+    farcasterUserId: state.farcasterUserId,
   };
 }

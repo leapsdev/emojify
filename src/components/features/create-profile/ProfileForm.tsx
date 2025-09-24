@@ -4,6 +4,7 @@ import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { getBasename } from '@/lib/basename/basename';
 import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { profileFormSchema } from '@/repository/db/user/schema';
@@ -20,6 +21,7 @@ const initialState: ProfileFormState = null;
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
     const { user } = usePrivy();
+    const { farcasterUserId } = useFarcasterAuth();
     const { isMiniApp } = useIsMiniApp();
     const [basename, setBasename] = useState<string>('');
 
@@ -71,7 +73,11 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
           value={user?.email?.address || ''}
         />
         <input type="hidden" name={fields.imageUrl.name} />
-        <input type="hidden" name="userId" value={user?.id || ''} />
+        <input
+          type="hidden"
+          name="userId"
+          value={isMiniApp ? farcasterUserId || '' : user?.id || ''}
+        />
         <input
           type="hidden"
           name="isMiniApp"

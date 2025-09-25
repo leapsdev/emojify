@@ -249,9 +249,13 @@ export function useFarcasterAuth() {
     authenticateWithFarcaster,
   ]);
 
-  // ローディング状態とFarcasterユーザーIDを返す
+  // 認証状態とFarcasterユーザーIDを返す
   return {
+    isFarcasterAuthenticated: state.isFarcasterAuthenticated,
+    isFirebaseAuthenticated: state.isFirebaseAuthenticated,
     isLoading: state.isLoading,
     farcasterUserId: state.farcasterUserId,
+    user: state.user,
+    error: state.error,
   };
 }

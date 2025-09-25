@@ -10,20 +10,20 @@ import {
 } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
-interface FirebaseAuthState {
+interface PrivyAuthState {
   isFirebaseAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   user: User | null;
 }
 
-export function useFirebaseAuth() {
+export function usePrivyAuth() {
   const {
     authenticated: isPrivyAuthenticated,
     user: privyUser,
     getAccessToken,
   } = usePrivy();
-  const [state, setState] = useState<FirebaseAuthState>({
+  const [state, setState] = useState<PrivyAuthState>({
     isFirebaseAuthenticated: false,
     isLoading: true,
     error: null,

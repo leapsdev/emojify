@@ -1,7 +1,8 @@
 'use client';
 
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+import { usePrivyAuth } from '@/hooks/usePrivyAuth';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
@@ -16,7 +17,13 @@ export const AuthRedirect = ({ mode }: Props) => {
   const {
     isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
     isLoading: isPrivyLoading,
-  } = useFirebaseAuth();
+  } = usePrivyAuth();
+  const {
+    isFarcasterAuthenticated,
+    isFirebaseAuthenticated: isFarcasterFirebaseAuthenticated,
+    isLoading: isFarcasterLoading,
+    farcasterUserId,
+  } = useFarcasterAuth();
   const { isMiniApp } = useIsMiniApp();
 
   const router = useRouter();
@@ -24,12 +31,38 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   // 認証状態に基づいてユーザーIDを取得するヘルパー関数
   const getUserId = useCallback((): string => {
+    console.log('getUserId: 認証状態チェック', {
+      isMiniApp,
+      isFarcasterAuthenticated,
+      isFarcasterFirebaseAuthenticated,
+      farcasterUserId,
+      isPrivyAuthenticated,
+      isPrivyFirebaseAuthenticated,
+      privyUserId: privyUser?.id,
+    });
+
+    // Mini App環境の場合、Farcaster認証を使用
+    if (
+      isMiniApp &&
+      isFarcasterAuthenticated &&
+      isFarcasterFirebaseAuthenticated
+    ) {
+      console.log('getUserId: Farcaster認証を使用', { farcasterUserId });
+      return farcasterUserId || '';
+    }
+    // Web環境の場合、Privy認証を使用
     if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
+      console.log('getUserId: Privy認証を使用', { privyUserId: privyUser?.id });
       return privyUser?.id || '';
     }
+    
+    console.log('getUserId: 認証されていない');
     return '';
   }, [
     isMiniApp,
+    isFarcasterAuthenticated,
+    isFarcasterFirebaseAuthenticated,
+    farcasterUserId,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
     privyUser?.id,
@@ -38,9 +71,29 @@ export const AuthRedirect = ({ mode }: Props) => {
   useEffect(() => {
     const handleAuthRedirect = async () => {
       // ローディング中は何もしない
-      if (isPrivyLoading) {
+      // Mini App環境でない場合は、Farcasterのローディング状態を無視
+      const shouldWaitForLoading = isPrivyLoading || (isMiniApp && isFarcasterLoading);
+      if (shouldWaitForLoading) {
+        console.log('AuthRedirect: ローディング中...', { 
+          isPrivyLoading, 
+          isFarcasterLoading, 
+          isMiniApp,
+          shouldWaitForLoading 
+        });
         return;
       }
+
+      console.log('AuthRedirect: 認証状態チェック', {
+        mode,
+        pathname,
+        isMiniApp,
+        isPrivyAuthenticated,
+        isPrivyFirebaseAuthenticated,
+        isFarcasterAuthenticated,
+        isFarcasterFirebaseAuthenticated,
+        privyUserId: privyUser?.id,
+        farcasterUserId,
+      });
 
       // プロフィール作成ページの場合
       if (mode === 'profile') {
@@ -68,17 +121,42 @@ export const AuthRedirect = ({ mode }: Props) => {
         // その他の認証関連ページ
         if (pathname === '/profile/create') return;
 
+        // 認証されている場合
         if (isAuthenticated && userId) {
+          console.log('AuthRedirect: 認証済み、DBチェック開始', { userId });
           const exists = await checkUserExists(userId);
+          console.log('AuthRedirect: DBチェック結果', { userId, exists });
           if (!exists) {
+            // DBにユーザーが存在しない場合はprofile/createに転送
+            console.log('AuthRedirect: ユーザーが存在しないためprofile/createに転送');
             router.push('/profile/create');
+          } else {
+            console.log('AuthRedirect: ユーザーが存在するため、現在のページに留まる');
           }
+        } else {
+          // 認証されていない場合は認証ページに転送
+          console.log('AuthRedirect: 未認証のため認証ページに転送');
+          router.push('/');
         }
       }
     };
 
     handleAuthRedirect();
-  }, [getUserId, isPrivyLoading, router, pathname, mode]);
+  }, [
+    getUserId,
+    isPrivyLoading,
+    isFarcasterLoading,
+    router,
+    pathname,
+    mode,
+    isMiniApp,
+    isFarcasterAuthenticated,
+    isFarcasterFirebaseAuthenticated,
+    farcasterUserId,
+    isPrivyAuthenticated,
+    isPrivyFirebaseAuthenticated,
+    privyUser?.id,
+  ]);
 
   return null;
 };

@@ -2,7 +2,7 @@
 
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Loading } from '@/components/ui/Loading';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
+import { usePrivyAuth } from '@/hooks/usePrivyAuth';
 import { PrivyProvider } from '@privy-io/react-auth';
 
 interface PrivyAuthProviderProps {
@@ -11,7 +11,7 @@ interface PrivyAuthProviderProps {
 
 export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
   const { isMiniApp } = useIsMiniApp();
-  const { isLoading } = useFirebaseAuth();
+  const { isLoading } = usePrivyAuth();
 
   if (!isMiniApp && isLoading) {
     return (

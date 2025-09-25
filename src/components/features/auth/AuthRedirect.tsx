@@ -70,11 +70,11 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   useEffect(() => {
     const handleAuthRedirect = async () => {
-      // ローディング中は何もしない
+      // 認証状態の初期化が完了するまで待機
       // Mini App環境でない場合は、Farcasterのローディング状態を無視
       const shouldWaitForLoading = isPrivyLoading || (isMiniApp && isFarcasterLoading);
       if (shouldWaitForLoading) {
-        console.log('AuthRedirect: ローディング中...', { 
+        console.log('AuthRedirect: 認証状態の初期化待機中...', { 
           isPrivyLoading, 
           isFarcasterLoading, 
           isMiniApp,
@@ -94,6 +94,14 @@ export const AuthRedirect = ({ mode }: Props) => {
         privyUserId: privyUser?.id,
         farcasterUserId,
       });
+
+      // 認証状態がまだ初期化されていない場合は待機
+      // 少なくとも一つの認証プロバイダーが初期化完了していることを確認
+      const hasAnyAuthProvider = isPrivyAuthenticated !== undefined || isFarcasterAuthenticated !== undefined;
+      if (!hasAnyAuthProvider) {
+        console.log('AuthRedirect: 認証プロバイダーの初期化待機中...');
+        return;
+      }
 
       // プロフィール作成ページの場合
       if (mode === 'profile') {

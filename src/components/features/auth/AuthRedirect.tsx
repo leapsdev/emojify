@@ -55,7 +55,7 @@ export const AuthRedirect = ({ mode }: Props) => {
       console.log('getUserId: Privy認証を使用', { privyUserId: privyUser?.id });
       return privyUser?.id || '';
     }
-    
+
     console.log('getUserId: 認証されていない');
     return '';
   }, [
@@ -72,13 +72,14 @@ export const AuthRedirect = ({ mode }: Props) => {
     const handleAuthRedirect = async () => {
       // 認証状態の初期化が完了するまで待機
       // Mini App環境でない場合は、Farcasterのローディング状態を無視
-      const shouldWaitForLoading = isPrivyLoading || (isMiniApp && isFarcasterLoading);
+      const shouldWaitForLoading =
+        isPrivyLoading || (isMiniApp && isFarcasterLoading);
       if (shouldWaitForLoading) {
-        console.log('AuthRedirect: 認証状態の初期化待機中...', { 
-          isPrivyLoading, 
-          isFarcasterLoading, 
+        console.log('AuthRedirect: 認証状態の初期化待機中...', {
+          isPrivyLoading,
+          isFarcasterLoading,
           isMiniApp,
-          shouldWaitForLoading 
+          shouldWaitForLoading,
         });
         return;
       }
@@ -97,7 +98,9 @@ export const AuthRedirect = ({ mode }: Props) => {
 
       // 認証状態がまだ初期化されていない場合は待機
       // 少なくとも一つの認証プロバイダーが初期化完了していることを確認
-      const hasAnyAuthProvider = isPrivyAuthenticated !== undefined || isFarcasterAuthenticated !== undefined;
+      const hasAnyAuthProvider =
+        isPrivyAuthenticated !== undefined ||
+        isFarcasterAuthenticated !== undefined;
       if (!hasAnyAuthProvider) {
         console.log('AuthRedirect: 認証プロバイダーの初期化待機中...');
         return;
@@ -129,6 +132,9 @@ export const AuthRedirect = ({ mode }: Props) => {
         // その他の認証関連ページ
         if (pathname === '/profile/create') return;
 
+        // Mini Appでない環境で/signupページの場合はリダイレクトしない
+        if (!isMiniApp && pathname === '/signup') return;
+
         // 認証されている場合
         if (isAuthenticated && userId) {
           console.log('AuthRedirect: 認証済み、DBチェック開始', { userId });
@@ -136,10 +142,14 @@ export const AuthRedirect = ({ mode }: Props) => {
           console.log('AuthRedirect: DBチェック結果', { userId, exists });
           if (!exists) {
             // DBにユーザーが存在しない場合はprofile/createに転送
-            console.log('AuthRedirect: ユーザーが存在しないためprofile/createに転送');
+            console.log(
+              'AuthRedirect: ユーザーが存在しないためprofile/createに転送',
+            );
             router.push('/profile/create');
           } else {
-            console.log('AuthRedirect: ユーザーが存在するため、現在のページに留まる');
+            console.log(
+              'AuthRedirect: ユーザーが存在するため、現在のページに留まる',
+            );
           }
         } else {
           // 認証されていない場合は認証ページに転送

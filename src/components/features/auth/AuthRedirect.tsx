@@ -107,9 +107,6 @@ export const AuthRedirect = ({ mode }: Props) => {
       if (!exists) {
         // ユーザーが存在しない場合はプロフィール作成ページへ
         router.push('/profile/create');
-      } else if (isMiniApp && pathname === '/') {
-        // Mini App環境でユーザーが存在し、ルートページにいる場合はチャットページへ
-        router.push('/chat');
       }
     } else {
       // 未認証の場合は認証ページへ

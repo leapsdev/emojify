@@ -5,7 +5,7 @@ import { LinkButton } from '@/components/ui/LinkButton';
 
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();
-  const href = isMiniApp ? '/profile/create' : '/signup';
+  const href = isMiniApp ? '/chat' : '/signup';
 
   return (
     <div className="mt-auto">

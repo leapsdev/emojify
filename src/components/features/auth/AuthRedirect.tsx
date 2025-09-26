@@ -84,6 +84,14 @@ export const AuthRedirect = ({ mode }: Props) => {
         return;
       }
 
+      // Mini App環境では、Farcaster認証の初期化が完了するまで追加で待機
+      if (isMiniApp && isFarcasterAuthenticated === undefined) {
+        console.log(
+          'AuthRedirect: Mini App環境でFarcaster認証の初期化待機中...',
+        );
+        return;
+      }
+
       console.log('AuthRedirect: 認証状態チェック', {
         mode,
         pathname,

@@ -117,12 +117,20 @@ export const AuthRedirect = ({ mode }: Props) => {
       // プロフィール作成ページの場合
       if (mode === 'profile') {
         const userId = getUserId();
+        console.log('AuthRedirect: profile mode - userId:', userId);
 
         if (userId) {
+          console.log('AuthRedirect: profile mode - DBチェック開始', { userId });
           const exists = await checkUserExists(userId);
+          console.log('AuthRedirect: profile mode - DBチェック結果', { userId, exists });
           if (exists) {
+            console.log('AuthRedirect: profile mode - /chatにリダイレクト');
             router.push('/chat');
+          } else {
+            console.log('AuthRedirect: profile mode - ユーザーが存在しないため、現在のページに留まる');
           }
+        } else {
+          console.log('AuthRedirect: profile mode - userIdが取得できない');
         }
         return;
       }

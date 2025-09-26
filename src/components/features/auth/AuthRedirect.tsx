@@ -100,6 +100,7 @@ export const AuthRedirect = ({ mode }: Props) => {
     // 特定のページではリダイレクトしない
     if (pathname === '/' || pathname === '/profile/create') return;
     if (!isMiniApp && pathname === '/signup') return;
+    if (pathname === '/choose-friends') return;
 
     if (isAuthenticated && userId) {
       const exists = await checkUserExists(userId);

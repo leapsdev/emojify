@@ -147,9 +147,15 @@ export const AuthRedirect = ({ mode }: Props) => {
             );
             router.push('/profile/create');
           } else {
+            // DBにユーザーが存在する場合
             console.log(
-              'AuthRedirect: ユーザーが存在するため、現在のページに留まる',
+              'AuthRedirect: ユーザーが存在するため、適切なページにリダイレクト',
             );
+            // Mini App環境で認証済みユーザーが存在する場合は/chatにリダイレクト
+            if (isMiniApp) {
+              router.push('/chat');
+            }
+            // Web環境の場合は現在のページに留まる（既に適切なページにいる可能性が高い）
           }
         } else {
           // 認証されていない場合は認証ページに転送

@@ -11,14 +11,11 @@ import { checkUserExists } from '../auth/action';
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();
   const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
-  const {
-    isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
-    isLoading: isPrivyLoading,
-  } = usePrivyAuth();
+  const { isFirebaseAuthenticated: isPrivyFirebaseAuthenticated } =
+    usePrivyAuth();
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated: isFarcasterFirebaseAuthenticated,
-    isLoading: isFarcasterLoading,
     farcasterUserId,
   } = useFarcasterAuth();
   const router = useRouter();

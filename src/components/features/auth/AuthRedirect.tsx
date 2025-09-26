@@ -160,7 +160,8 @@ export const AuthRedirect = ({ mode }: Props) => {
               'AuthRedirect: ユーザーが存在するため、適切なページにリダイレクト',
             );
             // Mini App環境で認証済みユーザーが存在する場合は/chatにリダイレクト
-            if (isMiniApp) {
+            // ただし、既に/chatにいる場合はリダイレクトしない
+            if (isMiniApp && pathname !== '/chat') {
               router.push('/chat');
             }
             // Web環境の場合は現在のページに留まる（既に適切なページにいる可能性が高い）

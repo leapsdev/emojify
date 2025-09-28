@@ -20,7 +20,6 @@ export function FarcasterAuthProvider({
   // Farcaster SDKの初期化と自動ログインを実行
   const { isLoading } = useFarcasterAuth();
   const { isMiniApp } = useIsMiniApp();
-
   // Service Worker登録（CORSエラー解決用）
   useEffect(() => {
     if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {

@@ -1,6 +1,6 @@
 'use client';
 
-import { getFarcasterSDK, initializeFarcasterMiniApp } from '@/lib/farcaster';
+import { initializeFarcasterMiniApp } from '@/lib/farcaster';
 import { useCallback, useEffect, useState } from 'react';
 
 interface FarcasterMiniAppState {

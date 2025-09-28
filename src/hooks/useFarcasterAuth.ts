@@ -1,10 +1,7 @@
 'use client';
 
-import {
-  type FarcasterInitializationResult,
-  getFarcasterSDK,
-  initializeFarcasterMiniApp,
-} from '@/lib/farcaster';
+import { useFarcasterMiniApp } from '@/hooks/useFarcasterMiniApp';
+import { getFarcasterSDK } from '@/lib/farcaster';
 import { auth } from '@/repository/db/config/client';
 import {
   type User,
@@ -13,7 +10,7 @@ import {
 } from 'firebase/auth';
 import { useCallback, useEffect, useState } from 'react';
 
-interface FarcasterAuthState extends FarcasterInitializationResult {
+interface FarcasterAuthState {
   isFarcasterAuthenticated: boolean;
   isFirebaseAuthenticated: boolean;
   isLoading: boolean;
@@ -29,62 +26,29 @@ interface FarcasterAuthState extends FarcasterInitializationResult {
  * Farcaster Mini App環境で使用される
  */
 export function useFarcasterAuth() {
+  const { isSDKLoaded, isReady, isMiniApp } = useFarcasterMiniApp();
   const [state, setState] = useState<FarcasterAuthState>({
-    // SDK初期化状態
-    isSDKLoaded: false,
-    isReady: false,
-    context: null,
-    isMiniApp: false,
-    error: null,
-    // 認証状態
     isFarcasterAuthenticated: false,
     isFirebaseAuthenticated: false,
     isLoading: true,
+    error: null,
     user: null,
     farcasterToken: null,
     farcasterUserId: null,
     autoLoginAttempted: false,
   });
 
-  // SDK初期化処理
-  const initializeSDK = useCallback(async () => {
-    if (state.isSDKLoaded) {
-      return;
-    }
-
-    try {
-      const result = await initializeFarcasterMiniApp();
-      setState((prev) => ({
-        ...prev,
-        isSDKLoaded: result.isSDKLoaded,
-        isReady: result.isReady,
-        context: result.context,
-        isMiniApp: result.isMiniApp,
-        error: result.error,
-      }));
-    } catch (error) {
-      console.error('Farcaster SDK初期化エラー:', error);
-      setState((prev) => ({
-        ...prev,
-        isSDKLoaded: true,
-        isReady: false,
-        isMiniApp: false,
-        error: error instanceof Error ? error.message : 'SDK初期化エラー',
-      }));
-    }
-  }, [state.isSDKLoaded]);
-
   const authenticateWithFarcaster = useCallback(async () => {
     try {
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       // Mini App環境でない場合はエラー
-      if (!state.isMiniApp) {
+      if (!isMiniApp) {
         throw new Error('この機能はFarcaster Mini App環境でのみ利用可能です');
       }
 
       // SDKが準備完了していない場合はエラー
-      if (!state.isSDKLoaded || !state.isReady) {
+      if (!isSDKLoaded || !isReady) {
         throw new Error('Farcaster SDKが準備完了していません');
       }
 
@@ -199,12 +163,7 @@ export function useFarcasterAuth() {
         farcasterToken: null,
       }));
     }
-  }, [state.isMiniApp, state.isSDKLoaded, state.isReady]);
-
-  // SDK初期化を実行
-  useEffect(() => {
-    initializeSDK();
-  }, [initializeSDK]);
+  }, [isMiniApp, isSDKLoaded, isReady]);
 
   useEffect(() => {
     // Firebase認証状態の監視
@@ -230,9 +189,9 @@ export function useFarcasterAuth() {
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {
     if (
-      state.isSDKLoaded &&
-      state.isReady &&
-      state.isMiniApp &&
+      isSDKLoaded &&
+      isReady &&
+      isMiniApp &&
       !state.autoLoginAttempted &&
       !state.isFarcasterAuthenticated
     ) {
@@ -241,9 +200,9 @@ export function useFarcasterAuth() {
       authenticateWithFarcaster();
     }
   }, [
-    state.isSDKLoaded,
-    state.isReady,
-    state.isMiniApp,
+    isSDKLoaded,
+    isReady,
+    isMiniApp,
     state.autoLoginAttempted,
     state.isFarcasterAuthenticated,
     authenticateWithFarcaster,

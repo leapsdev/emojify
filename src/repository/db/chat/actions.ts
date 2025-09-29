@@ -113,16 +113,21 @@ export async function updateUserInChatRooms(
   const userRooms = userRoomsSnapshot.val() || {};
   const roomIds = Object.keys(userRooms);
 
+  // ウォレットアドレスを取得
+  const walletAddress = getWalletAddressFromUserIdSync(userId);
+
   // 各チャットルームのメンバー情報を更新
   const updates: Record<string, string | null> = {};
   roomIds.forEach((roomId) => {
     if (userData.username) {
-      updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}/username`] =
-        userData.username;
+      updates[
+        `${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}/username`
+      ] = userData.username;
     }
     if (userData.imageUrl !== undefined) {
-      updates[`${DB_PATHS.chatRooms}/${roomId}/members/${userId}/imageUrl`] =
-        userData.imageUrl;
+      updates[
+        `${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}/imageUrl`
+      ] = userData.imageUrl;
     }
   });
 

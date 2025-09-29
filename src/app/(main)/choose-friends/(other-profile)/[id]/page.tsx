@@ -61,16 +61,6 @@ export default function Page({ params }: PageProps) {
     );
   }
 
-  if (!isAuthenticated || !userId || !targetUser || !currentUser) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Authentication is required</p>
-        </div>
-      </div>
-    );
-  }
-
   // フレンド状態の初期値を取得
   const initialIsFriend = Boolean(currentUser?.friends?.[targetUserId]);
 
@@ -78,7 +68,7 @@ export default function Page({ params }: PageProps) {
     <ProfilePage
       user={targetUser}
       isOwnProfile={false}
-      currentUserId={userId}
+      currentUserId={userId || ''}
       initialIsFriend={initialIsFriend}
     />
   );

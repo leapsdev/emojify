@@ -49,27 +49,22 @@ export default function Page() {
     );
   }
 
-  if (!isAuthenticated || !userId || !roomData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Authentication is required</p>
-        </div>
-      </div>
-    );
-  }
-
   // 相手のユーザー情報を取得
-  const otherMembers = Object.entries(roomData.members)
-    .filter(([id]) => id !== userId)
-    .map(([, member]) => member);
+  const otherMembers = roomData
+    ? Object.entries(roomData.members)
+        .filter(([id]) => id !== userId)
+        .map(([, member]) => member)
+    : [];
 
-  if (otherMembers.length === 0) {
+  if (roomData && otherMembers.length === 0) {
     notFound();
   }
 
   // ヘッダーに表示するユーザー名を生成
-  const headerTitle = otherMembers.map((member) => member.username).join(', ');
+  const headerTitle =
+    otherMembers.length > 0
+      ? otherMembers.map((member) => member.username).join(', ')
+      : '';
 
   return (
     <>
@@ -83,7 +78,7 @@ export default function Page() {
       />
       <ChatRoomPage
         roomId={roomId}
-        userId={userId}
+        userId={userId || ''}
         initialMessages={messages}
       />
     </>

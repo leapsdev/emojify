@@ -13,7 +13,7 @@ import { handleProfileFormAction } from './action';
 import type { ProfileFormState } from './action';
 
 interface ProfileEditFormProps {
-  user: User;
+  user: User | null;
 }
 
 const initialState: ProfileFormState = null;
@@ -28,9 +28,9 @@ export const ProfileEditForm = forwardRef<
   );
 
   const defaultValues = {
-    username: user.username,
-    bio: user.bio || '',
-    email: user.email || null,
+    username: user?.username || '',
+    bio: user?.bio || '',
+    email: user?.email || null,
   };
 
   const [form, fields] = useForm({
@@ -51,8 +51,8 @@ export const ProfileEditForm = forwardRef<
       action={formAction}
       ref={ref}
     >
-      <input type="hidden" name="userId" value={user.id} />
-      <input type="hidden" name={fields.email.name} value={user.email || ''} />
+      <input type="hidden" name="userId" value={user?.id || ''} />
+      <input type="hidden" name={fields.email.name} value={user?.email || ''} />
 
       {state?.message && (
         <div
@@ -75,7 +75,7 @@ export const ProfileEditForm = forwardRef<
         <Input
           id={fields.username.id}
           name={fields.username.name}
-          defaultValue={user.username}
+          defaultValue={user?.username || ''}
           className={`rounded-2xl border-gray-200 bg-gray-50 px-4 py-6 text-lg ${
             fields.username.errors ? 'border-red-500' : ''
           }`}
@@ -94,7 +94,7 @@ export const ProfileEditForm = forwardRef<
           <Textarea
             id={fields.bio.id}
             name={fields.bio.name}
-            defaultValue={user.bio || ''}
+            defaultValue={user?.bio || ''}
             placeholder="Tell us about you..."
             className={`rounded-2xl border-gray-200 bg-gray-50 min-h-[150px] p-4 text-lg resize-none ${
               fields.bio.errors ? 'border-red-500' : ''

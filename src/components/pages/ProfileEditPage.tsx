@@ -6,7 +6,7 @@ import type { User } from '@/repository/db/database';
 import { useRef } from 'react';
 
 interface ProfileEditPageProps {
-  initialUser: User;
+  initialUser: User | null;
 }
 
 export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
@@ -24,7 +24,7 @@ export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
   return (
     <main className="flex flex-col max-w-2xl mx-auto w-full px-4 py-8">
       <ProfileImage
-        currentImageUrl={initialUser.imageUrl}
+        currentImageUrl={initialUser?.imageUrl || ''}
         onImageUpload={handleImageUpload}
       />
       <ProfileEditForm user={initialUser} ref={formRef} />

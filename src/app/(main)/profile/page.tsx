@@ -38,15 +38,5 @@ export default function Page() {
     );
   }
 
-  if (!isAuthenticated || !userId || !userData) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Authentication is required</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <ProfilePage user={userData} />;
+  return <ProfilePage user={userData || null} />;
 }

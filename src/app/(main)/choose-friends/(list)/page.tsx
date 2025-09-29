@@ -41,16 +41,6 @@ export default function ChooseFriendsPage() {
     );
   }
 
-  if (!isAuthenticated || !userId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Authentication is required</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <ClientChooseFriendsPage
       initialFriends={friendshipData.friends}

@@ -19,7 +19,7 @@ import { readContract } from '@wagmi/core';
 import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
-  user: User;
+  user: User | null;
   isOwnProfile?: boolean;
   currentUserId?: string;
   initialIsFriend?: boolean;
@@ -111,10 +111,10 @@ function ProfilePageContent({
         <div className="overflow-y-auto overflow-x-hidden flex-1">
           <div className="max-w-full">
             <UserProfile
-              username={user.username}
-              bio={user.bio || ''}
-              avatar={user.imageUrl || '/icons/faceIcon-192x192.png'}
-              userId={user.id}
+              username={user?.username || ''}
+              bio={user?.bio || ''}
+              avatar={user?.imageUrl || '/icons/faceIcon-192x192.png'}
+              userId={user?.id || ''}
               isOwnProfile={isOwnProfile}
               currentUserId={currentUserId}
               initialIsFriend={initialIsFriend}

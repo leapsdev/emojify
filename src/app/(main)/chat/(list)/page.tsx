@@ -39,15 +39,5 @@ export default function Page() {
     );
   }
 
-  if (!isAuthenticated || !userId) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <p>Authentication is required</p>
-        </div>
-      </div>
-    );
-  }
-
-  return <ChatRoomListPage userId={userId} initialRooms={rooms} />;
+  return <ChatRoomListPage userId={userId || ''} initialRooms={rooms} />;
 }

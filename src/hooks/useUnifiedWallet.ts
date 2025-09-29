@@ -60,13 +60,90 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
         throw new Error('Ethereum provider is not available');
       }
 
-      // ウォレットアドレスを取得
-      const accounts = (await provider.request({
-        method: 'eth_accounts',
-      })) as string[];
+      // Farcaster SDKの公式ドキュメントに基づいてウォレットアドレスを取得
+      console.log('Requesting eth_requestAccounts from Farcaster provider...');
+      let accounts: string[];
 
-      const address = accounts?.[0];
+      try {
+        // Farcaster SDKでは eth_requestAccounts を使用してウォレット接続を要求
+        accounts = (await provider.request({
+          method: 'eth_requestAccounts',
+        })) as string[];
+        console.log('eth_requestAccounts response:', accounts);
+      } catch (requestError) {
+        console.log(
+          'eth_requestAccounts failed, trying eth_accounts:',
+          requestError,
+        );
+        // eth_requestAccounts が失敗した場合、eth_accounts を試行
+        try {
+          accounts = (await provider.request({
+            method: 'eth_accounts',
+          })) as string[];
+          console.log('eth_accounts response:', accounts);
+        } catch (accountsError) {
+          console.log('eth_accounts also failed:', accountsError);
+          accounts = [];
+        }
+      }
 
+      let address = accounts?.[0];
+      console.log('Extracted address from provider:', address);
+
+      // プロバイダーからアドレスが取得できない場合、SDKのコンテキストから取得を試行
+      if (!address) {
+        console.log(
+          'No address from provider, trying to get from SDK context...',
+        );
+        try {
+          const context = await sdk.context;
+          console.log('SDK context:', context);
+
+          // コンテキストからユーザー情報を取得
+          if (context && typeof context === 'object' && 'user' in context) {
+            const user = (context as { user: unknown }).user;
+            console.log('User from context:', user);
+
+            // ユーザー情報からウォレットアドレスを取得
+            if (user && typeof user === 'object' && user !== null) {
+              // 様々な可能性のあるプロパティ名をチェック
+              const possibleAddressFields = [
+                'address',
+                'walletAddress',
+                'ethAddress',
+                'wallet_address',
+              ];
+              for (const field of possibleAddressFields) {
+                if ((user as Record<string, unknown>)[field]) {
+                  address = (user as Record<string, unknown>)[field] as string;
+                  console.log(`Found address in user.${field}:`, address);
+                  break;
+                }
+              }
+            }
+          }
+        } catch (contextError) {
+          console.log('Failed to get address from SDK context:', contextError);
+        }
+      }
+
+      // まだアドレスが取得できない場合、プロバイダーの状態を確認
+      if (!address) {
+        console.log('Still no address found, checking provider state...');
+        try {
+          // プロバイダーの状態を確認
+          const chainId = await provider.request({ method: 'eth_chainId' });
+          console.log('Chain ID:', chainId);
+
+          // ネットワークIDも確認
+          const netVersion = await provider.request({ method: 'net_version' });
+          console.log('Network version:', netVersion);
+        } catch (stateError) {
+          console.log('Failed to get provider state:', stateError);
+        }
+      }
+
+      console.log('Final extracted address:', address);
       console.log('Farcaster wallet initialized:', { address, provider });
 
       setFarcasterWallet({

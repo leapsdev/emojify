@@ -7,6 +7,7 @@ const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
 
 // Mini App環境ではFarcaster SDKのウォレット機能を直接使用するため、
 // Wagmiコネクターは設定しない（Privyのデフォルトコネクターのみ使用）
+// 将来的には @farcaster/frame-wagmi-connector を使用して統合することも可能
 export const config = createConfig({
   chains: [isProd ? base : baseSepolia],
   connectors: [], // Mini App環境ではFarcaster SDKを直接使用

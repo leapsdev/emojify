@@ -1,18 +1,15 @@
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { config } from '@/lib/basename/wagmi';
-import { usePrivy } from '@privy-io/react-auth';
 import { useAccount, useWalletClient } from 'wagmi';
 
 export const useWallet = () => {
   const { address } = useAccount();
   const { data: walletClient } = useWalletClient({ config });
-  const { authenticated, user } = usePrivy();
-
-  // Privyのウォレットアドレスを取得
-  const privyAddress = user?.wallet?.address;
+  const { isAuthenticated } = useUnifiedAuth();
 
   return {
-    address: address || privyAddress,
-    isConnected: authenticated,
+    address,
+    isConnected: isAuthenticated,
     walletClient,
   };
 };

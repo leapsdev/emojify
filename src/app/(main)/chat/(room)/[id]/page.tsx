@@ -2,24 +2,24 @@
 
 import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
 import type { ChatRoom, Message } from '@/repository/db/database';
-import { usePrivy } from '@privy-io/react-auth';
 import { notFound } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user, authenticated } = usePrivy();
+  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
   const [roomData, setRoomData] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const params = useParams();
   const roomId = params.id as string;
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      if (authenticated && user?.id && roomId) {
+      if (isAuthenticated && userId && roomId) {
         try {
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
@@ -32,13 +32,13 @@ export default function Page() {
           console.error('Failed to fetch room data:', error);
         }
       }
-      setIsLoading(false);
+      setIsDataLoading(false);
     };
 
     fetchRoomData();
-  }, [authenticated, user?.id, roomId]);
+  }, [isAuthenticated, userId, roomId]);
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -49,7 +49,7 @@ export default function Page() {
     );
   }
 
-  if (!authenticated || !user?.id || !roomData) {
+  if (!isAuthenticated || !userId || !roomData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -61,7 +61,7 @@ export default function Page() {
 
   // 相手のユーザー情報を取得
   const otherMembers = Object.entries(roomData.members)
-    .filter(([id]) => id !== user.id)
+    .filter(([id]) => id !== userId)
     .map(([, member]) => member);
 
   if (otherMembers.length === 0) {
@@ -83,7 +83,7 @@ export default function Page() {
       />
       <ChatRoomPage
         roomId={roomId}
-        userId={user.id}
+        userId={userId}
         initialMessages={messages}
       />
     </>

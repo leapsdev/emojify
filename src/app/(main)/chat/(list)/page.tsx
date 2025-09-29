@@ -1,34 +1,34 @@
 'use client';
 
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { getUserRooms } from '@/repository/db/chat/actions';
 import type { ChatRoom } from '@/repository/db/database';
-import { usePrivy } from '@privy-io/react-auth';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { user, authenticated } = usePrivy();
+  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchRooms = async () => {
-      if (authenticated && user?.id) {
+      if (isAuthenticated && userId) {
         try {
-          const userRooms = await getUserRooms(user.id);
+          const userRooms = await getUserRooms(userId);
           setRooms(userRooms || []);
         } catch (error) {
           console.error('Failed to fetch rooms:', error);
           setRooms([]);
         }
       }
-      setIsLoading(false);
+      setIsDataLoading(false);
     };
 
     fetchRooms();
-  }, [authenticated, user?.id]);
+  }, [isAuthenticated, userId]);
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -39,7 +39,7 @@ export default function Page() {
     );
   }
 
-  if (!authenticated || !user?.id) {
+  if (!isAuthenticated || !userId) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -49,5 +49,5 @@ export default function Page() {
     );
   }
 
-  return <ChatRoomListPage userId={user.id} initialRooms={rooms} />;
+  return <ChatRoomListPage userId={userId} initialRooms={rooms} />;
 }

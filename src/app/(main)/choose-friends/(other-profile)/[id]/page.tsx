@@ -1,9 +1,9 @@
 'use client';
 
 import { ProfilePage } from '@/components/pages/ProfilePage';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { getUserById } from '@/repository/db/user/actions';
-import { usePrivy } from '@privy-io/react-auth';
 // import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -14,10 +14,10 @@ interface PageProps {
 }
 
 export default function Page({ params }: PageProps) {
-  const { user, authenticated } = usePrivy();
+  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [isDataLoading, setIsDataLoading] = useState(true);
   const [targetUserId, setTargetUserId] = useState<string>('');
 
   useEffect(() => {
@@ -32,11 +32,11 @@ export default function Page({ params }: PageProps) {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (authenticated && user?.id && targetUserId) {
+      if (isAuthenticated && userId && targetUserId) {
         try {
           const [target, current] = await Promise.all([
             getUserById(targetUserId),
-            getUserById(user.id),
+            getUserById(userId),
           ]);
           setTargetUser(target);
           setCurrentUser(current);
@@ -44,13 +44,13 @@ export default function Page({ params }: PageProps) {
           console.error('Failed to fetch user data:', error);
         }
       }
-      setIsLoading(false);
+      setIsDataLoading(false);
     };
 
     fetchUserData();
-  }, [authenticated, user?.id, targetUserId]);
+  }, [isAuthenticated, userId, targetUserId]);
 
-  if (isLoading) {
+  if (isLoading || isDataLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -61,7 +61,7 @@ export default function Page({ params }: PageProps) {
     );
   }
 
-  if (!authenticated || !user?.id || !targetUser || !currentUser) {
+  if (!isAuthenticated || !userId || !targetUser || !currentUser) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -78,7 +78,7 @@ export default function Page({ params }: PageProps) {
     <ProfilePage
       user={targetUser}
       isOwnProfile={false}
-      currentUserId={user.id}
+      currentUserId={userId}
       initialIsFriend={initialIsFriend}
     />
   );

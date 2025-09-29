@@ -1,5 +1,6 @@
 'use client';
 
+import { getWalletAddressFromUserIdSync } from '@/lib/wallet-utils-client';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
@@ -125,10 +126,22 @@ export const addUserToRoom = async (
   roomId: string,
 ): Promise<void> => {
   const timestamp = Date.now();
+
+  // ウォレットアドレスを取得
+  const walletAddress = getWalletAddressFromUserIdSync(userId);
+
+  // ユーザー情報を取得してusernameを取得
+  const userSnapshot = await get(ref(db, `${DB_PATHS.users}/${userId}`));
+  const user = userSnapshot.val();
+  if (!user) throw new Error(`User not found: ${userId}`);
+
   const updates = {
     [`${DB_PATHS.userRooms}/${userId}/${roomId}`]: { joinedAt: timestamp },
-    [`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`]: {
+    [`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`]: {
       joinedAt: timestamp,
+      username: user.username,
+      lastReadAt: timestamp,
+      userId: userId, // ユーザーIDを保存
     },
     [`${DB_PATHS.chatRooms}/${roomId}/updatedAt`]: timestamp,
   };
@@ -143,9 +156,13 @@ export const removeUserFromRoom = async (
   roomId: string,
 ): Promise<void> => {
   const timestamp = Date.now();
+
+  // ウォレットアドレスを取得
+  const walletAddress = getWalletAddressFromUserIdSync(userId);
+
   const updates = {
     [`${DB_PATHS.userRooms}/${userId}/${roomId}`]: null,
-    [`${DB_PATHS.chatRooms}/${roomId}/members/${userId}`]: null,
+    [`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`]: null,
     [`${DB_PATHS.chatRooms}/${roomId}/updatedAt`]: timestamp,
   };
   await update(ref(db), updates);

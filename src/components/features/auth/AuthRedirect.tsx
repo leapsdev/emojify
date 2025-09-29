@@ -3,6 +3,7 @@
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { usePrivyAuth } from '@/hooks/usePrivyAuth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { usePrivy } from '@privy-io/react-auth';
 import { usePathname, useRouter } from 'next/navigation';
 import { useCallback, useEffect } from 'react';
@@ -24,6 +25,9 @@ export const AuthRedirect = ({ mode }: Props) => {
     isLoading: isFarcasterLoading,
     farcasterUserId,
   } = useFarcasterAuth();
+
+  // 統合認証状態も取得
+  const { isLoading: isUnifiedLoading } = useUnifiedAuth();
   const { isMiniApp } = useIsMiniApp();
 
   const router = useRouter();
@@ -94,6 +98,11 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   // 認証ページでのリダイレクト処理
   const handleAuthModeRedirect = useCallback(async () => {
+    // 統合認証のローディング中は待機
+    if (isUnifiedLoading) {
+      return; // ローディング中はリダイレクトしない
+    }
+
     // miniapp環境では認証処理が完了するまで待機
     if (isMiniApp && isFarcasterLoading) {
       return; // ローディング中はリダイレクトしない
@@ -112,6 +121,25 @@ export const AuthRedirect = ({ mode }: Props) => {
     if (!isMiniApp && pathname === '/signup') return;
     if (pathname === '/choose-friends') return;
 
+    // miniapp環境での認証状態の詳細チェック
+    if (isMiniApp) {
+      // Farcaster認証が完了しているかチェック
+      if (isFarcasterAuthenticated === false) {
+        // Farcaster認証が失敗した場合は認証ページへ
+        router.push('/');
+        return;
+      }
+
+      // Farcaster認証は成功しているが、Firebase認証が失敗している場合
+      if (
+        isFarcasterAuthenticated === true &&
+        !isFarcasterFirebaseAuthenticated
+      ) {
+        // Firebase認証の再試行を待つ（ローディング状態を継続）
+        return;
+      }
+    }
+
     if (isAuthenticated && userId) {
       const exists = await checkUserExists(userId);
       if (!exists) {
@@ -127,8 +155,10 @@ export const AuthRedirect = ({ mode }: Props) => {
     pathname,
     isMiniApp,
     router,
+    isUnifiedLoading,
     isFarcasterLoading,
     isFarcasterAuthenticated,
+    isFarcasterFirebaseAuthenticated,
   ]);
 
   useEffect(() => {

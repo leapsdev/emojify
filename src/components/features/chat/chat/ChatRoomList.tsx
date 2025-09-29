@@ -16,6 +16,7 @@ type Member = {
   username: string;
   lastReadAt: number;
   imageUrl?: string | null;
+  userId: string; // ユーザーIDを追加
 };
 
 const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
@@ -24,7 +25,7 @@ const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
 
   // メンバー情報を取得（自分以外）
   const otherMembers = Object.entries(members).filter(
-    ([memberId]) => memberId !== currentUserId,
+    ([, member]) => (member as Member).userId !== currentUserId,
   ) as [string, Member][];
 
   // アバター画像のURLを決定

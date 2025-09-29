@@ -161,7 +161,8 @@ function MessageListContent({
 
           <div className="space-y-4">
             {messagesForDate.map((message) => {
-              const isSentByCurrentUser = message.senderId === currentUserId;
+              const isSentByCurrentUser =
+                message.senderWalletAddress === currentUserId;
 
               return (
                 <div

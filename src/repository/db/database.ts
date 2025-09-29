@@ -34,7 +34,7 @@ export interface User {
 export interface Message {
   id: string;
   content: string;
-  senderId: string;
+  senderWalletAddress: string; // ウォレットアドレス
   roomId: string;
   createdAt: number;
   sent: boolean;
@@ -47,17 +47,18 @@ export interface Message {
 export interface ChatRoom {
   id: string;
   members: Record<
-    string,
+    string, // キーはウォレットアドレス
     {
       joinedAt: number;
       username: string;
       lastReadAt: number;
       imageUrl?: string | null;
+      userId: string; // ユーザーIDを追加（表示用）
     }
   >;
   lastMessage?: {
     content: string;
-    senderId: string;
+    senderWalletAddress: string; // ウォレットアドレス
     createdAt: number;
   };
   createdAt: number;

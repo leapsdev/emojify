@@ -1,5 +1,6 @@
 'use client';
 
+import { getWalletAddressFromUserIdSync } from '@/lib/wallet-utils-client';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
@@ -34,10 +35,15 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
           membersRef.current = room.members;
         }
 
+        // ウォレットアドレスを取得
+        const currentUserWalletAddress =
+          getWalletAddressFromUserIdSync(currentUserId);
+
         // 未読状態の更新
         const newUnreadStatus = room.lastMessage
-          ? room.lastMessage.senderId !== currentUserId &&
-            room.members[currentUserId].lastReadAt < room.lastMessage.createdAt
+          ? room.lastMessage.senderWalletAddress !== currentUserWalletAddress &&
+            room.members[currentUserWalletAddress]?.lastReadAt <
+              room.lastMessage.createdAt
           : false;
 
         // 未読状態またはメンバー情報が変更された場合のみコールバックを呼び出す

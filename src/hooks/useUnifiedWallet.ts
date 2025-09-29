@@ -3,13 +3,13 @@ import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { config } from '@/lib/basename/wagmi';
 import { getFarcasterSDK } from '@/lib/farcaster';
 import { useCallback, useEffect, useState } from 'react';
+import type { WalletClient } from 'viem';
 import { useAccount, useWalletClient } from 'wagmi';
 
 interface UnifiedWalletReturn {
   address: string | undefined;
   isConnected: boolean;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  walletClient: any; // WalletClient | EIP1193Provider - 環境によって異なる型のため
+  walletClient: WalletClient | unknown | null; // 環境によって異なる型（Farcaster SDKのプロバイダーはunknown）
   isLoading: boolean;
   error: string | null;
 }
@@ -30,8 +30,7 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
   // Farcaster ウォレット状態
   const [farcasterWallet, setFarcasterWallet] = useState<{
     address: string | undefined;
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    walletClient: any; // EIP1193Provider - Farcaster環境のプロバイダー
+    walletClient: unknown | null; // Farcaster環境のプロバイダー
     isLoading: boolean;
     error: string | null;
   }>({
@@ -68,6 +67,8 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
 
       const address = accounts?.[0];
 
+      console.log('Farcaster wallet initialized:', { address, provider });
+
       setFarcasterWallet({
         address,
         walletClient: provider,
@@ -94,6 +95,13 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
 
   // 環境に応じて適切なウォレット情報を返す
   if (isMiniApp) {
+    console.log('Using Farcaster wallet:', {
+      address: farcasterWallet.address,
+      isConnected: isAuthenticated && !!farcasterWallet.address,
+      isLoading: farcasterWallet.isLoading,
+      error: farcasterWallet.error,
+    });
+
     return {
       address: farcasterWallet.address,
       isConnected: isAuthenticated && !!farcasterWallet.address,
@@ -104,6 +112,11 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
   }
 
   // Web環境 (Privy + Wagmi)
+  console.log('Using Privy wallet:', {
+    address: wagmiAddress,
+    isConnected: isAuthenticated && !!wagmiAddress,
+  });
+
   return {
     address: wagmiAddress,
     isConnected: isAuthenticated && !!wagmiAddress,

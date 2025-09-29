@@ -25,15 +25,18 @@ export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
     <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
-        loginMethods: ['wallet', 'farcaster', 'email'],
+        // Mini App環境ではウォレット機能を無効化
+        loginMethods: isMiniApp
+          ? ['farcaster', 'email']
+          : ['wallet', 'farcaster', 'email'],
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
-          showWalletLoginFirst: true,
+          showWalletLoginFirst: !isMiniApp, // Mini App環境ではウォレットログインを無効化
         },
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
-          showWalletUIs: true,
+          showWalletUIs: !isMiniApp, // Mini App環境ではウォレットUIを表示しない
         },
       }}
     >

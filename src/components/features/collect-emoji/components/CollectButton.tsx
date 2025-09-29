@@ -48,30 +48,42 @@ export function CollectButton({ tokenId }: Props) {
       const valueToSend = isFirstMinter ? BigInt(0) : BigInt('500000000000000'); // 0.0005 ETH in wei
 
       // NFTを取得
-      const hash = walletClient.writeContract
-        ? await walletClient.writeContract({
-            ...emojiContract,
-            functionName: 'addEmojiSupply',
-            args: [
-              address as `0x${string}`,
-              BigInt(tokenId),
-              BigInt(1),
-              '0x' as `0x${string}`,
-            ],
-            value: valueToSend,
-          })
-        : await walletClient.request({
-            method: 'eth_sendTransaction',
-            params: [
-              {
-                to: emojiContract.address,
-                value: `0x${valueToSend.toString(16)}`,
-                data: '0x', // TODO: エンコードが必要
-              },
-            ],
-          });
+      const hash =
+        walletClient &&
+        typeof walletClient === 'object' &&
+        walletClient !== null &&
+        'writeContract' in walletClient
+          ? await (
+              walletClient as {
+                writeContract: (...args: unknown[]) => Promise<unknown>;
+              }
+            ).writeContract({
+              ...emojiContract,
+              functionName: 'addEmojiSupply',
+              args: [
+                address as `0x${string}`,
+                BigInt(tokenId),
+                BigInt(1),
+                '0x' as `0x${string}`,
+              ],
+              value: valueToSend,
+            })
+          : await (
+              walletClient as {
+                request: (...args: unknown[]) => Promise<unknown>;
+              }
+            ).request({
+              method: 'eth_sendTransaction',
+              params: [
+                {
+                  to: emojiContract.address,
+                  value: `0x${valueToSend.toString(16)}`,
+                  data: '0x', // TODO: エンコードが必要
+                },
+              ],
+            });
 
-      setCollectResult({ result: 'success', transactionHash: hash });
+      setCollectResult({ result: 'success', transactionHash: hash as string });
     } catch (error: unknown) {
       setCollectResult({ result: 'error' });
       console.error('Collect error:', error);

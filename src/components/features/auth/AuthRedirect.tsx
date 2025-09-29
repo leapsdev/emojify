@@ -94,6 +94,16 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   // 認証ページでのリダイレクト処理
   const handleAuthModeRedirect = useCallback(async () => {
+    // miniapp環境では認証処理が完了するまで待機
+    if (isMiniApp && isFarcasterLoading) {
+      return; // ローディング中はリダイレクトしない
+    }
+
+    // miniapp環境では認証状態が未確定の場合はリダイレクトしない
+    if (isMiniApp && isFarcasterAuthenticated === undefined) {
+      return;
+    }
+
     const userId = getUserId();
     const isAuthenticated = !!userId;
 
@@ -112,7 +122,14 @@ export const AuthRedirect = ({ mode }: Props) => {
       // 未認証の場合は認証ページへ
       router.push('/');
     }
-  }, [getUserId, pathname, isMiniApp, router]);
+  }, [
+    getUserId,
+    pathname,
+    isMiniApp,
+    router,
+    isFarcasterLoading,
+    isFarcasterAuthenticated,
+  ]);
 
   useEffect(() => {
     const handleAuthRedirect = async () => {

@@ -40,18 +40,21 @@ export function AuthProvider({ children }: AuthProviderProps) {
         if (sdk) {
           // SDKが存在する場合、コンテキストを取得してMini App判定
           const context = await sdk.context;
-          setIsMiniApp(!!context && Object.keys(context).length > 0);
+          const miniAppStatus = !!context && Object.keys(context).length > 0;
+          setIsMiniApp(miniAppStatus);
+          console.log('isMiniApp', miniAppStatus);
         } else {
           setIsMiniApp(false);
+          console.log('isMiniApp', false);
         }
       } catch {
         console.log('Farcaster SDK not available, using web mode');
         setIsMiniApp(false);
+        console.log('isMiniApp', false);
       }
     };
-    console.log('isMiniApp', isMiniApp);
     checkMiniApp();
-  }, [isMiniApp]);
+  }, []); // 依存配列からisMiniAppを削除して無限ループを防止
 
   // Mini App判定のコンテキスト値を提供
   const miniAppContextValue: MiniAppContextType = {

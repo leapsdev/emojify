@@ -48,7 +48,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     // Mini App環境: Farcaster認証を使用
     if (
       isMiniApp &&
-      isFarcasterAuthenticated &&
+      isFarcasterAuthenticated === true &&
       isFarcasterFirebaseAuthenticated
     ) {
       return farcasterUserId || null;
@@ -107,8 +107,9 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     if (isMiniApp) {
       // Mini App環境: Farcaster認証を使用
+      // undefinedの場合はfalseとして扱う
       isAuthenticated =
-        isFarcasterAuthenticated && isFarcasterFirebaseAuthenticated;
+        Boolean(isFarcasterAuthenticated) && isFarcasterFirebaseAuthenticated;
       user = farcasterFirebaseUser;
       error = farcasterError;
     } else {

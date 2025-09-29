@@ -14,7 +14,7 @@ import {
 import { useCallback, useEffect, useState } from 'react';
 
 interface FarcasterAuthState extends FarcasterInitializationResult {
-  isFarcasterAuthenticated: boolean;
+  isFarcasterAuthenticated: boolean | undefined; // undefinedを許可
   isFirebaseAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
@@ -36,8 +36,8 @@ export function useFarcasterAuth() {
     context: null,
     isMiniApp: false,
     error: null,
-    // 認証状態
-    isFarcasterAuthenticated: false,
+    // 認証状態 - 初期値をundefinedに変更して認証状態を未確定にする
+    isFarcasterAuthenticated: undefined, // false → undefined
     isFirebaseAuthenticated: false,
     isLoading: true,
     user: null,

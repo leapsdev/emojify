@@ -9,7 +9,7 @@ import { useCallback } from 'react';
 import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
-  const { ready, authenticated, user } = usePrivy();
+  const { ready } = usePrivy();
   const { isAuthenticated, userId } = useUnifiedAuth();
   const router = useRouter();
   const { login } = useLogin({

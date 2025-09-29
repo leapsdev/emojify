@@ -14,7 +14,7 @@ export const WalletConnectButton = ({
   className = '',
   showIcon = true,
 }: WalletConnectButtonProps) => {
-  const { ready, authenticated } = usePrivy();
+  const { ready } = usePrivy();
   const { login } = useLogin();
   const { isAuthenticated } = useUnifiedAuth();
 

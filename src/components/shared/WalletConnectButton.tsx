@@ -16,7 +16,12 @@ export const WalletConnectButton = ({
 }: WalletConnectButtonProps) => {
   const { ready } = usePrivy();
   const { login } = useLogin();
-  const { isAuthenticated } = useUnifiedAuth();
+  const { isAuthenticated, isLoading } = useUnifiedAuth();
+
+  // 認証状態の初期化中は何も表示しない
+  if (isLoading) {
+    return null;
+  }
 
   // 統合認証状態をチェック（Mini App環境ではFarcaster認証、Web環境ではPrivy認証）
   if (isAuthenticated) {

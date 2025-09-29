@@ -10,7 +10,7 @@ import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
   const { ready } = usePrivy();
-  const { isAuthenticated, userId } = useUnifiedAuth();
+  const { isAuthenticated, userId, isLoading } = useUnifiedAuth();
   const router = useRouter();
   const { login } = useLogin({
     onComplete: (params) =>
@@ -31,6 +31,11 @@ export const SignInSignUpButton = () => {
       login();
     }
   }, [isAuthenticated, userId, router, login]);
+
+  // 認証状態の初期化中は何も表示しない
+  if (isLoading) {
+    return null;
+  }
 
   return (
     <Button

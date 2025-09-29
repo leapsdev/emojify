@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -9,6 +10,7 @@ import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
   const { ready, authenticated, user } = usePrivy();
+  const { isAuthenticated, userId } = useUnifiedAuth();
   const router = useRouter();
   const { login } = useLogin({
     onComplete: (params) =>
@@ -16,9 +18,9 @@ export const SignInSignUpButton = () => {
   });
 
   const handleClick = useCallback(async () => {
-    if (authenticated && user?.id) {
-      // 認証済みの場合、DBでユーザーの存在をチェック
-      const exists = await checkUserExists(user.id);
+    if (isAuthenticated && userId) {
+      // 統合認証済みの場合、DBでユーザーの存在をチェック
+      const exists = await checkUserExists(userId);
       if (exists) {
         router.push('/chat');
       } else {
@@ -28,7 +30,7 @@ export const SignInSignUpButton = () => {
       // 未認証の場合はログイン処理を実行
       login();
     }
-  }, [authenticated, user?.id, router, login]);
+  }, [isAuthenticated, userId, router, login]);
 
   return (
     <Button

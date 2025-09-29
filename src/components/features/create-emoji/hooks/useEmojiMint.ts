@@ -1,10 +1,8 @@
-import { config } from '@/lib/basename/wagmi';
+import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 import { emojiContract } from '@/lib/contracts';
-import { useAccount, useWalletClient } from 'wagmi';
 
 export const useEmojiMint = () => {
-  const { data: walletClient } = useWalletClient({ config });
-  const { address } = useAccount();
+  const { address, walletClient } = useUnifiedWallet();
 
   const mintNFT = async (metadataUrl: string) => {
     if (!walletClient || !address) {
@@ -12,11 +10,26 @@ export const useEmojiMint = () => {
     }
 
     try {
-      const transactionHash = await walletClient.writeContract({
-        ...emojiContract,
-        functionName: 'registerNewEmoji',
-        args: [address as `0x${string}`, metadataUrl, '0x' as `0x${string}`],
-      });
+      // Farcaster環境では EIP-1193 プロバイダー、Wagmi環境ではWalletClientを使用
+      const transactionHash = walletClient.writeContract
+        ? await walletClient.writeContract({
+            ...emojiContract,
+            functionName: 'registerNewEmoji',
+            args: [
+              address as `0x${string}`,
+              metadataUrl,
+              '0x' as `0x${string}`,
+            ],
+          })
+        : await walletClient.request({
+            method: 'eth_sendTransaction',
+            params: [
+              {
+                to: emojiContract.address,
+                data: `${emojiContract.abi}`, // TODO: エンコードが必要
+              },
+            ],
+          });
 
       return { transactionHash: transactionHash as string };
     } catch (error: unknown) {

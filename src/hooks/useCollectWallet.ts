@@ -1,13 +1,11 @@
-import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
-import { useAccount } from 'wagmi';
+import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 
 export const useCollectWallet = () => {
-  const { address, isConnecting } = useAccount();
-  const { isAuthenticated } = useUnifiedAuth();
+  const { address, isConnected, isLoading } = useUnifiedWallet();
 
   return {
-    isConnected: isAuthenticated,
+    isConnected,
     walletAddress: address,
-    isLoading: isConnecting,
+    isLoading,
   };
 };

@@ -2,12 +2,12 @@ import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { Loading } from '@/components/ui/Loading';
 import { TransactionResult } from '@/components/ui/TransactionResult';
+import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
 import { readContract } from '@wagmi/core';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
-import { useAccount, useWalletClient } from 'wagmi';
 
 interface Props {
   tokenId: string;
@@ -23,8 +23,7 @@ export function CollectButton({ tokenId }: Props) {
   const [collectResult, setCollectResult] = useState<CollectResult | null>(
     null,
   );
-  const { address } = useAccount();
-  const { data: walletClient } = useWalletClient({ config });
+  const { address, walletClient } = useUnifiedWallet();
 
   const handleCollect = async () => {
     if (!walletClient || !address) {
@@ -49,17 +48,28 @@ export function CollectButton({ tokenId }: Props) {
       const valueToSend = isFirstMinter ? BigInt(0) : BigInt('500000000000000'); // 0.0005 ETH in wei
 
       // NFTを取得
-      const hash = await walletClient.writeContract({
-        ...emojiContract,
-        functionName: 'addEmojiSupply',
-        args: [
-          address as `0x${string}`,
-          BigInt(tokenId),
-          BigInt(1),
-          '0x' as `0x${string}`,
-        ],
-        value: valueToSend,
-      });
+      const hash = walletClient.writeContract
+        ? await walletClient.writeContract({
+            ...emojiContract,
+            functionName: 'addEmojiSupply',
+            args: [
+              address as `0x${string}`,
+              BigInt(tokenId),
+              BigInt(1),
+              '0x' as `0x${string}`,
+            ],
+            value: valueToSend,
+          })
+        : await walletClient.request({
+            method: 'eth_sendTransaction',
+            params: [
+              {
+                to: emojiContract.address,
+                value: `0x${valueToSend.toString(16)}`,
+                data: '0x', // TODO: エンコードが必要
+              },
+            ],
+          });
 
       setCollectResult({ result: 'success', transactionHash: hash });
     } catch (error: unknown) {

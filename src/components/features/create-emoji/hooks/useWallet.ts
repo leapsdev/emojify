@@ -1,15 +1,14 @@
-import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
-import { config } from '@/lib/basename/wagmi';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 
 export const useWallet = () => {
-  const { address } = useAccount();
-  const { data: walletClient } = useWalletClient({ config });
-  const { isAuthenticated } = useUnifiedAuth();
+  const { address, isConnected, walletClient, isLoading, error } =
+    useUnifiedWallet();
 
   return {
     address,
-    isConnected: isAuthenticated,
+    isConnected,
     walletClient,
+    isLoading,
+    error,
   };
 };

@@ -261,7 +261,7 @@ export async function getWalletAddresses(userId: string): Promise<string[]> {
   );
 
   try {
-    const user = await privy.getUser(userId);
+    const user = await privy.getUserById(userId);
     return user.linkedAccounts
       .filter(
         (account): account is LinkedAccountWithMetadata & { type: 'wallet' } =>

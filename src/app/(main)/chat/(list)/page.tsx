@@ -2,7 +2,7 @@
 
 import { ChatRoomListPage } from '@/components/pages/ChatRoomListPage';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
-import { getUserRooms } from '@/repository/db/chat/actions';
+import { getUserRooms } from '@/repository/db/chatroom/actions';
 import type { ChatRoom } from '@/repository/db/database';
 import { useEffect, useState } from 'react';
 

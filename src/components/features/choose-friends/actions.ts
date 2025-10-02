@@ -3,7 +3,7 @@
 import {
   createChatRoom,
   findChatRoomByMembers,
-} from '@/repository/db/chat/actions';
+} from '@/repository/db/chatroom/actions';
 import {
   addFriend,
   getUsersWithFriendship,

@@ -23,24 +23,8 @@ export async function getWalletAddressFromUserId(
       return null;
     }
 
-    // Privyユーザーの場合
-    if (user.authProvider === 'privy') {
-      // Privyの場合は、ユーザーIDがウォレットアドレスとして使用される場合がある
-      // または、別途ウォレットアドレスを保存している場合がある
-      // 現在の実装では、ユーザーIDをそのまま使用
-      return userId;
-    }
-
-    // Farcasterユーザーの場合
-    if (user.authProvider === 'farcaster') {
-      // Farcasterの場合は、ユーザーID（fid）からウォレットアドレスを取得する必要がある
-      // 現在の実装では、ユーザーIDをそのまま使用
-      // TODO: Farcaster SDKからウォレットアドレスを取得する実装が必要
-      return userId;
-    }
-
-    console.warn(`Unknown auth provider: ${user.authProvider}`);
-    return null;
+    // 新しいスキーマでは、idフィールドがウォレットアドレスを表す
+    return userId;
   } catch (error) {
     console.error('Failed to get wallet address from user ID:', error);
     return null;

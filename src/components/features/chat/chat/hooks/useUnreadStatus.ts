@@ -9,7 +9,9 @@ import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 export function useUnreadStatus(roomId: string, currentUserId: string) {
   const unreadStatusRef = useRef<boolean>(false);
-  const membersRef = useRef<Record<string, { imageUrl?: string | null }>>({});
+  const membersRef = useRef<
+    Record<string, { joinedAt: number; lastReadAt: number }>
+  >({});
 
   const getSnapshot = useCallback(() => {
     return unreadStatusRef.current;

@@ -30,7 +30,6 @@ export const ProfileEditForm = forwardRef<
   const defaultValues = {
     username: user?.username || '',
     bio: user?.bio || '',
-    email: user?.email || null,
   };
 
   const [form, fields] = useForm({
@@ -52,7 +51,6 @@ export const ProfileEditForm = forwardRef<
       ref={ref}
     >
       <input type="hidden" name="userId" value={user?.id || ''} />
-      <input type="hidden" name={fields.email.name} value={user?.email || ''} />
 
       {state?.message && (
         <div

@@ -6,27 +6,21 @@ import type { User } from '@/repository/db/database';
 import { PrivyClient } from '@privy-io/server-auth';
 import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import { updateUserInChatRooms } from '../chat/actions';
-import type { AuthProvider, ProfileForm } from './schema';
+import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
-export async function createUser(
-  data: ProfileForm,
-  userId: string,
-  authProvider: AuthProvider,
-) {
+export async function createUser(data: ProfileForm, userId: string) {
   const timestamp = getCurrentTimestamp();
   const userRef = adminDbRef(`${USERS_PATH}/${userId}`);
 
   const user: User = {
     id: userId,
-    authProvider,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
     createdAt: timestamp,
     updatedAt: timestamp,
-    email: data.email || null,
   };
 
   await userRef.set(user);
@@ -40,7 +34,7 @@ export async function createUser(
  * @returns 作成されたユーザー
  */
 export async function createPrivyUser(data: ProfileForm, privyId: string) {
-  return createUser(data, privyId, 'privy');
+  return createUser(data, privyId);
 }
 
 /**
@@ -51,7 +45,7 @@ export async function createPrivyUser(data: ProfileForm, privyId: string) {
  */
 export async function createFarcasterUser(data: ProfileForm, fid: string) {
   const userId = fid.toString();
-  return createUser(data, userId, 'farcaster');
+  return createUser(data, userId);
 }
 
 export async function getUser(userId: string) {

@@ -1,4 +1,3 @@
-import { getUser } from '@/repository/db/user/actions';
 import { PrivyClient } from '@privy-io/server-auth';
 import { cookies } from 'next/headers';
 import { createFirebaseCustomToken } from './firebase-auth';
@@ -161,27 +160,10 @@ export async function getFirebaseCustomTokenFromFarcaster(
 
 /**
  * ユーザーのメールアドレスを取得する
- * @returns メールアドレス
+ * @returns メールアドレス（新しいスキーマでは常にnull）
  * @throws {Error} 認証エラー時
  */
 export async function getPrivyEmail(): Promise<string | null> {
-  try {
-    // Cookieからトークンを取得
-    const requestCookies = await cookies();
-    const privyToken = requestCookies.get('privy-token')?.value;
-
-    if (!privyToken) {
-      return null;
-    }
-
-    // トークンの検証とユーザー情報の取得
-    const verifiedUser = await privy.verifyAuthToken(privyToken);
-    if (!verifiedUser) return null;
-
-    const user = await getUser(verifiedUser.userId);
-    return user?.email ?? null;
-  } catch (error) {
-    console.error('Privy authentication error:', error);
-    return null;
-  }
+  // 新しいスキーマではemailフィールドが存在しないため、常にnullを返す
+  return null;
 }

@@ -4,7 +4,8 @@ import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
-import type { ChatRoom, Message } from '@/repository/db/database';
+import type { ChatRoom, Message, User } from '@/repository/db/database';
+import { getUser } from '@/repository/db/user/actions';
 import { notFound } from 'next/navigation';
 import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -13,6 +14,7 @@ export default function Page() {
   const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
   const [roomData, setRoomData] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
+  const [otherUsers, setOtherUsers] = useState<User[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const params = useParams();
   const roomId = params.id as string;
@@ -28,6 +30,21 @@ export default function Page() {
           }
           setRoomData(room);
           setMessages(roomMessages);
+
+          // 他のメンバーのユーザー情報を取得
+          const otherMemberWalletAddresses = Object.keys(room.members).filter(
+            (walletAddress) => walletAddress !== userId,
+          );
+
+          const otherUsersData = await Promise.all(
+            otherMemberWalletAddresses.map((walletAddress) =>
+              getUser(walletAddress),
+            ),
+          );
+
+          setOtherUsers(
+            otherUsersData.filter((user): user is User => user !== null),
+          );
         } catch (error) {
           console.error('Failed to fetch room data:', error);
         }
@@ -49,21 +66,14 @@ export default function Page() {
     );
   }
 
-  // 相手のユーザー情報を取得
-  const otherMembers = roomData
-    ? Object.entries(roomData.members)
-        .filter(([id]) => id !== userId)
-        .map(([, member]) => member)
-    : [];
-
-  if (roomData && otherMembers.length === 0) {
+  if (roomData && otherUsers.length === 0) {
     notFound();
   }
 
   // ヘッダーに表示するユーザー名を生成
   const headerTitle =
-    otherMembers.length > 0
-      ? otherMembers.map((member) => member.username).join(', ')
+    otherUsers.length > 0
+      ? otherUsers.map((user) => user.username).join(', ')
       : '';
 
   return (

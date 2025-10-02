@@ -1,7 +1,15 @@
+/**
+ * Firebase Admin サーバーサイド設定
+ * @description サーバーサイドでFirebase Admin SDKを初期化し、管理者権限でのデータベース操作を提供
+ */
+
 import { cert, getApps, initializeApp } from 'firebase-admin/app';
 import { getDatabase } from 'firebase-admin/database';
 
-// Firebase Adminの初期化（まだ初期化されていない場合のみ）
+/**
+ * Firebase Adminの初期化
+ * @description まだ初期化されていない場合のみ初期化を実行
+ */
 if (!getApps().length) {
   initializeApp({
     credential: cert({
@@ -14,10 +22,18 @@ if (!getApps().length) {
   });
 }
 
-// データベースのインスタンスをエクスポート
+/**
+ * Firebase Admin Databaseインスタンス
+ * @description 管理者権限でのデータベース操作を提供
+ */
 export const adminDb = getDatabase();
 
-// 管理者権限でのデータベース操作用のユーティリティ関数
+/**
+ * 管理者権限でのデータベース操作用のユーティリティ関数
+ * @param path データベースパス
+ * @returns Firebase Database Reference
+ * @description 指定されたパスへの管理者権限でのデータベース参照を返す
+ */
 export const adminDbRef = (path: string) => {
   return adminDb.ref(path);
 };

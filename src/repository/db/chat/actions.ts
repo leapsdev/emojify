@@ -1,12 +1,14 @@
 'use server';
 
-import { getWalletAddressFromUserIdSync } from '@/lib/wallet-utils';
 import { adminDb } from '@/repository/db/config/server';
-import type { ChatRoom, Message, User } from '@/repository/db/database';
+import type { ChatRoom, Message } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 
 /**
- * チャットルームの情報とメッセージを取得
+ * チャットルームの情報とメッセージを取得する
+ * @param roomId チャットルームID
+ * @returns チャットルーム情報とメッセージ一覧（作成日時昇順でソート）
+ * @throws {Error} データベースエラー時（エラーはログに記録され、空の結果を返す）
  */
 export async function getChatRoomAction(
   roomId: string,
@@ -43,101 +45,12 @@ export async function getChatRoomAction(
 }
 
 /**
- * 新しいチャットルームを作成
- */
-export async function createChatRoom(members: string[]): Promise<string> {
-  const newRoomRef = adminDb.ref(DB_PATHS.chatRooms).push();
-  const roomId = newRoomRef.key;
-  if (!roomId) {
-    throw new Error('Failed to generate room ID');
-  }
-
-  const membersRecord: Record<
-    string,
-    { joinedAt: number; username: string; lastReadAt: number; userId: string }
-  > = {};
-  const now = Date.now();
-
-  // メンバーのユーザー情報を取得
-  const memberUsers = await Promise.all(
-    members.map((memberId) =>
-      adminDb.ref(`${DB_PATHS.users}/${memberId}`).get(),
-    ),
-  );
-
-  memberUsers.forEach((snapshot, index) => {
-    const user = snapshot.val();
-    if (!user) throw new Error(`User not found: ${members[index]}`);
-
-    // ウォレットアドレスを取得（現在の実装ではユーザーIDと同じ）
-    const walletAddress = getWalletAddressFromUserIdSync(members[index]);
-
-    membersRecord[walletAddress] = {
-      joinedAt: now,
-      username: user.username,
-      lastReadAt: now,
-      userId: members[index], // ユーザーIDを保存
-    };
-  });
-
-  const newRoom: ChatRoom = {
-    id: roomId,
-    members: membersRecord,
-    createdAt: now,
-    updatedAt: now,
-  };
-
-  await newRoomRef.set(newRoom);
-
-  // ユーザーのルームインデックスを更新
-  const updates: Record<string, boolean> = {};
-  members.forEach((memberId) => {
-    updates[`${DB_INDEXES.userRooms}/${memberId}/${roomId}`] = true;
-  });
-
-  await adminDb.ref().update(updates);
-  return roomId;
-}
-
-/**
- * チャットルーム内のユーザー情報を更新
- */
-export async function updateUserInChatRooms(
-  userId: string,
-  userData: Pick<User, 'username' | 'imageUrl'>,
-): Promise<void> {
-  // ユーザーが参加している全てのチャットルームを取得
-  const userRoomsSnapshot = await adminDb
-    .ref(`${DB_INDEXES.userRooms}/${userId}`)
-    .get();
-  const userRooms = userRoomsSnapshot.val() || {};
-  const roomIds = Object.keys(userRooms);
-
-  // ウォレットアドレスを取得
-  const walletAddress = getWalletAddressFromUserIdSync(userId);
-
-  // 各チャットルームのメンバー情報を更新
-  const updates: Record<string, string | null> = {};
-  roomIds.forEach((roomId) => {
-    if (userData.username) {
-      updates[
-        `${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}/username`
-      ] = userData.username;
-    }
-    if (userData.imageUrl !== undefined) {
-      updates[
-        `${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}/imageUrl`
-      ] = userData.imageUrl;
-    }
-  });
-
-  if (Object.keys(updates).length > 0) {
-    await adminDb.ref().update(updates);
-  }
-}
-
-/**
- * メッセージを送信
+ * メッセージを送信する
+ * @param roomId チャットルームID
+ * @param senderId 送信者のユーザーID（ウォレットアドレス）
+ * @param content メッセージ内容
+ * @returns 送信されたメッセージID
+ * @throws {Error} パラメータが不正な場合、ユーザーまたはルームが存在しない場合、データベースエラー時
  */
 export async function sendMessage(
   roomId: string,
@@ -163,8 +76,8 @@ export async function sendMessage(
     throw new Error(`Room not found: ${roomId}`);
   }
 
-  // ウォレットアドレスを取得
-  const senderWalletAddress = getWalletAddressFromUserIdSync(senderId);
+  // 新しいスキーマでは、senderIdがウォレットアドレスを表す
+  const senderWalletAddress = senderId;
 
   const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
   const messageId = newMessageRef.key;
@@ -206,116 +119,10 @@ export async function sendMessage(
 }
 
 /**
- * ユーザーのチャットルーム一覧を取得
- */
-export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
-  const userRoomsSnapshot = await adminDb
-    .ref(`${DB_INDEXES.userRooms}/${userId}`)
-    .get();
-  const userRooms = userRoomsSnapshot.val() || {};
-  const roomIds = Object.keys(userRooms);
-
-  const rooms: ChatRoom[] = [];
-  for (const roomId of roomIds) {
-    const roomSnapshot = await adminDb
-      .ref(`${DB_PATHS.chatRooms}/${roomId}`)
-      .get();
-    const room = roomSnapshot.val() as ChatRoom;
-    if (room) {
-      rooms.push(room);
-    }
-  }
-
-  return rooms.sort((a, b) => b.updatedAt - a.updatedAt);
-}
-
-/**
- * チャットルームにメンバーを追加
- */
-export async function addRoomMember(
-  roomId: string,
-  userId: string,
-): Promise<void> {
-  const updates: Record<
-    string,
-    | { joinedAt: number; username: string; lastReadAt: number; userId: string }
-    | boolean
-  > = {};
-  const now = Date.now();
-
-  // ルームのメンバーリストを更新
-  // ユーザー情報を取得
-  const userSnapshot = await adminDb.ref(`${DB_PATHS.users}/${userId}`).get();
-  const user = userSnapshot.val();
-  if (!user) throw new Error(`User not found: ${userId}`);
-
-  // ウォレットアドレスを取得
-  const walletAddress = getWalletAddressFromUserIdSync(userId);
-
-  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = {
-    joinedAt: now,
-    username: user.username,
-    lastReadAt: now,
-    userId, // ユーザーIDを保存
-  };
-
-  // ユーザーのルームインデックスを更新
-  updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = true;
-
-  await adminDb.ref().update(updates);
-}
-
-/**
- * チャットルームからメンバーを削除
- */
-export async function removeRoomMember(
-  roomId: string,
-  userId: string,
-): Promise<void> {
-  const updates: Record<string, null> = {};
-
-  // ウォレットアドレスを取得
-  const walletAddress = getWalletAddressFromUserIdSync(userId);
-
-  // ルームのメンバーリストから削除
-  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = null;
-
-  // ユーザーのルームインデックスから削除
-  updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = null;
-
-  await adminDb.ref().update(updates);
-}
-
-/**
- * チャットルームを削除
- */
-export async function deleteChatRoom(roomId: string): Promise<void> {
-  // ルームのメンバー一覧を取得
-  const roomSnapshot = await adminDb
-    .ref(`${DB_PATHS.chatRooms}/${roomId}`)
-    .get();
-  const room = roomSnapshot.val() as ChatRoom;
-
-  if (!room) return;
-
-  const updates: Record<string, null> = {};
-
-  // 各メンバーのインデックスからルームを削除
-  Object.keys(room.members).forEach((memberId) => {
-    updates[`${DB_INDEXES.userRooms}/${memberId}/${roomId}`] = null;
-  });
-
-  // ルーム自体を削除
-  updates[`${DB_PATHS.chatRooms}/${roomId}`] = null;
-
-  // ルームのメッセージインデックスを削除
-  updates[`${DB_INDEXES.roomMessages}/${roomId}`] = null;
-
-  await adminDb.ref().update(updates);
-}
-
-/**
  * メッセージを既読にする
+ * @param roomId チャットルームID
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @throws {Error} パラメータが不正な場合、ルームまたはユーザーが存在しない場合、データベースエラー時
  */
 export async function updateLastReadAction(
   roomId: string,
@@ -327,8 +134,8 @@ export async function updateLastReadAction(
 
   const now = Date.now();
 
-  // ウォレットアドレスを取得
-  const walletAddress = getWalletAddressFromUserIdSync(userId);
+  // 新しいスキーマでは、userIdがウォレットアドレスを表す
+  const walletAddress = userId;
 
   // ルームとユーザーの存在確認
   const roomRef = adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`);
@@ -345,33 +152,4 @@ export async function updateLastReadAction(
 
   // 最終既読時刻を更新
   await roomRef.child(`members/${walletAddress}/lastReadAt`).set(now);
-}
-
-/**
- * メンバーが完全一致するチャットルームを検索
- * @param members 検索対象のメンバーID配列
- * @returns 完全一致するチャットルーム、存在しない場合はnull
- */
-export async function findChatRoomByMembers(
-  members: string[],
-): Promise<ChatRoom | null> {
-  // メンバーIDをウォレットアドレスに変換
-  const memberWalletAddresses = members.map((memberId) =>
-    getWalletAddressFromUserIdSync(memberId),
-  );
-  const memberSet = new Set(memberWalletAddresses);
-
-  // 最初のメンバーのチャットルーム一覧を取得
-  const firstMemberRooms = await getUserRooms(members[0]);
-
-  // メンバーが完全一致するルームを検索
-  return (
-    firstMemberRooms.find((room) => {
-      const roomMembers = Object.keys(room.members);
-      return (
-        roomMembers.length === memberSet.size &&
-        roomMembers.every((walletAddress) => memberSet.has(walletAddress))
-      );
-    }) ?? null
-  );
 }

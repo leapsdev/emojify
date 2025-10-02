@@ -1,6 +1,5 @@
 'use client';
 
-import { getWalletAddressFromUserIdSync } from '@/lib/wallet-utils-client';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
@@ -9,7 +8,9 @@ import { useCallback, useRef, useSyncExternalStore } from 'react';
 
 export function useUnreadStatus(roomId: string, currentUserId: string) {
   const unreadStatusRef = useRef<boolean>(false);
-  const membersRef = useRef<Record<string, { imageUrl?: string | null }>>({});
+  const membersRef = useRef<
+    Record<string, { joinedAt: number; lastReadAt: number }>
+  >({});
 
   const getSnapshot = useCallback(() => {
     return unreadStatusRef.current;
@@ -35,9 +36,8 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
           membersRef.current = room.members;
         }
 
-        // ウォレットアドレスを取得
-        const currentUserWalletAddress =
-          getWalletAddressFromUserIdSync(currentUserId);
+        // 新しいスキーマでは、currentUserIdがウォレットアドレスを表す
+        const currentUserWalletAddress = currentUserId;
 
         // 未読状態の更新
         const newUnreadStatus = room.lastMessage

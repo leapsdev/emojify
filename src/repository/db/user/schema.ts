@@ -1,20 +1,31 @@
+/**
+ * ユーザー関連のZodスキーマ定義
+ * @description ユーザーデータのバリデーションと型安全性を提供
+ */
+
 import { z } from 'zod';
 
-export type AuthProvider = 'privy' | 'farcaster';
-
+/**
+ * プロフィールフォーム用のスキーマ
+ * @description ユーザープロフィール作成・編集時のバリデーション
+ */
 export const profileFormSchema = z.object({
-  email: z.string().email().nullable().optional(),
   username: z.string().min(3).max(20),
   bio: z.string().max(500).nullable().optional(),
   imageUrl: z.string().nullable().optional(),
 });
 
+/**
+ * プロフィールフォームの型
+ */
 export type ProfileForm = z.infer<typeof profileFormSchema>;
 
+/**
+ * ユーザーデータ用のスキーマ
+ * @description データベースに保存されるユーザー情報のバリデーション
+ */
 export const userSchema = z.object({
-  id: z.string(),
-  authProvider: z.enum(['privy', 'farcaster']),
-  email: z.string().email().nullable().optional(),
+  id: z.string(), // 主キー（中身はウォレットアドレス）
   username: z.string(),
   bio: z.string().nullable().optional(),
   imageUrl: z.string().nullable().optional(),
@@ -29,4 +40,7 @@ export const userSchema = z.object({
     .optional(),
 });
 
+/**
+ * ユーザーデータの型
+ */
 export type User = z.infer<typeof userSchema>;

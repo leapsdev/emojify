@@ -3,30 +3,28 @@
 import { getCurrentTimestamp } from '@/lib/utils';
 import { adminDbRef } from '@/repository/db/config/server';
 import type { User } from '@/repository/db/database';
-import { PrivyClient } from '@privy-io/server-auth';
-import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
-import { updateUserInChatRooms } from '../chat/actions';
-import type { AuthProvider, ProfileForm } from './schema';
+import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
-export async function createUser(
-  data: ProfileForm,
-  userId: string,
-  authProvider: AuthProvider,
-) {
+/**
+ * 新しいユーザーを作成する
+ * @param data プロフィール情報（username, bio, imageUrl）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns 作成されたユーザー情報
+ * @throws {Error} データベースエラー時
+ */
+export async function createUser(data: ProfileForm, userId: string) {
   const timestamp = getCurrentTimestamp();
   const userRef = adminDbRef(`${USERS_PATH}/${userId}`);
 
   const user: User = {
     id: userId,
-    authProvider,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
     createdAt: timestamp,
     updatedAt: timestamp,
-    email: data.email || null,
   };
 
   await userRef.set(user);
@@ -34,31 +32,24 @@ export async function createUser(
 }
 
 /**
- * Privyユーザーを作成
- * @param data プロフィール情報
- * @param privyId Privy ID
- * @returns 作成されたユーザー
+ * 指定されたユーザーIDのユーザー情報を取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
  */
-export async function createPrivyUser(data: ProfileForm, privyId: string) {
-  return createUser(data, privyId, 'privy');
-}
-
-/**
- * Farcasterユーザーを作成
- * @param data プロフィール情報
- * @param fid Farcaster ID
- * @returns 作成されたユーザー
- */
-export async function createFarcasterUser(data: ProfileForm, fid: string) {
-  const userId = fid.toString();
-  return createUser(data, userId, 'farcaster');
-}
-
 export async function getUser(userId: string) {
   const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
   return snapshot.val() as User | null;
 }
 
+/**
+ * ユーザー情報を更新する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param data 更新するデータ（idとcreatedAtは除く）
+ * @returns 更新されたデータ
+ * @throws {Error} データベースエラー時
+ * @description usernameまたはimageUrlが更新された場合、チャットルーム内の情報も自動更新される
+ */
 export async function updateUser(
   userId: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
@@ -72,45 +63,59 @@ export async function updateUser(
   // ユーザー情報を更新
   await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
 
-  // ユーザー名またはimageUrlが更新された場合、チャットルーム内の情報も更新
-  if (data.username || data.imageUrl !== undefined) {
-    const chatRoomUpdates: Partial<Pick<User, 'username' | 'imageUrl'>> = {
-      ...(data.username && { username: data.username }),
-      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
-    };
-    await updateUserInChatRooms(
-      userId,
-      chatRoomUpdates as Pick<User, 'username' | 'imageUrl'>,
-    );
-  }
+  // 新しいスキーマでは、チャットルームのメンバー情報は最小限（joinedAt, lastReadAt）のみ
+  // usernameやimageUrlはUserテーブルから取得するため、チャットルームの更新は不要
 
   return updates;
 }
 
+/**
+ * ユーザーを削除する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @throws {Error} データベースエラー時
+ */
 export async function deleteUser(userId: string) {
   await adminDbRef(`${USERS_PATH}/${userId}`).remove();
 }
 
+/**
+ * すべてのユーザー情報を取得する
+ * @returns 全ユーザーの配列
+ * @throws {Error} データベースエラー時
+ */
 export async function getAllUsers() {
   const snapshot = await adminDbRef(USERS_PATH).get();
   const users: Record<string, User> = snapshot.val() || {};
   return Object.values(users);
 }
 
+/**
+ * 指定されたIDのユーザー情報を取得する（getUserのエイリアス）
+ * @param id ユーザーID（ウォレットアドレス）
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
+ */
 export async function getUserById(id: string) {
   const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
   return snapshot.val() as User | null;
 }
 
+/**
+ * 指定されたIDのユーザーが存在するかチェックする
+ * @param id ユーザーID（ウォレットアドレス）
+ * @returns 存在する場合はtrue、存在しない場合はfalse
+ * @throws {Error} データベースエラー時
+ */
 export async function isIdExists(id: string): Promise<boolean> {
   const user = await getUserById(id);
   return user !== null;
 }
 
 /**
- * フレンドを追加
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を追加する（双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、既にフレンドの場合、データベースエラー時
  */
 export async function addFriend(
   userId: string,
@@ -144,9 +149,10 @@ export async function addFriend(
 }
 
 /**
- * フレンドを削除
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を削除する（双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、フレンド関係が存在しない場合、データベースエラー時
  */
 export async function removeFriend(
   userId: string,
@@ -180,9 +186,10 @@ export async function removeFriend(
 }
 
 /**
- * ユーザーのフレンド一覧を取得
- * @param userId ユーザーID
- * @returns フレンド一覧
+ * ユーザーのフレンド一覧を取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns フレンド一覧（更新日時降順でソート）
+ * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
 export async function getUserFriends(userId: string): Promise<User[]> {
   const user = await getUserById(userId);
@@ -205,9 +212,10 @@ export async function getUserFriends(userId: string): Promise<User[]> {
 }
 
 /**
- * 自分以外のユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
+ * 自分以外のユーザー一覧を取得する
+ * @param currentUserId 現在のユーザーID（ウォレットアドレス）
  * @returns 自分以外のユーザー一覧
+ * @throws {Error} データベースエラー時
  */
 export async function getOtherUsers(currentUserId: string): Promise<User[]> {
   const allUsers = await getAllUsers();
@@ -215,9 +223,10 @@ export async function getOtherUsers(currentUserId: string): Promise<User[]> {
 }
 
 /**
- * 友達状態を含むユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
- * @returns フレンドとその他のユーザー一覧
+ * フレンド状態を含むユーザー一覧を取得する
+ * @param currentUserId 現在のユーザーID（ウォレットアドレス）
+ * @returns フレンドとその他のユーザー一覧（更新日時降順でソート）
+ * @throws {Error} データベースエラー時
  */
 export async function getUsersWithFriendship(currentUserId: string): Promise<{
   friends: User[];
@@ -246,30 +255,4 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
     friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
     others: others.sort((a, b) => b.updatedAt - a.updatedAt),
   };
-}
-
-/**
- * ユーザーのウォレットアドレスを取得する
- * @param userId ユーザーID
- * @returns ウォレットアドレスの配列
- */
-export async function getWalletAddresses(userId: string): Promise<string[]> {
-  // Privyユーザーの場合
-  const privy = new PrivyClient(
-    process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
-    process.env.PRIVY_APP_SECRET || '',
-  );
-
-  try {
-    const user = await privy.getUserById(userId);
-    return user.linkedAccounts
-      .filter(
-        (account): account is LinkedAccountWithMetadata & { type: 'wallet' } =>
-          account.type === 'wallet',
-      )
-      .map((account) => account.address);
-  } catch (error) {
-    console.error('Error fetching user wallet addresses:', error);
-    return [];
-  }
 }

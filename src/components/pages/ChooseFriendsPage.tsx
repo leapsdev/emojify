@@ -9,7 +9,7 @@ import {
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
 
-import { usePrivyId } from '@/lib/usePrivy';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 
@@ -22,7 +22,7 @@ export function ClientChooseFriendsPage({
   initialFriends = [],
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
-  const userId = usePrivyId();
+  const { userId } = useUnifiedAuth();
   const router = useRouter();
   const {
     selectedUsers,

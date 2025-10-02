@@ -1,8 +1,17 @@
+/**
+ * Firebase クライアントサイド設定
+ * @description クライアントサイドでFirebaseサービスを初期化し、エクスポートする
+ */
+
 import { getAnalytics } from 'firebase/analytics';
 import { getApp, getApps, initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getDatabase } from 'firebase/database';
 
+/**
+ * Firebase設定オブジェクト
+ * @description 環境変数からFirebaseの設定を読み込む
+ */
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -14,15 +23,27 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
-// Initialize Firebase
+/**
+ * Firebaseアプリインスタンス
+ * @description 既存のアプリがある場合は取得、ない場合は初期化
+ */
 export const app = getApps().length ? getApp() : initializeApp(firebaseConfig);
 
-// Initialize Analytics
+/**
+ * Firebase Analyticsインスタンス
+ * @description ブラウザ環境でのみ初期化（SSR対応）
+ */
 export const analytics =
   typeof window !== 'undefined' ? getAnalytics(app) : null;
 
-// Initialize Firebase Auth
+/**
+ * Firebase Authインスタンス
+ * @description 認証機能を提供
+ */
 export const auth = getAuth(app);
 
-// Initialize Realtime Database
+/**
+ * Firebase Realtime Databaseインスタンス
+ * @description リアルタイムデータベース機能を提供
+ */
 export const db = getDatabase(app);

@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { getBasename } from '@/lib/basename/basename';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
@@ -26,12 +25,12 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
     const [basename, setBasename] = useState<string>('');
 
     const getAddress = useCallback(async () => {
-      const addresses = await getWalletAddressesByUserId(user?.id || '');
-      if (!addresses || addresses.length === 0) {
+      // 新しいスキーマでは、ユーザーIDがウォレットアドレスを表す
+      if (!user?.id) {
         return;
       }
       const result = await getBasename(
-        `0x${addresses[0].replace('0x', '')}` as `0x${string}`,
+        `0x${user.id.replace('0x', '')}` as `0x${string}`,
       );
       if (result) {
         setBasename(result);
@@ -67,11 +66,6 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         onSubmit={form.onSubmit}
         action={formAction}
       >
-        <input
-          type="hidden"
-          name={fields.email.name}
-          value={user?.email?.address || ''}
-        />
         <input type="hidden" name={fields.imageUrl.name} />
         <input
           type="hidden"

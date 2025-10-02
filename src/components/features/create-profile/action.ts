@@ -1,9 +1,6 @@
 'use server';
 
-import {
-  createFarcasterUser,
-  createPrivyUser,
-} from '@/repository/db/user/actions';
+import { createUser } from '@/repository/db/user/actions';
 import {
   type ProfileForm,
   profileFormSchema,
@@ -23,8 +20,6 @@ export async function handleProfileFormAction(
   if (!formData) return null;
 
   const userId = formData.get('userId') as string;
-  const isMiniAppValue = formData.get('isMiniApp') as string;
-  const isMiniApp = isMiniAppValue === 'true';
 
   console.log('userId', userId);
   if (!userId) {
@@ -59,20 +54,14 @@ export async function handleProfileFormAction(
   const profileData: ProfileForm = {
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
-    email: submission.payload.email ? String(submission.payload.email) : null,
     imageUrl: submission.payload.imageUrl
       ? String(submission.payload.imageUrl)
       : null,
   };
 
   try {
-    if (isMiniApp) {
-      // Farcasterユーザーの場合（数値文字列）
-      await createFarcasterUser(profileData, userId);
-    } else {
-      // Privyユーザーの場合
-      await createPrivyUser(profileData, userId);
-    }
+    // 新しいスキーマでは、認証プロバイダーに関係なくウォレットアドレスをユーザーIDとして使用
+    await createUser(profileData, userId);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'An error has occurred',

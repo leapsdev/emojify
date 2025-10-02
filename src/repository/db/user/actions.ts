@@ -32,29 +32,6 @@ export async function createUser(data: ProfileForm, userId: string) {
 }
 
 /**
- * Privyユーザーを作成する
- * @param data プロフィール情報（username, bio, imageUrl）
- * @param privyId Privy ID（ウォレットアドレス）
- * @returns 作成されたユーザー情報
- * @throws {Error} データベースエラー時
- */
-export async function createPrivyUser(data: ProfileForm, privyId: string) {
-  return createUser(data, privyId);
-}
-
-/**
- * Farcasterユーザーを作成する
- * @param data プロフィール情報（username, bio, imageUrl）
- * @param fid Farcaster ID（数値）
- * @returns 作成されたユーザー情報
- * @throws {Error} データベースエラー時
- */
-export async function createFarcasterUser(data: ProfileForm, fid: string) {
-  const userId = fid.toString();
-  return createUser(data, userId);
-}
-
-/**
  * 指定されたユーザーIDのユーザー情報を取得する
  * @param userId ユーザーID（ウォレットアドレス）
  * @returns ユーザー情報（存在しない場合はnull）

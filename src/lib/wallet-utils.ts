@@ -7,9 +7,10 @@ import { DB_PATHS } from '@/repository/db/database';
  */
 
 /**
- * ユーザーIDからウォレットアドレスを取得
- * @param userId ユーザーID
- * @returns ウォレットアドレス（取得できない場合はnull）
+ * ユーザーIDからウォレットアドレスを取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ウォレットアドレス（新しいスキーマではユーザーIDと同じ）
+ * @throws {Error} データベースエラー時（エラーはログに記録され、nullを返す）
  */
 export async function getWalletAddressFromUserId(
   userId: string,
@@ -32,9 +33,11 @@ export async function getWalletAddressFromUserId(
 }
 
 /**
- * ウォレットアドレスからユーザー情報を取得
+ * ウォレットアドレスからユーザー情報を取得する
  * @param walletAddress ウォレットアドレス
  * @returns ユーザー情報（見つからない場合はnull）
+ * @throws {Error} データベースエラー時（エラーはログに記録され、nullを返す）
+ * @description 効率的な検索のため、本番環境ではインデックス作成を推奨
  */
 export async function getUserFromWalletAddress(
   walletAddress: string,
@@ -75,9 +78,10 @@ export async function getUserFromWalletAddress(
 }
 
 /**
- * ウォレットアドレスが有効かどうかを検証
+ * ウォレットアドレスが有効かどうかを検証する
  * @param walletAddress ウォレットアドレス
- * @returns 有効な場合はtrue
+ * @returns 有効な場合はtrue、無効な場合はfalse
+ * @description Ethereumアドレスの基本的な形式チェック（0x + 40文字の16進数）
  */
 export function isValidWalletAddress(walletAddress: string): boolean {
   // Ethereumアドレスの基本的な検証
@@ -85,10 +89,10 @@ export function isValidWalletAddress(walletAddress: string): boolean {
 }
 
 /**
- * ユーザーIDからウォレットアドレスを取得（同期版）
- * 注意: この関数は現在の実装ではユーザーIDをそのまま返す
- * @param userId ユーザーID
- * @returns ウォレットアドレス
+ * ユーザーIDからウォレットアドレスを取得する（同期版）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ウォレットアドレス（新しいスキーマではユーザーIDと同じ）
+ * @description 新しいスキーマではユーザーIDがウォレットアドレスを表すため、そのまま返す
  */
 export function getWalletAddressFromUserIdSync(userId: string): string {
   // 現在の実装では、ユーザーIDがウォレットアドレスとして使用されている
@@ -96,10 +100,10 @@ export function getWalletAddressFromUserIdSync(userId: string): string {
 }
 
 /**
- * ウォレットアドレスからユーザーIDを取得（同期版）
- * 注意: この関数は現在の実装ではウォレットアドレスをそのまま返す
+ * ウォレットアドレスからユーザーIDを取得する（同期版）
  * @param walletAddress ウォレットアドレス
- * @returns ユーザーID
+ * @returns ユーザーID（新しいスキーマではウォレットアドレスと同じ）
+ * @description 新しいスキーマではウォレットアドレスがユーザーIDを表すため、そのまま返す
  */
 export function getUserIdFromWalletAddressSync(walletAddress: string): string {
   // 現在の実装では、ウォレットアドレスがユーザーIDとして使用されている

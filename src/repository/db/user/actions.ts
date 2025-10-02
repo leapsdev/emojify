@@ -10,6 +10,13 @@ import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
+/**
+ * 新しいユーザーを作成する
+ * @param data プロフィール情報（username, bio, imageUrl）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns 作成されたユーザー情報
+ * @throws {Error} データベースエラー時
+ */
 export async function createUser(data: ProfileForm, userId: string) {
   const timestamp = getCurrentTimestamp();
   const userRef = adminDbRef(`${USERS_PATH}/${userId}`);
@@ -28,31 +35,47 @@ export async function createUser(data: ProfileForm, userId: string) {
 }
 
 /**
- * Privyユーザーを作成
- * @param data プロフィール情報
- * @param privyId Privy ID
- * @returns 作成されたユーザー
+ * Privyユーザーを作成する
+ * @param data プロフィール情報（username, bio, imageUrl）
+ * @param privyId Privy ID（ウォレットアドレス）
+ * @returns 作成されたユーザー情報
+ * @throws {Error} データベースエラー時
  */
 export async function createPrivyUser(data: ProfileForm, privyId: string) {
   return createUser(data, privyId);
 }
 
 /**
- * Farcasterユーザーを作成
- * @param data プロフィール情報
- * @param fid Farcaster ID
- * @returns 作成されたユーザー
+ * Farcasterユーザーを作成する
+ * @param data プロフィール情報（username, bio, imageUrl）
+ * @param fid Farcaster ID（数値）
+ * @returns 作成されたユーザー情報
+ * @throws {Error} データベースエラー時
  */
 export async function createFarcasterUser(data: ProfileForm, fid: string) {
   const userId = fid.toString();
   return createUser(data, userId);
 }
 
+/**
+ * 指定されたユーザーIDのユーザー情報を取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
+ */
 export async function getUser(userId: string) {
   const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
   return snapshot.val() as User | null;
 }
 
+/**
+ * ユーザー情報を更新する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param data 更新するデータ（idとcreatedAtは除く）
+ * @returns 更新されたデータ
+ * @throws {Error} データベースエラー時
+ * @description usernameまたはimageUrlが更新された場合、チャットルーム内の情報も自動更新される
+ */
 export async function updateUser(
   userId: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
@@ -81,30 +104,53 @@ export async function updateUser(
   return updates;
 }
 
+/**
+ * ユーザーを削除する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @throws {Error} データベースエラー時
+ */
 export async function deleteUser(userId: string) {
   await adminDbRef(`${USERS_PATH}/${userId}`).remove();
 }
 
+/**
+ * すべてのユーザー情報を取得する
+ * @returns 全ユーザーの配列
+ * @throws {Error} データベースエラー時
+ */
 export async function getAllUsers() {
   const snapshot = await adminDbRef(USERS_PATH).get();
   const users: Record<string, User> = snapshot.val() || {};
   return Object.values(users);
 }
 
+/**
+ * 指定されたIDのユーザー情報を取得する（getUserのエイリアス）
+ * @param id ユーザーID（ウォレットアドレス）
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
+ */
 export async function getUserById(id: string) {
   const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
   return snapshot.val() as User | null;
 }
 
+/**
+ * 指定されたIDのユーザーが存在するかチェックする
+ * @param id ユーザーID（ウォレットアドレス）
+ * @returns 存在する場合はtrue、存在しない場合はfalse
+ * @throws {Error} データベースエラー時
+ */
 export async function isIdExists(id: string): Promise<boolean> {
   const user = await getUserById(id);
   return user !== null;
 }
 
 /**
- * フレンドを追加
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を追加する（双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、既にフレンドの場合、データベースエラー時
  */
 export async function addFriend(
   userId: string,
@@ -138,9 +184,10 @@ export async function addFriend(
 }
 
 /**
- * フレンドを削除
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を削除する（双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、フレンド関係が存在しない場合、データベースエラー時
  */
 export async function removeFriend(
   userId: string,
@@ -174,9 +221,10 @@ export async function removeFriend(
 }
 
 /**
- * ユーザーのフレンド一覧を取得
- * @param userId ユーザーID
- * @returns フレンド一覧
+ * ユーザーのフレンド一覧を取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns フレンド一覧（更新日時降順でソート）
+ * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
 export async function getUserFriends(userId: string): Promise<User[]> {
   const user = await getUserById(userId);
@@ -199,9 +247,10 @@ export async function getUserFriends(userId: string): Promise<User[]> {
 }
 
 /**
- * 自分以外のユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
+ * 自分以外のユーザー一覧を取得する
+ * @param currentUserId 現在のユーザーID（ウォレットアドレス）
  * @returns 自分以外のユーザー一覧
+ * @throws {Error} データベースエラー時
  */
 export async function getOtherUsers(currentUserId: string): Promise<User[]> {
   const allUsers = await getAllUsers();
@@ -209,9 +258,10 @@ export async function getOtherUsers(currentUserId: string): Promise<User[]> {
 }
 
 /**
- * 友達状態を含むユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
- * @returns フレンドとその他のユーザー一覧
+ * フレンド状態を含むユーザー一覧を取得する
+ * @param currentUserId 現在のユーザーID（ウォレットアドレス）
+ * @returns フレンドとその他のユーザー一覧（更新日時降順でソート）
+ * @throws {Error} データベースエラー時
  */
 export async function getUsersWithFriendship(currentUserId: string): Promise<{
   friends: User[];
@@ -243,9 +293,11 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
 }
 
 /**
- * ユーザーのウォレットアドレスを取得する
- * @param userId ユーザーID
+ * Privyユーザーのウォレットアドレス一覧を取得する
+ * @param userId PrivyユーザーID
  * @returns ウォレットアドレスの配列
+ * @throws {Error} Privy APIエラー時
+ * @description この関数はPrivyユーザーのみに対応。新しいスキーマでは通常不要
  */
 export async function getWalletAddresses(userId: string): Promise<string[]> {
   // Privyユーザーの場合

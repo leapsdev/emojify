@@ -6,7 +6,10 @@ import type { ChatRoom, Message, User } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 
 /**
- * チャットルームの情報とメッセージを取得
+ * チャットルームの情報とメッセージを取得する
+ * @param roomId チャットルームID
+ * @returns チャットルーム情報とメッセージ一覧（作成日時昇順でソート）
+ * @throws {Error} データベースエラー時（エラーはログに記録され、空の結果を返す）
  */
 export async function getChatRoomAction(
   roomId: string,
@@ -43,7 +46,10 @@ export async function getChatRoomAction(
 }
 
 /**
- * 新しいチャットルームを作成
+ * 新しいチャットルームを作成する
+ * @param members メンバーのウォレットアドレス配列
+ * @returns 作成されたチャットルームID
+ * @throws {Error} ルームID生成失敗時、メンバーが存在しない場合、データベースエラー時
  */
 export async function createChatRoom(members: string[]): Promise<string> {
   const newRoomRef = adminDb.ref(DB_PATHS.chatRooms).push();
@@ -100,7 +106,11 @@ export async function createChatRoom(members: string[]): Promise<string> {
 }
 
 /**
- * チャットルーム内のユーザー情報を更新
+ * チャットルーム内のユーザー情報を更新する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param userData 更新するユーザーデータ（username, imageUrl）
+ * @throws {Error} データベースエラー時
+ * @description ユーザーが参加しているすべてのチャットルームで情報を更新
  */
 export async function updateUserInChatRooms(
   userId: string,
@@ -137,7 +147,12 @@ export async function updateUserInChatRooms(
 }
 
 /**
- * メッセージを送信
+ * メッセージを送信する
+ * @param roomId チャットルームID
+ * @param senderId 送信者のユーザーID（ウォレットアドレス）
+ * @param content メッセージ内容
+ * @returns 送信されたメッセージID
+ * @throws {Error} パラメータが不正な場合、ユーザーまたはルームが存在しない場合、データベースエラー時
  */
 export async function sendMessage(
   roomId: string,
@@ -206,7 +221,10 @@ export async function sendMessage(
 }
 
 /**
- * ユーザーのチャットルーム一覧を取得
+ * ユーザーのチャットルーム一覧を取得する
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ユーザーが参加しているチャットルーム一覧（更新日時降順でソート）
+ * @throws {Error} データベースエラー時
  */
 export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
   const userRoomsSnapshot = await adminDb
@@ -230,7 +248,10 @@ export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
 }
 
 /**
- * チャットルームにメンバーを追加
+ * チャットルームにメンバーを追加する
+ * @param roomId チャットルームID
+ * @param userId 追加するユーザーID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
 export async function addRoomMember(
   roomId: string,
@@ -266,7 +287,10 @@ export async function addRoomMember(
 }
 
 /**
- * チャットルームからメンバーを削除
+ * チャットルームからメンバーを削除する
+ * @param roomId チャットルームID
+ * @param userId 削除するユーザーID（ウォレットアドレス）
+ * @throws {Error} データベースエラー時
  */
 export async function removeRoomMember(
   roomId: string,
@@ -287,7 +311,10 @@ export async function removeRoomMember(
 }
 
 /**
- * チャットルームを削除
+ * チャットルームを削除する
+ * @param roomId チャットルームID
+ * @throws {Error} データベースエラー時
+ * @description ルームとメンバーのインデックス、メッセージインデックスも同時に削除
  */
 export async function deleteChatRoom(roomId: string): Promise<void> {
   // ルームのメンバー一覧を取得
@@ -316,6 +343,9 @@ export async function deleteChatRoom(roomId: string): Promise<void> {
 
 /**
  * メッセージを既読にする
+ * @param roomId チャットルームID
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @throws {Error} パラメータが不正な場合、ルームまたはユーザーが存在しない場合、データベースエラー時
  */
 export async function updateLastReadAction(
   roomId: string,
@@ -348,9 +378,11 @@ export async function updateLastReadAction(
 }
 
 /**
- * メンバーが完全一致するチャットルームを検索
- * @param members 検索対象のメンバーID配列
+ * メンバーが完全一致するチャットルームを検索する
+ * @param members 検索対象のメンバーID配列（ウォレットアドレス）
  * @returns 完全一致するチャットルーム、存在しない場合はnull
+ * @throws {Error} データベースエラー時
+ * @description メンバーの数と構成が完全に一致するルームを検索
  */
 export async function findChatRoomByMembers(
   members: string[],

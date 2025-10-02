@@ -15,7 +15,10 @@ import {
 } from 'firebase/database';
 
 /**
- * チャットルームの情報を取得
+ * チャットルームの情報を取得する（クライアントサイド）
+ * @param roomId チャットルームID
+ * @returns チャットルーム情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
  */
 export const getChatRoom = async (roomId: string): Promise<ChatRoom | null> => {
   const roomRef = ref(db, `${DB_PATHS.chatRooms}/${roomId}`);
@@ -24,7 +27,11 @@ export const getChatRoom = async (roomId: string): Promise<ChatRoom | null> => {
 };
 
 /**
- * チャットルームの変更を監視
+ * チャットルームの変更をリアルタイムで監視する（クライアントサイド）
+ * @param roomId チャットルームID
+ * @param callback 変更時のコールバック関数
+ * @returns 監視を停止する関数
+ * @description Firebase Realtime Databaseのリスナーを設定し、ルーム情報の変更を監視
  */
 export const subscribeToChatRoom = (
   roomId: string,
@@ -37,7 +44,12 @@ export const subscribeToChatRoom = (
 };
 
 /**
- * ユーザーのチャットルーム一覧を監視
+ * ユーザーのチャットルーム一覧をリアルタイムで監視する（クライアントサイド）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param callback 変更時のコールバック関数
+ * @returns 監視を停止する関数
+ * @throws {Error} データベースエラー時（エラーはログに記録され、空の配列を返す）
+ * @description ユーザーが参加しているルーム一覧を取得し、更新日時降順でソート
  */
 export const subscribeToUserRooms = (
   userId: string,
@@ -72,7 +84,10 @@ export const subscribeToUserRooms = (
 };
 
 /**
- * チャットルームを作成
+ * チャットルームを作成する（クライアントサイド）
+ * @param roomData ルームデータ（id, createdAt, updatedAtは除く）
+ * @returns 作成されたチャットルームID
+ * @throws {Error} ルームID生成失敗時、データベースエラー時
  */
 export const createChatRoom = async (
   roomData: Omit<ChatRoom, 'id' | 'createdAt' | 'updatedAt'>,
@@ -97,7 +112,11 @@ export const createChatRoom = async (
 };
 
 /**
- * チャットルームを更新
+ * チャットルームを更新する（クライアントサイド）
+ * @param roomId チャットルームID
+ * @param updates 更新するデータ（id, createdAtは除く）
+ * @throws {Error} データベースエラー時
+ * @description updatedAtは自動的に現在時刻に設定される
  */
 export const updateChatRoom = async (
   roomId: string,
@@ -111,7 +130,9 @@ export const updateChatRoom = async (
 };
 
 /**
- * チャットルームを削除
+ * チャットルームを削除する（クライアントサイド）
+ * @param roomId チャットルームID
+ * @throws {Error} データベースエラー時
  */
 export const deleteChatRoom = async (roomId: string): Promise<void> => {
   const roomRef = ref(db, `${DB_PATHS.chatRooms}/${roomId}`);
@@ -119,7 +140,11 @@ export const deleteChatRoom = async (roomId: string): Promise<void> => {
 };
 
 /**
- * ユーザーをチャットルームに追加
+ * ユーザーをチャットルームに追加する（クライアントサイド）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param roomId チャットルームID
+ * @throws {Error} ユーザーが存在しない場合、データベースエラー時
+ * @description ユーザーのルームインデックスとルームのメンバー情報を同時に更新
  */
 export const addUserToRoom = async (
   userId: string,
@@ -149,7 +174,11 @@ export const addUserToRoom = async (
 };
 
 /**
- * ユーザーをチャットルームから削除
+ * ユーザーをチャットルームから削除する（クライアントサイド）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param roomId チャットルームID
+ * @throws {Error} データベースエラー時
+ * @description ユーザーのルームインデックスとルームのメンバー情報を同時に削除
  */
 export const removeUserFromRoom = async (
   userId: string,

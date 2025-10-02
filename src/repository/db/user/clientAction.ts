@@ -14,7 +14,10 @@ interface DisplayUser extends Pick<User, 'id' | 'username'> {
 const USERS_PATH = 'users';
 
 /**
- * ユーザー情報を取得
+ * ユーザー情報を取得する（クライアントサイド）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
  */
 export const getUser = async (userId: string): Promise<User | null> => {
   const userRef = ref(db, `${USERS_PATH}/${userId}`);
@@ -23,7 +26,10 @@ export const getUser = async (userId: string): Promise<User | null> => {
 };
 
 /**
- * ユーザー情報を更新
+ * ユーザー情報を更新する（クライアントサイド）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param data 更新するデータ（id, createdAtは除く）
+ * @throws {Error} データベースエラー時
  */
 export const updateUser = async (
   userId: string,
@@ -34,7 +40,11 @@ export const updateUser = async (
 };
 
 /**
- * フレンドを追加
+ * フレンド関係を追加する（クライアントサイド・双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} データベースエラー時
+ * @description 双方向のフレンド関係を設定し、両方のユーザーのupdatedAtを更新
  */
 export const addFriend = async (
   userId: string,
@@ -51,7 +61,11 @@ export const addFriend = async (
 };
 
 /**
- * フレンドを削除
+ * フレンド関係を削除する（クライアントサイド・双方向）
+ * @param userId ユーザーID（ウォレットアドレス）
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} データベースエラー時
+ * @description 双方向のフレンド関係を削除し、両方のユーザーのupdatedAtを更新
  */
 export const removeFriend = async (
   userId: string,
@@ -68,7 +82,10 @@ export const removeFriend = async (
 };
 
 /**
- * ユーザーリストの変更を監視
+ * ユーザーリストの変更をリアルタイムで監視する（クライアントサイド）
+ * @param callback 変更時のコールバック関数
+ * @returns 監視を停止する関数
+ * @description Firebase Realtime Databaseのリスナーを設定し、全ユーザー情報の変更を監視
  */
 export const subscribeToUsers = (
   callback: (users: Record<string, User>) => void,
@@ -81,7 +98,11 @@ export const subscribeToUsers = (
 };
 
 /**
- * ユーザーをDisplayUser形式に変換
+ * ユーザーをDisplayUser形式に変換する
+ * @param user ユーザー情報
+ * @param section セクション（'friend' | 'other'）
+ * @returns DisplayUser形式のユーザー情報
+ * @description UI表示用にユーザー情報を変換し、デフォルトアバターを設定
  */
 export const convertToDisplayUser = (
   user: User,

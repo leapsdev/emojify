@@ -4,73 +4,24 @@ import { DB_PATHS } from '@/repository/db/database';
 
 /**
  * ウォレットアドレス関連のユーティリティ関数
+ * @description サーバーサイドとクライアントサイド両方で使用可能
  */
 
 /**
- * ユーザーIDからウォレットアドレスを取得する
- * @param userId ユーザーID（ウォレットアドレス）
- * @returns ウォレットアドレス（新しいスキーマではユーザーIDと同じ）
- * @throws {Error} データベースエラー時（エラーはログに記録され、nullを返す）
- */
-export async function getWalletAddressFromUserId(
-  userId: string,
-): Promise<string | null> {
-  try {
-    const userSnapshot = await adminDb.ref(`${DB_PATHS.users}/${userId}`).get();
-    const user = userSnapshot.val() as User | null;
-
-    if (!user) {
-      console.warn(`User not found: ${userId}`);
-      return null;
-    }
-
-    // 新しいスキーマでは、idフィールドがウォレットアドレスを表す
-    return userId;
-  } catch (error) {
-    console.error('Failed to get wallet address from user ID:', error);
-    return null;
-  }
-}
-
-/**
- * ウォレットアドレスからユーザー情報を取得する
+ * ウォレットアドレスからユーザー情報を取得する（サーバーサイド専用）
  * @param walletAddress ウォレットアドレス
  * @returns ユーザー情報（見つからない場合はnull）
  * @throws {Error} データベースエラー時（エラーはログに記録され、nullを返す）
- * @description 効率的な検索のため、本番環境ではインデックス作成を推奨
+ * @description 新しいスキーマではウォレットアドレスがユーザーIDと同じ
  */
 export async function getUserFromWalletAddress(
   walletAddress: string,
 ): Promise<User | null> {
   try {
-    // ウォレットアドレスがユーザーIDと同じ場合の処理
     const userSnapshot = await adminDb
       .ref(`${DB_PATHS.users}/${walletAddress}`)
       .get();
-    const user = userSnapshot.val() as User | null;
-
-    if (user) {
-      return user;
-    }
-
-    // ウォレットアドレスが異なる場合、全ユーザーを検索
-    // 注意: この方法は非効率なので、本番環境では別のインデックスを作成することを推奨
-    const usersSnapshot = await adminDb.ref(DB_PATHS.users).get();
-    const users = usersSnapshot.val() as Record<string, User> | null;
-
-    if (!users) {
-      return null;
-    }
-
-    // ウォレットアドレスに一致するユーザーを検索
-    for (const [userId, user] of Object.entries(users)) {
-      // 現在の実装では、ユーザーIDがウォレットアドレスとして使用されている
-      if (userId === walletAddress) {
-        return user;
-      }
-    }
-
-    return null;
+    return userSnapshot.val() as User | null;
   } catch (error) {
     console.error('Failed to get user from wallet address:', error);
     return null;
@@ -78,34 +29,11 @@ export async function getUserFromWalletAddress(
 }
 
 /**
- * ウォレットアドレスが有効かどうかを検証する
+ * ウォレットアドレスが有効かどうかを検証する（クライアント・サーバー共通）
  * @param walletAddress ウォレットアドレス
  * @returns 有効な場合はtrue、無効な場合はfalse
  * @description Ethereumアドレスの基本的な形式チェック（0x + 40文字の16進数）
  */
 export function isValidWalletAddress(walletAddress: string): boolean {
-  // Ethereumアドレスの基本的な検証
   return /^0x[a-fA-F0-9]{40}$/.test(walletAddress);
-}
-
-/**
- * ユーザーIDからウォレットアドレスを取得する（同期版）
- * @param userId ユーザーID（ウォレットアドレス）
- * @returns ウォレットアドレス（新しいスキーマではユーザーIDと同じ）
- * @description 新しいスキーマではユーザーIDがウォレットアドレスを表すため、そのまま返す
- */
-export function getWalletAddressFromUserIdSync(userId: string): string {
-  // 現在の実装では、ユーザーIDがウォレットアドレスとして使用されている
-  return userId;
-}
-
-/**
- * ウォレットアドレスからユーザーIDを取得する（同期版）
- * @param walletAddress ウォレットアドレス
- * @returns ユーザーID（新しいスキーマではウォレットアドレスと同じ）
- * @description 新しいスキーマではウォレットアドレスがユーザーIDを表すため、そのまま返す
- */
-export function getUserIdFromWalletAddressSync(walletAddress: string): string {
-  // 現在の実装では、ウォレットアドレスがユーザーIDとして使用されている
-  return walletAddress;
 }

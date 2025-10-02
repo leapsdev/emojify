@@ -3,9 +3,6 @@
 import { getCurrentTimestamp } from '@/lib/utils';
 import { adminDbRef } from '@/repository/db/config/server';
 import type { User } from '@/repository/db/database';
-import { PrivyClient } from '@privy-io/server-auth';
-import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
-import { updateUserInChatRooms } from '../chat/actions';
 import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
@@ -89,17 +86,8 @@ export async function updateUser(
   // ユーザー情報を更新
   await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
 
-  // ユーザー名またはimageUrlが更新された場合、チャットルーム内の情報も更新
-  if (data.username || data.imageUrl !== undefined) {
-    const chatRoomUpdates: Partial<Pick<User, 'username' | 'imageUrl'>> = {
-      ...(data.username && { username: data.username }),
-      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
-    };
-    await updateUserInChatRooms(
-      userId,
-      chatRoomUpdates as Pick<User, 'username' | 'imageUrl'>,
-    );
-  }
+  // 新しいスキーマでは、チャットルームのメンバー情報は最小限（joinedAt, lastReadAt）のみ
+  // usernameやimageUrlはUserテーブルから取得するため、チャットルームの更新は不要
 
   return updates;
 }
@@ -290,32 +278,4 @@ export async function getUsersWithFriendship(currentUserId: string): Promise<{
     friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
     others: others.sort((a, b) => b.updatedAt - a.updatedAt),
   };
-}
-
-/**
- * Privyユーザーのウォレットアドレス一覧を取得する
- * @param userId PrivyユーザーID
- * @returns ウォレットアドレスの配列
- * @throws {Error} Privy APIエラー時
- * @description この関数はPrivyユーザーのみに対応。新しいスキーマでは通常不要
- */
-export async function getWalletAddresses(userId: string): Promise<string[]> {
-  // Privyユーザーの場合
-  const privy = new PrivyClient(
-    process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
-    process.env.PRIVY_APP_SECRET || '',
-  );
-
-  try {
-    const user = await privy.getUserById(userId);
-    return user.linkedAccounts
-      .filter(
-        (account): account is LinkedAccountWithMetadata & { type: 'wallet' } =>
-          account.type === 'wallet',
-      )
-      .map((account) => account.address);
-  } catch (error) {
-    console.error('Error fetching user wallet addresses:', error);
-    return [];
-  }
 }

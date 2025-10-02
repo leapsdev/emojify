@@ -2,7 +2,6 @@
 
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { addFriend, removeFriend } from '@/repository/db/user/actions';
 import { Name } from '@coinbase/onchainkit/identity';
 import { useUser } from '@privy-io/react-auth';
@@ -34,12 +33,10 @@ export const UserProfile = ({
   const { user } = useUser();
   const [addresses, setAddresses] = useState<string[]>([]);
   useEffect(() => {
-    const fetchAddresses = async () => {
-      if (!user?.id) return;
-      const addresses = await getWalletAddressesByUserId(user.id);
-      setAddresses(addresses);
-    };
-    fetchAddresses();
+    // 新しいスキーマでは、ユーザーIDがウォレットアドレスを表す
+    if (user?.id) {
+      setAddresses([user.id]);
+    }
   }, [user?.id]);
 
   const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);

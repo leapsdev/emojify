@@ -83,16 +83,14 @@ export function useUnifiedAuth(): UnifiedAuthState {
       return false;
     }
 
-    // Mini App環境ではFarcaster認証の初期化完了を待つ
-    if (isMiniApp && isFarcasterAuthenticated === undefined) {
-      return false;
+    // Mini App環境: Farcaster認証の初期化が完了しているかチェック
+    if (isMiniApp) {
+      // 認証状態が確定している（true/false）場合は初期化完了とみなす
+      return isFarcasterAuthenticated !== undefined;
     }
 
-    // 少なくとも一つの認証プロバイダーが初期化完了していることを確認
-    return (
-      isPrivyAuthenticated !== undefined ||
-      isFarcasterAuthenticated !== undefined
-    );
+    // Web環境: Privy認証の初期化完了を確認
+    return isPrivyAuthenticated !== undefined;
   }, [
     isPrivyLoading,
     isFarcasterLoading,
@@ -113,9 +111,9 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     if (isMiniApp) {
       // Mini App環境: Farcaster認証を使用
-      // undefinedの場合はfalseとして扱う
+      // undefinedの場合はfalseとして扱う（認証未確定）
       isAuthenticated =
-        Boolean(isFarcasterAuthenticated) && isFarcasterFirebaseAuthenticated;
+        isFarcasterAuthenticated === true && isFarcasterFirebaseAuthenticated;
       user = farcasterFirebaseUser;
       error = farcasterError;
     } else {

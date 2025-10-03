@@ -13,11 +13,23 @@ export default function Page() {
   const [isDataLoading, setIsDataLoading] = useState(true);
   const router = useRouter();
 
+  // 認証状態のデバッグログ
+  useEffect(() => {
+    console.log('📊 Profile page auth state:', {
+      isAuthenticated,
+      isLoading,
+      walletAddress,
+      timestamp: new Date().toISOString()
+    });
+  }, [isAuthenticated, isLoading, walletAddress]);
+
   useEffect(() => {
     const fetchUserData = async () => {
       if (isAuthenticated && walletAddress) {
         try {
+          console.log('📱 Fetching user data for wallet:', walletAddress);
           const data = await getUser(walletAddress);
+          console.log('✅ User data fetched:', data);
           setUserData(data);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
@@ -31,7 +43,14 @@ export default function Page() {
 
   // 未認証の場合はホームページにリダイレクト
   useEffect(() => {
+    console.log('🔄 Profile page redirect check:', {
+      isLoading,
+      isAuthenticated,
+      shouldRedirect: !isLoading && !isAuthenticated
+    });
+    
     if (!isLoading && !isAuthenticated) {
+      console.log('🚀 Redirecting to / due to unauthenticated state');
       router.push('/');
     }
   }, [isAuthenticated, isLoading, router]);

@@ -26,7 +26,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
 
   // Privy認証関連
-  const { authenticated: isPrivyAuthenticated, user: privyUser, ready: privyReady } = usePrivy();
+  const { authenticated: isPrivyAuthenticated, ready: privyReady } = usePrivy();
   const { wallets, ready: walletsReady } = useWallets();
   const {
     isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
@@ -129,7 +129,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
       user,
       error,
       // Privy環境ではウォレットの準備状態も含める
-      ready: isMiniApp ? true : (privyReady && walletsReady),
+      ready: isMiniApp ? true : privyReady && walletsReady,
     };
   }, [
     getWalletAddress,

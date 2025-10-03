@@ -5,21 +5,32 @@ import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { checkUserExists } from '../auth/action';
+import { autoCreateUserFromFarcaster } from '../auth/autoCreateUser';
 
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();
-  const { isAuthenticated, walletAddress, isLoading } = useUnifiedAuth();
+  const { isAuthenticated, walletAddress, isLoading, ready } = useUnifiedAuth();
   const router = useRouter();
 
   const handleClick = useCallback(async () => {
-    // ローディング中は処理しない
-    if (isLoading) {
+    console.log('GetStartedButton clicked', {
+      isAuthenticated,
+      walletAddress,
+      isLoading,
+      ready,
+      isMiniApp,
+    });
+
+    // ローディング中または準備未完了の場合は処理しない
+    if (isLoading || !ready) {
+      console.log('Still loading or not ready, skipping action');
       return;
     }
 
     // 認証状態とウォレットアドレスの詳細チェック
     if (isAuthenticated && walletAddress) {
       try {
+        console.log('User authenticated, checking user existence in DB...');
         // DBでユーザーの存在を確実にチェック
         const exists = await checkUserExists(walletAddress);
 
@@ -28,9 +39,28 @@ export const GetStartedButton = () => {
           console.log('Existing user found, redirecting to /chat');
           router.push('/chat');
         } else {
-          // ✅ 新規ユーザー: プロフィール作成ページへ
-          console.log('New user, redirecting to /profile/create');
-          router.push('/profile/create');
+          // ✅ 新規ユーザー: Mini App環境では自動登録
+          console.log('New user detected');
+
+          if (isMiniApp) {
+            // Mini App環境: Farcaster情報で自動ユーザー登録
+            console.log('Mini App environment: Auto-creating user profile');
+            try {
+              await autoCreateUserFromFarcaster(walletAddress);
+              console.log(
+                'User auto-created successfully, redirecting to /chat',
+              );
+              router.push('/chat');
+            } catch (error) {
+              console.error('Failed to auto-create user:', error);
+              // 自動登録失敗時はプロフィール作成ページへ
+              router.push('/profile/create');
+            }
+          } else {
+            // Web環境: プロフィール作成ページへ
+            console.log('Web environment: redirecting to /profile/create');
+            router.push('/profile/create');
+          }
         }
       } catch (error) {
         // DBエラーの場合はプロフィール作成ページへ（安全側に倒す）
@@ -48,7 +78,7 @@ export const GetStartedButton = () => {
         router.push('/');
       }
     }
-  }, [isAuthenticated, walletAddress, isLoading, isMiniApp, router]);
+  }, [isAuthenticated, walletAddress, isLoading, ready, isMiniApp, router]);
 
   return (
     <div className="mt-auto">

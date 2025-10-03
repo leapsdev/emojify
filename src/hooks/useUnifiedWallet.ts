@@ -1,5 +1,5 @@
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
-import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+
 import { config } from '@/lib/basename/wagmi';
 import { getFarcasterSDK } from '@/lib/farcaster';
 import { useCallback, useEffect, useState } from 'react';
@@ -21,7 +21,6 @@ interface UnifiedWalletReturn {
  */
 export const useUnifiedWallet = (): UnifiedWalletReturn => {
   const { isMiniApp } = useIsMiniApp();
-  const { isAuthenticated } = useUnifiedAuth();
 
   // Wagmi (Privy) ウォレット情報
   const { address: wagmiAddress } = useAccount();
@@ -42,7 +41,7 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
 
   // Farcaster ウォレットの初期化と情報取得
   const initializeFarcasterWallet = useCallback(async () => {
-    if (!isMiniApp || !isAuthenticated) {
+    if (!isMiniApp) {
       return;
     }
 
@@ -161,27 +160,27 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
         error: error instanceof Error ? error.message : 'Unknown error',
       });
     }
-  }, [isMiniApp, isAuthenticated]);
+  }, [isMiniApp]);
 
   // Mini App環境でのウォレット初期化
   useEffect(() => {
-    if (isMiniApp && isAuthenticated) {
+    if (isMiniApp) {
       initializeFarcasterWallet();
     }
-  }, [isMiniApp, isAuthenticated, initializeFarcasterWallet]);
+  }, [isMiniApp, initializeFarcasterWallet]);
 
   // 環境に応じて適切なウォレット情報を返す
   if (isMiniApp) {
     console.log('Using Farcaster wallet:', {
       address: farcasterWallet.address,
-      isConnected: isAuthenticated && !!farcasterWallet.address,
+      isConnected: !!farcasterWallet.address,
       isLoading: farcasterWallet.isLoading,
       error: farcasterWallet.error,
     });
 
     return {
       address: farcasterWallet.address,
-      isConnected: isAuthenticated && !!farcasterWallet.address,
+      isConnected: !!farcasterWallet.address,
       walletClient: farcasterWallet.walletClient,
       isLoading: farcasterWallet.isLoading,
       error: farcasterWallet.error,
@@ -191,12 +190,12 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
   // Web環境 (Privy + Wagmi)
   console.log('Using Privy wallet:', {
     address: wagmiAddress,
-    isConnected: isAuthenticated && !!wagmiAddress,
+    isConnected: !!wagmiAddress,
   });
 
   return {
     address: wagmiAddress,
-    isConnected: isAuthenticated && !!wagmiAddress,
+    isConnected: !!wagmiAddress,
     walletClient: wagmiWalletClient || null,
     isLoading: false,
     error: null,

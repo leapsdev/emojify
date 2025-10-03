@@ -3,6 +3,7 @@
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { usePrivyAuth } from '@/hooks/usePrivyAuth';
+import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 import { usePrivy, useWallets } from '@privy-io/react-auth';
 import type { User } from 'firebase/auth';
 import { useCallback, useMemo } from 'react';
@@ -25,9 +26,12 @@ interface UnifiedAuthState {
 export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
 
+  // 統合ウォレット（環境に応じたウォレットアドレスを取得）
+  const { address: unifiedWalletAddress } = useUnifiedWallet();
+
   // Privy認証関連
   const { authenticated: isPrivyAuthenticated, ready: privyReady } = usePrivy();
-  const { wallets, ready: walletsReady } = useWallets();
+  const { ready: walletsReady } = useWallets();
   const {
     isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
     isLoading: isPrivyLoading,
@@ -40,26 +44,26 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated: isFarcasterFirebaseAuthenticated,
     isLoading: isFarcasterLoading,
-    farcasterUserId,
     error: farcasterError,
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
 
   // 認証状態に基づいてウォレットアドレスを取得
   const getWalletAddress = useCallback((): string | null => {
-    // Mini App環境: Farcaster認証を使用
-    if (
-      isMiniApp &&
-      isFarcasterAuthenticated === true &&
-      isFarcasterFirebaseAuthenticated
-    ) {
-      return farcasterUserId || null;
-    }
-
-    // Web環境: Privy認証を使用
-    if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
-      // ウォレットアドレスを取得（埋め込みウォレットまたは接続済みウォレット）
-      return wallets[0]?.address || null;
+    // 認証済みの場合、統合ウォレットからアドレスを取得
+    // Mini App環境: Farcaster SDKから取得したウォレットアドレス
+    // Web環境: Privyの埋め込みウォレットまたは接続済みウォレットアドレス
+    if (isMiniApp) {
+      if (
+        isFarcasterAuthenticated === true &&
+        isFarcasterFirebaseAuthenticated
+      ) {
+        return unifiedWalletAddress || null;
+      }
+    } else {
+      if (isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
+        return unifiedWalletAddress || null;
+      }
     }
 
     return null;
@@ -67,10 +71,9 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isMiniApp,
     isFarcasterAuthenticated,
     isFarcasterFirebaseAuthenticated,
-    farcasterUserId,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
-    wallets,
+    unifiedWalletAddress,
   ]);
 
   // 認証状態の初期化が完了しているかチェック

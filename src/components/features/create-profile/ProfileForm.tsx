@@ -4,12 +4,13 @@ import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
-import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
+
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { getBasename } from '@/lib/basename/basename';
 import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { useWallets } from '@privy-io/react-auth';
+
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
@@ -19,13 +20,11 @@ const initialState: ProfileFormState = null;
 
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
-    const { wallets } = useWallets();
-    const { farcasterUserId } = useFarcasterAuth();
     const { isMiniApp } = useIsMiniApp();
+    const { walletAddress } = useUnifiedAuth();
     const [basename, setBasename] = useState<string>('');
 
     const getAddress = useCallback(async () => {
-      const walletAddress = wallets[0]?.address;
       if (!walletAddress) {
         return;
       }
@@ -34,17 +33,15 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         setBasename(result);
       }
       return result;
-    }, [wallets]);
+    }, [walletAddress]);
 
     useEffect(() => {
-      if (wallets[0]?.address) {
+      if (walletAddress) {
         getAddress();
       }
-    }, [getAddress, wallets]);
-    // 送信されるuserIdを計算
-    const userId = isMiniApp
-      ? farcasterUserId || ''
-      : wallets[0]?.address || '';
+    }, [getAddress, walletAddress]);
+    // 送信されるuserIdを計算（統合認証から取得したウォレットアドレス）
+    const userId = walletAddress || '';
 
     const [state, formAction, isPending] = useActionState(
       handleProfileFormAction,

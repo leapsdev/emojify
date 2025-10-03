@@ -45,27 +45,37 @@ export const GetStartedButton = () => {
           if (isMiniApp) {
             // Mini App環境: Farcaster情報で自動ユーザー登録
             console.log('Mini App environment: Auto-creating user profile');
-            console.log('Calling autoCreateUserFromFarcaster with wallet:', walletAddress);
-            
+            console.log(
+              'Calling autoCreateUserFromFarcaster with wallet:',
+              walletAddress,
+            );
+
             try {
+              console.log('🔄 Starting autoCreateUserFromFarcaster...');
               const result = await autoCreateUserFromFarcaster(walletAddress);
-              console.log('autoCreateUserFromFarcaster completed successfully:', result);
-              console.log('User auto-created successfully, redirecting to /chat');
-              
+              console.log(
+                '✅ autoCreateUserFromFarcaster completed successfully:',
+                result,
+              );
+              console.log(
+                '🎯 User auto-created successfully, redirecting to /chat',
+              );
+
               // リダイレクト前に少し待機（UI更新のため）
               setTimeout(() => {
-                console.log('Executing router.push("/chat")');
+                console.log('🚀 Executing router.push("/chat")');
                 router.push('/chat');
               }, 100);
-              
             } catch (error) {
-              console.error('Failed to auto-create user:', error);
-              console.error('Error details:', {
-                message: error instanceof Error ? error.message : 'Unknown error',
-                stack: error instanceof Error ? error.stack : undefined
+              console.error('💥 Failed to auto-create user:', error);
+              console.error('📊 Error details:', {
+                name: error instanceof Error ? error.name : 'Unknown',
+                message:
+                  error instanceof Error ? error.message : 'Unknown error',
+                stack: error instanceof Error ? error.stack : undefined,
               });
               // 自動登録失敗時はプロフィール作成ページへ
-              console.log('Redirecting to /profile/create due to error');
+              console.log('🔄 Redirecting to /profile/create due to error');
               router.push('/profile/create');
             }
           } else {

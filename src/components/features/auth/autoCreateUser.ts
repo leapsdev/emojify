@@ -23,10 +23,10 @@ export async function autoCreateUserFromFarcaster(
   try {
     // まず簡単なテストから開始
     console.log('🧪 Testing basic server action functionality...');
-    
+
     // 一時的にFarcaster SDKの取得をスキップして、直接ユーザー作成をテスト
     console.log('📝 Creating user with basic data...');
-    
+
     const userData = {
       username: `user_${Date.now()}`, // 一時的なユーザー名
       bio: null,
@@ -37,7 +37,7 @@ export async function autoCreateUserFromFarcaster(
       '💾 Calling createUser with basic data:',
       JSON.stringify(userData, null, 2),
     );
-    
+
     const result = await createUser(userData, walletAddress);
     console.log('✅ User auto-created successfully:', {
       walletAddress,

@@ -6,11 +6,10 @@ import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
-import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
   const { ready } = usePrivy();
-  const { isAuthenticated, walletAddress, isLoading } = useUnifiedAuth();
+  const { isLoading } = useUnifiedAuth();
   const router = useRouter();
   const { login } = useLogin({
     onComplete: (params) =>
@@ -18,19 +17,10 @@ export const SignInSignUpButton = () => {
   });
 
   const handleClick = useCallback(async () => {
-    if (isAuthenticated && walletAddress) {
-      // 統合認証済みの場合、DBでユーザーの存在をチェック
-      const exists = await checkUserExists(walletAddress);
-      if (exists) {
-        router.push('/chat');
-      } else {
-        router.push('/profile/create');
-      }
-    } else {
-      // 未認証の場合はログイン処理を実行
-      login();
-    }
-  }, [isAuthenticated, walletAddress, router, login]);
+    // 複雑なリダイレクトロジックを削除
+    // GetStartedButtonで統一して処理
+    login();
+  }, [login]);
 
   // 認証状態の初期化中は何も表示しない
   if (isLoading) {

@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 // 認証が不要なページの配列
-const UNAUTHENTICATED_PAGES = ['/', '/signup'];
+const UNAUTHENTICATED_PAGES = ['/', '/signup', '/terms', '/privacy-policy'];
 
 // 静的ファイルを検出する正規表現
 const PUBLIC_FILE = /\.(.*)$/;
@@ -55,9 +55,8 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(redirectUrl);
   }
 
-  // if (!definitelyAuthenticated) {
-  //   return NextResponse.redirect(new URL('/signup', req.url));
-  // }
+  // コメントアウトされた自動リダイレクトを完全に削除
+  // 手動のボタンクリックでリダイレクトを管理
 
   return NextResponse.next();
 }

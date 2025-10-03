@@ -4,12 +4,14 @@ import { ProfilePage } from '@/components/pages/ProfilePage';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { getUser } from '@/repository/db/user/actions';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const router = useRouter();
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -27,7 +29,14 @@ export default function Page() {
     fetchUserData();
   }, [isAuthenticated, walletAddress]);
 
-  if (isLoading || isDataLoading) {
+  // 未認証の場合はホームページにリダイレクト
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      router.push('/');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  if (isLoading || isDataLoading || !isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

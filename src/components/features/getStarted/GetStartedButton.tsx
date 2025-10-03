@@ -1,75 +1,43 @@
 'use client';
 
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
-import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
-import { usePrivyAuth } from '@/hooks/usePrivyAuth';
-import { usePrivy } from '@privy-io/react-auth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { checkUserExists } from '../auth/action';
 
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();
-  const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
-  const { isFirebaseAuthenticated: isPrivyFirebaseAuthenticated } =
-    usePrivyAuth();
-  const {
-    isFarcasterAuthenticated,
-    isFirebaseAuthenticated: isFarcasterFirebaseAuthenticated,
-    farcasterUserId,
-  } = useFarcasterAuth();
+  const { isAuthenticated, walletAddress, isLoading } = useUnifiedAuth();
   const router = useRouter();
 
-  // 認証状態に基づいてウォレットアドレスを取得
-  const getWalletAddress = useCallback((): string => {
-    // Mini App環境: Farcaster認証を使用
-    if (
-      isMiniApp &&
-      isFarcasterAuthenticated &&
-      isFarcasterFirebaseAuthenticated
-    ) {
-      return farcasterUserId || '';
-    }
-
-    // Web環境: Privy認証を使用
-    if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
-      return privyUser?.id || '';
-    }
-
-    return '';
-  }, [
-    isMiniApp,
-    isFarcasterAuthenticated,
-    isFarcasterFirebaseAuthenticated,
-    farcasterUserId,
-    isPrivyAuthenticated,
-    isPrivyFirebaseAuthenticated,
-    privyUser?.id,
-  ]);
-
   const handleClick = useCallback(async () => {
-    // Mini App以外の場合は/signupにリダイレクト
-    if (!isMiniApp) {
-      router.push('/signup');
+    // ローディング中は処理しない
+    if (isLoading) {
       return;
     }
 
-    // Mini App環境の場合
-    const walletAddress = getWalletAddress();
-
-    if (walletAddress) {
+    if (isAuthenticated && walletAddress) {
       // 認証済みの場合、DBでユーザーの存在をチェック
       const exists = await checkUserExists(walletAddress);
       if (exists) {
+        // ユーザーが存在する場合はチャットページへ
         router.push('/chat');
       } else {
+        // ユーザーが存在しない場合はプロフィール作成ページへ
         router.push('/profile/create');
       }
     } else {
-      // 未認証の場合は認証ページへ
-      router.push('/');
+      // 未認証の場合
+      if (!isMiniApp) {
+        // Webアプリ環境の場合はサインアップページへ
+        router.push('/signup');
+      } else {
+        // Mini App環境の場合は認証ページへ
+        router.push('/');
+      }
     }
-  }, [isMiniApp, getWalletAddress, router]);
+  }, [isAuthenticated, walletAddress, isLoading, isMiniApp, router]);
 
   return (
     <div className="mt-auto">

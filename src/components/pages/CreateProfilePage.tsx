@@ -2,11 +2,34 @@
 import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
 import { ProfileForm } from '@/components/features/create-profile/ProfileForm';
 import { ProfileImage } from '@/components/features/create-profile/ProfileImage';
-
-import { useRef } from 'react';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 
 export function CreateProfilePage() {
   const formRef = useRef<HTMLFormElement>(null);
+  const { isAuthenticated, isLoading } = useUnifiedAuth();
+  const router = useRouter();
+
+  // 認証状態のチェック
+  useEffect(() => {
+    if (!isLoading && !isAuthenticated) {
+      // 未認証の場合はホームページにリダイレクト
+      router.push('/');
+    }
+  }, [isAuthenticated, isLoading, router]);
+
+  // ローディング中または未認証の場合はローディング画面を表示
+  if (isLoading || !isAuthenticated) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleImageUpload = (url: string) => {
     if (!formRef.current) return;

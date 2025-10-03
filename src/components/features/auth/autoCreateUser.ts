@@ -1,6 +1,5 @@
 'use server';
 
-import { getFarcasterSDK } from '@/lib/farcaster';
 import { createUser } from '@/repository/db/user/actions';
 
 /**
@@ -22,65 +21,26 @@ export async function autoCreateUserFromFarcaster(
   }
 
   try {
-    console.log('📱 Getting Farcaster SDK...');
-    // Farcaster SDKからユーザー情報を取得
-    const sdk = getFarcasterSDK();
-    if (!sdk) {
-      console.error('❌ Farcaster SDK is not available');
-      throw new Error('Farcaster SDK is not available');
-    }
-    console.log('✅ Farcaster SDK obtained successfully');
-
-    console.log('🔍 Getting Farcaster context...');
-    // Farcasterコンテキストからユーザー情報を取得
-    const context = await sdk.context;
-    console.log(
-      '📋 Farcaster context obtained:',
-      JSON.stringify(context, null, 2),
-    );
-
-    const userContext = context?.user;
-    console.log(
-      '👤 Farcaster user context:',
-      JSON.stringify(userContext, null, 2),
-    );
-
-    if (!userContext) {
-      console.error('❌ Farcaster user context is not available');
-      throw new Error('Farcaster user context is not available');
-    }
-
-    // ユーザー名を取得（displayNameまたはusernameを優先）
-    const username =
-      userContext.displayName ||
-      userContext.username ||
-      `user_${userContext.fid}`;
-
-    // プロフィール画像URLを取得
-    const imageUrl = userContext.pfpUrl || null;
-
-    console.log('📝 Prepared user data:', {
-      username,
-      imageUrl,
-      walletAddress,
-    });
-
-    // ユーザーを作成
+    // まず簡単なテストから開始
+    console.log('🧪 Testing basic server action functionality...');
+    
+    // 一時的にFarcaster SDKの取得をスキップして、直接ユーザー作成をテスト
+    console.log('📝 Creating user with basic data...');
+    
     const userData = {
-      username,
-      bio: null, // 初期値はnull
-      imageUrl,
+      username: `user_${Date.now()}`, // 一時的なユーザー名
+      bio: null,
+      imageUrl: null,
     };
 
     console.log(
-      '💾 Calling createUser with data:',
+      '💾 Calling createUser with basic data:',
       JSON.stringify(userData, null, 2),
     );
+    
     const result = await createUser(userData, walletAddress);
     console.log('✅ User auto-created successfully:', {
       walletAddress,
-      username,
-      imageUrl,
       result,
     });
 

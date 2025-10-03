@@ -3,7 +3,7 @@
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { useFarcasterAuth } from '@/hooks/useFarcasterAuth';
 import { usePrivyAuth } from '@/hooks/usePrivyAuth';
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 import type { User } from 'firebase/auth';
 import { useCallback, useMemo } from 'react';
 
@@ -13,6 +13,7 @@ interface UnifiedAuthState {
   walletAddress: string | null;
   user: User | null; // Firebase User
   error: string | null;
+  ready: boolean; // Privy環境でウォレットが準備完了しているか
 }
 
 /**
@@ -25,7 +26,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
 
   // Privy認証関連
-  const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
+  const { authenticated: isPrivyAuthenticated, user: privyUser, ready: privyReady } = usePrivy();
+  const { wallets, ready: walletsReady } = useWallets();
   const {
     isFirebaseAuthenticated: isPrivyFirebaseAuthenticated,
     isLoading: isPrivyLoading,
@@ -56,7 +58,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     // Web環境: Privy認証を使用
     if (!isMiniApp && isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
-      return privyUser?.id || null;
+      // ウォレットアドレスを取得（埋め込みウォレットまたは接続済みウォレット）
+      return wallets[0]?.address || null;
     }
 
     return null;
@@ -67,7 +70,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     farcasterUserId,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
-    privyUser?.id,
+    wallets,
   ]);
 
   // 認証状態の初期化が完了しているかチェック
@@ -125,6 +128,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
       walletAddress,
       user,
       error,
+      // Privy環境ではウォレットの準備状態も含める
+      ready: isMiniApp ? true : (privyReady && walletsReady),
     };
   }, [
     getWalletAddress,
@@ -138,6 +143,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isPrivyFirebaseAuthenticated,
     privyFirebaseUser,
     privyError,
+    privyReady,
+    walletsReady,
   ]);
 
   return unifiedState;

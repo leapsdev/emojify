@@ -9,7 +9,7 @@ import { getBasename } from '@/lib/basename/basename';
 import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { usePrivy } from '@privy-io/react-auth';
+import { usePrivy, useWallets } from '@privy-io/react-auth';
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
@@ -20,6 +20,7 @@ const initialState: ProfileFormState = null;
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
     const { user } = usePrivy();
+    const { wallets } = useWallets();
     const { farcasterUserId } = useFarcasterAuth();
     const { isMiniApp } = useIsMiniApp();
     const [basename, setBasename] = useState<string>('');
@@ -43,6 +44,10 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         getAddress();
       }
     }, [getAddress, user?.id]);
+  // 送信されるuserIdを計算
+  const userId = isMiniApp ? farcasterUserId || '' : wallets[0]?.address || '';
+
+
 
     const [state, formAction, isPending] = useActionState(
       handleProfileFormAction,
@@ -70,7 +75,7 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         <input
           type="hidden"
           name="userId"
-          value={isMiniApp ? farcasterUserId || '' : user?.id || ''}
+          value={userId}
         />
         <input
           type="hidden"

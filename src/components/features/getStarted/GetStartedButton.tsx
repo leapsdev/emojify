@@ -17,18 +17,29 @@ export const GetStartedButton = () => {
       return;
     }
 
+    // 認証状態とウォレットアドレスの詳細チェック
     if (isAuthenticated && walletAddress) {
-      // 認証済みの場合、DBでユーザーの存在をチェック
-      const exists = await checkUserExists(walletAddress);
-      if (exists) {
-        // ユーザーが存在する場合はチャットページへ
-        router.push('/chat');
-      } else {
-        // ユーザーが存在しない場合はプロフィール作成ページへ
+      try {
+        // DBでユーザーの存在を確実にチェック
+        const exists = await checkUserExists(walletAddress);
+
+        if (exists) {
+          // ✅ 既存ユーザー: チャットページへ
+          console.log('Existing user found, redirecting to /chat');
+          router.push('/chat');
+        } else {
+          // ✅ 新規ユーザー: プロフィール作成ページへ
+          console.log('New user, redirecting to /profile/create');
+          router.push('/profile/create');
+        }
+      } catch (error) {
+        // DBエラーの場合はプロフィール作成ページへ（安全側に倒す）
+        console.error('Error checking user existence:', error);
         router.push('/profile/create');
       }
     } else {
-      // 未認証の場合
+      // ❌ 未認証の場合
+      console.log('User not authenticated, redirecting to auth page');
       if (!isMiniApp) {
         // Webアプリ環境の場合はサインアップページへ
         router.push('/signup');

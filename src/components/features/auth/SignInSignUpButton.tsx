@@ -5,16 +5,49 @@ import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { useCallback } from 'react';
+import { useCallback, useEffect, useState } from 'react';
+import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
   const { ready } = usePrivy();
-  const { isLoading } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const router = useRouter();
+  const [loginCompleted, setLoginCompleted] = useState(false);
+
   const { login } = useLogin({
-    onComplete: (params) =>
-      params.isNewUser ? router.push('/profile/create') : router.push('/chat'),
+    onComplete: (params) => {
+      console.log('Privy login completed:', params);
+      setLoginCompleted(true);
+    },
   });
+
+  // ログイン完了後にDBでユーザー存在をチェック
+  useEffect(() => {
+    const checkUserAfterLogin = async () => {
+      if (loginCompleted && isAuthenticated && walletAddress) {
+        try {
+          console.log('Checking user existence in DB after login...');
+          const exists = await checkUserExists(walletAddress);
+
+          if (exists) {
+            console.log('User exists in DB, redirecting to /chat');
+            router.push('/chat');
+          } else {
+            console.log('User not found in DB, redirecting to /profile/create');
+            router.push('/profile/create');
+          }
+        } catch (error) {
+          console.error('Error checking user existence after login:', error);
+          // エラーの場合は安全側に倒してプロフィール作成ページへ
+          router.push('/profile/create');
+        }
+        // チェック完了後にフラグをリセット
+        setLoginCompleted(false);
+      }
+    };
+
+    checkUserAfterLogin();
+  }, [loginCompleted, isAuthenticated, walletAddress, router]);
 
   const handleClick = useCallback(async () => {
     // 複雑なリダイレクトロジックを削除

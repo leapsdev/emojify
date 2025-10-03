@@ -10,7 +10,7 @@ import { useCallback, useMemo } from 'react';
 interface UnifiedAuthState {
   isAuthenticated: boolean;
   isLoading: boolean;
-  userId: string | null;
+  walletAddress: string | null;
   user: User | null; // Firebase User
   error: string | null;
 }
@@ -43,8 +43,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
 
-  // 認証状態に基づいてユーザーIDを取得
-  const getUserId = useCallback((): string | null => {
+  // 認証状態に基づいてウォレットアドレスを取得
+  const getWalletAddress = useCallback((): string | null => {
     // Mini App環境: Farcaster認証を使用
     if (
       isMiniApp &&
@@ -97,7 +97,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
   // 統合認証状態を計算
   const unifiedState = useMemo((): UnifiedAuthState => {
-    const userId = getUserId();
+    const walletAddress = getWalletAddress();
     const isLoading = !isAuthInitialized();
 
     // 認証状態の判定
@@ -122,12 +122,12 @@ export function useUnifiedAuth(): UnifiedAuthState {
     return {
       isAuthenticated,
       isLoading,
-      userId,
+      walletAddress,
       user,
       error,
     };
   }, [
-    getUserId,
+    getWalletAddress,
     isAuthInitialized,
     isMiniApp,
     isFarcasterAuthenticated,

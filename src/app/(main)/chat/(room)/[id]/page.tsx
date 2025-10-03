@@ -11,7 +11,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [roomData, setRoomData] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherUsers, setOtherUsers] = useState<User[]>([]);
@@ -21,7 +21,7 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      if (isAuthenticated && userId && roomId) {
+      if (isAuthenticated && walletAddress && roomId) {
         try {
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
@@ -33,12 +33,12 @@ export default function Page() {
 
           // 他のメンバーのユーザー情報を取得
           const otherMemberWalletAddresses = Object.keys(room.members).filter(
-            (walletAddress) => walletAddress !== userId,
+            (memberAddress) => memberAddress !== walletAddress,
           );
 
           const otherUsersData = await Promise.all(
-            otherMemberWalletAddresses.map((walletAddress) =>
-              getUser(walletAddress),
+            otherMemberWalletAddresses.map((memberAddress) =>
+              getUser(memberAddress),
             ),
           );
 
@@ -53,7 +53,7 @@ export default function Page() {
     };
 
     fetchRoomData();
-  }, [isAuthenticated, userId, roomId]);
+  }, [isAuthenticated, walletAddress, roomId]);
 
   if (isLoading || isDataLoading) {
     return (
@@ -88,7 +88,7 @@ export default function Page() {
       />
       <ChatRoomPage
         roomId={roomId}
-        userId={userId || ''}
+        walletAddress={walletAddress || ''}
         initialMessages={messages}
       />
     </>

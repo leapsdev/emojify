@@ -22,7 +22,7 @@ export function ClientChooseFriendsPage({
   initialFriends = [],
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
-  const { userId } = useUnifiedAuth();
+  const { walletAddress } = useUnifiedAuth();
   const router = useRouter();
   const {
     selectedUsers,
@@ -32,18 +32,18 @@ export function ClientChooseFriendsPage({
     others,
     handleUserSelect,
   } = useUserSelection({
-    currentUserId: userId ?? '',
+    currentWalletAddress: walletAddress ?? '',
     initialFriends,
     initialOthers,
   });
 
   const handleAddFriend = async (friendId: string) => {
-    if (!userId) {
+    if (!walletAddress) {
       return;
     }
 
     try {
-      const result = await addFriendAction(userId, friendId);
+      const result = await addFriendAction(walletAddress, friendId);
       if (!result.success) {
         router.refresh();
       }
@@ -53,11 +53,14 @@ export function ClientChooseFriendsPage({
   };
 
   const handleCreateRoom = async () => {
-    if (!userId) {
+    if (!walletAddress) {
       return;
     }
 
-    const result = await createChatRoomAction([userId, ...selectedUsers]);
+    const result = await createChatRoomAction([
+      walletAddress,
+      ...selectedUsers,
+    ]);
     if (!result.success) {
       return;
     }

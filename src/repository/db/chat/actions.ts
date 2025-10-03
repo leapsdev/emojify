@@ -47,25 +47,28 @@ export async function getChatRoomAction(
 /**
  * メッセージを送信する
  * @param roomId チャットルームID
- * @param senderId 送信者のユーザーID（ウォレットアドレス）
+ * @param senderWalletAddress 送信者のウォレットアドレス
  * @param content メッセージ内容
  * @returns 送信されたメッセージID
  * @throws {Error} パラメータが不正な場合、ユーザーまたはルームが存在しない場合、データベースエラー時
  */
 export async function sendMessage(
   roomId: string,
-  senderId: string,
+  senderWalletAddress: string,
   content: string,
 ): Promise<string> {
   // パラメータのバリデーション
   if (!roomId) throw new Error('Room ID is required');
-  if (!senderId) throw new Error('Sender ID is required');
+  if (!senderWalletAddress)
+    throw new Error('Sender wallet address is required');
   if (!content) throw new Error('Message content is required');
 
   // ユーザーの存在確認
-  const userSnapshot = await adminDb.ref(`${DB_PATHS.users}/${senderId}`).get();
+  const userSnapshot = await adminDb
+    .ref(`${DB_PATHS.users}/${senderWalletAddress}`)
+    .get();
   if (!userSnapshot.exists()) {
-    throw new Error(`User not found: ${senderId}`);
+    throw new Error(`User not found: ${senderWalletAddress}`);
   }
 
   // ルームの存在確認
@@ -75,9 +78,6 @@ export async function sendMessage(
   if (!roomSnapshot.exists()) {
     throw new Error(`Room not found: ${roomId}`);
   }
-
-  // 新しいスキーマでは、senderIdがウォレットアドレスを表す
-  const senderWalletAddress = senderId;
 
   const newMessageRef = adminDb.ref(DB_PATHS.messages).push();
   const messageId = newMessageRef.key;
@@ -121,21 +121,18 @@ export async function sendMessage(
 /**
  * メッセージを既読にする
  * @param roomId チャットルームID
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @throws {Error} パラメータが不正な場合、ルームまたはユーザーが存在しない場合、データベースエラー時
  */
 export async function updateLastReadAction(
   roomId: string,
-  userId: string,
+  walletAddress: string,
 ): Promise<void> {
   // パラメータのバリデーション
   if (!roomId) throw new Error('Room ID is required');
-  if (!userId) throw new Error('User ID is required');
+  if (!walletAddress) throw new Error('Wallet address is required');
 
   const now = Date.now();
-
-  // 新しいスキーマでは、userIdがウォレットアドレスを表す
-  const walletAddress = userId;
 
   // ルームとユーザーの存在確認
   const roomRef = adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`);
@@ -147,7 +144,7 @@ export async function updateLastReadAction(
 
   const room = roomSnapshot.val() as ChatRoom;
   if (!room.members[walletAddress]) {
-    throw new Error(`User ${userId} is not a member of room ${roomId}`);
+    throw new Error(`User ${walletAddress} is not a member of room ${roomId}`);
   }
 
   // 最終既読時刻を更新

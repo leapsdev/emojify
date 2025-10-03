@@ -50,7 +50,7 @@ export const ProfileEditForm = forwardRef<
       action={formAction}
       ref={ref}
     >
-      <input type="hidden" name="userId" value={user?.id || ''} />
+      <input type="hidden" name="walletAddress" value={user?.id || ''} />
 
       {state?.message && (
         <div

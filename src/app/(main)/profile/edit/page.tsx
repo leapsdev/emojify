@@ -7,15 +7,15 @@ import { getUser } from '@/repository/db/user/actions';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (isAuthenticated && userId) {
+      if (isAuthenticated && walletAddress) {
         try {
-          const data = await getUser(userId);
+          const data = await getUser(walletAddress);
           setUserData(data);
         } catch (error) {
           console.error('Failed to fetch user data:', error);
@@ -25,7 +25,7 @@ export default function Page() {
     };
 
     fetchUserData();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, walletAddress]);
 
   if (isLoading || isDataLoading) {
     return (

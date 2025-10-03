@@ -10,7 +10,7 @@ import { checkUserExists } from './action';
 
 export const SignInSignUpButton = () => {
   const { ready } = usePrivy();
-  const { isAuthenticated, userId, isLoading } = useUnifiedAuth();
+  const { isAuthenticated, walletAddress, isLoading } = useUnifiedAuth();
   const router = useRouter();
   const { login } = useLogin({
     onComplete: (params) =>
@@ -18,9 +18,9 @@ export const SignInSignUpButton = () => {
   });
 
   const handleClick = useCallback(async () => {
-    if (isAuthenticated && userId) {
+    if (isAuthenticated && walletAddress) {
       // 統合認証済みの場合、DBでユーザーの存在をチェック
-      const exists = await checkUserExists(userId);
+      const exists = await checkUserExists(walletAddress);
       if (exists) {
         router.push('/chat');
       } else {
@@ -30,7 +30,7 @@ export const SignInSignUpButton = () => {
       // 未認証の場合はログイン処理を実行
       login();
     }
-  }, [isAuthenticated, userId, router, login]);
+  }, [isAuthenticated, walletAddress, router, login]);
 
   // 認証状態の初期化中は何も表示しない
   if (isLoading) {

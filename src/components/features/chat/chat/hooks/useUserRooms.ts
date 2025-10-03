@@ -15,7 +15,7 @@ import { useCallback, useRef, useSyncExternalStore } from 'react';
 /**
  * ユーザーのチャットルーム一覧をリアルタイムで購読するhook
  */
-export function useUserRooms(userId: string, initialRooms: ChatRoom[]) {
+export function useUserRooms(walletAddress: string, initialRooms: ChatRoom[]) {
   // ルーム一覧の状態を管理
   const roomsRef = useRef<ChatRoom[]>(initialRooms);
 
@@ -27,14 +27,14 @@ export function useUserRooms(userId: string, initialRooms: ChatRoom[]) {
   // ルーム一覧の変更を監視
   const subscribe = useCallback(
     (callback: () => void) => {
-      if (!userId) {
+      if (!walletAddress) {
         roomsRef.current = [];
         callback();
         return () => {};
       }
 
       // ユーザーのルーム一覧を監視
-      const userRoomsRef = ref(db, `${DB_PATHS.userRooms}/${userId}`);
+      const userRoomsRef = ref(db, `${DB_PATHS.userRooms}/${walletAddress}`);
       const unsubscribe = onValue(userRoomsRef, async (snapshot) => {
         try {
           const snapshotVal = snapshot.val();
@@ -73,7 +73,7 @@ export function useUserRooms(userId: string, initialRooms: ChatRoom[]) {
         roomsRef.current = initialRooms;
       };
     },
-    [userId, initialRooms],
+    [walletAddress, initialRooms],
   );
 
   // サーバーレンダリング時は初期ルーム一覧を返す

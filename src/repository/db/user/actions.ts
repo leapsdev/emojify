@@ -10,16 +10,16 @@ const USERS_PATH = 'users';
 /**
  * 新しいユーザーを作成する
  * @param data プロフィール情報（username, bio, imageUrl）
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @returns 作成されたユーザー情報
  * @throws {Error} データベースエラー時
  */
-export async function createUser(data: ProfileForm, userId: string) {
+export async function createUser(data: ProfileForm, walletAddress: string) {
   const timestamp = getCurrentTimestamp();
-  const userRef = adminDbRef(`${USERS_PATH}/${userId}`);
+  const userRef = adminDbRef(`${USERS_PATH}/${walletAddress}`);
 
   const user: User = {
-    id: userId,
+    id: walletAddress,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
@@ -33,25 +33,25 @@ export async function createUser(data: ProfileForm, userId: string) {
 
 /**
  * 指定されたユーザーIDのユーザー情報を取得する
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @returns ユーザー情報（存在しない場合はnull）
  * @throws {Error} データベースエラー時
  */
-export async function getUser(userId: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
+export async function getUser(walletAddress: string) {
+  const snapshot = await adminDbRef(`${USERS_PATH}/${walletAddress}`).get();
   return snapshot.val() as User | null;
 }
 
 /**
  * ユーザー情報を更新する
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @param data 更新するデータ（idとcreatedAtは除く）
  * @returns 更新されたデータ
  * @throws {Error} データベースエラー時
  * @description usernameまたはimageUrlが更新された場合、チャットルーム内の情報も自動更新される
  */
 export async function updateUser(
-  userId: string,
+  walletAddress: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
@@ -61,7 +61,7 @@ export async function updateUser(
   };
 
   // ユーザー情報を更新
-  await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
+  await adminDbRef(`${USERS_PATH}/${walletAddress}`).update(updates);
 
   // 新しいスキーマでは、チャットルームのメンバー情報は最小限（joinedAt, lastReadAt）のみ
   // usernameやimageUrlはUserテーブルから取得するため、チャットルームの更新は不要
@@ -71,11 +71,11 @@ export async function updateUser(
 
 /**
  * ユーザーを削除する
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @throws {Error} データベースエラー時
  */
-export async function deleteUser(userId: string) {
-  await adminDbRef(`${USERS_PATH}/${userId}`).remove();
+export async function deleteUser(walletAddress: string) {
+  await adminDbRef(`${USERS_PATH}/${walletAddress}`).remove();
 }
 
 /**
@@ -91,7 +91,7 @@ export async function getAllUsers() {
 
 /**
  * 指定されたIDのユーザー情報を取得する（getUserのエイリアス）
- * @param id ユーザーID（ウォレットアドレス）
+ * @param id ウォレットアドレス
  * @returns ユーザー情報（存在しない場合はnull）
  * @throws {Error} データベースエラー時
  */
@@ -102,7 +102,7 @@ export async function getUserById(id: string) {
 
 /**
  * 指定されたIDのユーザーが存在するかチェックする
- * @param id ユーザーID（ウォレットアドレス）
+ * @param id ウォレットアドレス
  * @returns 存在する場合はtrue、存在しない場合はfalse
  * @throws {Error} データベースエラー時
  */
@@ -113,19 +113,19 @@ export async function isIdExists(id: string): Promise<boolean> {
 
 /**
  * フレンド関係を追加する（双方向）
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @param friendId フレンドのID（ウォレットアドレス）
  * @throws {Error} ユーザーが存在しない場合、既にフレンドの場合、データベースエラー時
  */
 export async function addFriend(
-  userId: string,
+  walletAddress: string,
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(userId),
+    getUserById(walletAddress),
     getUserById(friendId),
   ]);
 
@@ -139,9 +139,13 @@ export async function addFriend(
 
   // 双方向のフレンド関係を更新
   const updates = {
-    [`${USERS_PATH}/${userId}/friends/${friendId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${friendId}/friends/${userId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: {
+      createdAt: timestamp,
+    },
+    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: {
+      createdAt: timestamp,
+    },
+    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
     [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
   };
 
@@ -150,19 +154,19 @@ export async function addFriend(
 
 /**
  * フレンド関係を削除する（双方向）
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @param friendId フレンドのID（ウォレットアドレス）
  * @throws {Error} ユーザーが存在しない場合、フレンド関係が存在しない場合、データベースエラー時
  */
 export async function removeFriend(
-  userId: string,
+  walletAddress: string,
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(userId),
+    getUserById(walletAddress),
     getUserById(friendId),
   ]);
 
@@ -176,9 +180,9 @@ export async function removeFriend(
 
   // 双方向のフレンド関係を削除
   const updates = {
-    [`${USERS_PATH}/${userId}/friends/${friendId}`]: null,
-    [`${USERS_PATH}/${friendId}/friends/${userId}`]: null,
-    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: null,
+    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: null,
+    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
     [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
   };
 
@@ -187,12 +191,12 @@ export async function removeFriend(
 
 /**
  * ユーザーのフレンド一覧を取得する
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @returns フレンド一覧（更新日時降順でソート）
  * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
-export async function getUserFriends(userId: string): Promise<User[]> {
-  const user = await getUserById(userId);
+export async function getUserFriends(walletAddress: string): Promise<User[]> {
+  const user = await getUserById(walletAddress);
   if (!user) {
     throw new Error('User not found');
   }
@@ -213,28 +217,32 @@ export async function getUserFriends(userId: string): Promise<User[]> {
 
 /**
  * 自分以外のユーザー一覧を取得する
- * @param currentUserId 現在のユーザーID（ウォレットアドレス）
+ * @param currentWalletAddress 現在のウォレットアドレス
  * @returns 自分以外のユーザー一覧
  * @throws {Error} データベースエラー時
  */
-export async function getOtherUsers(currentUserId: string): Promise<User[]> {
+export async function getOtherUsers(
+  currentWalletAddress: string,
+): Promise<User[]> {
   const allUsers = await getAllUsers();
-  return allUsers.filter((user) => user.id !== currentUserId);
+  return allUsers.filter((user) => user.id !== currentWalletAddress);
 }
 
 /**
  * フレンド状態を含むユーザー一覧を取得する
- * @param currentUserId 現在のユーザーID（ウォレットアドレス）
+ * @param currentWalletAddress 現在のウォレットアドレス
  * @returns フレンドとその他のユーザー一覧（更新日時降順でソート）
  * @throws {Error} データベースエラー時
  */
-export async function getUsersWithFriendship(currentUserId: string): Promise<{
+export async function getUsersWithFriendship(
+  currentWalletAddress: string,
+): Promise<{
   friends: User[];
   others: User[];
 }> {
   const [currentUser, otherUsers] = await Promise.all([
-    getUserById(currentUserId),
-    getOtherUsers(currentUserId),
+    getUserById(currentWalletAddress),
+    getOtherUsers(currentWalletAddress),
   ]);
 
   if (!currentUser) return { friends: [], others: [] };

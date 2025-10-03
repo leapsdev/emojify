@@ -21,14 +21,14 @@ import { useEffect, useState } from 'react';
 interface ProfilePageProps {
   user: User | null;
   isOwnProfile?: boolean;
-  currentUserId?: string;
+  currentWalletAddress?: string;
   initialIsFriend?: boolean;
 }
 
 function ProfilePageContent({
   user,
   isOwnProfile = true,
-  currentUserId,
+  currentWalletAddress,
   initialIsFriend = false,
 }: ProfilePageProps) {
   const backHref = isOwnProfile ? '/chat' : '/choose-friends';
@@ -114,9 +114,9 @@ function ProfilePageContent({
               username={user?.username || ''}
               bio={user?.bio || ''}
               avatar={user?.imageUrl || '/icons/faceIcon-192x192.png'}
-              userId={user?.id || ''}
+              walletAddress={user?.id || ''}
               isOwnProfile={isOwnProfile}
-              currentUserId={currentUserId}
+              currentWalletAddress={currentWalletAddress}
               initialIsFriend={initialIsFriend}
             />
             <ProfileTabs

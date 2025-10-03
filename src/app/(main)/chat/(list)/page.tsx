@@ -7,15 +7,15 @@ import type { ChatRoom } from '@/repository/db/database';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
   useEffect(() => {
     const fetchRooms = async () => {
-      if (isAuthenticated && userId) {
+      if (isAuthenticated && walletAddress) {
         try {
-          const userRooms = await getUserRooms(userId);
+          const userRooms = await getUserRooms(walletAddress);
           setRooms(userRooms || []);
         } catch (error) {
           console.error('Failed to fetch rooms:', error);
@@ -26,7 +26,7 @@ export default function Page() {
     };
 
     fetchRooms();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, walletAddress]);
 
   if (isLoading || isDataLoading) {
     return (
@@ -39,5 +39,10 @@ export default function Page() {
     );
   }
 
-  return <ChatRoomListPage userId={userId || ''} initialRooms={rooms} />;
+  return (
+    <ChatRoomListPage
+      walletAddress={walletAddress || ''}
+      initialRooms={rooms}
+    />
+  );
 }

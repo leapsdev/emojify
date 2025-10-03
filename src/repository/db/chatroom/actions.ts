@@ -64,13 +64,13 @@ export async function createChatRoom(members: string[]): Promise<string> {
 
 /**
  * ユーザーのチャットルーム一覧を取得する
- * @param userId ユーザーID（ウォレットアドレス）
+ * @param walletAddress ウォレットアドレス
  * @returns ユーザーが参加しているチャットルーム一覧（更新日時降順でソート）
  * @throws {Error} データベースエラー時
  */
-export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
+export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
   const userRoomsSnapshot = await adminDb
-    .ref(`${DB_INDEXES.userRooms}/${userId}`)
+    .ref(`${DB_INDEXES.userRooms}/${walletAddress}`)
     .get();
   const userRooms = userRoomsSnapshot.val() || {};
   const roomIds = Object.keys(userRooms);
@@ -92,12 +92,12 @@ export async function getUserRooms(userId: string): Promise<ChatRoom[]> {
 /**
  * チャットルームにメンバーを追加する
  * @param roomId チャットルームID
- * @param userId 追加するユーザーID（ウォレットアドレス）
+ * @param walletAddress 追加するウォレットアドレス
  * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
 export async function addRoomMember(
   roomId: string,
-  userId: string,
+  walletAddress: string,
 ): Promise<void> {
   const updates: Record<
     string,
@@ -105,16 +105,13 @@ export async function addRoomMember(
   > = {};
   const now = Date.now();
 
-  // 新しいスキーマでは、userIdがウォレットアドレスを表す
-  const walletAddress = userId;
-
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = {
     joinedAt: now,
     lastReadAt: now,
   };
 
   // ユーザーのルームインデックスを更新
-  updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = true;
+  updates[`${DB_INDEXES.userRooms}/${walletAddress}/${roomId}`] = true;
 
   await adminDb.ref().update(updates);
 }
@@ -122,23 +119,20 @@ export async function addRoomMember(
 /**
  * チャットルームからメンバーを削除する
  * @param roomId チャットルームID
- * @param userId 削除するユーザーID（ウォレットアドレス）
+ * @param walletAddress 削除するウォレットアドレス
  * @throws {Error} データベースエラー時
  */
 export async function removeRoomMember(
   roomId: string,
-  userId: string,
+  walletAddress: string,
 ): Promise<void> {
   const updates: Record<string, null> = {};
-
-  // 新しいスキーマでは、userIdがウォレットアドレスを表す
-  const walletAddress = userId;
 
   // ルームのメンバーリストから削除
   updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = null;
 
   // ユーザーのルームインデックスから削除
-  updates[`${DB_INDEXES.userRooms}/${userId}/${roomId}`] = null;
+  updates[`${DB_INDEXES.userRooms}/${walletAddress}/${roomId}`] = null;
 
   await adminDb.ref().update(updates);
 }

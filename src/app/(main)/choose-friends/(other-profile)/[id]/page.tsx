@@ -14,7 +14,7 @@ interface PageProps {
 }
 
 export default function Page({ params }: PageProps) {
-  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [targetUser, setTargetUser] = useState<User | null>(null);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
@@ -32,11 +32,11 @@ export default function Page({ params }: PageProps) {
 
   useEffect(() => {
     const fetchUserData = async () => {
-      if (isAuthenticated && userId && targetUserId) {
+      if (isAuthenticated && walletAddress && targetUserId) {
         try {
           const [target, current] = await Promise.all([
             getUserById(targetUserId),
-            getUserById(userId),
+            getUserById(walletAddress),
           ]);
           setTargetUser(target);
           setCurrentUser(current);
@@ -48,7 +48,7 @@ export default function Page({ params }: PageProps) {
     };
 
     fetchUserData();
-  }, [isAuthenticated, userId, targetUserId]);
+  }, [isAuthenticated, walletAddress, targetUserId]);
 
   if (isLoading || isDataLoading) {
     return (
@@ -68,7 +68,7 @@ export default function Page({ params }: PageProps) {
     <ProfilePage
       user={targetUser}
       isOwnProfile={false}
-      currentUserId={userId || ''}
+      currentWalletAddress={walletAddress || ''}
       initialIsFriend={initialIsFriend}
     />
   );

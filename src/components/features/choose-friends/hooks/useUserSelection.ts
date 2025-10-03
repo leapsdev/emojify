@@ -14,13 +14,13 @@ import {
 
 interface DisplayUser extends Pick<User, 'id' | 'username'> {
   displayName: string;
-  userId: string;
+  walletAddress: string;
   avatar: string;
   section: 'friend' | 'other';
 }
 
 interface UseUserSelectionProps {
-  currentUserId: string;
+  currentWalletAddress: string;
   initialFriends?: User[];
   initialOthers?: User[];
 }
@@ -34,7 +34,7 @@ function convertToDisplayUser(
     id: user.id,
     username: user.username,
     displayName: user.username,
-    userId: user.id,
+    walletAddress: user.id,
     avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };
@@ -63,7 +63,7 @@ function createUserList(
 }
 
 export const useUserSelection = ({
-  currentUserId,
+  currentWalletAddress,
   initialFriends = [],
   initialOthers = [],
 }: UseUserSelectionProps) => {
@@ -82,7 +82,7 @@ export const useUserSelection = ({
   // ユーザーリストの購読
   const subscribe = useCallback(
     (callback: () => void) => {
-      if (!currentUserId) {
+      if (!currentWalletAddress) {
         userListRef.current = createUserList([], []);
         callback();
         return () => {};
@@ -93,7 +93,7 @@ export const useUserSelection = ({
       const unsubscribe = onValue(dbRef, async () => {
         try {
           const { friends, others } =
-            await getUsersWithFriendshipAction(currentUserId);
+            await getUsersWithFriendshipAction(currentWalletAddress);
           userListRef.current = {
             friends: friends.map((user) =>
               convertToDisplayUser(user, 'friend'),
@@ -115,7 +115,7 @@ export const useUserSelection = ({
         userListRef.current = initialUserList;
       };
     },
-    [currentUserId, initialUserList],
+    [currentWalletAddress, initialUserList],
   );
 
   // 現在のユーザーリストを返す
@@ -135,7 +135,7 @@ export const useUserSelection = ({
   const filteredUsers = users.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchQuery.toLowerCase()),
+      user.walletAddress.toLowerCase().includes(searchQuery.toLowerCase()),
   );
 
   // フィルタリングされたユーザーを友達とその他に分類
@@ -143,11 +143,11 @@ export const useUserSelection = ({
   const others = filteredUsers.filter((user) => user.section === 'other');
 
   // ユーザーの選択状態を切り替え
-  const handleUserSelect = useCallback((userId: string) => {
+  const handleUserSelect = useCallback((walletAddress: string) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId],
+      prev.includes(walletAddress)
+        ? prev.filter((id) => id !== walletAddress)
+        : [...prev, walletAddress],
     );
   }, []);
 

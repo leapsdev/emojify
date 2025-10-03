@@ -8,7 +8,7 @@ import { useUnreadStatus } from './hooks/useUnreadStatus';
 
 type ChatRoomProps = {
   room: ChatRoomType;
-  currentUserId: string;
+  currentWalletAddress: string;
 };
 
 type Member = {
@@ -16,16 +16,16 @@ type Member = {
   username: string;
   lastReadAt: number;
   imageUrl?: string | null;
-  userId: string; // ユーザーIDを追加
+  walletAddress: string; // ウォレットアドレスを追加
 };
 
-const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
-  const hasUnread = useUnreadStatus(room.id, currentUserId);
+const ChatRoom = ({ room, currentWalletAddress }: ChatRoomProps) => {
+  const hasUnread = useUnreadStatus(room.id, currentWalletAddress);
   const members = useRoomMembers(room.id);
 
   // メンバー情報を取得（自分以外）
   const otherMembers = Object.entries(members).filter(
-    ([, member]) => (member as Member).userId !== currentUserId,
+    ([, member]) => (member as Member).walletAddress !== currentWalletAddress,
   ) as [string, Member][];
 
   // アバター画像のURLを決定
@@ -72,15 +72,19 @@ const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
 
 export const ChatRoomList = ({
   rooms,
-  currentUserId,
+  currentWalletAddress,
 }: {
   rooms: ChatRoomType[];
-  currentUserId: string;
+  currentWalletAddress: string;
 }) => {
   return (
     <div className="pb-14">
       {rooms.map((room) => (
-        <ChatRoom key={room.id} room={room} currentUserId={currentUserId} />
+        <ChatRoom
+          key={room.id}
+          room={room}
+          currentWalletAddress={currentWalletAddress}
+        />
       ))}
     </div>
   );

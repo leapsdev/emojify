@@ -3,7 +3,7 @@ import { UserItem } from './UserItem';
 
 interface DisplayUser extends Pick<User, 'id' | 'username'> {
   displayName: string;
-  userId: string;
+  walletAddress: string;
   avatar: string;
   section: 'friend' | 'other';
 }
@@ -12,8 +12,8 @@ interface UserSectionProps {
   title: string;
   users: DisplayUser[];
   selectedUsers: string[];
-  onUserSelect: (userId: string) => void;
-  onAddFriend?: (userId: string) => void;
+  onUserSelect: (walletAddress: string) => void;
+  onAddFriend?: (walletAddress: string) => void;
   count?: number;
 }
 

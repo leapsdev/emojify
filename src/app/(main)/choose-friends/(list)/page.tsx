@@ -7,7 +7,7 @@ import { getUsersWithFriendship } from '@/repository/db/user/actions';
 import { useEffect, useState } from 'react';
 
 export default function ChooseFriendsPage() {
-  const { isAuthenticated, isLoading, userId } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [friendshipData, setFriendshipData] = useState<{
     friends: User[];
     others: User[];
@@ -16,9 +16,9 @@ export default function ChooseFriendsPage() {
 
   useEffect(() => {
     const fetchFriendshipData = async () => {
-      if (isAuthenticated && userId) {
+      if (isAuthenticated && walletAddress) {
         try {
-          const data = await getUsersWithFriendship(userId);
+          const data = await getUsersWithFriendship(walletAddress);
           setFriendshipData(data);
         } catch (error) {
           console.error('Failed to fetch friendship data:', error);
@@ -28,7 +28,7 @@ export default function ChooseFriendsPage() {
     };
 
     fetchFriendshipData();
-  }, [isAuthenticated, userId]);
+  }, [isAuthenticated, walletAddress]);
 
   if (isLoading || isDataLoading) {
     return (

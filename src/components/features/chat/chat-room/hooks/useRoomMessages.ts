@@ -12,7 +12,7 @@ import { useCallback, useMemo, useRef, useSyncExternalStore } from 'react';
 
 export function useRoomMessages(
   roomId: string,
-  currentUserId: string,
+  currentWalletAddress: string,
   initialMessages: Message[] = [],
 ) {
   const messagesRef = useRef<Message[]>(initialMessages);
@@ -35,7 +35,7 @@ export function useRoomMessages(
             document.visibilityState === 'visible' &&
             messagesRef.current.length > 0
           ) {
-            await updateLastReadAction(roomId, currentUserId);
+            await updateLastReadAction(roomId, currentWalletAddress);
           }
 
           callback();
@@ -49,7 +49,7 @@ export function useRoomMessages(
         messagesRef.current = initialMessages;
       };
     },
-    [roomId, currentUserId, initialMessages],
+    [roomId, currentWalletAddress, initialMessages],
   );
 
   // サーバーレンダリング時は初期メッセージを返す

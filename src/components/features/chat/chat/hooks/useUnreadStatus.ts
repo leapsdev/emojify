@@ -6,7 +6,7 @@ import { DB_PATHS } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
-export function useUnreadStatus(roomId: string, currentUserId: string) {
+export function useUnreadStatus(roomId: string, currentWalletAddress: string) {
   const unreadStatusRef = useRef<boolean>(false);
   const membersRef = useRef<
     Record<string, { joinedAt: number; lastReadAt: number }>
@@ -36,8 +36,8 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
           membersRef.current = room.members;
         }
 
-        // 新しいスキーマでは、currentUserIdがウォレットアドレスを表す
-        const currentUserWalletAddress = currentUserId;
+        // 新しいスキーマでは、currentWalletAddressがウォレットアドレスを表す
+        const currentUserWalletAddress = currentWalletAddress;
 
         // 未読状態の更新
         const newUnreadStatus = room.lastMessage
@@ -59,7 +59,7 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
         membersRef.current = {};
       };
     },
-    [roomId, currentUserId],
+    [roomId, currentWalletAddress],
   );
 
   const getServerSnapshot = useCallback(() => {

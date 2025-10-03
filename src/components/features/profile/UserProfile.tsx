@@ -15,9 +15,9 @@ interface UserProfileProps {
   username: string;
   bio: string;
   avatar: string;
-  userId: string;
+  walletAddress: string;
   isOwnProfile?: boolean;
-  currentUserId?: string;
+  currentWalletAddress?: string;
   initialIsFriend?: boolean;
 }
 
@@ -25,9 +25,9 @@ export const UserProfile = ({
   username,
   bio,
   avatar,
-  userId,
+  walletAddress,
   isOwnProfile = true,
-  currentUserId,
+  currentWalletAddress,
   initialIsFriend = false,
 }: UserProfileProps) => {
   const { user } = useUser();
@@ -39,16 +39,20 @@ export const UserProfile = ({
     }
   }, [user?.id]);
 
-  const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
+  const isFriend = useIsFriend(
+    currentWalletAddress || '',
+    walletAddress,
+    initialIsFriend,
+  );
 
   const handleAddFriend = async () => {
-    if (!currentUserId) return;
-    await addFriend(currentUserId, userId);
+    if (!currentWalletAddress) return;
+    await addFriend(currentWalletAddress, walletAddress);
   };
 
   const handleRemoveFriend = async () => {
-    if (!currentUserId) return;
-    await removeFriend(currentUserId, userId);
+    if (!currentWalletAddress) return;
+    await removeFriend(currentWalletAddress, walletAddress);
   };
 
   const FriendButton = () => {

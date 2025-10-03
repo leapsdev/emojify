@@ -11,16 +11,20 @@ import { useRoomMessages } from './hooks/useRoomMessages';
 
 type MessageListProps = {
   roomId: string;
-  currentUserId: string;
+  currentWalletAddress: string;
   initialMessages: Message[];
 };
 
 function MessageListContent({
   roomId,
-  currentUserId,
+  currentWalletAddress,
   initialMessages,
 }: MessageListProps) {
-  const messages = useRoomMessages(roomId, currentUserId, initialMessages);
+  const messages = useRoomMessages(
+    roomId,
+    currentWalletAddress,
+    initialMessages,
+  );
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { nfts } = useGlobalNFTs();
 
@@ -162,7 +166,7 @@ function MessageListContent({
           <div className="space-y-4">
             {messagesForDate.map((message) => {
               const isSentByCurrentUser =
-                message.senderWalletAddress === currentUserId;
+                message.senderWalletAddress === currentWalletAddress;
 
               return (
                 <div

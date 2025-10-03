@@ -5,18 +5,18 @@ import { useUserRooms } from '@/components/features/chat/chat/hooks/useUserRooms
 import type { ChatRoom } from '@/repository/db/database';
 
 type ChatRoomListPageProps = {
-  userId: string;
+  walletAddress: string;
   initialRooms: ChatRoom[];
 };
 
 export function ChatRoomListPage({
-  userId,
+  walletAddress,
   initialRooms,
 }: ChatRoomListPageProps) {
-  const rooms = useUserRooms(userId, initialRooms);
+  const rooms = useUserRooms(walletAddress, initialRooms);
   return (
     <main>
-      <ChatRoomList rooms={rooms} currentUserId={userId} />
+      <ChatRoomList rooms={rooms} currentWalletAddress={walletAddress} />
     </main>
   );
 }

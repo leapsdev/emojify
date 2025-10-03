@@ -20,8 +20,8 @@ export const GetStartedButton = () => {
   } = useFarcasterAuth();
   const router = useRouter();
 
-  // 認証状態に基づいてユーザーIDを取得
-  const getUserId = useCallback((): string => {
+  // 認証状態に基づいてウォレットアドレスを取得
+  const getWalletAddress = useCallback((): string => {
     // Mini App環境: Farcaster認証を使用
     if (
       isMiniApp &&
@@ -55,11 +55,11 @@ export const GetStartedButton = () => {
     }
 
     // Mini App環境の場合
-    const userId = getUserId();
+    const walletAddress = getWalletAddress();
 
-    if (userId) {
+    if (walletAddress) {
       // 認証済みの場合、DBでユーザーの存在をチェック
-      const exists = await checkUserExists(userId);
+      const exists = await checkUserExists(walletAddress);
       if (exists) {
         router.push('/chat');
       } else {
@@ -69,7 +69,7 @@ export const GetStartedButton = () => {
       // 未認証の場合は認証ページへ
       router.push('/');
     }
-  }, [isMiniApp, getUserId, router]);
+  }, [isMiniApp, getWalletAddress, router]);
 
   return (
     <div className="mt-auto">

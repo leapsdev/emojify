@@ -34,7 +34,7 @@ export const AuthRedirect = ({ mode }: Props) => {
   const pathname = usePathname();
 
   // 認証状態に基づいてユーザーIDを取得
-  const getUserId = useCallback((): string => {
+  const getWalletAddress = useCallback((): string => {
     // Mini App環境: Farcaster認証を使用
     if (
       isMiniApp &&
@@ -87,14 +87,14 @@ export const AuthRedirect = ({ mode }: Props) => {
 
   // プロフィール作成ページでのリダイレクト処理
   const handleProfileModeRedirect = useCallback(async () => {
-    const userId = getUserId();
-    if (!userId) return;
+    const walletAddress = getWalletAddress();
+    if (!walletAddress) return;
 
-    const exists = await checkUserExists(userId);
+    const exists = await checkUserExists(walletAddress);
     if (exists) {
       router.push('/chat');
     }
-  }, [getUserId, router]);
+  }, [getWalletAddress, router]);
 
   // 認証ページでのリダイレクト処理
   const handleAuthModeRedirect = useCallback(async () => {
@@ -113,8 +113,8 @@ export const AuthRedirect = ({ mode }: Props) => {
       return;
     }
 
-    const userId = getUserId();
-    const isAuthenticated = !!userId;
+    const walletAddress = getWalletAddress();
+    const isAuthenticated = !!walletAddress;
 
     // 特定のページではリダイレクトしない
     if (pathname === '/' || pathname === '/profile/create') return;
@@ -140,8 +140,8 @@ export const AuthRedirect = ({ mode }: Props) => {
       }
     }
 
-    if (isAuthenticated && userId) {
-      const exists = await checkUserExists(userId);
+    if (isAuthenticated && walletAddress) {
+      const exists = await checkUserExists(walletAddress);
       if (!exists) {
         // ユーザーが存在しない場合はプロフィール作成ページへ
         router.push('/profile/create');
@@ -151,7 +151,7 @@ export const AuthRedirect = ({ mode }: Props) => {
       router.push('/');
     }
   }, [
-    getUserId,
+    getWalletAddress,
     pathname,
     isMiniApp,
     router,

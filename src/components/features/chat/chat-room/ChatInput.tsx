@@ -21,10 +21,10 @@ interface NFT {
 
 type ChatRoomInputProps = {
   roomId: string;
-  userId: string;
+  walletAddress: string;
 };
 
-function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
+function ChatRoomInputContent({ roomId, walletAddress }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { address } = useWallet();
@@ -59,7 +59,7 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
     try {
       setIsLoading(true);
       setError(null);
-      await sendMessageAction(roomId, userId, trimmedMessage);
+      await sendMessageAction(roomId, walletAddress, trimmedMessage);
       clearMessage();
     } catch (error) {
       console.error('Failed to send message:', error);

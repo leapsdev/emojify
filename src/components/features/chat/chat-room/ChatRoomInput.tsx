@@ -8,10 +8,10 @@ import { useEmojiInput } from './hooks/useEmojiInput';
 
 type ChatRoomInputProps = {
   roomId: string;
-  userId: string;
+  walletAddress: string;
 };
 
-export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
+export function ChatRoomInput({ roomId, walletAddress }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const {
@@ -34,7 +34,7 @@ export function ChatRoomInput({ roomId, userId }: ChatRoomInputProps) {
     try {
       setIsLoading(true);
       setError(null);
-      await sendMessageAction(roomId, userId, trimmedMessage);
+      await sendMessageAction(roomId, walletAddress, trimmedMessage);
       clearMessage();
     } catch (error) {
       console.error('Failed to send message:', error);

@@ -8,7 +8,7 @@ import { base } from 'viem/chains';
 
 interface DisplayUser extends Pick<User, 'id' | 'username'> {
   displayName: string;
-  userId: string;
+  walletAddress: string;
   avatar: string;
   section: 'friend' | 'other';
 }

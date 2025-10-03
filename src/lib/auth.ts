@@ -96,6 +96,7 @@ export async function getFirebaseCustomTokenFromPrivy(
  */
 export async function getFirebaseCustomTokenFromFarcaster(
   farcasterToken: string,
+  walletAddress?: string,
 ): Promise<string | null> {
   console.log('[Farcaster Auth] 🚀 Starting Farcaster authentication process');
 
@@ -132,17 +133,21 @@ export async function getFirebaseCustomTokenFromFarcaster(
     console.log('[Farcaster Auth] ✅ JWT verified successfully');
     console.log('[Farcaster Auth] 🆔 FID extracted:', payload.sub);
 
-    // FIDをユーザーIDとして使用
-    const farcasterUserId = String(payload.sub);
-    console.log('[Farcaster Auth] 👤 Generated user ID:', farcasterUserId);
+    // ウォレットアドレスが提供されている場合はそれを使用、なければFIDを使用（フォールバック）
+    const userId = walletAddress || String(payload.sub);
+    console.log('[Farcaster Auth] 👤 User ID to use:', userId);
+    console.log(
+      '[Farcaster Auth] 📍 Source:',
+      walletAddress ? 'Wallet Address' : 'FID (fallback)',
+    );
     console.log('[Farcaster Auth] 🔥 Generating Firebase custom token...');
 
     // Firebaseカスタムトークンを生成
     const { createFirebaseCustomToken } = await import('./firebase-auth');
-    const customToken = await createFirebaseCustomToken(farcasterUserId, {
-      farcasterUserId: farcasterUserId,
+    const customToken = await createFirebaseCustomToken(userId, {
       farcasterFid: payload.sub,
       authProvider: 'farcaster',
+      ...(walletAddress && { walletAddress }),
     });
 
     console.log(

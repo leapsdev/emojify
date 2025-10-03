@@ -158,6 +158,38 @@ export function useFarcasterAuth() {
         farcasterToken: token,
       }));
 
+      // Farcaster SDKからウォレットアドレスを取得
+      console.log('Farcasterウォレットアドレスの取得を開始します');
+      let walletAddress: string | null = null;
+
+      try {
+        const provider = await sdk.wallet.getEthereumProvider();
+        if (provider) {
+          const accounts = (await provider.request({
+            method: 'eth_requestAccounts',
+          })) as string[];
+          walletAddress = accounts?.[0] || null;
+          console.log('Farcasterウォレットアドレス取得成功:', walletAddress);
+        }
+      } catch (walletError) {
+        console.log(
+          'ウォレットアドレス取得失敗、eth_accountsを試行:',
+          walletError,
+        );
+        try {
+          const provider = await sdk.wallet.getEthereumProvider();
+          if (provider) {
+            const accounts = (await provider.request({
+              method: 'eth_accounts',
+            })) as string[];
+            walletAddress = accounts?.[0] || null;
+            console.log('eth_accountsでウォレットアドレス取得:', walletAddress);
+          }
+        } catch (fallbackError) {
+          console.error('ウォレットアドレス取得完全失敗:', fallbackError);
+        }
+      }
+
       // サーバーサイドでFirebaseカスタムトークンを取得
       console.log('Firebaseカスタムトークンの取得を開始します');
       const response = await fetch('/api/auth/farcaster-firebase-token', {
@@ -166,6 +198,9 @@ export function useFarcasterAuth() {
           'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
+        body: JSON.stringify({
+          walletAddress: walletAddress,
+        }),
       });
 
       if (!response.ok) {

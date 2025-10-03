@@ -5,6 +5,11 @@ export async function POST(request: Request) {
   try {
     console.log('[API] 🚀 Farcaster Firebase token API called');
 
+    // リクエストボディからウォレットアドレスを取得
+    const body = await request.json().catch(() => ({}));
+    const walletAddress = body.walletAddress as string | undefined;
+    console.log('[API] 📍 Wallet address from request:', walletAddress);
+
     // AuthorizationヘッダーからFarcaster JWTを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -22,8 +27,10 @@ export async function POST(request: Request) {
 
     // Firebaseカスタムトークンを取得
     console.log('[API] 🔄 Calling getFirebaseCustomTokenFromFarcaster...');
-    const customToken =
-      await getFirebaseCustomTokenFromFarcaster(farcasterToken);
+    const customToken = await getFirebaseCustomTokenFromFarcaster(
+      farcasterToken,
+      walletAddress,
+    );
     console.log(
       '[API] 📦 getFirebaseCustomTokenFromFarcaster result:',
       customToken ? '✅ Token received' : '❌ No token',

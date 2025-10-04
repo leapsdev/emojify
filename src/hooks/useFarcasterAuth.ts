@@ -297,6 +297,10 @@ export function useFarcasterAuth() {
         isLoading:
           prev.isFarcasterAuthenticated === true ? false : prev.isLoading,
         user,
+        // 認証が成功した後は状態を安定させる（リセットしない）
+        ...(prev.isFarcasterAuthenticated === true && {
+          isFarcasterAuthenticated: true,
+        }),
       }));
     });
 
@@ -321,7 +325,7 @@ export function useFarcasterAuth() {
       state.isReady &&
       state.isMiniApp &&
       !state.autoLoginAttempted &&
-      !state.isFarcasterAuthenticated
+      state.isFarcasterAuthenticated !== true
     ) {
       console.log('自動認証実行開始');
       setState((prev) => ({ ...prev, autoLoginAttempted: true }));

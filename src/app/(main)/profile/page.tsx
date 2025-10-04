@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const router = useRouter();
@@ -18,8 +18,11 @@ export default function Page() {
       isAuthenticated,
       isLoading,
       walletAddress,
+      user: !!user,
+      userUid: user?.uid,
     });
 
+    // Firebase認証が完了してからデータを取得
     if (!isAuthenticated || !walletAddress) {
       console.log(
         'Skipping user data fetch - not authenticated or no wallet address',
@@ -28,9 +31,25 @@ export default function Page() {
       return;
     }
 
+    // Firebase認証が完了するまで待機
+    if (!user) {
+      console.log(
+        'Waiting for Firebase authentication to complete before fetching user data',
+      );
+      return; // ローディング状態を維持
+    }
+
     const fetchUserData = async () => {
       console.log('Fetching user data for:', walletAddress);
       try {
+        // Firebase認証が完了していることを確認
+        if (user.uid !== walletAddress) {
+          console.warn('Firebase UID and wallet address mismatch:', {
+            firebaseUid: user.uid,
+            walletAddress,
+          });
+        }
+
         const data = await getUser(walletAddress);
         console.log('User data fetched:', data);
         setUserData(data);
@@ -42,7 +61,7 @@ export default function Page() {
     };
 
     fetchUserData();
-  }, [isAuthenticated, walletAddress, isLoading]);
+  }, [isAuthenticated, walletAddress, isLoading, user]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {
@@ -60,6 +79,12 @@ export default function Page() {
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
           <p>Loading...</p>
+          {isLoading && (
+            <p className="text-sm text-gray-500 mt-2">Authenticating...</p>
+          )}
+          {!isLoading && isDataLoading && (
+            <p className="text-sm text-gray-500 mt-2">Loading profile...</p>
+          )}
         </div>
       </div>
     );

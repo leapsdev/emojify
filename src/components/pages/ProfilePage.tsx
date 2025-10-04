@@ -43,7 +43,11 @@ function ProfilePageContent({
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
   const { isAuthenticated } = useUnifiedAuth();
   console.log('ProfilePage received user:', user);
-  console.log('ProfilePage auth state:', isAuthenticated);
+  console.log('User imageUrl:', user?.imageUrl);
+  console.log(
+    'Avatar prop passed to UserProfile:',
+    user?.imageUrl || '/icons/faceIcon-192x192.png',
+  );
 
   useEffect(() => {
     const fetchNFTs = async () => {

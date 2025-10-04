@@ -28,6 +28,7 @@ export const UserProfile = ({
   currentWalletAddress,
   initialIsFriend = false,
 }: UserProfileProps) => {
+  console.log('UserProfile received avatar:', avatar);
   const isFriend = useIsFriend(
     currentWalletAddress || '',
     walletAddress,
@@ -91,6 +92,8 @@ export const UserProfile = ({
               sizes="(max-width: 768px) 96px, 96px"
               priority
               className="rounded-full object-cover"
+              onLoad={() => console.log('Image loaded successfully:', avatar)}
+              onError={() => console.error('Image failed to load:', avatar)}
             />
           </div>
           <div className="flex flex-1 min-w-0 items-start justify-between ml-4">

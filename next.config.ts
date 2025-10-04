@@ -53,6 +53,11 @@ const nextConfig: NextConfig = {
         hostname: 'gateway.pinata.cloud',
         pathname: '/ipfs/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'imagedelivery.net',
+        pathname: '/**',
+      },
     ],
   },
   async rewrites() {

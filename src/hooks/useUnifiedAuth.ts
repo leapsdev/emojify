@@ -26,8 +26,6 @@ interface UnifiedAuthState {
 export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
 
-  console.log('🔍 useUnifiedAuth hook started:', { isMiniApp });
-
   // 統合ウォレット（環境に応じたウォレットアドレスを取得）
   const {
     address: unifiedWalletAddress,
@@ -35,13 +33,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isLoading: walletLoading,
     error: walletError,
   } = useUnifiedWallet();
-
-  console.log('🔍 Unified wallet state:', {
-    unifiedWalletAddress,
-    walletConnected,
-    walletLoading,
-    walletError,
-  });
 
   // Privy認証関連
   const { authenticated: isPrivyAuthenticated, ready: privyReady } = usePrivy();
@@ -62,14 +53,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
 
-  console.log('🔍 Farcaster auth state:', {
-    isFarcasterAuthenticated,
-    isFarcasterFirebaseAuthenticated,
-    isFarcasterLoading,
-    farcasterError,
-    farcasterFirebaseUser: !!farcasterFirebaseUser,
-  });
-
   // 認証状態に基づいてウォレットアドレスを取得
   const getWalletAddress = useCallback((): string | null => {
     // 認証済みの場合、統合ウォレットからアドレスを取得
@@ -78,10 +61,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
     if (isMiniApp) {
       // Firebase認証が失敗していてもFarcaster認証が成功している場合はウォレットアドレスを返す
       if (isFarcasterAuthenticated === true) {
-        console.log(
-          '🔍 Returning wallet address for Farcaster auth:',
-          unifiedWalletAddress,
-        );
         return unifiedWalletAddress || null;
       }
     } else {
@@ -90,7 +69,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
       }
     }
 
-    console.log('🔍 No wallet address available');
     return null;
   }, [
     isMiniApp,
@@ -106,7 +84,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
     if (isMiniApp) {
       // ローディング中は待機
       if (isFarcasterLoading) {
-        console.log('🔍 Auth not initialized: Farcaster still loading');
         return false;
       }
       // 認証状態が確定している（true/false）場合は初期化完了とみなす
@@ -115,28 +92,18 @@ export function useUnifiedAuth(): UnifiedAuthState {
         isFarcasterAuthenticated === true &&
         isFarcasterFirebaseAuthenticated
       ) {
-        console.log('🔍 Auth initialized: Farcaster authenticated');
         return true;
       }
       const result = isFarcasterAuthenticated !== undefined;
-      console.log('🔍 Auth initialization check:', {
-        isFarcasterAuthenticated,
-        result,
-      });
       return result;
     }
 
     // Web環境: Privy認証の初期化完了を確認
     // ローディング中は待機
     if (isPrivyLoading) {
-      console.log('🔍 Auth not initialized: Privy still loading');
       return false;
     }
     const result = isPrivyAuthenticated !== undefined;
-    console.log('🔍 Privy auth initialization check:', {
-      isPrivyAuthenticated,
-      result,
-    });
     return result;
   }, [
     isPrivyLoading,
@@ -152,18 +119,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
     const walletAddress = getWalletAddress();
 
     // 認証状態の詳細デバッグログ
-    console.log('🔍 useUnifiedAuth state calculation:', {
-      isMiniApp,
-      isFarcasterAuthenticated,
-      isFarcasterFirebaseAuthenticated,
-      isFarcasterLoading,
-      isPrivyAuthenticated,
-      isPrivyFirebaseAuthenticated,
-      isPrivyLoading,
-      unifiedWalletAddress,
-      walletAddress,
-      isAuthInitialized: isAuthInitialized(),
-    });
 
     // 認証状態の判定
     let isAuthenticated = false;
@@ -176,12 +131,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
       isAuthenticated = isFarcasterAuthenticated === true;
       user = farcasterFirebaseUser;
       error = farcasterError;
-
-      console.log('🔍 Mini App auth calculation:', {
-        isFarcasterAuthenticated,
-        isFarcasterFirebaseAuthenticated,
-        result: isAuthenticated,
-      });
     } else {
       // Web環境: Privy認証を使用
       isAuthenticated = isPrivyAuthenticated && isPrivyFirebaseAuthenticated;
@@ -191,12 +140,6 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     // 認証が成功している場合は即座にローディングを終了
     const isLoading = isAuthenticated ? false : !isAuthInitialized();
-
-    console.log('🔍 Final auth state:', {
-      isAuthenticated,
-      isLoading,
-      walletAddress,
-    });
 
     return {
       isAuthenticated,
@@ -212,18 +155,14 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isAuthInitialized,
     isMiniApp,
     isFarcasterAuthenticated,
-    isFarcasterFirebaseAuthenticated,
-    isFarcasterLoading,
     farcasterFirebaseUser,
     farcasterError,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
-    isPrivyLoading,
     privyFirebaseUser,
     privyError,
     privyReady,
     walletsReady,
-    unifiedWalletAddress,
   ]);
 
   return unifiedState;

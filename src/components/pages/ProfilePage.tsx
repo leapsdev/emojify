@@ -40,6 +40,7 @@ function ProfilePageContent({
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
   const { isAuthenticated } = useUnifiedAuth();
+  console.log(user);
 
   useEffect(() => {
     const fetchNFTs = async () => {

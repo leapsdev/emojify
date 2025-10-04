@@ -93,8 +93,6 @@ export function useFarcasterAuth() {
         throw new Error('Farcaster SDKが初期化されていません');
       }
 
-      console.log('Farcaster認証開始: SDKとMini App環境が確認されました');
-
       let token: string;
       try {
         // Farcaster Quick Authトークンを取得
@@ -105,13 +103,10 @@ export function useFarcasterAuth() {
           throw new Error('Farcasterトークンの取得に失敗しました');
         }
 
-        console.log('Farcasterトークン取得成功');
-
         // SDKからユーザー情報を取得してログ出力
         try {
           const context = await sdk.context;
           const userContext = context.user;
-          console.log('Farcasterユーザー情報:', userContext);
 
           // FarcasterユーザーIDを設定
           if (userContext?.fid) {
@@ -120,9 +115,7 @@ export function useFarcasterAuth() {
               farcasterUserId: userContext.fid.toString(),
             }));
           }
-        } catch (userError) {
-          console.log('ユーザー情報の取得に失敗:', userError);
-        }
+        } catch (userError) {}
       } catch (tokenError) {
         console.error('Farcaster SDK token取得エラー:', tokenError);
 
@@ -159,7 +152,6 @@ export function useFarcasterAuth() {
       }));
 
       // Farcaster SDKからウォレットアドレスを取得
-      console.log('Farcasterウォレットアドレスの取得を開始します');
       let walletAddress: string | null = null;
 
       try {
@@ -169,13 +161,8 @@ export function useFarcasterAuth() {
             method: 'eth_requestAccounts',
           })) as string[];
           walletAddress = accounts?.[0] || null;
-          console.log('Farcasterウォレットアドレス取得成功:', walletAddress);
         }
       } catch (walletError) {
-        console.log(
-          'ウォレットアドレス取得失敗、eth_accountsを試行:',
-          walletError,
-        );
         try {
           const provider = await sdk.wallet.getEthereumProvider();
           if (provider) {
@@ -183,7 +170,6 @@ export function useFarcasterAuth() {
               method: 'eth_accounts',
             })) as string[];
             walletAddress = accounts?.[0] || null;
-            console.log('eth_accountsでウォレットアドレス取得:', walletAddress);
           }
         } catch (fallbackError) {
           console.error('ウォレットアドレス取得完全失敗:', fallbackError);
@@ -191,7 +177,6 @@ export function useFarcasterAuth() {
       }
 
       // サーバーサイドでFirebaseカスタムトークンを取得
-      console.log('Firebaseカスタムトークンの取得を開始します');
       const response = await fetch('/api/auth/farcaster-firebase-token', {
         method: 'POST',
         headers: {
@@ -211,20 +196,12 @@ export function useFarcasterAuth() {
       }
 
       const { customToken } = await response.json();
-      console.log('Firebaseカスタムトークンの取得が完了しました');
 
       // Firebaseにカスタムトークンでサインイン
       await signInWithCustomToken(auth, customToken);
 
-      console.log('Farcaster認証完了: Firebase認証も成功しました');
-
       // Firebase認証後の状態を確認
       const currentUser = auth.currentUser;
-      console.log('🔍 Firebase認証後の状態:', {
-        currentUser: !!currentUser,
-        uid: currentUser?.uid,
-        email: currentUser?.email,
-      });
 
       // 認証成功時はローディング状態を終了
       setState((prev) => ({
@@ -252,13 +229,6 @@ export function useFarcasterAuth() {
   useEffect(() => {
     // Firebase認証状態の監視
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('🔍 Firebase auth state changed:', {
-        user: !!user,
-        uid: user?.uid,
-        email: user?.email,
-        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
-      });
-
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,
@@ -272,7 +242,7 @@ export function useFarcasterAuth() {
     return () => {
       unsubscribe();
     };
-  }, [state.isFarcasterAuthenticated]);
+  }, []);
 
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {
@@ -283,7 +253,6 @@ export function useFarcasterAuth() {
       !state.autoLoginAttempted &&
       !state.isFarcasterAuthenticated
     ) {
-      console.log('Farcaster SDK準備完了、自動ログインを開始します');
       setState((prev) => ({ ...prev, autoLoginAttempted: true }));
       authenticateWithFarcaster();
     }

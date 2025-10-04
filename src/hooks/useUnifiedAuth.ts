@@ -43,6 +43,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const {
     isFarcasterAuthenticated,
     isFirebaseAuthenticated: isFarcasterFirebaseAuthenticated,
+    isLoading: isFarcasterLoading,
     error: farcasterError,
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
@@ -79,6 +80,10 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const isAuthInitialized = useCallback((): boolean => {
     // Mini App環境: Farcaster認証の初期化が完了しているかチェック
     if (isMiniApp) {
+      // ローディング中は待機
+      if (isFarcasterLoading) {
+        return false;
+      }
       // 認証状態が確定している（true/false）場合は初期化完了とみなす
       // ただし、認証が成功している場合は即座に初期化完了とする
       if (
@@ -98,6 +103,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     return isPrivyAuthenticated !== undefined;
   }, [
     isPrivyLoading,
+    isFarcasterLoading,
     isMiniApp,
     isFarcasterAuthenticated,
     isFarcasterFirebaseAuthenticated,
@@ -113,8 +119,10 @@ export function useUnifiedAuth(): UnifiedAuthState {
       isMiniApp,
       isFarcasterAuthenticated,
       isFarcasterFirebaseAuthenticated,
+      isFarcasterLoading,
       isPrivyAuthenticated,
       isPrivyFirebaseAuthenticated,
+      isPrivyLoading,
       unifiedWalletAddress,
       walletAddress,
       isAuthInitialized: isAuthInitialized(),
@@ -169,10 +177,12 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isMiniApp,
     isFarcasterAuthenticated,
     isFarcasterFirebaseAuthenticated,
+    isFarcasterLoading,
     farcasterFirebaseUser,
     farcasterError,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
+    isPrivyLoading,
     privyFirebaseUser,
     privyError,
     privyReady,

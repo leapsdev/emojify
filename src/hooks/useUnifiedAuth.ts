@@ -25,6 +25,8 @@ interface UnifiedAuthState {
  */
 export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
+  
+  console.log('🔍 useUnifiedAuth hook started:', { isMiniApp });
 
   // 統合ウォレット（環境に応じたウォレットアドレスを取得）
   const { address: unifiedWalletAddress } = useUnifiedWallet();
@@ -47,6 +49,14 @@ export function useUnifiedAuth(): UnifiedAuthState {
     error: farcasterError,
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
+  
+  console.log('🔍 Farcaster auth state:', {
+    isFarcasterAuthenticated,
+    isFarcasterFirebaseAuthenticated,
+    isFarcasterLoading,
+    farcasterError,
+    farcasterFirebaseUser: !!farcasterFirebaseUser,
+  });
 
   // 認証状態に基づいてウォレットアドレスを取得
   const getWalletAddress = useCallback((): string | null => {
@@ -82,6 +92,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     if (isMiniApp) {
       // ローディング中は待機
       if (isFarcasterLoading) {
+        console.log('🔍 Auth not initialized: Farcaster still loading');
         return false;
       }
       // 認証状態が確定している（true/false）場合は初期化完了とみなす
@@ -90,17 +101,29 @@ export function useUnifiedAuth(): UnifiedAuthState {
         isFarcasterAuthenticated === true &&
         isFarcasterFirebaseAuthenticated
       ) {
+        console.log('🔍 Auth initialized: Farcaster authenticated');
         return true;
       }
-      return isFarcasterAuthenticated !== undefined;
+      const result = isFarcasterAuthenticated !== undefined;
+      console.log('🔍 Auth initialization check:', {
+        isFarcasterAuthenticated,
+        result,
+      });
+      return result;
     }
 
     // Web環境: Privy認証の初期化完了を確認
     // ローディング中は待機
     if (isPrivyLoading) {
+      console.log('🔍 Auth not initialized: Privy still loading');
       return false;
     }
-    return isPrivyAuthenticated !== undefined;
+    const result = isPrivyAuthenticated !== undefined;
+    console.log('🔍 Privy auth initialization check:', {
+      isPrivyAuthenticated,
+      result,
+    });
+    return result;
   }, [
     isPrivyLoading,
     isFarcasterLoading,

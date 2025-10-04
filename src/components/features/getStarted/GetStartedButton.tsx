@@ -34,7 +34,13 @@ export const GetStartedButton = () => {
             // Mini App環境: Farcaster情報で自動ユーザー登録
 
             try {
-              await autoCreateUserFromFarcaster(walletAddress);
+              // 最小限のプロフィールデータで自動登録
+              await autoCreateUserFromFarcaster({
+                id: walletAddress,
+                username: `user_${walletAddress.slice(2, 8)}`,
+                bio: null,
+                imageUrl: null,
+              });
 
               // リダイレクト前に少し待機（UI更新のため）
               setTimeout(() => {

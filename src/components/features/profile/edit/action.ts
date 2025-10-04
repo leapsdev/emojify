@@ -2,10 +2,7 @@
 
 import { getPrivyId } from '@/lib/auth';
 import { updateUser } from '@/repository/db/user/actions';
-import {
-  type ProfileForm,
-  profileFormSchema,
-} from '@/repository/db/user/schema';
+import { profileFormSchema } from '@/repository/db/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 
@@ -41,7 +38,7 @@ export async function handleProfileFormAction(
     };
   }
 
-  const profileData: ProfileForm = {
+  const profileData = {
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
     imageUrl: submission.payload.imageUrl

@@ -51,6 +51,7 @@ export async function handleProfileFormAction(
   }
 
   const profileData: ProfileForm = {
+    id: userId,
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
     imageUrl: submission.payload.imageUrl

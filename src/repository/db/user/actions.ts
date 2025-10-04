@@ -19,6 +19,7 @@ export async function createUser(data: ProfileForm, walletAddress: string) {
   const userRef = adminDbRef(`${USERS_PATH}/${walletAddress}`);
 
   const user: User = {
+    id: walletAddress, // ウォレットアドレスをidとして設定
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
@@ -51,7 +52,7 @@ export async function getUser(walletAddress: string) {
  */
 export async function updateUser(
   walletAddress: string,
-  data: Partial<Omit<User, 'createdAt'>>,
+  data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
   const updates = {
@@ -90,7 +91,7 @@ export async function getAllUsers(): Promise<
   // ウォレットアドレス（キー）とユーザーデータを組み合わせて返す
   return Object.entries(users).map(([walletAddress, user]) => ({
     ...user,
-    walletAddress,
+    walletAddress: user.id || walletAddress, // ユーザーのidフィールドを優先使用
   }));
 }
 
@@ -216,7 +217,9 @@ export async function getUserFriends(
   const friends = await Promise.all(
     friendIds.map(async (friendId) => {
       const friend = await getUserById(friendId);
-      return friend ? { ...friend, walletAddress: friendId } : null;
+      return friend
+        ? { ...friend, walletAddress: friend.id || friendId }
+        : null;
     }),
   );
 

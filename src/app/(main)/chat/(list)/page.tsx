@@ -13,6 +13,7 @@ export default function Page() {
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [authRecoveryAttempted, setAuthRecoveryAttempted] = useState(false);
   const router = useRouter();
 
   console.log('📊 Chat page initial state:', {
@@ -50,20 +51,17 @@ export default function Page() {
     fetchRooms();
   }, [isAuthenticated, walletAddress]);
 
-  // 未認証の場合はホームページにリダイレクト
+  // Mini App環境での認証状態復旧を待つ
   useEffect(() => {
-    console.log('🔄 Chat page redirect check:', {
-      isLoading,
-      isAuthenticated,
-      shouldRedirect: !isLoading && !isAuthenticated,
-    });
+    if (!isLoading && !isAuthenticated && !authRecoveryAttempted) {
+      console.log('🔄 Chat page - Waiting for auth recovery in Mini App');
+      setAuthRecoveryAttempted(true);
 
-    // 認証状態の初期化が完了し、かつ未認証の場合のみリダイレクト
-    // これにより、ページ遷移時の一時的な認証状態リセットを回避
-    if (!isLoading && !isAuthenticated) {
-      // 少し待機してからリダイレクト（認証状態の復旧を待つ）
+      // Mini App環境では認証復旧により長い時間を待つ
       const timeoutId = setTimeout(() => {
-        console.log('🚀 Redirecting to / due to unauthenticated state');
+        console.log(
+          '🚀 Redirecting to / due to unauthenticated state after wait',
+        );
         console.log(
           '🚨 REDIRECT TRIGGERED - Current URL:',
           window.location.href,
@@ -73,11 +71,17 @@ export default function Page() {
           isAuthenticated,
         });
         router.push('/');
-      }, 500); // 500ms待機
+      }, 3000); // 3秒待機して認証復旧を待つ
 
       return () => clearTimeout(timeoutId);
     }
-  }, [isAuthenticated, isLoading, router]);
+
+    // 認証が回復した場合は復旧フラグをリセット
+    if (isAuthenticated && authRecoveryAttempted) {
+      console.log('✅ Auth recovered, resetting recovery flag');
+      setAuthRecoveryAttempted(false);
+    }
+  }, [isAuthenticated, isLoading, authRecoveryAttempted, router]);
 
   if (isLoading || isDataLoading || !isAuthenticated) {
     return (

@@ -13,6 +13,7 @@ export default function Page() {
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
+  const [authRecoveryAttempted, setAuthRecoveryAttempted] = useState(false);
   const router = useRouter();
 
   console.log('📊 Profile page initial state:', {
@@ -51,24 +52,37 @@ export default function Page() {
     fetchUserData();
   }, [isAuthenticated, walletAddress]);
 
-  // 未認証の場合はホームページにリダイレクト
+  // Mini App環境での認証状態復旧を待つ
   useEffect(() => {
-    console.log('🔄 Profile page redirect check:', {
-      isLoading,
-      isAuthenticated,
-      shouldRedirect: !isLoading && !isAuthenticated,
-    });
+    if (!isLoading && !isAuthenticated && !authRecoveryAttempted) {
+      console.log('🔄 Profile page - Waiting for auth recovery in Mini App');
+      setAuthRecoveryAttempted(true);
 
-    if (!isLoading && !isAuthenticated) {
-      console.log('🚀 Redirecting to / due to unauthenticated state');
-      console.log('🚨 REDIRECT TRIGGERED - Current URL:', window.location.href);
-      console.log('🚨 REDIRECT TRIGGERED - Auth state:', {
-        isLoading,
-        isAuthenticated,
-      });
-      router.push('/');
+      // Mini App環境では認証復旧により長い時間を待つ
+      const timeoutId = setTimeout(() => {
+        console.log(
+          '🚀 Redirecting to / due to unauthenticated state after wait',
+        );
+        console.log(
+          '🚨 REDIRECT TRIGGERED - Current URL:',
+          window.location.href,
+        );
+        console.log('🚨 REDIRECT TRIGGERED - Auth state:', {
+          isLoading,
+          isAuthenticated,
+        });
+        router.push('/');
+      }, 3000); // 3秒待機して認証復旧を待つ
+
+      return () => clearTimeout(timeoutId);
     }
-  }, [isAuthenticated, isLoading, router]);
+
+    // 認証が回復した場合は復旧フラグをリセット
+    if (isAuthenticated && authRecoveryAttempted) {
+      console.log('✅ Profile page - Auth recovered, resetting recovery flag');
+      setAuthRecoveryAttempted(false);
+    }
+  }, [isAuthenticated, isLoading, authRecoveryAttempted, router]);
 
   if (isLoading || isDataLoading || !isAuthenticated) {
     return (

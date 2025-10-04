@@ -35,6 +35,10 @@ export default function Page() {
   }, [isAuthenticated, isLoading, walletAddress]);
 
   useEffect(() => {
+    console.log('🔄 fetchUserData effect triggered:', {
+      isAuthenticated,
+      walletAddress,
+    });
     const fetchUserData = async () => {
       if (isAuthenticated && walletAddress) {
         try {
@@ -45,6 +49,11 @@ export default function Page() {
         } catch (error) {
           console.error('Failed to fetch user data:', error);
         }
+      } else {
+        console.log('⚠️ Skipping user data fetch:', {
+          isAuthenticated,
+          walletAddress,
+        });
       }
       setIsDataLoading(false);
     };

@@ -186,6 +186,11 @@ export function useFarcasterAuth() {
       }
 
       // サーバーサイドでFirebaseカスタムトークンを取得
+      console.log('Firebaseカスタムトークン取得開始:', {
+        walletAddress,
+        tokenLength: token.length,
+      });
+
       const response = await fetch('/api/auth/farcaster-firebase-token', {
         method: 'POST',
         headers: {
@@ -199,15 +204,31 @@ export function useFarcasterAuth() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
+        console.error('Firebaseトークン取得エラー:', {
+          status: response.status,
+          statusText: response.statusText,
+          errorData,
+        });
         throw new Error(
           errorData.error || 'Firebaseトークンの取得に失敗しました',
         );
       }
 
       const { customToken } = await response.json();
+      console.log('Firebaseカスタムトークン取得成功:', {
+        customTokenLength: customToken.length,
+      });
 
       // Firebaseにカスタムトークンでサインイン
+      console.log(
+        'Firebase認証開始 - カスタムトークン:',
+        `${customToken.substring(0, 20)}...`,
+      );
       await signInWithCustomToken(auth, customToken);
+      console.log(
+        'Firebase認証完了 - auth.currentUser:',
+        auth.currentUser?.uid,
+      );
 
       // Firebase認証後の状態を確認
 
@@ -237,6 +258,14 @@ export function useFarcasterAuth() {
   useEffect(() => {
     // Firebase認証状態の監視
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('Farcaster Firebase認証状態変更:', {
+        isAuthenticated: !!user,
+        uid: user?.uid,
+        email: user?.email,
+        displayName: user?.displayName,
+        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
+      });
+
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,
@@ -250,7 +279,7 @@ export function useFarcasterAuth() {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [state.isFarcasterAuthenticated]);
 
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {

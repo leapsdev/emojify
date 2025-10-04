@@ -120,6 +120,16 @@ export function useUnifiedAuth(): UnifiedAuthState {
     const walletAddress = getWalletAddress();
 
     // 認証状態の詳細デバッグログ
+    console.log('統合認証状態の詳細:', {
+      isMiniApp,
+      isFarcasterAuthenticated,
+      isFarcasterFirebaseAuthenticated,
+      farcasterFirebaseUser: !!farcasterFirebaseUser,
+      isPrivyAuthenticated,
+      isPrivyFirebaseAuthenticated,
+      privyFirebaseUser: !!privyFirebaseUser,
+      walletAddress,
+    });
 
     // 認証状態の判定
     let isAuthenticated = false;
@@ -160,6 +170,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isAuthInitialized,
     isMiniApp,
     isFarcasterAuthenticated,
+    isFarcasterFirebaseAuthenticated,
     farcasterFirebaseUser,
     farcasterError,
     farcasterUsername,

@@ -2,10 +2,10 @@
 
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { autoCreateUserFromFarcaster } from '@/repository/db/user/actions';
 import { useRouter } from 'next/navigation';
 import { useCallback } from 'react';
 import { checkUserExists } from '../auth/action';
-import { autoCreateUserFromFarcaster } from '../auth/autoCreateUser';
 
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();

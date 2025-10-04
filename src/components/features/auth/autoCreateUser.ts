@@ -26,7 +26,7 @@ export async function autoCreateUserFromFarcaster(
       imageUrl: null,
     };
 
-    const result = await createUser(userData, walletAddress);
+    await createUser(userData, walletAddress);
 
     return; // 成功時に明示的にreturn
   } catch (error) {

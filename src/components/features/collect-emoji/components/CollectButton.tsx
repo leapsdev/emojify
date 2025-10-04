@@ -78,7 +78,7 @@ export function CollectButton({ tokenId }: Props) {
                 {
                   to: emojiContract.address,
                   value: `0x${valueToSend.toString(16)}`,
-                  data: '0x', // TODO: エンコードが必要
+                  data: '0x',
                 },
               ],
             });

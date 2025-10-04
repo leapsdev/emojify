@@ -21,7 +21,6 @@ export async function handleProfileFormAction(
 
   const userId = formData.get('userId') as string;
 
-  console.log('userId', userId);
   if (!userId) {
     return {
       message: '認証情報が不足しています',

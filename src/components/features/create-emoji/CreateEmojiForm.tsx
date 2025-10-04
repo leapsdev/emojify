@@ -22,7 +22,7 @@ export function CreateEmojiForm() {
   const [loading, setLoading] = useState(false);
   const [mintResult, setMintResult] = useState<MintResult>(null);
   const { address } = useWallet();
-  const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
+  const { uploadToIPFS, uploadMetadataToIPFS } = useIPFS();
   const { mintNFT } = useEmojiMint();
   const { isConnected } = useCollectWallet();
 
@@ -39,23 +39,12 @@ export function CreateEmojiForm() {
 
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
-      const imageHttpUrl = ipfsToHttp(imageUrl);
-      console.log(
-        `Image upload completed.\nYou can check it at:\n${imageHttpUrl}\n${imageUrl}`,
-      );
 
       // Step 2: メタデータを作成してIPFSにアップロード
       const metadataUrl = await uploadMetadataToIPFS(imageUrl, address);
-      console.log(`metadataUrl: ${metadataUrl}`);
-      const metadataHttpUrl = ipfsToHttp(metadataUrl);
-      console.log(
-        `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
-      );
 
       // Step 3: NFTのミント（Wagmiを使用）
       const { transactionHash } = await mintNFT(metadataUrl);
-      console.log('NFT minted successfully!');
-      console.log('Transaction Hash:', transactionHash);
       setMintResult({
         result: 'success',
         transactionHash,

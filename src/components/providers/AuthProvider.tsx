@@ -42,17 +42,10 @@ export function AuthProvider({ children }: AuthProviderProps) {
           const context = await sdk.context;
           const miniAppStatus = !!context && Object.keys(context).length > 0;
           setIsMiniApp(miniAppStatus);
-          console.log('Mini App detection:', {
-            sdkAvailable: !!sdk,
-            context: context,
-            isMiniApp: miniAppStatus,
-          });
         } else {
           setIsMiniApp(false);
-          console.log('Farcaster SDK not available, using web mode');
         }
-      } catch (error) {
-        console.log('Farcaster SDK not available, using web mode:', error);
+      } catch {
         setIsMiniApp(false);
       }
     };

@@ -15,8 +15,7 @@ export const SignInSignUpButton = () => {
   const [loginCompleted, setLoginCompleted] = useState(false);
 
   const { login } = useLogin({
-    onComplete: (params) => {
-      console.log('Privy login completed:', params);
+    onComplete: () => {
       setLoginCompleted(true);
     },
   });
@@ -26,14 +25,11 @@ export const SignInSignUpButton = () => {
     const checkUserAfterLogin = async () => {
       if (loginCompleted && isAuthenticated && walletAddress) {
         try {
-          console.log('Checking user existence in DB after login...');
           const exists = await checkUserExists(walletAddress);
 
           if (exists) {
-            console.log('User exists in DB, redirecting to /chat');
             router.push('/chat');
           } else {
-            console.log('User not found in DB, redirecting to /profile/create');
             router.push('/profile/create');
           }
         } catch (error) {

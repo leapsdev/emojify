@@ -60,7 +60,6 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
       }
 
       // Farcaster SDKの公式ドキュメントに基づいてウォレットアドレスを取得
-      console.log('Requesting eth_requestAccounts from Farcaster provider...');
       let accounts: string[];
 
       try {
@@ -68,20 +67,13 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
         accounts = (await provider.request({
           method: 'eth_requestAccounts',
         })) as string[];
-        console.log('eth_requestAccounts response:', accounts);
-      } catch (requestError) {
-        console.log(
-          'eth_requestAccounts failed, trying eth_accounts:',
-          requestError,
-        );
+      } catch {
         // eth_requestAccounts が失敗した場合、eth_accounts を試行
         try {
           accounts = (await provider.request({
             method: 'eth_accounts',
           })) as string[];
-          console.log('eth_accounts response:', accounts);
-        } catch (accountsError) {
-          console.log('eth_accounts also failed:', accountsError);
+        } catch {
           accounts = [];
         }
       }

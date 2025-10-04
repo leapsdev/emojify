@@ -68,8 +68,6 @@ async function proxyRequest(request: NextRequest, pathSegments: string[]) {
       }
     });
 
-    console.log(`Proxying request to: ${fullUrl}`);
-
     // プロキシリクエストを送信
     const response = await fetch(fullUrl, {
       method: request.method,

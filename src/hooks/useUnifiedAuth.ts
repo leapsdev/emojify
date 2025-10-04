@@ -27,12 +27,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
 
   // 統合ウォレット（環境に応じたウォレットアドレスを取得）
-  const {
-    address: unifiedWalletAddress,
-    isConnected: walletConnected,
-    isLoading: walletLoading,
-    error: walletError,
-  } = useUnifiedWallet();
+  const { address: unifiedWalletAddress } = useUnifiedWallet();
 
   // Privy認証関連
   const { authenticated: isPrivyAuthenticated, ready: privyReady } = usePrivy();

@@ -38,7 +38,7 @@ export const useEmojiMint = () => {
               params: [
                 {
                   to: emojiContract.address,
-                  data: `${emojiContract.abi}`, // TODO: エンコードが必要
+                  data: `${emojiContract.abi}`,
                 },
               ],
             });

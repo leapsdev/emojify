@@ -115,7 +115,7 @@ export function useFarcasterAuth() {
               farcasterUserId: userContext.fid.toString(),
             }));
           }
-        } catch (userError) {}
+        } catch {}
       } catch (tokenError) {
         console.error('Farcaster SDK token取得エラー:', tokenError);
 
@@ -162,7 +162,7 @@ export function useFarcasterAuth() {
           })) as string[];
           walletAddress = accounts?.[0] || null;
         }
-      } catch (walletError) {
+      } catch {
         try {
           const provider = await sdk.wallet.getEthereumProvider();
           if (provider) {
@@ -201,7 +201,6 @@ export function useFarcasterAuth() {
       await signInWithCustomToken(auth, customToken);
 
       // Firebase認証後の状態を確認
-      const currentUser = auth.currentUser;
 
       // 認証成功時はローディング状態を終了
       setState((prev) => ({

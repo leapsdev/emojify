@@ -274,6 +274,7 @@ export function useFarcasterAuth() {
     };
   }, [state.isFarcasterAuthenticated]);
 
+
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {
     if (

@@ -4,10 +4,8 @@ import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { addFriend, removeFriend } from '@/repository/db/user/actions';
 import { Name } from '@coinbase/onchainkit/identity';
-import { useUser } from '@privy-io/react-auth';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
 import { useIsFriend } from './hooks/useIsFriend';
 
@@ -30,15 +28,6 @@ export const UserProfile = ({
   currentWalletAddress,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const { user } = useUser();
-  const [addresses, setAddresses] = useState<string[]>([]);
-  useEffect(() => {
-    // 新しいスキーマでは、ユーザーIDがウォレットアドレスを表す
-    if (user?.id) {
-      setAddresses([user.id]);
-    }
-  }, [user?.id]);
-
   const isFriend = useIsFriend(
     currentWalletAddress || '',
     walletAddress,

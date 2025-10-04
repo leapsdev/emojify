@@ -8,58 +8,19 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  console.log('🏁 Profile page component started');
-  console.log('🌍 Environment:', {
-    isMiniApp:
-      typeof window !== 'undefined' &&
-      window.location.search.includes('miniapp'),
-    url: typeof window !== 'undefined' ? window.location.href : 'SSR',
-  });
-
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const [authRecoveryAttempted, setAuthRecoveryAttempted] = useState(false);
   const router = useRouter();
 
-  console.log('📊 Profile page initial state:', {
-    isAuthenticated,
-    isLoading,
-    walletAddress,
-    userData,
-    isDataLoading,
-  });
-
-  // 認証状態のデバッグログ
   useEffect(() => {
-    console.log('📊 Profile page auth state:', {
-      isAuthenticated,
-      isLoading,
-      walletAddress,
-      timestamp: new Date().toISOString(),
-    });
-  }, [isAuthenticated, isLoading, walletAddress]);
-
-  useEffect(() => {
-    console.log('🔄 fetchUserData effect triggered:', {
-      isAuthenticated,
-      walletAddress,
-    });
-
-    // 認証が完了していない場合は何もしない
     if (!isAuthenticated || !walletAddress) {
-      console.log('⚠️ Skipping user data fetch - auth not ready:', {
-        isAuthenticated,
-        walletAddress,
-      });
       return;
     }
 
     const fetchUserData = async () => {
       try {
-        console.log('📱 Fetching user data for wallet:', walletAddress);
         const data = await getUser(walletAddress);
-        console.log('✅ User data fetched:', data);
         setUserData(data);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -71,47 +32,17 @@ export default function Page() {
     fetchUserData();
   }, [isAuthenticated, walletAddress]);
 
-  // Mini App環境での認証状態復旧を待つ
   useEffect(() => {
-    if (!isLoading && !isAuthenticated && !authRecoveryAttempted) {
-      console.log('🔄 Profile page - Waiting for auth recovery in Mini App');
-      setAuthRecoveryAttempted(true);
-
-      // Mini App環境では認証復旧により長い時間を待つ
+    if (!isLoading && !isAuthenticated) {
       const timeoutId = setTimeout(() => {
-        console.log(
-          '🚀 Redirecting to / due to unauthenticated state after wait',
-        );
-        console.log(
-          '🚨 REDIRECT TRIGGERED - Current URL:',
-          window.location.href,
-        );
-        console.log('🚨 REDIRECT TRIGGERED - Auth state:', {
-          isLoading,
-          isAuthenticated,
-        });
         router.push('/');
-      }, 3000); // 3秒待機して認証復旧を待つ
+      }, 1000);
 
       return () => clearTimeout(timeoutId);
     }
-
-    // 認証が回復した場合は復旧フラグをリセット
-    if (isAuthenticated && authRecoveryAttempted) {
-      console.log('✅ Profile page - Auth recovered, resetting recovery flag');
-      setAuthRecoveryAttempted(false);
-    }
-  }, [isAuthenticated, isLoading, authRecoveryAttempted, router]);
-
-  console.log('🎯 Rendering decision:', {
-    isLoading,
-    isDataLoading,
-    isAuthenticated,
-    userData: !!userData,
-  });
+  }, [isAuthenticated, isLoading, router]);
 
   if (isLoading || isDataLoading) {
-    console.log('⏳ Showing loading state');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -123,7 +54,6 @@ export default function Page() {
   }
 
   if (!isAuthenticated) {
-    console.log('🔒 Not authenticated, should redirect');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -133,6 +63,5 @@ export default function Page() {
     );
   }
 
-  console.log('✅ Rendering ProfilePage with userData:', !!userData);
   return <ProfilePage user={userData || null} />;
 }

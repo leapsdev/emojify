@@ -9,18 +9,18 @@ import { useEffect, useState } from 'react';
 
 export default function Page() {
   console.log('🏁 Profile page component started');
-  
+
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const router = useRouter();
-  
+
   console.log('📊 Profile page initial state:', {
     isAuthenticated,
     isLoading,
     walletAddress,
     userData,
-    isDataLoading
+    isDataLoading,
   });
 
   // 認証状態のデバッグログ
@@ -29,7 +29,7 @@ export default function Page() {
       isAuthenticated,
       isLoading,
       walletAddress,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }, [isAuthenticated, isLoading, walletAddress]);
 
@@ -56,13 +56,16 @@ export default function Page() {
     console.log('🔄 Profile page redirect check:', {
       isLoading,
       isAuthenticated,
-      shouldRedirect: !isLoading && !isAuthenticated
+      shouldRedirect: !isLoading && !isAuthenticated,
     });
-    
+
     if (!isLoading && !isAuthenticated) {
       console.log('🚀 Redirecting to / due to unauthenticated state');
       console.log('🚨 REDIRECT TRIGGERED - Current URL:', window.location.href);
-      console.log('🚨 REDIRECT TRIGGERED - Auth state:', { isLoading, isAuthenticated });
+      console.log('🚨 REDIRECT TRIGGERED - Auth state:', {
+        isLoading,
+        isAuthenticated,
+      });
       router.push('/');
     }
   }, [isAuthenticated, isLoading, router]);

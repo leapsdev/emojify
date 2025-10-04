@@ -248,11 +248,8 @@ export function useFarcasterAuth() {
         ...prev,
         isFirebaseAuthenticated: !!user,
         // Farcaster認証が成功している場合、Firebase認証が完了したらローディングを終了
-        // ただし、既にisLoadingがfalseになっている場合は変更しない
         isLoading:
-          prev.isFarcasterAuthenticated && prev.isLoading
-            ? !user
-            : prev.isLoading,
+          prev.isFarcasterAuthenticated === true ? false : prev.isLoading,
         user,
       }));
     });

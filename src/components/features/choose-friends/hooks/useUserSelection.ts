@@ -12,7 +12,8 @@ import {
   useSyncExternalStore,
 } from 'react';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
   walletAddress: string;
   avatar: string;
@@ -21,20 +22,21 @@ interface DisplayUser extends Pick<User, 'id' | 'username'> {
 
 interface UseUserSelectionProps {
   currentWalletAddress: string;
-  initialFriends?: User[];
-  initialOthers?: User[];
+  initialFriends?: Array<User & { walletAddress: string }>;
+  initialOthers?: Array<User & { walletAddress: string }>;
 }
 
 // ユーザー情報をDisplayUser形式に変換
 function convertToDisplayUser(
   user: User,
+  walletAddress: string,
   section: 'friend' | 'other',
 ): DisplayUser {
   return {
-    id: user.id,
+    id: walletAddress,
     username: user.username,
     displayName: user.username,
-    walletAddress: user.id,
+    walletAddress: walletAddress,
     avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };
@@ -49,16 +51,24 @@ interface UserList {
 
 // 初期ユーザーリストを作成
 function createUserList(
-  initialFriends: User[],
-  initialOthers: User[],
+  initialFriends: Array<User & { walletAddress: string }>,
+  initialOthers: Array<User & { walletAddress: string }>,
 ): UserList {
   return {
     users: [
-      ...initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
-      ...initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+      ...initialFriends.map((user) =>
+        convertToDisplayUser(user, user.walletAddress, 'friend'),
+      ),
+      ...initialOthers.map((user) =>
+        convertToDisplayUser(user, user.walletAddress, 'other'),
+      ),
     ],
-    friends: initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
-    others: initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+    friends: initialFriends.map((user) =>
+      convertToDisplayUser(user, user.walletAddress, 'friend'),
+    ),
+    others: initialOthers.map((user) =>
+      convertToDisplayUser(user, user.walletAddress, 'other'),
+    ),
   };
 }
 
@@ -96,12 +106,18 @@ export const useUserSelection = ({
             await getUsersWithFriendshipAction(currentWalletAddress);
           userListRef.current = {
             friends: friends.map((user) =>
-              convertToDisplayUser(user, 'friend'),
+              convertToDisplayUser(user, user.walletAddress, 'friend'),
             ),
-            others: others.map((user) => convertToDisplayUser(user, 'other')),
+            others: others.map((user) =>
+              convertToDisplayUser(user, user.walletAddress, 'other'),
+            ),
             users: [
-              ...friends.map((user) => convertToDisplayUser(user, 'friend')),
-              ...others.map((user) => convertToDisplayUser(user, 'other')),
+              ...friends.map((user) =>
+                convertToDisplayUser(user, user.walletAddress, 'friend'),
+              ),
+              ...others.map((user) =>
+                convertToDisplayUser(user, user.walletAddress, 'other'),
+              ),
             ],
           };
           callback();

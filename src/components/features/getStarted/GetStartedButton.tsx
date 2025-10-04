@@ -43,12 +43,14 @@ export const GetStartedButton = () => {
             try {
               // Farcasterプロフィールデータで自動登録
               // username は実質的に必須（すべてのFarcasterユーザーが持つ）
-              await autoCreateUserFromFarcaster({
-                id: walletAddress,
-                username: farcasterUsername || 'no-username',
-                bio: null,
-                imageUrl: farcasterPfpUrl || null,
-              });
+              await autoCreateUserFromFarcaster(
+                {
+                  username: farcasterUsername || 'no-username',
+                  bio: null,
+                  imageUrl: farcasterPfpUrl || null,
+                },
+                walletAddress,
+              );
 
               // リダイレクト前に少し待機（UI更新のため）
               setTimeout(() => {

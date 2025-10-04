@@ -38,5 +38,10 @@ export default function Page() {
     );
   }
 
-  return <ProfileEditPage initialUser={userData} />;
+  return (
+    <ProfileEditPage
+      initialUser={userData}
+      walletAddress={walletAddress || ''}
+    />
+  );
 }

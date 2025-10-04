@@ -14,8 +14,8 @@ import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 
 interface ClientChooseFriendsPageProps {
-  initialFriends?: User[];
-  initialOthers?: User[];
+  initialFriends?: Array<User & { walletAddress: string }>;
+  initialOthers?: Array<User & { walletAddress: string }>;
 }
 
 export function ClientChooseFriendsPage({

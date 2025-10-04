@@ -4,7 +4,8 @@ import { db } from '@/repository/db/config/client';
 import type { User } from '@/repository/db/database';
 import { get, onValue, ref, update } from 'firebase/database';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
   walletAddress: string;
   avatar: string;
@@ -33,7 +34,7 @@ export const getUser = async (walletAddress: string): Promise<User | null> => {
  */
 export const updateUser = async (
   walletAddress: string,
-  data: Partial<Omit<User, 'id' | 'createdAt'>>,
+  data: Partial<Omit<User, 'createdAt'>>,
 ): Promise<void> => {
   const userRef = ref(db, `${USERS_PATH}/${walletAddress}`);
   await update(userRef, data);
@@ -110,13 +111,14 @@ export const subscribeToUsers = (
  */
 export const convertToDisplayUser = (
   user: User,
+  walletAddress: string,
   section: 'friend' | 'other',
 ): DisplayUser => {
   return {
-    id: user.id,
+    id: walletAddress,
     username: user.username,
     displayName: user.username,
-    walletAddress: user.id,
+    walletAddress: walletAddress,
     avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };

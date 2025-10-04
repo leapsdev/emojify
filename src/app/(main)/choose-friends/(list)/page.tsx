@@ -9,8 +9,8 @@ import { useEffect, useState } from 'react';
 export default function ChooseFriendsPage() {
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [friendshipData, setFriendshipData] = useState<{
-    friends: User[];
-    others: User[];
+    friends: Array<User & { walletAddress: string }>;
+    others: Array<User & { walletAddress: string }>;
   }>({ friends: [], others: [] });
   const [isDataLoading, setIsDataLoading] = useState(true);
 

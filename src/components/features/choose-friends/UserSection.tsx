@@ -1,7 +1,8 @@
 import type { User } from '@/repository/db/database';
 import { UserItem } from './UserItem';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
   walletAddress: string;
   avatar: string;

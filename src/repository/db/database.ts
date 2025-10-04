@@ -16,7 +16,6 @@
  * - フレンドリストはオプショナル
  */
 export interface User {
-  id: string; // ウォレットアドレス
   username: string;
   bio?: string | null;
   imageUrl?: string | null;

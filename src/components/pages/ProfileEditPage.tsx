@@ -7,9 +7,13 @@ import { useRef } from 'react';
 
 interface ProfileEditPageProps {
   initialUser: User | null;
+  walletAddress: string;
 }
 
-export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
+export function ProfileEditPage({
+  initialUser,
+  walletAddress,
+}: ProfileEditPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
 
   const handleImageUpload = (url: string) => {
@@ -27,7 +31,11 @@ export function ProfileEditPage({ initialUser }: ProfileEditPageProps) {
         currentImageUrl={initialUser?.imageUrl || ''}
         onImageUpload={handleImageUpload}
       />
-      <ProfileEditForm user={initialUser} ref={formRef} />
+      <ProfileEditForm
+        user={initialUser}
+        walletAddress={walletAddress}
+        ref={formRef}
+      />
     </main>
   );
 }

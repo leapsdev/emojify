@@ -19,7 +19,6 @@ export async function createUser(data: ProfileForm, walletAddress: string) {
   const userRef = adminDbRef(`${USERS_PATH}/${walletAddress}`);
 
   const user: User = {
-    id: walletAddress,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
@@ -52,7 +51,7 @@ export async function getUser(walletAddress: string) {
  */
 export async function updateUser(
   walletAddress: string,
-  data: Partial<Omit<User, 'id' | 'createdAt'>>,
+  data: Partial<Omit<User, 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
   const updates = {
@@ -83,10 +82,16 @@ export async function deleteUser(walletAddress: string) {
  * @returns 全ユーザーの配列
  * @throws {Error} データベースエラー時
  */
-export async function getAllUsers() {
+export async function getAllUsers(): Promise<
+  Array<User & { walletAddress: string }>
+> {
   const snapshot = await adminDbRef(USERS_PATH).get();
   const users: Record<string, User> = snapshot.val() || {};
-  return Object.values(users);
+  // ウォレットアドレス（キー）とユーザーデータを組み合わせて返す
+  return Object.entries(users).map(([walletAddress, user]) => ({
+    ...user,
+    walletAddress,
+  }));
 }
 
 /**
@@ -195,7 +200,9 @@ export async function removeFriend(
  * @returns フレンド一覧（更新日時降順でソート）
  * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
-export async function getUserFriends(walletAddress: string): Promise<User[]> {
+export async function getUserFriends(
+  walletAddress: string,
+): Promise<Array<User & { walletAddress: string }>> {
   const user = await getUserById(walletAddress);
   if (!user) {
     throw new Error('User not found');
@@ -207,11 +214,16 @@ export async function getUserFriends(walletAddress: string): Promise<User[]> {
 
   const friendIds = Object.keys(user.friends);
   const friends = await Promise.all(
-    friendIds.map((friendId) => getUserById(friendId)),
+    friendIds.map(async (friendId) => {
+      const friend = await getUserById(friendId);
+      return friend ? { ...friend, walletAddress: friendId } : null;
+    }),
   );
 
   return friends
-    .filter((friend): friend is User => friend !== null)
+    .filter(
+      (friend): friend is User & { walletAddress: string } => friend !== null,
+    )
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
@@ -223,9 +235,9 @@ export async function getUserFriends(walletAddress: string): Promise<User[]> {
  */
 export async function getOtherUsers(
   currentWalletAddress: string,
-): Promise<User[]> {
+): Promise<Array<User & { walletAddress: string }>> {
   const allUsers = await getAllUsers();
-  return allUsers.filter((user) => user.id !== currentWalletAddress);
+  return allUsers.filter((user) => user.walletAddress !== currentWalletAddress);
 }
 
 /**
@@ -237,8 +249,8 @@ export async function getOtherUsers(
 export async function getUsersWithFriendship(
   currentWalletAddress: string,
 ): Promise<{
-  friends: User[];
-  others: User[];
+  friends: Array<User & { walletAddress: string }>;
+  others: Array<User & { walletAddress: string }>;
 }> {
   const [currentUser, otherUsers] = await Promise.all([
     getUserById(currentWalletAddress),
@@ -247,12 +259,12 @@ export async function getUsersWithFriendship(
 
   if (!currentUser) return { friends: [], others: [] };
 
-  const friends: User[] = [];
-  const others: User[] = [];
+  const friends: Array<User & { walletAddress: string }> = [];
+  const others: Array<User & { walletAddress: string }> = [];
 
   // 友達かどうかで振り分け
   otherUsers.forEach((user) => {
-    if (currentUser.friends?.[user.id]) {
+    if (currentUser.friends?.[user.walletAddress]) {
       friends.push(user);
     } else {
       others.push(user);
@@ -271,15 +283,16 @@ export async function getUsersWithFriendship(
  * @throws {Error} ユーザー作成に失敗した場合
  */
 export async function autoCreateUserFromFarcaster(
-  userData: ProfileForm & { id: string },
+  userData: ProfileForm,
+  walletAddress: string,
 ): Promise<void> {
-  if (!userData.id) {
+  if (!walletAddress) {
     console.error('❌ Wallet address is required');
     throw new Error('Wallet address is required');
   }
 
   try {
-    await createUser(userData, userData.id);
+    await createUser(userData, walletAddress);
   } catch (error) {
     console.error('Failed to auto-create user from Farcaster:', error);
     throw new Error(

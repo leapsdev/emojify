@@ -75,5 +75,7 @@ export default function Page() {
     );
   }
 
-  return <ProfilePage user={userData || null} />;
+  return (
+    <ProfilePage user={userData || null} walletAddress={walletAddress || ''} />
+  );
 }

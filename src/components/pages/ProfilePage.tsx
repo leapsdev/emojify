@@ -20,6 +20,7 @@ import { useEffect, useState } from 'react';
 
 interface ProfilePageProps {
   user: User | null;
+  walletAddress?: string; // ユーザーのウォレットアドレス
   isOwnProfile?: boolean;
   currentWalletAddress?: string;
   initialIsFriend?: boolean;
@@ -27,6 +28,7 @@ interface ProfilePageProps {
 
 function ProfilePageContent({
   user,
+  walletAddress,
   isOwnProfile = true,
   currentWalletAddress,
   initialIsFriend = false,
@@ -116,7 +118,7 @@ function ProfilePageContent({
               username={user?.username || ''}
               bio={user?.bio || ''}
               avatar={user?.imageUrl || '/icons/faceIcon-192x192.png'}
-              walletAddress={user?.id || ''}
+              walletAddress={walletAddress || ''}
               isOwnProfile={isOwnProfile}
               currentWalletAddress={currentWalletAddress}
               initialIsFriend={initialIsFriend}

@@ -67,6 +67,7 @@ export default function Page({ params }: PageProps) {
   return (
     <ProfilePage
       user={targetUser}
+      walletAddress={targetUserId}
       isOwnProfile={false}
       currentWalletAddress={walletAddress || ''}
       initialIsFriend={initialIsFriend}

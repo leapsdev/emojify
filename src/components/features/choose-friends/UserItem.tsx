@@ -6,7 +6,8 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
   walletAddress: string;
   avatar: string;

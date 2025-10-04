@@ -25,7 +25,6 @@ export type ProfileForm = z.infer<typeof profileFormSchema>;
  * @description データベースに保存されるユーザー情報のバリデーション
  */
 export const userSchema = z.object({
-  id: z.string(), // 主キー（中身はウォレットアドレス）
   username: z.string(),
   bio: z.string().nullable().optional(),
   imageUrl: z.string().nullable().optional(),

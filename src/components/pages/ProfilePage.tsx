@@ -41,7 +41,25 @@ function ProfilePageContent({
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
-  const { isAuthenticated } = useUnifiedAuth();
+  const {
+    isAuthenticated,
+    isLoading,
+    walletAddress: authWalletAddress,
+    user: authUser,
+  } = useUnifiedAuth();
+
+  // 認証状態の詳細ログ
+  console.log('ProfilePage認証状態詳細:', {
+    isAuthenticated,
+    isLoading,
+    authWalletAddress,
+    authUser: !!authUser,
+    authUserUid: authUser?.uid,
+    propsUser: !!user,
+    propsWalletAddress: walletAddress,
+    timestamp: new Date().toISOString(),
+  });
+
   console.log('ProfilePage received user:', user);
   console.log('User imageUrl:', user?.imageUrl);
   console.log(

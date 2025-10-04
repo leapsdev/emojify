@@ -125,10 +125,13 @@ export function useUnifiedAuth(): UnifiedAuthState {
       isFarcasterAuthenticated,
       isFarcasterFirebaseAuthenticated,
       farcasterFirebaseUser: !!farcasterFirebaseUser,
+      farcasterFirebaseUserUid: farcasterFirebaseUser?.uid,
       isPrivyAuthenticated,
       isPrivyFirebaseAuthenticated,
       privyFirebaseUser: !!privyFirebaseUser,
+      privyFirebaseUserUid: privyFirebaseUser?.uid,
       walletAddress,
+      timestamp: new Date().toISOString(),
     });
 
     // 認証状態の判定

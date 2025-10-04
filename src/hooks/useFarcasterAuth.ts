@@ -82,6 +82,14 @@ export function useFarcasterAuth() {
 
   const authenticateWithFarcaster = useCallback(async () => {
     try {
+      console.log('Farcaster認証開始:', {
+        isSDKLoaded: state.isSDKLoaded,
+        isReady: state.isReady,
+        isMiniApp: state.isMiniApp,
+        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
+        timestamp: new Date().toISOString(),
+      });
+
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       // Mini App環境でない場合はエラー
@@ -160,6 +168,11 @@ export function useFarcasterAuth() {
         farcasterToken: token,
       }));
 
+      console.log('Farcaster認証成功:', {
+        tokenLength: token.length,
+        timestamp: new Date().toISOString(),
+      });
+
       // Farcaster SDKからウォレットアドレスを取得
       let walletAddress: string | null = null;
 
@@ -237,6 +250,12 @@ export function useFarcasterAuth() {
         ...prev,
         isLoading: false,
       }));
+
+      console.log('Firebase認証完全完了:', {
+        uid: auth.currentUser?.uid,
+        email: auth.currentUser?.email,
+        timestamp: new Date().toISOString(),
+      });
     } catch (error) {
       console.error('Farcaster認証エラー:', error);
       setState((prev) => ({
@@ -248,7 +267,12 @@ export function useFarcasterAuth() {
         farcasterToken: null,
       }));
     }
-  }, [state.isMiniApp, state.isSDKLoaded, state.isReady]);
+  }, [
+    state.isMiniApp,
+    state.isSDKLoaded,
+    state.isReady,
+    state.isFarcasterAuthenticated,
+  ]);
 
   // SDK初期化を実行
   useEffect(() => {
@@ -283,6 +307,15 @@ export function useFarcasterAuth() {
 
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {
+    console.log('自動認証チェック:', {
+      isSDKLoaded: state.isSDKLoaded,
+      isReady: state.isReady,
+      isMiniApp: state.isMiniApp,
+      autoLoginAttempted: state.autoLoginAttempted,
+      isFarcasterAuthenticated: state.isFarcasterAuthenticated,
+      timestamp: new Date().toISOString(),
+    });
+
     if (
       state.isSDKLoaded &&
       state.isReady &&
@@ -290,6 +323,7 @@ export function useFarcasterAuth() {
       !state.autoLoginAttempted &&
       !state.isFarcasterAuthenticated
     ) {
+      console.log('自動認証実行開始');
       setState((prev) => ({ ...prev, autoLoginAttempted: true }));
       authenticateWithFarcaster();
     }

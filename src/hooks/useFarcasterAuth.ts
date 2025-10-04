@@ -217,6 +217,14 @@ export function useFarcasterAuth() {
       await signInWithCustomToken(auth, customToken);
 
       console.log('Farcaster認証完了: Firebase認証も成功しました');
+      
+      // Firebase認証後の状態を確認
+      const currentUser = auth.currentUser;
+      console.log('🔍 Firebase認証後の状態:', {
+        currentUser: !!currentUser,
+        uid: currentUser?.uid,
+        email: currentUser?.email,
+      });
 
       // 認証成功時はローディング状態を終了
       setState((prev) => ({
@@ -244,6 +252,13 @@ export function useFarcasterAuth() {
   useEffect(() => {
     // Firebase認証状態の監視
     const unsubscribe = onAuthStateChanged(auth, (user) => {
+      console.log('🔍 Firebase auth state changed:', {
+        user: !!user,
+        uid: user?.uid,
+        email: user?.email,
+        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
+      });
+      
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,
@@ -257,7 +272,7 @@ export function useFarcasterAuth() {
     return () => {
       unsubscribe();
     };
-  }, []);
+  }, [state.isFarcasterAuthenticated]);
 
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {

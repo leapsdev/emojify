@@ -9,7 +9,14 @@ import { autoCreateUserFromFarcaster } from '../auth/autoCreateUser';
 
 export const GetStartedButton = () => {
   const { isMiniApp } = useIsMiniApp();
-  const { isAuthenticated, walletAddress, isLoading, ready } = useUnifiedAuth();
+  const {
+    isAuthenticated,
+    walletAddress,
+    isLoading,
+    ready,
+    farcasterUsername,
+    farcasterPfpUrl,
+  } = useUnifiedAuth();
   const router = useRouter();
 
   const handleClick = useCallback(async () => {
@@ -34,12 +41,13 @@ export const GetStartedButton = () => {
             // Mini App環境: Farcaster情報で自動ユーザー登録
 
             try {
-              // 最小限のプロフィールデータで自動登録
+              // Farcasterプロフィールデータで自動登録
+              // username は実質的に必須（すべてのFarcasterユーザーが持つ）
               await autoCreateUserFromFarcaster({
                 id: walletAddress,
-                username: `user_${walletAddress.slice(2, 8)}`,
+                username: farcasterUsername || 'no-username',
                 bio: null,
-                imageUrl: null,
+                imageUrl: farcasterPfpUrl || null,
               });
 
               // リダイレクト前に少し待機（UI更新のため）
@@ -72,7 +80,16 @@ export const GetStartedButton = () => {
         router.push('/');
       }
     }
-  }, [isAuthenticated, walletAddress, isLoading, ready, isMiniApp, router]);
+  }, [
+    isAuthenticated,
+    walletAddress,
+    isLoading,
+    ready,
+    isMiniApp,
+    router,
+    farcasterUsername,
+    farcasterPfpUrl,
+  ]);
 
   return (
     <div className="mt-auto">

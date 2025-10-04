@@ -21,6 +21,9 @@ interface FarcasterAuthState extends FarcasterInitializationResult {
   user: User | null;
   farcasterToken: string | null;
   farcasterUserId: string | null;
+  farcasterUsername: string | null;
+  farcasterDisplayName: string | null;
+  farcasterPfpUrl: string | null;
   autoLoginAttempted: boolean;
 }
 
@@ -43,6 +46,9 @@ export function useFarcasterAuth() {
     user: null,
     farcasterToken: null,
     farcasterUserId: null,
+    farcasterUsername: null,
+    farcasterDisplayName: null,
+    farcasterPfpUrl: null,
     autoLoginAttempted: false,
   });
 
@@ -108,11 +114,14 @@ export function useFarcasterAuth() {
           const context = await sdk.context;
           const userContext = context.user;
 
-          // FarcasterユーザーIDを設定
+          // Farcasterユーザー情報を設定
           if (userContext?.fid) {
             setState((prev) => ({
               ...prev,
               farcasterUserId: userContext.fid.toString(),
+              farcasterUsername: userContext.username || null,
+              farcasterDisplayName: userContext.displayName || null,
+              farcasterPfpUrl: userContext.pfpUrl || null,
             }));
           }
         } catch {}
@@ -264,12 +273,15 @@ export function useFarcasterAuth() {
     authenticateWithFarcaster,
   ]);
 
-  // 認証状態とFarcasterユーザーIDを返す
+  // 認証状態とFarcasterユーザー情報を返す
   return {
     isFarcasterAuthenticated: state.isFarcasterAuthenticated,
     isFirebaseAuthenticated: state.isFirebaseAuthenticated,
     isLoading: state.isLoading,
     farcasterUserId: state.farcasterUserId,
+    farcasterUsername: state.farcasterUsername,
+    farcasterDisplayName: state.farcasterDisplayName,
+    farcasterPfpUrl: state.farcasterPfpUrl,
     user: state.user,
     error: state.error,
   };

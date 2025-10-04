@@ -15,6 +15,9 @@ interface UnifiedAuthState {
   user: User | null; // Firebase User
   error: string | null;
   ready: boolean; // Privy環境でウォレットが準備完了しているか
+  farcasterUsername: string | null;
+  farcasterDisplayName: string | null;
+  farcasterPfpUrl: string | null;
 }
 
 /**
@@ -46,6 +49,9 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isLoading: isFarcasterLoading,
     error: farcasterError,
     user: farcasterFirebaseUser,
+    farcasterUsername,
+    farcasterDisplayName,
+    farcasterPfpUrl,
   } = useFarcasterAuth();
 
   // 認証状態に基づいてウォレットアドレスを取得
@@ -144,6 +150,10 @@ export function useUnifiedAuth(): UnifiedAuthState {
       error,
       // Privy環境ではウォレットの準備状態も含める
       ready: isMiniApp ? true : privyReady && walletsReady,
+      // Farcasterユーザー情報を追加
+      farcasterUsername,
+      farcasterDisplayName,
+      farcasterPfpUrl,
     };
   }, [
     getWalletAddress,
@@ -152,6 +162,9 @@ export function useUnifiedAuth(): UnifiedAuthState {
     isFarcasterAuthenticated,
     farcasterFirebaseUser,
     farcasterError,
+    farcasterUsername,
+    farcasterDisplayName,
+    farcasterPfpUrl,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
     privyFirebaseUser,

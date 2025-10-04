@@ -3,7 +3,7 @@
 import { ProfilePage } from '@/components/pages/ProfilePage';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
-import { getUser } from '@/repository/db/user/actions';
+import { getUser } from '@/repository/db/user/clientAction';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 

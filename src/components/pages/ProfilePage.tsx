@@ -10,7 +10,7 @@ import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
-import { usePrivy } from '@privy-io/react-auth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 import { config } from '@/lib/basename/wagmi';
 import { emojiContract } from '@/lib/contracts';
@@ -39,7 +39,7 @@ function ProfilePageContent({
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
-  const { authenticated } = usePrivy();
+  const { isAuthenticated } = useUnifiedAuth();
 
   useEffect(() => {
     const fetchNFTs = async () => {
@@ -92,7 +92,7 @@ function ProfilePageContent({
     fetchNFTs();
   }, [address, nfts]);
 
-  if (!authenticated) {
+  if (!isAuthenticated) {
     return <WalletConnectButton />;
   }
 

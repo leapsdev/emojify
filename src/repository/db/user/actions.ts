@@ -267,11 +267,11 @@ export async function getUsersWithFriendship(
 
 /**
  * Farcaster情報から自動的にユーザーを作成する
- * @param userData ユーザー情報
+ * @param userData ユーザー情報（id + ProfileForm）
  * @throws {Error} ユーザー作成に失敗した場合
  */
 export async function autoCreateUserFromFarcaster(
-  userData: ProfileForm,
+  userData: ProfileForm & { id: string },
 ): Promise<void> {
   if (!userData.id) {
     console.error('❌ Wallet address is required');

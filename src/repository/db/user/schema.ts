@@ -10,7 +10,6 @@ import { z } from 'zod';
  * @description ユーザープロフィール作成・編集時のバリデーション
  */
 export const profileFormSchema = z.object({
-  id: z.string(),
   username: z.string().min(3).max(20),
   bio: z.string().max(500).nullable().optional(),
   imageUrl: z.string().nullable().optional(),

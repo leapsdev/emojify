@@ -9,6 +9,12 @@ import { useEffect, useState } from 'react';
 
 export default function Page() {
   console.log('🏁 Profile page component started');
+  console.log('🌍 Environment:', {
+    isMiniApp:
+      typeof window !== 'undefined' &&
+      window.location.search.includes('miniapp'),
+    url: typeof window !== 'undefined' ? window.location.href : 'SSR',
+  });
 
   const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
@@ -39,23 +45,27 @@ export default function Page() {
       isAuthenticated,
       walletAddress,
     });
+
+    // 認証が完了していない場合は何もしない
+    if (!isAuthenticated || !walletAddress) {
+      console.log('⚠️ Skipping user data fetch - auth not ready:', {
+        isAuthenticated,
+        walletAddress,
+      });
+      return;
+    }
+
     const fetchUserData = async () => {
-      if (isAuthenticated && walletAddress) {
-        try {
-          console.log('📱 Fetching user data for wallet:', walletAddress);
-          const data = await getUser(walletAddress);
-          console.log('✅ User data fetched:', data);
-          setUserData(data);
-        } catch (error) {
-          console.error('Failed to fetch user data:', error);
-        }
-      } else {
-        console.log('⚠️ Skipping user data fetch:', {
-          isAuthenticated,
-          walletAddress,
-        });
+      try {
+        console.log('📱 Fetching user data for wallet:', walletAddress);
+        const data = await getUser(walletAddress);
+        console.log('✅ User data fetched:', data);
+        setUserData(data);
+      } catch (error) {
+        console.error('Failed to fetch user data:', error);
+      } finally {
+        setIsDataLoading(false);
       }
-      setIsDataLoading(false);
     };
 
     fetchUserData();
@@ -93,7 +103,15 @@ export default function Page() {
     }
   }, [isAuthenticated, isLoading, authRecoveryAttempted, router]);
 
-  if (isLoading || isDataLoading || !isAuthenticated) {
+  console.log('🎯 Rendering decision:', {
+    isLoading,
+    isDataLoading,
+    isAuthenticated,
+    userData: !!userData,
+  });
+
+  if (isLoading || isDataLoading) {
+    console.log('⏳ Showing loading state');
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -104,5 +122,17 @@ export default function Page() {
     );
   }
 
+  if (!isAuthenticated) {
+    console.log('🔒 Not authenticated, should redirect');
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <p>Redirecting...</p>
+        </div>
+      </div>
+    );
+  }
+
+  console.log('✅ Rendering ProfilePage with userData:', !!userData);
   return <ProfilePage user={userData || null} />;
 }

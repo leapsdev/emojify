@@ -108,6 +108,18 @@ export function useUnifiedAuth(): UnifiedAuthState {
   const unifiedState = useMemo((): UnifiedAuthState => {
     const walletAddress = getWalletAddress();
 
+    // 認証状態の詳細デバッグログ
+    console.log('🔍 useUnifiedAuth state calculation:', {
+      isMiniApp,
+      isFarcasterAuthenticated,
+      isFarcasterFirebaseAuthenticated,
+      isPrivyAuthenticated,
+      isPrivyFirebaseAuthenticated,
+      unifiedWalletAddress,
+      walletAddress,
+      isAuthInitialized: isAuthInitialized(),
+    });
+
     // 認証状態の判定
     let isAuthenticated = false;
     let user: User | null = null;
@@ -120,6 +132,12 @@ export function useUnifiedAuth(): UnifiedAuthState {
         isFarcasterAuthenticated === true && isFarcasterFirebaseAuthenticated;
       user = farcasterFirebaseUser;
       error = farcasterError;
+
+      console.log('🔍 Mini App auth calculation:', {
+        isFarcasterAuthenticated,
+        isFarcasterFirebaseAuthenticated,
+        result: isAuthenticated,
+      });
     } else {
       // Web環境: Privy認証を使用
       isAuthenticated = isPrivyAuthenticated && isPrivyFirebaseAuthenticated;
@@ -129,6 +147,12 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     // 認証が成功している場合は即座にローディングを終了
     const isLoading = isAuthenticated ? false : !isAuthInitialized();
+
+    console.log('🔍 Final auth state:', {
+      isAuthenticated,
+      isLoading,
+      walletAddress,
+    });
 
     return {
       isAuthenticated,
@@ -153,6 +177,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     privyError,
     privyReady,
     walletsReady,
+    unifiedWalletAddress,
   ]);
 
   return unifiedState;

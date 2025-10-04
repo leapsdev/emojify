@@ -25,11 +25,23 @@ interface UnifiedAuthState {
  */
 export function useUnifiedAuth(): UnifiedAuthState {
   const { isMiniApp } = useIsMiniApp();
-  
+
   console.log('🔍 useUnifiedAuth hook started:', { isMiniApp });
 
   // 統合ウォレット（環境に応じたウォレットアドレスを取得）
-  const { address: unifiedWalletAddress } = useUnifiedWallet();
+  const {
+    address: unifiedWalletAddress,
+    isConnected: walletConnected,
+    isLoading: walletLoading,
+    error: walletError,
+  } = useUnifiedWallet();
+
+  console.log('🔍 Unified wallet state:', {
+    unifiedWalletAddress,
+    walletConnected,
+    walletLoading,
+    walletError,
+  });
 
   // Privy認証関連
   const { authenticated: isPrivyAuthenticated, ready: privyReady } = usePrivy();
@@ -49,7 +61,7 @@ export function useUnifiedAuth(): UnifiedAuthState {
     error: farcasterError,
     user: farcasterFirebaseUser,
   } = useFarcasterAuth();
-  
+
   console.log('🔍 Farcaster auth state:', {
     isFarcasterAuthenticated,
     isFarcasterFirebaseAuthenticated,
@@ -64,10 +76,12 @@ export function useUnifiedAuth(): UnifiedAuthState {
     // Mini App環境: Farcaster SDKから取得したウォレットアドレス
     // Web環境: Privyの埋め込みウォレットまたは接続済みウォレットアドレス
     if (isMiniApp) {
-      if (
-        isFarcasterAuthenticated === true &&
-        isFarcasterFirebaseAuthenticated
-      ) {
+      // Firebase認証が失敗していてもFarcaster認証が成功している場合はウォレットアドレスを返す
+      if (isFarcasterAuthenticated === true) {
+        console.log(
+          '🔍 Returning wallet address for Farcaster auth:',
+          unifiedWalletAddress,
+        );
         return unifiedWalletAddress || null;
       }
     } else {
@@ -76,11 +90,11 @@ export function useUnifiedAuth(): UnifiedAuthState {
       }
     }
 
+    console.log('🔍 No wallet address available');
     return null;
   }, [
     isMiniApp,
     isFarcasterAuthenticated,
-    isFarcasterFirebaseAuthenticated,
     isPrivyAuthenticated,
     isPrivyFirebaseAuthenticated,
     unifiedWalletAddress,
@@ -158,9 +172,8 @@ export function useUnifiedAuth(): UnifiedAuthState {
 
     if (isMiniApp) {
       // Mini App環境: Farcaster認証を使用
-      // undefinedの場合はfalseとして扱う（認証未確定）
-      isAuthenticated =
-        isFarcasterAuthenticated === true && isFarcasterFirebaseAuthenticated;
+      // Firebase認証が失敗していてもFarcaster認証が成功している場合は認証済みとして扱う
+      isAuthenticated = isFarcasterAuthenticated === true;
       user = farcasterFirebaseUser;
       error = farcasterError;
 

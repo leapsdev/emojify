@@ -217,7 +217,7 @@ export function useFarcasterAuth() {
       await signInWithCustomToken(auth, customToken);
 
       console.log('Farcaster認証完了: Firebase認証も成功しました');
-      
+
       // Firebase認証後の状態を確認
       const currentUser = auth.currentUser;
       console.log('🔍 Firebase認証後の状態:', {
@@ -258,7 +258,7 @@ export function useFarcasterAuth() {
         email: user?.email,
         isFarcasterAuthenticated: state.isFarcasterAuthenticated,
       });
-      
+
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,

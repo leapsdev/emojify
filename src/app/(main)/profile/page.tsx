@@ -14,13 +14,25 @@ export default function Page() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('Profile page - Auth state:', {
+      isAuthenticated,
+      isLoading,
+      walletAddress,
+    });
+
     if (!isAuthenticated || !walletAddress) {
+      console.log(
+        'Skipping user data fetch - not authenticated or no wallet address',
+      );
+      setIsDataLoading(false);
       return;
     }
 
     const fetchUserData = async () => {
+      console.log('Fetching user data for:', walletAddress);
       try {
         const data = await getUser(walletAddress);
+        console.log('User data fetched:', data);
         setUserData(data);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
@@ -30,7 +42,7 @@ export default function Page() {
     };
 
     fetchUserData();
-  }, [isAuthenticated, walletAddress]);
+  }, [isAuthenticated, walletAddress, isLoading]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

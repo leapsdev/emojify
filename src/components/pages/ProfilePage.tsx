@@ -40,7 +40,8 @@ function ProfilePageContent({
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
   const [isLoadingCollected, setIsLoadingCollected] = useState(false);
   const { isAuthenticated } = useUnifiedAuth();
-  console.log(user);
+  console.log('ProfilePage received user:', user);
+  console.log('ProfilePage auth state:', isAuthenticated);
 
   useEffect(() => {
     const fetchNFTs = async () => {

@@ -20,8 +20,17 @@ export function ProfileImage({
 
   // currentImageUrlプロップの変更を監視してimageUrlステートを同期
   useEffect(() => {
+    console.log(
+      '📸 [ProfileImage] currentImageUrl prop changed:',
+      currentImageUrl,
+    );
     setImageUrl(currentImageUrl);
   }, [currentImageUrl]);
+
+  // imageUrlステートの変更を監視
+  useEffect(() => {
+    console.log('📸 [ProfileImage] imageUrl state updated:', imageUrl);
+  }, [imageUrl]);
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,

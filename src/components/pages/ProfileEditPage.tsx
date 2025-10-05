@@ -19,8 +19,18 @@ export function ProfileEditPage({
 
   // initialUserの変更を監視してimageUrlを同期
   useEffect(() => {
-    setImageUrl(initialUser?.imageUrl || null);
-  }, [initialUser]);
+    const currentImageUrl = initialUser?.imageUrl || null;
+    console.log(
+      '📸 [ProfileEditPage] initialUser.imageUrl changed:',
+      currentImageUrl,
+    );
+    setImageUrl(currentImageUrl);
+  }, [initialUser?.imageUrl]);
+
+  // imageUrlステートの変更を監視
+  useEffect(() => {
+    console.log('📸 [ProfileEditPage] imageUrl state updated:', imageUrl);
+  }, [imageUrl]);
 
   const handleImageUpload = (url: string) => {
     setImageUrl(url);

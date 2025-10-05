@@ -16,6 +16,11 @@ export default function Page() {
       if (isAuthenticated && walletAddress) {
         try {
           const data = await getUser(walletAddress);
+          console.log('📸 [ProfileEdit/page] Fetched user data:', {
+            hasData: !!data,
+            imageUrl: data?.imageUrl,
+            username: data?.username,
+          });
           setUserData(data);
         } catch (error) {
           console.error('Failed to fetch user data:', error);

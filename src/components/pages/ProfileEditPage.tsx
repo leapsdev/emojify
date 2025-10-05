@@ -3,7 +3,7 @@
 import { ProfileEditForm } from '@/components/features/profile/edit/ProfileEditForm';
 import { ProfileImage } from '@/components/features/profile/edit/ProfileImage';
 import type { User } from '@/repository/db/database';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface ProfileEditPageProps {
   initialUser: User | null;
@@ -15,9 +15,12 @@ export function ProfileEditPage({
   walletAddress,
 }: ProfileEditPageProps) {
   const formRef = useRef<HTMLFormElement>(null);
-  const [imageUrl, setImageUrl] = useState<string | null>(
-    initialUser?.imageUrl || null,
-  );
+  const [imageUrl, setImageUrl] = useState<string | null>(null);
+
+  // initialUserの変更を監視してimageUrlを同期
+  useEffect(() => {
+    setImageUrl(initialUser?.imageUrl || null);
+  }, [initialUser]);
 
   const handleImageUpload = (url: string) => {
     setImageUrl(url);

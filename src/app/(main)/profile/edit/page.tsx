@@ -27,7 +27,7 @@ export default function Page() {
     fetchUserData();
   }, [isAuthenticated, walletAddress]);
 
-  if (isLoading || isDataLoading) {
+  if (isLoading || isDataLoading || !userData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

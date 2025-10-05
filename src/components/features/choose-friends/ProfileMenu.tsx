@@ -1,6 +1,7 @@
 'use client';
 
 import { SignOutButton } from '@/components/features/auth/SignOutButton';
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,6 +12,8 @@ import { LinkButton } from '@/components/ui/LinkButton';
 import { MoreVertical } from 'lucide-react';
 
 export const ProfileMenu = () => {
+  const { isMiniApp } = useIsMiniApp();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -20,9 +23,11 @@ export const ProfileMenu = () => {
         align="end"
         className="rounded-xl min-w-[120px] bg-white dark:bg-gray-800"
       >
-        <DropdownMenuItem asChild className="rounded-lg">
-          <SignOutButton />
-        </DropdownMenuItem>
+        {!isMiniApp && (
+          <DropdownMenuItem asChild className="rounded-lg">
+            <SignOutButton />
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild className="rounded-lg">
           <LinkButton
             href="/privacy-policy"

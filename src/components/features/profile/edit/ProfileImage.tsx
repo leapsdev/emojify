@@ -2,6 +2,7 @@
 
 import { Plus, User2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from './uploadImage';
 
@@ -83,9 +84,11 @@ export function ProfileImage({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <img
+              <Image
                 src={imageUrl}
                 alt="Profile"
+                width={128}
+                height={128}
                 className="w-full h-full object-cover"
               />
             )

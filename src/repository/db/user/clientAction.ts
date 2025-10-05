@@ -34,7 +34,7 @@ export const getUser = async (walletAddress: string): Promise<User | null> => {
  */
 export const updateUser = async (
   walletAddress: string,
-  data: Partial<Omit<User, 'id' | 'createdAt'>>,
+  data: Partial<Omit<User, 'createdAt'>>,
 ): Promise<void> => {
   const userRef = ref(db, `${USERS_PATH}/${walletAddress}`);
   await update(userRef, data);
@@ -115,10 +115,10 @@ export const convertToDisplayUser = (
   section: 'friend' | 'other',
 ): DisplayUser => {
   return {
-    id: user.id || walletAddress, // ユーザーのidフィールドを優先使用
+    id: walletAddress,
     username: user.username,
     displayName: user.username,
-    walletAddress: user.id || walletAddress, // ユーザーのidフィールドを優先使用
+    walletAddress: walletAddress,
     avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };

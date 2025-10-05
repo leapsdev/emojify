@@ -152,7 +152,7 @@ function ProfilePageContent({
               username={user?.username || ''}
               bio={user?.bio || ''}
               avatar={user?.imageUrl || '/icons/faceIcon-192x192.png'}
-              walletAddress={user?.id || walletAddress || ''}
+              walletAddress={walletAddress || ''}
               isOwnProfile={isOwnProfile}
               currentWalletAddress={currentWalletAddress}
               initialIsFriend={initialIsFriend}

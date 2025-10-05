@@ -2,7 +2,7 @@
 
 import { Plus, User2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from './uploadImage';
 
 interface ProfileImageProps {
@@ -17,6 +17,11 @@ export function ProfileImage({
   const [isPending, setIsPending] = useState(false);
   const [imageUrl, setImageUrl] = useState(currentImageUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // currentImageUrlプロップの変更を監視してimageUrlステートを同期
+  useEffect(() => {
+    setImageUrl(currentImageUrl);
+  }, [currentImageUrl]);
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,

@@ -15,6 +15,7 @@ import type { ProfileFormState } from './action';
 interface ProfileEditFormProps {
   user: User | null;
   walletAddress: string;
+  imageUrl?: string | null;
 }
 
 const initialState: ProfileFormState = null;
@@ -22,7 +23,7 @@ const initialState: ProfileFormState = null;
 export const ProfileEditForm = forwardRef<
   HTMLFormElement,
   ProfileEditFormProps
->(function ProfileEditForm({ user, walletAddress }, ref) {
+>(function ProfileEditForm({ user, walletAddress, imageUrl }, ref) {
   const [state, formAction, isPending] = useActionState(
     handleProfileFormAction,
     initialState,
@@ -52,6 +53,7 @@ export const ProfileEditForm = forwardRef<
       ref={ref}
     >
       <input type="hidden" name="walletAddress" value={walletAddress} />
+      <input type="hidden" name="imageUrl" value={imageUrl || ''} />
 
       {state?.message && (
         <div

@@ -42,6 +42,7 @@ export default function Page() {
           });
           if (!room) {
             console.log('[ChatRoomPage] ルームが見つかりません:', { roomId });
+            setIsDataLoading(false);
             notFound();
           }
           setRoomData(room);
@@ -67,8 +68,13 @@ export default function Page() {
             // ユーザー情報の取得に失敗してもページは表示
             setOtherUsers([]);
           }
+
+          // データ取得成功時のみローディング終了
+          setIsDataLoading(false);
         } catch (error) {
           console.error('[ChatRoomPage] データ取得エラー:', error);
+          // エラー時もローディング終了
+          setIsDataLoading(false);
         }
       } else {
         console.log('[ChatRoomPage] データ取得スキップ:', {
@@ -77,8 +83,8 @@ export default function Page() {
           roomId,
           hasFirebaseUser: !!user,
         });
+        // Firebase認証完了を待つため、ローディング継続（setIsDataLoading(false)を呼ばない）
       }
-      setIsDataLoading(false);
     };
 
     fetchRoomData();

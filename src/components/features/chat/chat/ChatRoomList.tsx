@@ -13,10 +13,10 @@ type ChatRoomProps = {
 
 type Member = {
   joinedAt: number;
-  username: string;
+  username?: string;
   lastReadAt: number;
   imageUrl?: string | null;
-  walletAddress: string; // ウォレットアドレスを追加
+  walletAddress: string;
 };
 
 const ChatRoom = ({ room, currentWalletAddress }: ChatRoomProps) => {
@@ -53,7 +53,13 @@ const ChatRoom = ({ room, currentWalletAddress }: ChatRoomProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold truncate">
-              {otherMembers.map(([, member]) => member.username).join(', ')}
+              {otherMembers
+                .map(
+                  ([, member]) =>
+                    member.username ||
+                    `${member.walletAddress.slice(0, 6)}...${member.walletAddress.slice(-4)}`,
+                )
+                .join(', ')}
             </h3>
             <div className="flex items-center gap-2">
               {hasUnread && <DotBadge />}

@@ -66,15 +66,28 @@ export default function Page() {
     );
   }
 
-  if (roomData && otherUsers.length === 0) {
+  // ルームが存在しない場合のみ404エラー
+  if (!roomData) {
     notFound();
   }
 
   // ヘッダーに表示するユーザー名を生成
-  const headerTitle =
-    otherUsers.length > 0
-      ? otherUsers.map((user) => user.username).join(', ')
-      : '';
+  const headerTitle = (() => {
+    if (otherUsers.length > 0) {
+      // ユーザー名が取得できた場合
+      return otherUsers.map((user) => user.username).join(', ');
+    }
+    if (roomData) {
+      // ユーザー名が取得できない場合は、ウォレットアドレスを表示
+      const otherMemberAddresses = Object.keys(roomData.members).filter(
+        (address) => address !== walletAddress,
+      );
+      return otherMemberAddresses
+        .map((address) => `${address.slice(0, 6)}...${address.slice(-4)}`)
+        .join(', ');
+    }
+    return '';
+  })();
 
   return (
     <>

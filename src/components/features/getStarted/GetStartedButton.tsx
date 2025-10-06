@@ -14,19 +14,36 @@ export const GetStartedButton = () => {
     walletAddress,
     isLoading,
     ready,
+    user,
     farcasterUsername,
     farcasterPfpUrl,
   } = useUnifiedAuth();
   const router = useRouter();
 
   const handleClick = useCallback(async () => {
+    console.log('[GetStartedButton] クリック処理開始:', {
+      isAuthenticated,
+      walletAddress,
+      hasFirebaseUser: !!user,
+      isLoading,
+      ready,
+      timestamp: new Date().toISOString(),
+    });
+
     // ローディング中または準備未完了の場合は処理しない
     if (isLoading || !ready) {
+      console.log('[GetStartedButton] ローディング中または準備未完了:', {
+        isLoading,
+        ready,
+      });
       return;
     }
 
-    // 認証状態とウォレットアドレスの詳細チェック
-    if (isAuthenticated && walletAddress) {
+    // 認証状態とウォレットアドレスとFirebaseユーザーの詳細チェック
+    if (isAuthenticated && walletAddress && user) {
+      console.log('[GetStartedButton] 認証チェック通過:', {
+        walletAddress,
+      });
       try {
         // DBでユーザーの存在を確実にチェック
         const exists = await checkUserExists(walletAddress);
@@ -74,17 +91,29 @@ export const GetStartedButton = () => {
       }
     } else {
       // ❌ 未認証の場合
+      console.log('[GetStartedButton] 認証チェック失敗:', {
+        isAuthenticated,
+        walletAddress,
+        hasFirebaseUser: !!user,
+      });
+
       if (!isMiniApp) {
         // Webアプリ環境の場合はサインアップページへ
         router.push('/signup');
       } else {
-        // Mini App環境の場合は認証ページへ
+        // Mini App環境の場合は認証ページへ（Firebase認証完了待ち）
+        // Firebase認証未完了の場合は何もしない（待機）
+        if (!user) {
+          console.log('[GetStartedButton] Firebase認証未完了のため待機中...');
+          return;
+        }
         router.push('/');
       }
     }
   }, [
     isAuthenticated,
     walletAddress,
+    user,
     isLoading,
     ready,
     isMiniApp,

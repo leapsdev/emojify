@@ -312,15 +312,29 @@ export async function autoCreateUserFromFarcaster(
   userData: ProfileForm,
   walletAddress: string,
 ): Promise<void> {
+  console.log('[autoCreateUserFromFarcaster] 開始:', {
+    walletAddress,
+    username: userData.username,
+    timestamp: new Date().toISOString(),
+  });
+
   if (!walletAddress) {
-    console.error('❌ Wallet address is required');
+    console.error('[autoCreateUserFromFarcaster] ウォレットアドレスが必要です');
     throw new Error('Wallet address is required');
   }
 
   try {
     await createUser(userData, walletAddress);
+    console.log('[autoCreateUserFromFarcaster] 完了:', {
+      walletAddress,
+      username: userData.username,
+    });
   } catch (error) {
-    console.error('Failed to auto-create user from Farcaster:', error);
+    console.error('[autoCreateUserFromFarcaster] エラー:', {
+      error,
+      walletAddress,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    });
     throw new Error(
       `Failed to create user: ${error instanceof Error ? error.message : 'Unknown error'}`,
     );

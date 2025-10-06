@@ -2,7 +2,7 @@
 
 import { adminDbRef } from '@/repository/db/config/server';
 import type { ChatRoom } from '@/repository/db/database';
-import { DB_PATHS } from '@/repository/db/database';
+import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 
 /**
  * ユーザーのチャットルーム一覧を取得
@@ -10,7 +10,7 @@ import { DB_PATHS } from '@/repository/db/database';
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
   if (!walletAddress) return [];
 
-  const userRoomsRef = adminDbRef(`${DB_PATHS.userRooms}/${walletAddress}`);
+  const userRoomsRef = adminDbRef(`${DB_INDEXES.userRooms}/${walletAddress}`);
   const indexSnapshot = await userRoomsRef.get();
   const snapshotVal = indexSnapshot.val();
 

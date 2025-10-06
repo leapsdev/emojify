@@ -68,7 +68,6 @@ export const DB_PATHS = {
   users: '/users', // idはウォレットアドレス
   chatRooms: '/chatRooms',
   messages: '/messages',
-  userRooms: '/user-rooms', // idはウォレットアドレス
 } as const;
 
 /**

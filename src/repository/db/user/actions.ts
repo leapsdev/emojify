@@ -95,24 +95,13 @@ export async function getAllUsers(): Promise<
 }
 
 /**
- * 指定されたIDのユーザー情報を取得する（getUserのエイリアス）
- * @param id ウォレットアドレス
- * @returns ユーザー情報（存在しない場合はnull）
- * @throws {Error} データベースエラー時
- */
-export async function getUserById(id: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
-  return snapshot.val() as User | null;
-}
-
-/**
  * 指定されたIDのユーザーが存在するかチェックする
  * @param id ウォレットアドレス
  * @returns 存在する場合はtrue、存在しない場合はfalse
  * @throws {Error} データベースエラー時
  */
 export async function isIdExists(id: string): Promise<boolean> {
-  const user = await getUserById(id);
+  const user = await getUser(id);
   return user !== null;
 }
 
@@ -130,8 +119,8 @@ export async function addFriend(
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(walletAddress),
-    getUserById(friendId),
+    getUser(walletAddress),
+    getUser(friendId),
   ]);
 
   if (!user || !friend) {
@@ -171,8 +160,8 @@ export async function removeFriend(
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(walletAddress),
-    getUserById(friendId),
+    getUser(walletAddress),
+    getUser(friendId),
   ]);
 
   if (!user || !friend) {
@@ -203,7 +192,7 @@ export async function removeFriend(
 export async function getUserFriends(
   walletAddress: string,
 ): Promise<Array<User & { walletAddress: string }>> {
-  const user = await getUserById(walletAddress);
+  const user = await getUser(walletAddress);
   if (!user) {
     throw new Error('User not found');
   }
@@ -215,7 +204,7 @@ export async function getUserFriends(
   const friendIds = Object.keys(user.friends);
   const friends = await Promise.all(
     friendIds.map(async (friendId) => {
-      const friend = await getUserById(friendId);
+      const friend = await getUser(friendId);
       return friend ? { ...friend, walletAddress: friendId } : null;
     }),
   );
@@ -253,7 +242,7 @@ export async function getUsersWithFriendship(
   others: Array<User & { walletAddress: string }>;
 }> {
   const [currentUser, otherUsers] = await Promise.all([
-    getUserById(currentWalletAddress),
+    getUser(currentWalletAddress),
     getOtherUsers(currentWalletAddress),
   ]);
 

@@ -3,7 +3,7 @@
 import { ProfilePage } from '@/components/pages/ProfilePage';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
-import { getUserById } from '@/repository/db/user/actions';
+import { getUser } from '@/repository/db/user/actions';
 // import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
@@ -35,8 +35,8 @@ export default function Page({ params }: PageProps) {
       if (isAuthenticated && walletAddress && targetUserId) {
         try {
           const [target, current] = await Promise.all([
-            getUserById(targetUserId),
-            getUserById(walletAddress),
+            getUser(targetUserId),
+            getUser(walletAddress),
           ]);
           setTargetUser(target);
           setCurrentUser(current);

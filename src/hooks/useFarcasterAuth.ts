@@ -82,14 +82,6 @@ export function useFarcasterAuth() {
 
   const authenticateWithFarcaster = useCallback(async () => {
     try {
-      console.log('Farcaster認証開始:', {
-        isSDKLoaded: state.isSDKLoaded,
-        isReady: state.isReady,
-        isMiniApp: state.isMiniApp,
-        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
-        timestamp: new Date().toISOString(),
-      });
-
       setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
       // Mini App環境でない場合はエラー
@@ -168,11 +160,6 @@ export function useFarcasterAuth() {
         farcasterToken: token,
       }));
 
-      console.log('Farcaster認証成功:', {
-        tokenLength: token.length,
-        timestamp: new Date().toISOString(),
-      });
-
       // Farcaster SDKからウォレットアドレスを取得
       let walletAddress: string | null = null;
 
@@ -199,11 +186,6 @@ export function useFarcasterAuth() {
       }
 
       // サーバーサイドでFirebaseカスタムトークンを取得
-      console.log('Firebaseカスタムトークン取得開始:', {
-        walletAddress,
-        tokenLength: token.length,
-      });
-
       const response = await fetch('/api/auth/farcaster-firebase-token', {
         method: 'POST',
         headers: {
@@ -228,34 +210,15 @@ export function useFarcasterAuth() {
       }
 
       const { customToken } = await response.json();
-      console.log('Firebaseカスタムトークン取得成功:', {
-        customTokenLength: customToken.length,
-      });
 
       // Firebaseにカスタムトークンでサインイン
-      console.log(
-        'Firebase認証開始 - カスタムトークン:',
-        `${customToken.substring(0, 20)}...`,
-      );
       await signInWithCustomToken(auth, customToken);
-      console.log(
-        'Firebase認証完了 - auth.currentUser:',
-        auth.currentUser?.uid,
-      );
-
-      // Firebase認証後の状態を確認
 
       // 認証成功時はローディング状態を終了
       setState((prev) => ({
         ...prev,
         isLoading: false,
       }));
-
-      console.log('Firebase認証完全完了:', {
-        uid: auth.currentUser?.uid,
-        email: auth.currentUser?.email,
-        timestamp: new Date().toISOString(),
-      });
     } catch (error) {
       console.error('Farcaster認証エラー:', error);
       setState((prev) => ({
@@ -267,12 +230,7 @@ export function useFarcasterAuth() {
         farcasterToken: null,
       }));
     }
-  }, [
-    state.isMiniApp,
-    state.isSDKLoaded,
-    state.isReady,
-    state.isFarcasterAuthenticated,
-  ]);
+  }, [state.isMiniApp, state.isSDKLoaded, state.isReady]);
 
   // SDK初期化を実行
   useEffect(() => {
@@ -282,14 +240,6 @@ export function useFarcasterAuth() {
   useEffect(() => {
     // Firebase認証状態の監視
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log('Farcaster Firebase認証状態変更:', {
-        isAuthenticated: !!user,
-        uid: user?.uid,
-        email: user?.email,
-        displayName: user?.displayName,
-        isFarcasterAuthenticated: state.isFarcasterAuthenticated,
-      });
-
       setState((prev) => ({
         ...prev,
         isFirebaseAuthenticated: !!user,
@@ -307,19 +257,10 @@ export function useFarcasterAuth() {
     return () => {
       unsubscribe();
     };
-  }, [state.isFarcasterAuthenticated]);
+  }, []);
 
   // SDKが準備完了した時点で自動認証を実行
   useEffect(() => {
-    console.log('自動認証チェック:', {
-      isSDKLoaded: state.isSDKLoaded,
-      isReady: state.isReady,
-      isMiniApp: state.isMiniApp,
-      autoLoginAttempted: state.autoLoginAttempted,
-      isFarcasterAuthenticated: state.isFarcasterAuthenticated,
-      timestamp: new Date().toISOString(),
-    });
-
     if (
       state.isSDKLoaded &&
       state.isReady &&
@@ -327,7 +268,6 @@ export function useFarcasterAuth() {
       !state.autoLoginAttempted &&
       state.isFarcasterAuthenticated !== true
     ) {
-      console.log('自動認証実行開始');
       setState((prev) => ({ ...prev, autoLoginAttempted: true }));
       authenticateWithFarcaster();
     }

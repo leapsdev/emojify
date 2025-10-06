@@ -7,7 +7,7 @@ import { getUsersWithFriendship } from '@/repository/db/user/actions';
 import { useEffect, useState } from 'react';
 
 export default function ChooseFriendsPage() {
-  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [friendshipData, setFriendshipData] = useState<{
     friends: Array<User & { walletAddress: string }>;
     others: Array<User & { walletAddress: string }>;
@@ -19,10 +19,11 @@ export default function ChooseFriendsPage() {
       console.log('[ChooseFriendsPage] データ取得開始:', {
         isAuthenticated,
         walletAddress,
+        hasFirebaseUser: !!user,
         timestamp: new Date().toISOString(),
       });
 
-      if (isAuthenticated && walletAddress) {
+      if (isAuthenticated && walletAddress && user) {
         try {
           console.log('[ChooseFriendsPage] getUsersWithFriendship呼び出し:', {
             walletAddress,
@@ -40,13 +41,14 @@ export default function ChooseFriendsPage() {
         console.log('[ChooseFriendsPage] データ取得スキップ:', {
           isAuthenticated,
           walletAddress,
+          hasFirebaseUser: !!user,
         });
       }
       setIsDataLoading(false);
     };
 
     fetchFriendshipData();
-  }, [isAuthenticated, walletAddress]);
+  }, [isAuthenticated, walletAddress, user]);
 
   if (isLoading || isDataLoading) {
     return (

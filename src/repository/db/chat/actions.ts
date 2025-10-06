@@ -14,15 +14,12 @@ export async function getChatRoomAction(
   roomId: string,
 ): Promise<{ room: ChatRoom | null; messages: Message[] }> {
   try {
-    console.log('getChatRoomAction called with roomId:', roomId);
     // チャットルーム情報を取得
     const roomSnapshot = await adminDb
       .ref(`${DB_PATHS.chatRooms}/${roomId}`)
       .get();
     const room = roomSnapshot.val();
-    console.log('Room snapshot result:', room);
     if (!room) {
-      console.log('Room not found in database');
       return { room: null, messages: [] };
     }
 
@@ -42,10 +39,6 @@ export async function getChatRoomAction(
       .filter((message): message is Message => message !== null)
       .sort((a, b) => a.createdAt - b.createdAt);
 
-    console.log('Returning room and messages:', {
-      room,
-      messagesCount: messages.length,
-    });
     return { room, messages };
   } catch (error) {
     console.error('Failed to get chat room:', error);

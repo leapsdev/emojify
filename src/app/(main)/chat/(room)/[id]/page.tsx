@@ -19,38 +19,13 @@ export default function Page() {
   const params = useParams();
   const roomId = params.id as string;
 
-  console.log('ChatRoomPage render:', {
-    isAuthenticated,
-    isLoading,
-    walletAddress,
-    roomId,
-  });
-
   useEffect(() => {
-    console.log('useEffect triggered:', {
-      isAuthenticated,
-      isLoading,
-      walletAddress,
-      roomId,
-    });
-
     const fetchRoomData = async () => {
-      console.log('fetchRoomData called with:', {
-        isAuthenticated,
-        walletAddress,
-        roomId,
-      });
       if (isAuthenticated && walletAddress && roomId) {
         try {
-          console.log('Fetching room data for roomId:', roomId);
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
-          console.log('Room data received:', {
-            room,
-            messagesCount: roomMessages.length,
-          });
           if (!room) {
-            console.log('Room not found, calling notFound()');
             notFound();
           }
           setRoomData(room);
@@ -60,7 +35,6 @@ export default function Page() {
           const otherMemberWalletAddresses = Object.keys(room.members).filter(
             (memberAddress) => memberAddress !== walletAddress,
           );
-          console.log('Other member addresses:', otherMemberWalletAddresses);
 
           try {
             const otherUsersData = await Promise.all(
@@ -80,18 +54,12 @@ export default function Page() {
         } catch (error) {
           console.error('Failed to fetch room data:', error);
         }
-      } else {
-        console.log('Skipping fetchRoomData due to missing requirements:', {
-          isAuthenticated,
-          walletAddress: !!walletAddress,
-          roomId: !!roomId,
-        });
       }
       setIsDataLoading(false);
     };
 
     fetchRoomData();
-  }, [isAuthenticated, isLoading, walletAddress, roomId]);
+  }, [isAuthenticated, walletAddress, roomId]);
 
   if (isLoading || isDataLoading) {
     return (

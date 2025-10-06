@@ -241,29 +241,66 @@ export async function getUsersWithFriendship(
   friends: Array<User & { walletAddress: string }>;
   others: Array<User & { walletAddress: string }>;
 }> {
-  const [currentUser, otherUsers] = await Promise.all([
-    getUser(currentWalletAddress),
-    getOtherUsers(currentWalletAddress),
-  ]);
-
-  if (!currentUser) return { friends: [], others: [] };
-
-  const friends: Array<User & { walletAddress: string }> = [];
-  const others: Array<User & { walletAddress: string }> = [];
-
-  // 友達かどうかで振り分け
-  otherUsers.forEach((user) => {
-    if (currentUser.friends?.[user.walletAddress]) {
-      friends.push(user);
-    } else {
-      others.push(user);
-    }
+  console.log('[getUsersWithFriendship] 開始:', {
+    currentWalletAddress,
+    timestamp: new Date().toISOString(),
   });
 
-  return {
-    friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
-    others: others.sort((a, b) => b.updatedAt - a.updatedAt),
-  };
+  try {
+    const [currentUser, otherUsers] = await Promise.all([
+      getUser(currentWalletAddress),
+      getOtherUsers(currentWalletAddress),
+    ]);
+
+    console.log('[getUsersWithFriendship] ユーザーデータ取得完了:', {
+      currentUser: !!currentUser,
+      currentUserHasFriends: !!currentUser?.friends,
+      friendsCount: currentUser?.friends
+        ? Object.keys(currentUser.friends).length
+        : 0,
+      otherUsersCount: otherUsers.length,
+    });
+
+    if (!currentUser) {
+      console.log(
+        '[getUsersWithFriendship] 現在のユーザーが見つかりません:',
+        currentWalletAddress,
+      );
+      return { friends: [], others: [] };
+    }
+
+    const friends: Array<User & { walletAddress: string }> = [];
+    const others: Array<User & { walletAddress: string }> = [];
+
+    // 友達かどうかで振り分け
+    otherUsers.forEach((user) => {
+      if (currentUser.friends?.[user.walletAddress]) {
+        friends.push(user);
+      } else {
+        others.push(user);
+      }
+    });
+
+    const result = {
+      friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
+      others: others.sort((a, b) => b.updatedAt - a.updatedAt),
+    };
+
+    console.log('[getUsersWithFriendship] 完了:', {
+      friendsCount: result.friends.length,
+      othersCount: result.others.length,
+    });
+
+    return result;
+  } catch (error) {
+    console.error('[getUsersWithFriendship] エラー発生:', {
+      error,
+      currentWalletAddress,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw error; // エラーを再スローして呼び出し元でキャッチできるようにする
+  }
 }
 
 /**

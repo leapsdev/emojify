@@ -16,13 +16,31 @@ export default function ChooseFriendsPage() {
 
   useEffect(() => {
     const fetchFriendshipData = async () => {
+      console.log('[ChooseFriendsPage] データ取得開始:', {
+        isAuthenticated,
+        walletAddress,
+        timestamp: new Date().toISOString(),
+      });
+
       if (isAuthenticated && walletAddress) {
         try {
+          console.log('[ChooseFriendsPage] getUsersWithFriendship呼び出し:', {
+            walletAddress,
+          });
           const data = await getUsersWithFriendship(walletAddress);
+          console.log('[ChooseFriendsPage] データ取得成功:', {
+            friendsCount: data.friends.length,
+            othersCount: data.others.length,
+          });
           setFriendshipData(data);
         } catch (error) {
-          console.error('Failed to fetch friendship data:', error);
+          console.error('[ChooseFriendsPage] データ取得エラー:', error);
         }
+      } else {
+        console.log('[ChooseFriendsPage] データ取得スキップ:', {
+          isAuthenticated,
+          walletAddress,
+        });
       }
       setIsDataLoading(false);
     };

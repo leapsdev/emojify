@@ -19,41 +19,79 @@ export default function Page() {
   const params = useParams();
   const roomId = params.id as string;
 
+  console.log('ChatRoomPage render:', {
+    isAuthenticated,
+    isLoading,
+    walletAddress,
+    roomId,
+  });
+
   useEffect(() => {
+    console.log('useEffect triggered:', {
+      isAuthenticated,
+      isLoading,
+      walletAddress,
+      roomId,
+    });
+
     const fetchRoomData = async () => {
+      console.log('fetchRoomData called with:', {
+        isAuthenticated,
+        walletAddress,
+        roomId,
+      });
       if (isAuthenticated && walletAddress && roomId) {
         try {
+          console.log('Fetching room data for roomId:', roomId);
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
+          console.log('Room data received:', {
+            room,
+            messagesCount: roomMessages.length,
+          });
           if (!room) {
+            console.log('Room not found, calling notFound()');
             notFound();
           }
           setRoomData(room);
           setMessages(roomMessages);
 
-          // 他のメンバーのユーザー情報を取得
+          // 他のメンバーのユーザー情報を取得（エラーが発生してもページは表示）
           const otherMemberWalletAddresses = Object.keys(room.members).filter(
             (memberAddress) => memberAddress !== walletAddress,
           );
+          console.log('Other member addresses:', otherMemberWalletAddresses);
 
-          const otherUsersData = await Promise.all(
-            otherMemberWalletAddresses.map((memberAddress) =>
-              getUser(memberAddress),
-            ),
-          );
+          try {
+            const otherUsersData = await Promise.all(
+              otherMemberWalletAddresses.map((memberAddress) =>
+                getUser(memberAddress),
+              ),
+            );
 
-          setOtherUsers(
-            otherUsersData.filter((user): user is User => user !== null),
-          );
+            setOtherUsers(
+              otherUsersData.filter((user): user is User => user !== null),
+            );
+          } catch (userError) {
+            console.warn('Failed to fetch user data:', userError);
+            // ユーザー情報の取得に失敗してもページは表示
+            setOtherUsers([]);
+          }
         } catch (error) {
           console.error('Failed to fetch room data:', error);
         }
+      } else {
+        console.log('Skipping fetchRoomData due to missing requirements:', {
+          isAuthenticated,
+          walletAddress: !!walletAddress,
+          roomId: !!roomId,
+        });
       }
       setIsDataLoading(false);
     };
 
     fetchRoomData();
-  }, [isAuthenticated, walletAddress, roomId]);
+  }, [isAuthenticated, isLoading, walletAddress, roomId]);
 
   if (isLoading || isDataLoading) {
     return (

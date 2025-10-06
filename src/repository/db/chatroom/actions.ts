@@ -23,20 +23,8 @@ export async function createChatRoom(members: string[]): Promise<string> {
   > = {};
   const now = Date.now();
 
-  // メンバーのユーザー情報を取得
-  const memberUsers = await Promise.all(
-    members.map((memberId) =>
-      adminDb.ref(`${DB_PATHS.users}/${memberId}`).get(),
-    ),
-  );
-
-  memberUsers.forEach((snapshot, index) => {
-    const user = snapshot.val();
-    if (!user) throw new Error(`User not found: ${members[index]}`);
-
-    // 新しいスキーマでは、members[index]がウォレットアドレスを表す
-    const walletAddress = members[index];
-
+  // メンバーの情報を直接設定（ユーザー存在確認は不要）
+  members.forEach((walletAddress) => {
     membersRecord[walletAddress] = {
       joinedAt: now,
       lastReadAt: now,

@@ -54,7 +54,11 @@ export function useRoomMembers(roomId: string) {
                 `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
               imageUrl: user?.imageUrl || null,
             };
-          } catch {
+          } catch (error) {
+            console.warn(
+              `Failed to fetch user data for ${walletAddress}:`,
+              error,
+            );
             // ユーザー情報が取得できない場合は、ウォレットアドレスを使用
             membersWithUserInfo[walletAddress] = {
               ...memberInfo,

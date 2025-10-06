@@ -13,13 +13,26 @@ import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 export async function getChatRoomAction(
   roomId: string,
 ): Promise<{ room: ChatRoom | null; messages: Message[] }> {
+  console.log('[getChatRoomAction] 開始:', {
+    roomId,
+    timestamp: new Date().toISOString(),
+  });
+
   try {
     // チャットルーム情報を取得
     const roomSnapshot = await adminDb
       .ref(`${DB_PATHS.chatRooms}/${roomId}`)
       .get();
     const room = roomSnapshot.val();
+
+    console.log('[getChatRoomAction] ルーム取得結果:', {
+      roomId,
+      hasRoom: !!room,
+      roomExists: roomSnapshot.exists(),
+    });
+
     if (!room) {
+      console.log('[getChatRoomAction] ルームが存在しません:', { roomId });
       return { room: null, messages: [] };
     }
 
@@ -28,6 +41,11 @@ export async function getChatRoomAction(
       .ref(`${DB_INDEXES.roomMessages}/${roomId}`)
       .get();
     const messageIds = Object.keys(messagesIndexSnapshot.val() || {});
+
+    console.log('[getChatRoomAction] メッセージID取得完了:', {
+      roomId,
+      messageIdsCount: messageIds.length,
+    });
 
     const messagePromises = messageIds.map((messageId) =>
       adminDb.ref(`${DB_PATHS.messages}/${messageId}`).get(),
@@ -39,9 +57,19 @@ export async function getChatRoomAction(
       .filter((message): message is Message => message !== null)
       .sort((a, b) => a.createdAt - b.createdAt);
 
+    console.log('[getChatRoomAction] 完了:', {
+      roomId,
+      messagesCount: messages.length,
+    });
+
     return { room, messages };
   } catch (error) {
-    console.error('Failed to get chat room:', error);
+    console.error('[getChatRoomAction] エラー発生:', {
+      error,
+      roomId,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
     return { room: null, messages: [] };
   }
 }

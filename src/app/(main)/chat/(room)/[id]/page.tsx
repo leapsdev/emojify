@@ -11,7 +11,7 @@ import { useParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [roomData, setRoomData] = useState<ChatRoom | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [otherUsers, setOtherUsers] = useState<User[]>([]);
@@ -21,11 +21,27 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      if (isAuthenticated && walletAddress && roomId) {
+      console.log('[ChatRoomPage] データ取得開始:', {
+        isAuthenticated,
+        walletAddress,
+        roomId,
+        hasFirebaseUser: !!user,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (isAuthenticated && walletAddress && roomId && user) {
+        console.log('[ChatRoomPage] getChatRoomAction呼び出し:', {
+          roomId,
+        });
         try {
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
+          console.log('[ChatRoomPage] データ取得完了:', {
+            hasRoom: !!room,
+            messagesCount: roomMessages.length,
+          });
           if (!room) {
+            console.log('[ChatRoomPage] ルームが見つかりません:', { roomId });
             notFound();
           }
           setRoomData(room);
@@ -52,14 +68,21 @@ export default function Page() {
             setOtherUsers([]);
           }
         } catch (error) {
-          console.error('Failed to fetch room data:', error);
+          console.error('[ChatRoomPage] データ取得エラー:', error);
         }
+      } else {
+        console.log('[ChatRoomPage] データ取得スキップ:', {
+          isAuthenticated,
+          walletAddress,
+          roomId,
+          hasFirebaseUser: !!user,
+        });
       }
       setIsDataLoading(false);
     };
 
     fetchRoomData();
-  }, [isAuthenticated, walletAddress, roomId]);
+  }, [isAuthenticated, walletAddress, roomId, user]);
 
   if (isLoading || isDataLoading) {
     return (

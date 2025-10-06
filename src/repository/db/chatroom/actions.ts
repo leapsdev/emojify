@@ -57,22 +57,12 @@ export async function createChatRoom(members: string[]): Promise<string> {
  * @throws {Error} データベースエラー時
  */
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
-  console.log('[getUserRooms] Starting:', {
-    walletAddress,
-    timestamp: new Date().toISOString(),
-  });
-
   try {
     const userRoomsSnapshot = await adminDb
       .ref(`${DB_INDEXES.userRooms}/${walletAddress}`)
       .get();
     const userRooms = userRoomsSnapshot.val() || {};
     const roomIds = Object.keys(userRooms);
-
-    console.log('[getUserRooms] User room IDs retrieved:', {
-      roomIdsCount: roomIds.length,
-      roomIds,
-    });
 
     const rooms: ChatRoom[] = [];
     for (const roomId of roomIds) {
@@ -86,10 +76,6 @@ export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
     }
 
     const result = rooms.sort((a, b) => b.updatedAt - a.updatedAt);
-
-    console.log('[getUserRooms] Completed:', {
-      roomsCount: result.length,
-    });
 
     return result;
   } catch (error) {

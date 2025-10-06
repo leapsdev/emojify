@@ -241,31 +241,13 @@ export async function getUsersWithFriendship(
   friends: Array<User & { walletAddress: string }>;
   others: Array<User & { walletAddress: string }>;
 }> {
-  console.log('[getUsersWithFriendship] Starting:', {
-    currentWalletAddress,
-    timestamp: new Date().toISOString(),
-  });
-
   try {
     const [currentUser, otherUsers] = await Promise.all([
       getUser(currentWalletAddress),
       getOtherUsers(currentWalletAddress),
     ]);
 
-    console.log('[getUsersWithFriendship] User data retrieval completed:', {
-      currentUser: !!currentUser,
-      currentUserHasFriends: !!currentUser?.friends,
-      friendsCount: currentUser?.friends
-        ? Object.keys(currentUser.friends).length
-        : 0,
-      otherUsersCount: otherUsers.length,
-    });
-
     if (!currentUser) {
-      console.log(
-        '[getUsersWithFriendship] Current user not found:',
-        currentWalletAddress,
-      );
       return { friends: [], others: [] };
     }
 
@@ -285,11 +267,6 @@ export async function getUsersWithFriendship(
       friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
       others: others.sort((a, b) => b.updatedAt - a.updatedAt),
     };
-
-    console.log('[getUsersWithFriendship] Completed:', {
-      friendsCount: result.friends.length,
-      othersCount: result.others.length,
-    });
 
     return result;
   } catch (error) {
@@ -312,25 +289,14 @@ export async function autoCreateUserFromFarcaster(
   userData: ProfileForm,
   walletAddress: string,
 ): Promise<void> {
-  console.log('[autoCreateUserFromFarcaster] 開始:', {
-    walletAddress,
-    username: userData.username,
-    timestamp: new Date().toISOString(),
-  });
-
   if (!walletAddress) {
-    console.error('[autoCreateUserFromFarcaster] ウォレットアドレスが必要です');
     throw new Error('Wallet address is required');
   }
 
   try {
     await createUser(userData, walletAddress);
-    console.log('[autoCreateUserFromFarcaster] 完了:', {
-      walletAddress,
-      username: userData.username,
-    });
   } catch (error) {
-    console.error('[autoCreateUserFromFarcaster] エラー:', {
+    console.error('[autoCreateUserFromFarcaster] Error:', {
       error,
       walletAddress,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',

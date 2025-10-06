@@ -16,33 +16,14 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRooms = async () => {
-      console.log('[ChatListPage] Starting to fetch chat rooms:', {
-        isAuthenticated,
-        walletAddress,
-        hasFirebaseUser: !!user,
-        timestamp: new Date().toISOString(),
-      });
-
       if (isAuthenticated && walletAddress && user) {
         try {
-          console.log('[ChatListPage] Calling getUserRooms:', {
-            walletAddress,
-          });
           const userRooms = await getUserRooms(walletAddress);
-          console.log('[ChatListPage] Successfully fetched chat rooms:', {
-            roomsCount: userRooms?.length || 0,
-          });
           setRooms(userRooms || []);
         } catch (error) {
           console.error('[ChatListPage] Error fetching chat rooms:', error);
           setRooms([]);
         }
-      } else {
-        console.log('[ChatListPage] Skipping chat room fetch:', {
-          isAuthenticated,
-          walletAddress,
-          hasFirebaseUser: !!user,
-        });
       }
       setIsDataLoading(false);
     };

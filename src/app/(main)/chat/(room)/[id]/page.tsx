@@ -21,27 +21,11 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRoomData = async () => {
-      console.log('[ChatRoomPage] データ取得開始:', {
-        isAuthenticated,
-        walletAddress,
-        roomId,
-        hasFirebaseUser: !!user,
-        timestamp: new Date().toISOString(),
-      });
-
       if (isAuthenticated && walletAddress && roomId && user) {
-        console.log('[ChatRoomPage] getChatRoomAction呼び出し:', {
-          roomId,
-        });
         try {
           const { room, messages: roomMessages } =
             await getChatRoomAction(roomId);
-          console.log('[ChatRoomPage] データ取得完了:', {
-            hasRoom: !!room,
-            messagesCount: roomMessages.length,
-          });
           if (!room) {
-            console.log('[ChatRoomPage] ルームが見つかりません:', { roomId });
             setIsDataLoading(false);
             notFound();
           }
@@ -72,19 +56,12 @@ export default function Page() {
           // データ取得成功時のみローディング終了
           setIsDataLoading(false);
         } catch (error) {
-          console.error('[ChatRoomPage] データ取得エラー:', error);
+          console.error('[ChatRoomPage] Error fetching room data:', error);
           // エラー時もローディング終了
           setIsDataLoading(false);
         }
-      } else {
-        console.log('[ChatRoomPage] データ取得スキップ:', {
-          isAuthenticated,
-          walletAddress,
-          roomId,
-          hasFirebaseUser: !!user,
-        });
-        // Firebase認証完了を待つため、ローディング継続（setIsDataLoading(false)を呼ばない）
       }
+      // Firebase認証完了を待つため、ローディング継続（setIsDataLoading(false)を呼ばない）
     };
 
     fetchRoomData();

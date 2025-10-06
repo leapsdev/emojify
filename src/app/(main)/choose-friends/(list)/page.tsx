@@ -16,33 +16,13 @@ export default function ChooseFriendsPage() {
 
   useEffect(() => {
     const fetchFriendshipData = async () => {
-      console.log('[ChooseFriendsPage] Starting data fetch:', {
-        isAuthenticated,
-        walletAddress,
-        hasFirebaseUser: !!user,
-        timestamp: new Date().toISOString(),
-      });
-
       if (isAuthenticated && walletAddress && user) {
         try {
-          console.log('[ChooseFriendsPage] Calling getUsersWithFriendship:', {
-            walletAddress,
-          });
           const data = await getUsersWithFriendship(walletAddress);
-          console.log('[ChooseFriendsPage] Data fetch successful:', {
-            friendsCount: data.friends.length,
-            othersCount: data.others.length,
-          });
           setFriendshipData(data);
         } catch (error) {
           console.error('[ChooseFriendsPage] Data fetch error:', error);
         }
-      } else {
-        console.log('[ChooseFriendsPage] Skipping data fetch:', {
-          isAuthenticated,
-          walletAddress,
-          hasFirebaseUser: !!user,
-        });
       }
       setIsDataLoading(false);
     };

@@ -57,24 +57,50 @@ export async function createChatRoom(members: string[]): Promise<string> {
  * @throws {Error} データベースエラー時
  */
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
-  const userRoomsSnapshot = await adminDb
-    .ref(`${DB_INDEXES.userRooms}/${walletAddress}`)
-    .get();
-  const userRooms = userRoomsSnapshot.val() || {};
-  const roomIds = Object.keys(userRooms);
+  console.log('[getUserRooms] 開始:', {
+    walletAddress,
+    timestamp: new Date().toISOString(),
+  });
 
-  const rooms: ChatRoom[] = [];
-  for (const roomId of roomIds) {
-    const roomSnapshot = await adminDb
-      .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+  try {
+    const userRoomsSnapshot = await adminDb
+      .ref(`${DB_INDEXES.userRooms}/${walletAddress}`)
       .get();
-    const room = roomSnapshot.val() as ChatRoom;
-    if (room) {
-      rooms.push(room);
-    }
-  }
+    const userRooms = userRoomsSnapshot.val() || {};
+    const roomIds = Object.keys(userRooms);
 
-  return rooms.sort((a, b) => b.updatedAt - a.updatedAt);
+    console.log('[getUserRooms] ユーザーのルームID取得完了:', {
+      roomIdsCount: roomIds.length,
+      roomIds,
+    });
+
+    const rooms: ChatRoom[] = [];
+    for (const roomId of roomIds) {
+      const roomSnapshot = await adminDb
+        .ref(`${DB_PATHS.chatRooms}/${roomId}`)
+        .get();
+      const room = roomSnapshot.val() as ChatRoom;
+      if (room) {
+        rooms.push(room);
+      }
+    }
+
+    const result = rooms.sort((a, b) => b.updatedAt - a.updatedAt);
+
+    console.log('[getUserRooms] 完了:', {
+      roomsCount: result.length,
+    });
+
+    return result;
+  } catch (error) {
+    console.error('[getUserRooms] エラー発生:', {
+      error,
+      walletAddress,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw error;
+  }
 }
 
 /**

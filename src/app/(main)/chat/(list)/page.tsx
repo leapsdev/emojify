@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [rooms, setRooms] = useState<ChatRoom[]>([]);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [authRecoveryAttempted, setAuthRecoveryAttempted] = useState(false);
@@ -16,20 +16,39 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRooms = async () => {
-      if (isAuthenticated && walletAddress) {
+      console.log('[ChatListPage] チャットルーム取得開始:', {
+        isAuthenticated,
+        walletAddress,
+        hasFirebaseUser: !!user,
+        timestamp: new Date().toISOString(),
+      });
+
+      if (isAuthenticated && walletAddress && user) {
         try {
+          console.log('[ChatListPage] getUserRooms呼び出し:', {
+            walletAddress,
+          });
           const userRooms = await getUserRooms(walletAddress);
+          console.log('[ChatListPage] チャットルーム取得成功:', {
+            roomsCount: userRooms?.length || 0,
+          });
           setRooms(userRooms || []);
         } catch (error) {
-          console.error('Failed to fetch rooms:', error);
+          console.error('[ChatListPage] チャットルーム取得エラー:', error);
           setRooms([]);
         }
+      } else {
+        console.log('[ChatListPage] チャットルーム取得スキップ:', {
+          isAuthenticated,
+          walletAddress,
+          hasFirebaseUser: !!user,
+        });
       }
       setIsDataLoading(false);
     };
 
     fetchRooms();
-  }, [isAuthenticated, walletAddress]);
+  }, [isAuthenticated, walletAddress, user]);
 
   // Mini App環境での認証状態復旧を待つ
   useEffect(() => {

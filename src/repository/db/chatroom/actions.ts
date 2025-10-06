@@ -57,7 +57,7 @@ export async function createChatRoom(members: string[]): Promise<string> {
  * @throws {Error} データベースエラー時
  */
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
-  console.log('[getUserRooms] 開始:', {
+  console.log('[getUserRooms] Starting:', {
     walletAddress,
     timestamp: new Date().toISOString(),
   });
@@ -69,7 +69,7 @@ export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
     const userRooms = userRoomsSnapshot.val() || {};
     const roomIds = Object.keys(userRooms);
 
-    console.log('[getUserRooms] ユーザーのルームID取得完了:', {
+    console.log('[getUserRooms] User room IDs retrieved:', {
       roomIdsCount: roomIds.length,
       roomIds,
     });
@@ -87,13 +87,13 @@ export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
 
     const result = rooms.sort((a, b) => b.updatedAt - a.updatedAt);
 
-    console.log('[getUserRooms] 完了:', {
+    console.log('[getUserRooms] Completed:', {
       roomsCount: result.length,
     });
 
     return result;
   } catch (error) {
-    console.error('[getUserRooms] エラー発生:', {
+    console.error('[getUserRooms] Error occurred:', {
       error,
       walletAddress,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',

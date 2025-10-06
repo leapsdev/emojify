@@ -139,7 +139,7 @@ const ChainSwitchButton = () => {
         try {
           await switchChain({ chainId: defaultChain.id });
         } catch (error) {
-          console.error('デフォルトチェーン切り替えに失敗しました:', error);
+          console.error('Failed to switch to default chain:', error);
         }
         return;
       }
@@ -150,7 +150,7 @@ const ChainSwitchButton = () => {
         try {
           await switchChain({ chainId: targetChain.id });
         } catch (error) {
-          console.error('自動チェーン切り替えに失敗しました:', error);
+          console.error('Failed to switch chain automatically:', error);
         }
       }
     };
@@ -164,7 +164,7 @@ const ChainSwitchButton = () => {
       await switchChain({ chainId });
       setIsDropdownOpen(false);
     } catch (error) {
-      console.error('チェーン切替に失敗しました:', error);
+      console.error('Failed to switch chain:', error);
     }
   };
 

@@ -241,7 +241,7 @@ export async function getUsersWithFriendship(
   friends: Array<User & { walletAddress: string }>;
   others: Array<User & { walletAddress: string }>;
 }> {
-  console.log('[getUsersWithFriendship] 開始:', {
+  console.log('[getUsersWithFriendship] Starting:', {
     currentWalletAddress,
     timestamp: new Date().toISOString(),
   });
@@ -252,7 +252,7 @@ export async function getUsersWithFriendship(
       getOtherUsers(currentWalletAddress),
     ]);
 
-    console.log('[getUsersWithFriendship] ユーザーデータ取得完了:', {
+    console.log('[getUsersWithFriendship] User data retrieval completed:', {
       currentUser: !!currentUser,
       currentUserHasFriends: !!currentUser?.friends,
       friendsCount: currentUser?.friends
@@ -263,7 +263,7 @@ export async function getUsersWithFriendship(
 
     if (!currentUser) {
       console.log(
-        '[getUsersWithFriendship] 現在のユーザーが見つかりません:',
+        '[getUsersWithFriendship] Current user not found:',
         currentWalletAddress,
       );
       return { friends: [], others: [] };
@@ -286,14 +286,14 @@ export async function getUsersWithFriendship(
       others: others.sort((a, b) => b.updatedAt - a.updatedAt),
     };
 
-    console.log('[getUsersWithFriendship] 完了:', {
+    console.log('[getUsersWithFriendship] Completed:', {
       friendsCount: result.friends.length,
       othersCount: result.others.length,
     });
 
     return result;
   } catch (error) {
-    console.error('[getUsersWithFriendship] エラー発生:', {
+    console.error('[getUsersWithFriendship] Error occurred:', {
       error,
       currentWalletAddress,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',

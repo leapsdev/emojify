@@ -16,7 +16,7 @@ export default function Page() {
 
   useEffect(() => {
     const fetchRooms = async () => {
-      console.log('[ChatListPage] チャットルーム取得開始:', {
+      console.log('[ChatListPage] Starting to fetch chat rooms:', {
         isAuthenticated,
         walletAddress,
         hasFirebaseUser: !!user,
@@ -25,20 +25,20 @@ export default function Page() {
 
       if (isAuthenticated && walletAddress && user) {
         try {
-          console.log('[ChatListPage] getUserRooms呼び出し:', {
+          console.log('[ChatListPage] Calling getUserRooms:', {
             walletAddress,
           });
           const userRooms = await getUserRooms(walletAddress);
-          console.log('[ChatListPage] チャットルーム取得成功:', {
+          console.log('[ChatListPage] Successfully fetched chat rooms:', {
             roomsCount: userRooms?.length || 0,
           });
           setRooms(userRooms || []);
         } catch (error) {
-          console.error('[ChatListPage] チャットルーム取得エラー:', error);
+          console.error('[ChatListPage] Error fetching chat rooms:', error);
           setRooms([]);
         }
       } else {
-        console.log('[ChatListPage] チャットルーム取得スキップ:', {
+        console.log('[ChatListPage] Skipping chat room fetch:', {
           isAuthenticated,
           walletAddress,
           hasFirebaseUser: !!user,

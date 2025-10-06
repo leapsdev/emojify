@@ -61,7 +61,7 @@ export async function verifyFirebaseCustomToken(
     const decodedToken = await getAuth().verifyIdToken(customToken);
     return decodedToken.uid;
   } catch (error) {
-    console.error('Firebaseトークン検証エラー:', error);
+    console.error('Firebase token verification error:', error);
     throw new Error('Firebase認証トークンの検証に失敗しました');
   }
 }

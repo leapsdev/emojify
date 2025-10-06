@@ -69,7 +69,7 @@ export function useFarcasterAuth() {
         error: result.error,
       }));
     } catch (error) {
-      console.error('Farcaster SDK初期化エラー:', error);
+      console.error('Farcaster SDK initialization error:', error);
       setState((prev) => ({
         ...prev,
         isSDKLoaded: true,
@@ -126,7 +126,7 @@ export function useFarcasterAuth() {
           }
         } catch {}
       } catch (tokenError) {
-        console.error('Farcaster SDK token取得エラー:', tokenError);
+        console.error('Farcaster SDK token retrieval error:', tokenError);
 
         // CORSエラーまたはネットワークエラーの場合の詳細なエラーメッセージ
         if (tokenError instanceof Error) {
@@ -181,7 +181,10 @@ export function useFarcasterAuth() {
             walletAddress = accounts?.[0] || null;
           }
         } catch (fallbackError) {
-          console.error('ウォレットアドレス取得完全失敗:', fallbackError);
+          console.error(
+            'Wallet address retrieval completely failed:',
+            fallbackError,
+          );
         }
       }
 
@@ -199,7 +202,7 @@ export function useFarcasterAuth() {
 
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
-        console.error('Firebaseトークン取得エラー:', {
+        console.error('Firebase token retrieval error:', {
           status: response.status,
           statusText: response.statusText,
           errorData,
@@ -220,7 +223,7 @@ export function useFarcasterAuth() {
         isLoading: false,
       }));
     } catch (error) {
-      console.error('Farcaster認証エラー:', error);
+      console.error('Farcaster authentication error:', error);
       setState((prev) => ({
         ...prev,
         isLoading: false,

@@ -49,7 +49,7 @@ function ProfilePageContent({
   } = useUnifiedAuth();
 
   // 認証状態の詳細ログ
-  console.log('ProfilePage認証状態詳細:', {
+  console.log('ProfilePage detailed authentication state:', {
     isAuthenticated,
     isLoading,
     authWalletAddress,

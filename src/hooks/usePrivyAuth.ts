@@ -74,7 +74,7 @@ export function usePrivyAuth() {
         // Firebaseにカスタムトークンでサインイン
         await signInWithCustomToken(auth, token);
       } catch (error) {
-        console.error('Firebase認証同期エラー:', error);
+        console.error('Firebase authentication sync error:', error);
         setState((prev) => ({
           ...prev,
           isLoading: false,
@@ -106,7 +106,7 @@ export function usePrivyAuth() {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error('Firebaseサインアウトエラー:', error);
+      console.error('Firebase sign out error:', error);
     }
   };
 

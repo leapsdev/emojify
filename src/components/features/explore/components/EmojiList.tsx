@@ -2,7 +2,7 @@
 
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Loading } from '@/components/ui/Loading';
-import { usePrivy } from '@privy-io/react-auth';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
@@ -13,7 +13,7 @@ export function EmojiList() {
 
 function EmojiListContent() {
   const { nfts, loading, error } = useExploreNFTs();
-  const { authenticated } = usePrivy();
+  const { isAuthenticated } = useUnifiedAuth();
 
   // フィルタリングとメモ化
   const filteredNFTs = useMemo(() => {
@@ -28,7 +28,7 @@ function EmojiListContent() {
     );
   }
 
-  if (!authenticated) {
+  if (!isAuthenticated) {
     return <WalletConnectButton />;
   }
 

@@ -8,51 +8,60 @@ import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 
 export default function Page() {
-  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const router = useRouter();
 
   useEffect(() => {
-    console.log('[Profile page] Fetching user data triggered:', {
+    console.log('Profile page - Auth state:', {
       isAuthenticated,
+      isLoading,
       walletAddress,
+      user: !!user,
+      userUid: user?.uid,
     });
 
-    // ウォレットアドレスが変更された場合は、必ずデータを再取得
+    // Firebase認証が完了してからデータを取得
+    if (!isAuthenticated || !walletAddress) {
+      console.log(
+        'Skipping user data fetch - not authenticated or no wallet address',
+      );
+      setIsDataLoading(false);
+      return;
+    }
+
+    // Firebase認証が完了するまで待機
+    if (!user) {
+      console.log(
+        'Waiting for Firebase authentication to complete before fetching user data',
+      );
+      return; // ローディング状態を維持
+    }
+
     const fetchUserData = async () => {
-      // 認証チェック
-      if (!isAuthenticated || !walletAddress) {
-        console.log(
-          '[Profile page] Skipping user data fetch - not authenticated or no wallet address',
-        );
-        setUserData(null);
-        setIsDataLoading(false);
-        return;
-      }
-
-      // ローディング開始
-      setIsDataLoading(true);
-      console.log('[Profile page] Fetching user data for:', walletAddress);
-
+      console.log('Fetching user data for:', walletAddress);
       try {
+        // Firebase認証が完了していることを確認
+        if (user.uid !== walletAddress) {
+          console.warn('Firebase UID and wallet address mismatch:', {
+            firebaseUid: user.uid,
+            walletAddress,
+          });
+        }
+
         const data = await getUser(walletAddress);
-        console.log('[Profile page] User data fetched:', {
-          walletAddress,
-          hasData: !!data,
-          username: data?.username,
-        });
+        console.log('User data fetched:', data);
         setUserData(data);
       } catch (error) {
-        console.error('[Profile page] Failed to fetch user data:', error);
-        setUserData(null);
+        console.error('Failed to fetch user data:', error);
       } finally {
         setIsDataLoading(false);
       }
     };
 
     fetchUserData();
-  }, [isAuthenticated, walletAddress]);
+  }, [isAuthenticated, walletAddress, isLoading, user]);
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated) {

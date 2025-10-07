@@ -12,8 +12,9 @@ export const config = createConfig({
   chains: [isProd ? base : baseSepolia],
   connectors: [], // Mini App環境ではFarcaster SDKを直接使用
   transports: {
-    [base.id]: http(),
-    [baseSepolia.id]: http(),
+    // 公開RPCエンドポイントを使用（読み取り専用操作用）
+    [base.id]: http('https://mainnet.base.org'),
+    [baseSepolia.id]: http('https://sepolia.base.org'),
   },
   // WalletConnectの重複初期化を防ぐ設定
   multiInjectedProviderDiscovery: false,

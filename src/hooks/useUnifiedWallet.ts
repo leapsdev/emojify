@@ -41,7 +41,12 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
 
   // Farcaster ウォレットの初期化と情報取得
   const initializeFarcasterWallet = useCallback(async () => {
+    console.log('[useUnifiedWallet] initializeFarcasterWallet called', {
+      isMiniApp,
+    });
+
     if (!isMiniApp) {
+      console.log('[useUnifiedWallet] Skipping: not in MiniApp environment');
       return;
     }
 
@@ -134,8 +139,12 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
         }
       }
 
-      console.log('Final extracted address:', address);
-      console.log('Farcaster wallet initialized:', { address, provider });
+      console.log('[useUnifiedWallet] Final extracted address:', address);
+      console.log('[useUnifiedWallet] Farcaster wallet initialized:', {
+        address,
+        hasProvider: !!provider,
+        providerType: typeof provider,
+      });
 
       setFarcasterWallet({
         address,
@@ -163,11 +172,12 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
 
   // 環境に応じて適切なウォレット情報を返す
   if (isMiniApp) {
-    console.log('Using Farcaster wallet:', {
+    console.log('[useUnifiedWallet] Using Farcaster wallet:', {
       address: farcasterWallet.address,
       isConnected: !!farcasterWallet.address,
       isLoading: farcasterWallet.isLoading,
       error: farcasterWallet.error,
+      isMiniApp,
     });
 
     return {
@@ -180,9 +190,10 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
   }
 
   // Web環境 (Privy + Wagmi)
-  console.log('Using Privy wallet:', {
+  console.log('[useUnifiedWallet] Using Privy wallet:', {
     address: wagmiAddress,
     isConnected: !!wagmiAddress,
+    isMiniApp,
   });
 
   return {

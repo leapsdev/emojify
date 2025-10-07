@@ -7,7 +7,6 @@ import { ProfileMenu } from '@/components/features/choose-friends/ProfileMenu';
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { ProfileTabs } from '@/components/features/profile/ProfileTabs';
 import { UserProfile } from '@/components/features/profile/UserProfile';
-import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
@@ -38,7 +37,6 @@ function ProfilePageContent({
   const rightContent = isOwnProfile ? <ProfileMenu /> : null;
   const { address } = useWallet();
   const { nfts, error } = useGlobalNFTs();
-  const { isMiniApp } = useIsMiniApp();
   const [createdNFTs, setCreatedNFTs] = useState<NFT[]>([]);
   const [collectedNFTs, setCollectedNFTs] = useState<NFT[]>([]);
   const [isLoadingCreated, setIsLoadingCreated] = useState(false);
@@ -71,19 +69,7 @@ function ProfilePageContent({
 
   useEffect(() => {
     const fetchNFTs = async () => {
-      console.log('[ProfilePage] NFT fetch started:', {
-        address,
-        nftsCount: nfts.length,
-        isMiniApp,
-      });
-
-      if (!address || !nfts.length) {
-        console.log('[ProfilePage] Skipping NFT fetch:', {
-          hasAddress: !!address,
-          hasNfts: !!nfts.length,
-        });
-        return;
-      }
+      if (!address || !nfts.length) return;
 
       setIsLoadingCreated(true);
       setIsLoadingCollected(true);
@@ -94,18 +80,11 @@ function ProfilePageContent({
 
         for (const nft of nfts) {
           try {
-            console.log(`[ProfilePage] Processing NFT ${nft.tokenId}`, {
-              address,
-              tokenId: nft.tokenId,
-            });
-
             const balance = (await readContract(config, {
               ...emojiContract,
               functionName: 'balanceOf',
               args: [address as `0x${string}`, BigInt(nft.tokenId)],
             })) as bigint;
-
-            console.log(`[ProfilePage] NFT ${nft.tokenId} balance:`, balance);
 
             if (Number(balance) > 0) {
               const minter = (await readContract(config, {
@@ -115,12 +94,6 @@ function ProfilePageContent({
               })) as string;
               const isCreator = minter.toLowerCase() === address.toLowerCase();
 
-              console.log(`[ProfilePage] NFT ${nft.tokenId} minter info:`, {
-                minter,
-                isCreator,
-                currentAddress: address,
-              });
-
               if (isCreator) {
                 created.push(nft);
               } else {
@@ -128,30 +101,14 @@ function ProfilePageContent({
               }
             }
           } catch (err) {
-            console.error(
-              `[ProfilePage] Error processing NFT ${nft.tokenId}:`,
-              {
-                error: err,
-                message: err instanceof Error ? err.message : 'Unknown error',
-                stack: err instanceof Error ? err.stack : undefined,
-              },
-            );
+            console.error(`Error processing NFT ${nft.tokenId}:`, err);
           }
         }
-
-        console.log('[ProfilePage] NFT fetch completed:', {
-          createdCount: created.length,
-          collectedCount: collected.length,
-        });
 
         setCreatedNFTs(created);
         setCollectedNFTs(collected);
       } catch (err) {
-        console.error('[ProfilePage] Error fetching NFTs:', {
-          error: err,
-          message: err instanceof Error ? err.message : 'Unknown error',
-          stack: err instanceof Error ? err.stack : undefined,
-        });
+        console.error('Error fetching NFTs:', err);
       } finally {
         setIsLoadingCreated(false);
         setIsLoadingCollected(false);
@@ -159,7 +116,7 @@ function ProfilePageContent({
     };
 
     fetchNFTs();
-  }, [address, nfts, isMiniApp]);
+  }, [address, nfts]);
 
   if (!isAuthenticated) {
     return <WalletConnectButton />;

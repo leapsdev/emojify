@@ -62,29 +62,14 @@ export function useUnifiedAuth(): UnifiedAuthState {
     if (isMiniApp) {
       // Firebase認証が失敗していてもFarcaster認証が成功している場合はウォレットアドレスを返す
       if (isFarcasterAuthenticated === true) {
-        console.log('[useUnifiedAuth] Farcaster wallet address:', {
-          unifiedWalletAddress,
-          isFarcasterAuthenticated,
-        });
         return unifiedWalletAddress || null;
       }
     } else {
       if (isPrivyAuthenticated && isPrivyFirebaseAuthenticated) {
-        console.log('[useUnifiedAuth] Privy wallet address:', {
-          unifiedWalletAddress,
-          isPrivyAuthenticated,
-          isPrivyFirebaseAuthenticated,
-        });
         return unifiedWalletAddress || null;
       }
     }
 
-    console.log('[useUnifiedAuth] No wallet address available:', {
-      isMiniApp,
-      isFarcasterAuthenticated,
-      isPrivyAuthenticated,
-      isPrivyFirebaseAuthenticated,
-    });
     return null;
   }, [
     isMiniApp,

@@ -1,5 +1,67 @@
 import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 import { emojiContract } from '@/lib/contracts';
+import { encodeFunctionData } from 'viem';
+
+type WalletClient = unknown;
+
+// Privy環境のWalletClientかどうかを判定
+const isPrivyWallet = (
+  walletClient: WalletClient,
+): walletClient is {
+  writeContract: (...args: unknown[]) => Promise<unknown>;
+} => {
+  return (
+    !!walletClient &&
+    typeof walletClient === 'object' &&
+    walletClient !== null &&
+    'writeContract' in walletClient
+  );
+};
+
+// Privy環境でトランザクションを送信
+const sendTransactionViaPrivy = async (
+  walletClient: WalletClient,
+  address: string,
+  metadataUrl: string,
+): Promise<string> => {
+  return (await (
+    walletClient as {
+      writeContract: (...args: unknown[]) => Promise<unknown>;
+    }
+  ).writeContract({
+    ...emojiContract,
+    functionName: 'registerNewEmoji',
+    args: [address as `0x${string}`, metadataUrl, '0x' as `0x${string}`],
+  })) as string;
+};
+
+// Farcaster環境でトランザクションを送信
+const sendTransactionViaFarcaster = async (
+  walletClient: WalletClient,
+  address: string,
+  metadataUrl: string,
+): Promise<string> => {
+  const data = encodeFunctionData({
+    abi: emojiContract.abi,
+    functionName: 'registerNewEmoji',
+    args: [address as `0x${string}`, metadataUrl, '0x' as `0x${string}`],
+  });
+
+  return (await (
+    walletClient as {
+      request: (...args: unknown[]) => Promise<unknown>;
+    }
+  ).request({
+    method: 'eth_sendTransaction',
+    params: [
+      {
+        from: address,
+        to: emojiContract.address,
+        data,
+      },
+    ],
+  })) as string;
+};
 
 export const useEmojiMint = () => {
   const { address, walletClient } = useUnifiedWallet();
@@ -10,40 +72,12 @@ export const useEmojiMint = () => {
     }
 
     try {
-      // Farcaster環境では EIP-1193 プロバイダー、Wagmi環境ではWalletClientを使用
-      const transactionHash =
-        walletClient &&
-        typeof walletClient === 'object' &&
-        walletClient !== null &&
-        'writeContract' in walletClient
-          ? await (
-              walletClient as {
-                writeContract: (...args: unknown[]) => Promise<unknown>;
-              }
-            ).writeContract({
-              ...emojiContract,
-              functionName: 'registerNewEmoji',
-              args: [
-                address as `0x${string}`,
-                metadataUrl,
-                '0x' as `0x${string}`,
-              ],
-            })
-          : await (
-              walletClient as {
-                request: (...args: unknown[]) => Promise<unknown>;
-              }
-            ).request({
-              method: 'eth_sendTransaction',
-              params: [
-                {
-                  to: emojiContract.address,
-                  data: `${emojiContract.abi}`,
-                },
-              ],
-            });
+      // 環境に応じてトランザクション送信方法を選択
+      const transactionHash = isPrivyWallet(walletClient)
+        ? await sendTransactionViaPrivy(walletClient, address, metadataUrl)
+        : await sendTransactionViaFarcaster(walletClient, address, metadataUrl);
 
-      return { transactionHash: transactionHash as string };
+      return { transactionHash };
     } catch (error: unknown) {
       const e = error as { code?: number; message?: string };
       if (e.code === 4001) {

@@ -8,6 +8,82 @@ import { emojiContract } from '@/lib/contracts';
 import { readContract } from '@wagmi/core';
 import { Plus } from 'lucide-react';
 import { useState } from 'react';
+import { encodeFunctionData } from 'viem';
+
+type WalletClient = unknown;
+
+// Privy環境のWalletClientかどうかを判定
+const isPrivyWallet = (
+  walletClient: WalletClient,
+): walletClient is {
+  writeContract: (...args: unknown[]) => Promise<unknown>;
+} => {
+  return (
+    !!walletClient &&
+    typeof walletClient === 'object' &&
+    walletClient !== null &&
+    'writeContract' in walletClient
+  );
+};
+
+// Privy環境でCollectトランザクションを送信
+const sendCollectTransactionViaPrivy = async (
+  walletClient: WalletClient,
+  address: string,
+  tokenId: string,
+  valueToSend: bigint,
+): Promise<string> => {
+  return (await (
+    walletClient as {
+      writeContract: (...args: unknown[]) => Promise<unknown>;
+    }
+  ).writeContract({
+    ...emojiContract,
+    functionName: 'addEmojiSupply',
+    args: [
+      address as `0x${string}`,
+      BigInt(tokenId),
+      BigInt(1),
+      '0x' as `0x${string}`,
+    ],
+    value: valueToSend,
+  })) as string;
+};
+
+// Farcaster環境でCollectトランザクションを送信
+const sendCollectTransactionViaFarcaster = async (
+  walletClient: WalletClient,
+  address: string,
+  tokenId: string,
+  valueToSend: bigint,
+): Promise<string> => {
+  const data = encodeFunctionData({
+    abi: emojiContract.abi,
+    functionName: 'addEmojiSupply',
+    args: [
+      address as `0x${string}`,
+      BigInt(tokenId),
+      BigInt(1),
+      '0x' as `0x${string}`,
+    ],
+  });
+
+  return (await (
+    walletClient as {
+      request: (...args: unknown[]) => Promise<unknown>;
+    }
+  ).request({
+    method: 'eth_sendTransaction',
+    params: [
+      {
+        from: address,
+        to: emojiContract.address,
+        value: `0x${valueToSend.toString(16)}`,
+        data,
+      },
+    ],
+  })) as string;
+};
 
 interface Props {
   tokenId: string;
@@ -47,43 +123,22 @@ export function CollectButton({ tokenId }: Props) {
 
       const valueToSend = isFirstMinter ? BigInt(0) : BigInt('500000000000000'); // 0.0005 ETH in wei
 
-      // NFTを取得
-      const hash =
-        walletClient &&
-        typeof walletClient === 'object' &&
-        walletClient !== null &&
-        'writeContract' in walletClient
-          ? await (
-              walletClient as {
-                writeContract: (...args: unknown[]) => Promise<unknown>;
-              }
-            ).writeContract({
-              ...emojiContract,
-              functionName: 'addEmojiSupply',
-              args: [
-                address as `0x${string}`,
-                BigInt(tokenId),
-                BigInt(1),
-                '0x' as `0x${string}`,
-              ],
-              value: valueToSend,
-            })
-          : await (
-              walletClient as {
-                request: (...args: unknown[]) => Promise<unknown>;
-              }
-            ).request({
-              method: 'eth_sendTransaction',
-              params: [
-                {
-                  to: emojiContract.address,
-                  value: `0x${valueToSend.toString(16)}`,
-                  data: '0x',
-                },
-              ],
-            });
+      // 環境に応じてトランザクション送信方法を選択
+      const hash = isPrivyWallet(walletClient)
+        ? await sendCollectTransactionViaPrivy(
+            walletClient,
+            address,
+            tokenId,
+            valueToSend,
+          )
+        : await sendCollectTransactionViaFarcaster(
+            walletClient,
+            address,
+            tokenId,
+            valueToSend,
+          );
 
-      setCollectResult({ result: 'success', transactionHash: hash as string });
+      setCollectResult({ result: 'success', transactionHash: hash });
     } catch (error: unknown) {
       setCollectResult({ result: 'error' });
       console.error('Collect error:', error);

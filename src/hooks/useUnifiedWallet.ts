@@ -154,12 +154,60 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
     }
   }, [isMiniApp]);
 
-  // Mini App環境でのウォレット初期化
+  // Mini App環境でのウォレット初期化とアカウント変更監視
   useEffect(() => {
-    if (isMiniApp) {
-      initializeFarcasterWallet();
+    if (!isMiniApp) {
+      return;
     }
-  }, [isMiniApp, initializeFarcasterWallet]);
+
+    initializeFarcasterWallet();
+
+    // EIP-1193 accountsChanged イベントをリスン
+    const setupAccountsListener = async () => {
+      try {
+        const sdk = getFarcasterSDK();
+        if (!sdk) {
+          return;
+        }
+
+        const provider = await sdk.wallet.getEthereumProvider();
+        if (!provider || typeof provider.on !== 'function') {
+          console.log('Provider does not support event listeners');
+          return;
+        }
+
+        const handleAccountsChanged = (accounts: readonly `0x${string}`[]) => {
+          console.log('🔄 Accounts changed event detected:', accounts);
+          const newAddress = accounts?.[0];
+
+          if (newAddress && newAddress !== farcasterWallet.address) {
+            console.log(
+              'New address detected, reinitializing wallet:',
+              newAddress,
+            );
+            // ウォレットアドレスが変更されたら再初期化
+            initializeFarcasterWallet();
+          }
+        };
+
+        provider.on('accountsChanged', handleAccountsChanged);
+
+        return () => {
+          if (typeof provider.removeListener === 'function') {
+            provider.removeListener('accountsChanged', handleAccountsChanged);
+          }
+        };
+      } catch (error) {
+        console.error('Failed to setup accounts listener:', error);
+      }
+    };
+
+    const cleanup = setupAccountsListener();
+
+    return () => {
+      cleanup?.then((cleanupFn) => cleanupFn?.());
+    };
+  }, [isMiniApp, initializeFarcasterWallet, farcasterWallet.address]);
 
   // 環境に応じて適切なウォレット情報を返す
   if (isMiniApp) {

@@ -27,6 +27,7 @@ export default function Page() {
       console.log(
         'Skipping user data fetch - not authenticated or no wallet address',
       );
+      setUserData(null); // データをクリア
       setIsDataLoading(false);
       return;
     }
@@ -39,22 +40,31 @@ export default function Page() {
       return; // ローディング状態を維持
     }
 
+    // Firebase UIDとウォレットアドレスの一致を確認
+    if (user.uid !== walletAddress) {
+      console.log(
+        '⚠️ Firebase UID and wallet address mismatch - waiting for re-authentication:',
+        {
+          firebaseUid: user.uid,
+          walletAddress,
+        },
+      );
+      // 不一致の場合は再認証を待つ（データはクリア）
+      setUserData(null);
+      setIsDataLoading(true);
+      return;
+    }
+
     const fetchUserData = async () => {
       console.log('Fetching user data for:', walletAddress);
+      setIsDataLoading(true); // 取得開始時にローディング状態にする
       try {
-        // Firebase認証が完了していることを確認
-        if (user.uid !== walletAddress) {
-          console.warn('Firebase UID and wallet address mismatch:', {
-            firebaseUid: user.uid,
-            walletAddress,
-          });
-        }
-
         const data = await getUser(walletAddress);
         console.log('User data fetched:', data);
         setUserData(data);
       } catch (error) {
         console.error('Failed to fetch user data:', error);
+        setUserData(null);
       } finally {
         setIsDataLoading(false);
       }

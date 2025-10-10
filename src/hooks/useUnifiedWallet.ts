@@ -2,7 +2,7 @@ import { useIsMiniApp } from '@/components/providers/AuthProvider';
 
 import { config } from '@/lib/basename/wagmi';
 import { getFarcasterSDK } from '@/lib/farcaster';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import type { WalletClient } from 'viem';
 import { useAccount, useWalletClient } from 'wagmi';
 
@@ -38,6 +38,9 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
     isLoading: false,
     error: null,
   });
+
+  // 前回のウォレットアドレスを追跡（無限ループを防ぐため）
+  const previousAddressRef = useRef<string | undefined>(undefined);
 
   // Farcaster ウォレットの初期化と情報取得
   const initializeFarcasterWallet = useCallback(async () => {
@@ -154,11 +157,61 @@ export const useUnifiedWallet = (): UnifiedWalletReturn => {
     }
   }, [isMiniApp]);
 
-  // Mini App環境でのウォレット初期化
+  // Mini App環境でのウォレット初期化とアカウント変更監視
   useEffect(() => {
-    if (isMiniApp) {
-      initializeFarcasterWallet();
+    if (!isMiniApp) {
+      return;
     }
+
+    initializeFarcasterWallet();
+
+    // accountsChanged イベントのリスナーを設定
+    const setupAccountsListener = async () => {
+      try {
+        const sdk = getFarcasterSDK();
+        if (!sdk) {
+          console.log('SDK not available for accounts listener');
+          return;
+        }
+
+        const provider = await sdk.wallet.getEthereumProvider();
+        if (!provider || typeof provider.on !== 'function') {
+          console.log('Provider does not support event listeners');
+          return;
+        }
+
+        const handleAccountsChanged = (accounts: readonly `0x${string}`[]) => {
+          const newAddress = accounts?.[0];
+          console.log('🔄 accountsChanged event detected:', {
+            newAddress,
+            previousAddress: previousAddressRef.current,
+          });
+
+          // アドレスが実際に変更された場合のみ再初期化
+          if (newAddress && newAddress !== previousAddressRef.current) {
+            console.log('Wallet address changed, reinitializing...');
+            previousAddressRef.current = newAddress;
+            initializeFarcasterWallet();
+          }
+        };
+
+        provider.on('accountsChanged', handleAccountsChanged);
+
+        return () => {
+          if (typeof provider.removeListener === 'function') {
+            provider.removeListener('accountsChanged', handleAccountsChanged);
+          }
+        };
+      } catch (error) {
+        console.error('Failed to setup accounts listener:', error);
+      }
+    };
+
+    const cleanup = setupAccountsListener();
+
+    return () => {
+      cleanup?.then((cleanupFn) => cleanupFn?.());
+    };
   }, [isMiniApp, initializeFarcasterWallet]);
 
   // 環境に応じて適切なウォレット情報を返す

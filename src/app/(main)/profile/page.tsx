@@ -5,13 +5,39 @@ import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { getUser } from '@/repository/db/user/clientAction';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export default function Page() {
   const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
   const [userData, setUserData] = useState<User | null>(null);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const router = useRouter();
+
+  // 前回のウォレットアドレスを追跡
+  const previousWalletAddressRef = useRef<string | null>(null);
+
+  // ウォレットアドレス変更を検出してデータをクリア・再取得
+  useEffect(() => {
+    if (walletAddress && previousWalletAddressRef.current) {
+      // ウォレットアドレスが変更された場合
+      if (
+        walletAddress.toLowerCase() !==
+        previousWalletAddressRef.current.toLowerCase()
+      ) {
+        console.log('🔄 Wallet address changed, clearing user data:', {
+          previous: previousWalletAddressRef.current,
+          current: walletAddress,
+        });
+
+        // データをクリアして再取得を促す
+        setUserData(null);
+        setIsDataLoading(true);
+      }
+    }
+
+    // 現在のウォレットアドレスを記録
+    previousWalletAddressRef.current = walletAddress || null;
+  }, [walletAddress]);
 
   useEffect(() => {
     console.log('Profile page - Auth state:', {

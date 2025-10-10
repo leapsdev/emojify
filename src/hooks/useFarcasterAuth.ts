@@ -11,7 +11,7 @@ import {
   onAuthStateChanged,
   signInWithCustomToken,
 } from 'firebase/auth';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 interface FarcasterAuthState extends FarcasterInitializationResult {
   isFarcasterAuthenticated: boolean | undefined; // undefinedを許可
@@ -51,6 +51,9 @@ export function useFarcasterAuth() {
     farcasterPfpUrl: null,
     autoLoginAttempted: false,
   });
+
+  // 最後に認証したウォレットアドレスを追跡（無限ループ防止）
+  const lastAuthenticatedWalletRef = useRef<string | null>(null);
 
   // SDK初期化処理
   const initializeSDK = useCallback(async () => {
@@ -217,6 +220,9 @@ export function useFarcasterAuth() {
       // Firebaseにカスタムトークンでサインイン
       await signInWithCustomToken(auth, customToken);
 
+      // 認証成功時、ウォレットアドレスを記録
+      lastAuthenticatedWalletRef.current = walletAddress;
+
       // 認証成功時はローディング状態を終了
       setState((prev) => ({
         ...prev,
@@ -281,6 +287,78 @@ export function useFarcasterAuth() {
     state.autoLoginAttempted,
     state.isFarcasterAuthenticated,
     authenticateWithFarcaster,
+  ]);
+
+  // ウォレットアドレス変更を検出して再認証
+  // biome-ignore lint/correctness/useExhaustiveDependencies: authenticateWithFarcasterを含めると無限ループが発生するため除外
+  useEffect(() => {
+    // 認証済み状態でのみチェック
+    if (
+      !state.isSDKLoaded ||
+      !state.isReady ||
+      !state.isMiniApp ||
+      state.isFarcasterAuthenticated !== true
+    ) {
+      return;
+    }
+
+    const checkWalletChange = async () => {
+      try {
+        const sdk = getFarcasterSDK();
+        if (!sdk) {
+          return;
+        }
+
+        // 現在のウォレットアドレスを取得
+        const provider = await sdk.wallet.getEthereumProvider();
+        if (!provider) {
+          return;
+        }
+
+        let currentAccounts: string[];
+        try {
+          currentAccounts = (await provider.request({
+            method: 'eth_accounts',
+          })) as string[];
+        } catch {
+          return;
+        }
+
+        const currentAddress = currentAccounts?.[0];
+
+        // ウォレットアドレスが変更された場合のみ再認証
+        if (
+          currentAddress &&
+          lastAuthenticatedWalletRef.current &&
+          currentAddress.toLowerCase() !==
+            lastAuthenticatedWalletRef.current.toLowerCase()
+        ) {
+          console.log('🔄 Wallet address changed, re-authenticating...', {
+            old: lastAuthenticatedWalletRef.current,
+            new: currentAddress,
+          });
+
+          // 再認証を実行
+          await authenticateWithFarcaster();
+        }
+      } catch (error) {
+        console.error('Failed to check wallet change:', error);
+      }
+    };
+
+    // 3秒ごとにウォレットアドレスをチェック
+    const intervalId = setInterval(checkWalletChange, 3000);
+
+    return () => {
+      clearInterval(intervalId);
+    };
+    // authenticateWithFarcasterを依存配列から除外して無限ループを防ぐ
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    state.isSDKLoaded,
+    state.isReady,
+    state.isMiniApp,
+    state.isFarcasterAuthenticated,
   ]);
 
   // 認証状態とFarcasterユーザー情報を返す

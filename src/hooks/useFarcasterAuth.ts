@@ -289,19 +289,20 @@ export function useFarcasterAuth() {
     authenticateWithFarcaster,
   ]);
 
-  // ウォレットアドレス変更を検出して再認証
+  // ウォレットアドレス変更を検出して再認証（EIP-1193イベントのバックアップ）
+  // biome-ignore lint/correctness/useExhaustiveDependencies: authenticateWithFarcasterを含めると無限ループが発生するため除外
   useEffect(() => {
-    const checkWalletChange = async () => {
-      // SDK、認証状態、MiniApp環境をチェック
-      if (
-        !state.isSDKLoaded ||
-        !state.isReady ||
-        !state.isMiniApp ||
-        state.isFarcasterAuthenticated !== true
-      ) {
-        return;
-      }
+    // SDK、認証状態、MiniApp環境をチェック
+    if (
+      !state.isSDKLoaded ||
+      !state.isReady ||
+      !state.isMiniApp ||
+      state.isFarcasterAuthenticated !== true
+    ) {
+      return;
+    }
 
+    const checkWalletChange = async () => {
       try {
         const sdk = getFarcasterSDK();
         if (!sdk) {
@@ -325,11 +326,12 @@ export function useFarcasterAuth() {
 
         const currentAddress = currentAccounts?.[0];
 
-        // ウォレットアドレスが変更された場合、再認証
+        // ウォレットアドレスが変更された場合のみ再認証
         if (
           currentAddress &&
           lastAuthenticatedWalletRef.current &&
-          currentAddress !== lastAuthenticatedWalletRef.current
+          currentAddress.toLowerCase() !==
+            lastAuthenticatedWalletRef.current.toLowerCase()
         ) {
           console.log('🔄 Wallet address changed, re-authenticating...', {
             old: lastAuthenticatedWalletRef.current,
@@ -344,18 +346,19 @@ export function useFarcasterAuth() {
       }
     };
 
-    // 定期的にウォレットアドレスをチェック（accountsChangedイベントのバックアップ）
-    const intervalId = setInterval(checkWalletChange, 2000);
+    // 5秒ごとにウォレットアドレスをチェック（頻度を下げる）
+    const intervalId = setInterval(checkWalletChange, 5000);
 
     return () => {
       clearInterval(intervalId);
     };
+    // authenticateWithFarcasterを依存配列から除外して無限ループを防ぐ
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     state.isSDKLoaded,
     state.isReady,
     state.isMiniApp,
     state.isFarcasterAuthenticated,
-    authenticateWithFarcaster,
   ]);
 
   // 認証状態とFarcasterユーザー情報を返す

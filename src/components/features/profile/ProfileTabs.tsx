@@ -1,11 +1,11 @@
 'use client';
 
 import type { EmojiProps } from '@/components/features/profile/types';
-import { Loading } from '@/components/ui/Loading';
 import { cn } from '@/lib/utils';
 import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
 import { useState } from 'react';
 import { EmojiGrid } from './EmojiGrid';
+import { EmojiGridSkeleton } from './EmojiGridSkeleton';
 
 interface ProfileTabsProps {
   createdEmojis: EmojiProps[];
@@ -53,20 +53,16 @@ export const ProfileTabs = ({
       </div>
 
       <Content value="created" className="p-2">
-        {isLoadingCreated ? (
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <Loading size="lg" />
-          </div>
+        {isLoadingCreated && createdEmojis.length === 0 ? (
+          <EmojiGridSkeleton count={6} />
         ) : (
           <EmojiGrid emojis={createdEmojis} />
         )}
       </Content>
 
       <Content value="collected" className="p-2">
-        {isLoadingCollected ? (
-          <div className="flex items-center justify-center min-h-[60vh]">
-            <Loading size="lg" />
-          </div>
+        {isLoadingCollected && collectedEmojis.length === 0 ? (
+          <EmojiGridSkeleton count={6} />
         ) : (
           <EmojiGrid emojis={collectedEmojis} />
         )}

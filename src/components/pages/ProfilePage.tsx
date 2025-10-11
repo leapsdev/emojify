@@ -75,10 +75,8 @@ function ProfilePageContent({
       setIsLoadingCollected(true);
 
       try {
-        const created: NFT[] = [];
-        const collected: NFT[] = [];
-
-        for (const nft of nfts) {
+        // ストリーミング方式: NFTを処理次第、即座にstateに追加
+        const processPromises = nfts.map(async (nft) => {
           try {
             const balance = (await readContract(config, {
               ...emojiContract,
@@ -94,19 +92,31 @@ function ProfilePageContent({
               })) as string;
               const isCreator = minter.toLowerCase() === address.toLowerCase();
 
+              // 取得次第、即座にstateに追加
               if (isCreator) {
-                created.push(nft);
+                setCreatedNFTs((prev) => {
+                  // 重複チェック: 既に同じtokenIdが存在する場合は追加しない
+                  if (prev.some((item) => item.tokenId === nft.tokenId)) {
+                    return prev;
+                  }
+                  return [...prev, nft];
+                });
               } else {
-                collected.push(nft);
+                setCollectedNFTs((prev) => {
+                  // 重複チェック: 既に同じtokenIdが存在する場合は追加しない
+                  if (prev.some((item) => item.tokenId === nft.tokenId)) {
+                    return prev;
+                  }
+                  return [...prev, nft];
+                });
               }
             }
           } catch (err) {
             console.error(`Error processing NFT ${nft.tokenId}:`, err);
           }
-        }
+        });
 
-        setCreatedNFTs(created);
-        setCollectedNFTs(collected);
+        await Promise.all(processPromises);
       } catch (err) {
         console.error('Error fetching NFTs:', err);
       } finally {
@@ -115,8 +125,23 @@ function ProfilePageContent({
       }
     };
 
+    // Reset NFTs before fetching
+    setCreatedNFTs([]);
+    setCollectedNFTs([]);
     fetchNFTs();
   }, [address, nfts]);
+
+  // 認証状態のローディング中はローディングを表示
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
+          <p>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!isAuthenticated) {
     return <WalletConnectButton />;

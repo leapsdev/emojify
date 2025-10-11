@@ -28,11 +28,16 @@ export function useGlobalNFTs() {
       try {
         setLoading(true);
         setError(null);
+        setNFTs([]); // Reset NFTs on fetch start
+
         const totalSupply = (await readContract(config, {
           ...emojiContract,
           functionName: 'totalSupply',
         })) as bigint;
-        const nftPromises: Promise<NFT | null>[] = [];
+
+        // ストリーミング方式: 取得したNFTから順次表示
+        const fetchPromises: Promise<void>[] = [];
+
         for (let i = 0; i < Number(totalSupply); i++) {
           const tokenId = i + 1;
           const promise = (async () => {
@@ -46,40 +51,56 @@ export function useGlobalNFTs() {
                 })) as string;
               } catch (err) {
                 console.error(`Error fetching URI for token ${tokenId}:`, err);
-                throw new Error(`Failed to fetch URI for token ${tokenId}`);
+                return;
               }
+
               if (!uri) {
-                return {
+                const nft: NFT = {
                   tokenId: tokenId.toString(),
                   name: `NFT #${tokenId}`,
                   imageUrl: '/placeholder.svg',
                   owner: '',
                   uri: '',
                   description: 'URI is not set',
-                } as NFT;
+                };
+
+                // 取得次第、即座にstateに追加
+                setNFTs((prev) => {
+                  // 重複チェック: 既に同じtokenIdが存在する場合は追加しない
+                  if (prev.some((item) => item.tokenId === nft.tokenId)) {
+                    return prev;
+                  }
+                  return [...prev, nft];
+                });
+                return;
               }
+
               // メタデータを取得
               const metadata = await fetchMetadata(uri);
               const imageUrl = metadata.image
                 ? ipfsToHttp(metadata.image)
                 : '/placeholder.svg';
-              return {
+
+              const nft: NFT = {
                 tokenId: tokenId.toString(),
                 name: metadata.name || `NFT #${tokenId}`,
                 imageUrl,
                 owner: '',
                 uri: ipfsToHttp(uri),
                 description: metadata.description || 'No description available',
-              } as NFT;
+              };
+
+              // 取得次第、即座にstateに追加
+              setNFTs((prev) => [...prev, nft]);
             } catch (err) {
               console.error(`Error processing NFT ${tokenId}:`, err);
-              return null;
             }
           })();
-          nftPromises.push(promise);
+          fetchPromises.push(promise);
         }
-        const results = await Promise.all(nftPromises);
-        setNFTs(results.filter(Boolean) as NFT[]);
+
+        // すべてのNFT取得完了を待つ
+        await Promise.all(fetchPromises);
       } catch {
         setError('NFTの取得に失敗しました');
         setNFTs([]);

@@ -1,11 +1,11 @@
 'use client';
 
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
-import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useMemo } from 'react';
 import { useExploreNFTs } from '../hooks/useExploreNFTs';
 import { EmojiItem } from './EmojiItem';
+import { EmojiItemSkeleton } from './EmojiItemSkeleton';
 
 export function EmojiList() {
   return <EmojiListContent />;
@@ -13,19 +13,16 @@ export function EmojiList() {
 
 function EmojiListContent() {
   const { nfts, loading, error } = useExploreNFTs();
-  const { isAuthenticated } = useUnifiedAuth();
+  const { isAuthenticated, isLoading: isAuthLoading } = useUnifiedAuth();
 
   // フィルタリングとメモ化
   const filteredNFTs = useMemo(() => {
     return nfts.filter((nft) => nft.imageUrl);
   }, [nfts]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <Loading size="xl" className="mb-4" />
-      </div>
-    );
+  // 認証状態のローディング中は何も表示しない
+  if (isAuthLoading) {
+    return null;
   }
 
   if (!isAuthenticated) {
@@ -43,9 +40,11 @@ function EmojiListContent() {
   return (
     <div className="p-2 flex-1">
       <div className="grid grid-cols-2 gap-2">
-        {filteredNFTs.map((nft) => (
+        {/* 取得済みのNFTを表示 */}
+        {filteredNFTs.map((nft, index) => (
           <EmojiItem
             key={nft.tokenId}
+            priority={index < 4}
             item={{
               tokenId: nft.tokenId,
               name: nft.name || `Emoji #${nft.tokenId}`,
@@ -63,6 +62,11 @@ function EmojiListContent() {
             }}
           />
         ))}
+        {/* ローディング中はスケルトンを表示 */}
+        {loading &&
+          Array.from({ length: filteredNFTs.length === 0 ? 6 : 2 }).map(
+            (_, index) => <EmojiItemSkeleton key={`skeleton-${index}`} />,
+          )}
       </div>
     </div>
   );

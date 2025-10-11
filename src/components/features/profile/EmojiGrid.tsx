@@ -8,7 +8,7 @@ interface EmojiGridProps {
 export const EmojiGrid = ({ emojis }: EmojiGridProps) => {
   return (
     <div className="grid grid-cols-3 gap-2">
-      {emojis.map((emoji) => (
+      {emojis.map((emoji, index) => (
         <div
           key={emoji.id}
           className="relative aspect-square bg-white rounded-lg p-2"
@@ -20,8 +20,10 @@ export const EmojiGrid = ({ emojis }: EmojiGridProps) => {
                 src={emoji.image || '/icons/faceIcon-192x192.png'}
                 alt={`Emoji ${emoji.id}`}
                 fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                sizes="(max-width: 768px) 33vw, (max-width: 1200px) 25vw, 20vw"
                 className="object-cover rounded-lg"
+                loading={index < 6 ? undefined : 'lazy'}
+                priority={index < 6}
               />
             </div>
             {/* クリエイターアイコン */}
@@ -33,6 +35,7 @@ export const EmojiGrid = ({ emojis }: EmojiGridProps) => {
                   fill
                   sizes="24px"
                   className="object-cover"
+                  loading="lazy"
                 />
               </div>
             </div>

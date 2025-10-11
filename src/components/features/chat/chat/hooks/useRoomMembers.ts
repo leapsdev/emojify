@@ -1,5 +1,6 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom, User } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
@@ -40,18 +41,19 @@ export function useRoomMembers(roomId: string) {
           room.members,
         )) {
           try {
+            const normalizedAddress = normalizeWalletAddress(walletAddress);
             // ユーザー情報を取得
             const userSnapshot = await get(
-              ref(db, `${DB_PATHS.users}/${walletAddress}`),
+              ref(db, `${DB_PATHS.users}/${normalizedAddress}`),
             );
             const user = userSnapshot.val() as User | null;
 
-            membersWithUserInfo[walletAddress] = {
+            membersWithUserInfo[normalizedAddress] = {
               ...memberInfo,
-              walletAddress,
+              walletAddress: normalizedAddress,
               username:
                 user?.username ||
-                `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
+                `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`,
               imageUrl: user?.imageUrl || null,
             };
           } catch (error) {
@@ -59,11 +61,12 @@ export function useRoomMembers(roomId: string) {
               `Failed to fetch user data for ${walletAddress}:`,
               error,
             );
+            const normalizedAddress = normalizeWalletAddress(walletAddress);
             // ユーザー情報が取得できない場合は、ウォレットアドレスを使用
-            membersWithUserInfo[walletAddress] = {
+            membersWithUserInfo[normalizedAddress] = {
               ...memberInfo,
-              walletAddress,
-              username: `${walletAddress.slice(0, 6)}...${walletAddress.slice(-4)}`,
+              walletAddress: normalizedAddress,
+              username: `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`,
               imageUrl: null,
             };
           }

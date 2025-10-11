@@ -1,6 +1,7 @@
 'use client';
 
 import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { User } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
@@ -151,7 +152,9 @@ export const useUserSelection = ({
   const filteredUsers = users.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.walletAddress.toLowerCase().includes(searchQuery.toLowerCase()),
+      normalizeWalletAddress(user.walletAddress).includes(
+        normalizeWalletAddress(searchQuery),
+      ),
   );
 
   // フィルタリングされたユーザーを友達とその他に分類

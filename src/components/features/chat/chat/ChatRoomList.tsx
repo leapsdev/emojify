@@ -1,5 +1,6 @@
 import { DotBadge } from '@/components/ui/DotBadge';
 import { formatRelativeTime } from '@/lib/utils';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import type { ChatRoom as ChatRoomType } from '@/repository/db/database';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -24,8 +25,11 @@ const ChatRoom = ({ room, currentWalletAddress }: ChatRoomProps) => {
   const members = useRoomMembers(room.id);
 
   // メンバー情報を取得（自分以外）
+  const normalizedCurrentAddress = normalizeWalletAddress(currentWalletAddress);
   const otherMembers = Object.entries(members).filter(
-    ([, member]) => (member as Member).walletAddress !== currentWalletAddress,
+    ([, member]) =>
+      normalizeWalletAddress((member as Member).walletAddress) !==
+      normalizedCurrentAddress,
   ) as [string, Member][];
 
   // アバター画像のURLを決定

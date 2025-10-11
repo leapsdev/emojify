@@ -1,6 +1,7 @@
 'use server';
 
 import { getCurrentTimestamp } from '@/lib/utils';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { adminDbRef } from '@/repository/db/config/server';
 import type { User } from '@/repository/db/database';
 import type { ProfileForm } from './schema';
@@ -16,7 +17,8 @@ const USERS_PATH = 'users';
  */
 export async function createUser(data: ProfileForm, walletAddress: string) {
   const timestamp = getCurrentTimestamp();
-  const userRef = adminDbRef(`${USERS_PATH}/${walletAddress}`);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const userRef = adminDbRef(`${USERS_PATH}/${normalizedAddress}`);
 
   const user: User = {
     username: data.username,
@@ -37,7 +39,8 @@ export async function createUser(data: ProfileForm, walletAddress: string) {
  * @throws {Error} データベースエラー時
  */
 export async function getUser(walletAddress: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${walletAddress}`).get();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const snapshot = await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).get();
   return snapshot.val() as User | null;
 }
 
@@ -54,13 +57,14 @@ export async function updateUser(
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
   const updates = {
     ...data,
     updatedAt: timestamp,
   };
 
   // ユーザー情報を更新
-  await adminDbRef(`${USERS_PATH}/${walletAddress}`).update(updates);
+  await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).update(updates);
 
   // 新しいスキーマでは、チャットルームのメンバー情報は最小限（joinedAt, lastReadAt）のみ
   // usernameやimageUrlはUserテーブルから取得するため、チャットルームの更新は不要
@@ -74,7 +78,8 @@ export async function updateUser(
  * @throws {Error} データベースエラー時
  */
 export async function deleteUser(walletAddress: string) {
-  await adminDbRef(`${USERS_PATH}/${walletAddress}`).remove();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).remove();
 }
 
 /**
@@ -116,31 +121,33 @@ export async function addFriend(
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUser(walletAddress),
-    getUser(friendId),
+    getUser(normalizedAddress),
+    getUser(normalizedFriendId),
   ]);
 
   if (!user || !friend) {
     throw new Error('User not found');
   }
 
-  if (user.friends?.[friendId]) {
+  if (user.friends?.[normalizedFriendId]) {
     throw new Error('Already friends');
   }
 
   // 双方向のフレンド関係を更新
   const updates = {
-    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: {
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: {
       createdAt: timestamp,
     },
-    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: {
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: {
       createdAt: timestamp,
     },
-    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);
@@ -157,27 +164,29 @@ export async function removeFriend(
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUser(walletAddress),
-    getUser(friendId),
+    getUser(normalizedAddress),
+    getUser(normalizedFriendId),
   ]);
 
   if (!user || !friend) {
     throw new Error('User not found');
   }
 
-  if (!user.friends?.[friendId]) {
+  if (!user.friends?.[normalizedFriendId]) {
     throw new Error('Not friends');
   }
 
   // 双方向のフレンド関係を削除
   const updates = {
-    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: null,
-    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: null,
-    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: null,
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: null,
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);
@@ -192,7 +201,8 @@ export async function removeFriend(
 export async function getUserFriends(
   walletAddress: string,
 ): Promise<Array<User & { walletAddress: string }>> {
-  const user = await getUser(walletAddress);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const user = await getUser(normalizedAddress);
   if (!user) {
     throw new Error('User not found');
   }
@@ -225,8 +235,9 @@ export async function getUserFriends(
 export async function getOtherUsers(
   currentWalletAddress: string,
 ): Promise<Array<User & { walletAddress: string }>> {
+  const normalizedAddress = normalizeWalletAddress(currentWalletAddress);
   const allUsers = await getAllUsers();
-  return allUsers.filter((user) => user.walletAddress !== currentWalletAddress);
+  return allUsers.filter((user) => user.walletAddress !== normalizedAddress);
 }
 
 /**
@@ -242,9 +253,10 @@ export async function getUsersWithFriendship(
   others: Array<User & { walletAddress: string }>;
 }> {
   try {
+    const normalizedAddress = normalizeWalletAddress(currentWalletAddress);
     const [currentUser, otherUsers] = await Promise.all([
-      getUser(currentWalletAddress),
-      getOtherUsers(currentWalletAddress),
+      getUser(normalizedAddress),
+      getOtherUsers(normalizedAddress),
     ]);
 
     if (!currentUser) {

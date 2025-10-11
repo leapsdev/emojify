@@ -1,5 +1,6 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
@@ -34,7 +35,11 @@ export function useUserRooms(walletAddress: string, initialRooms: ChatRoom[]) {
       }
 
       // ユーザーのルーム一覧を監視
-      const userRoomsRef = ref(db, `${DB_INDEXES.userRooms}/${walletAddress}`);
+      const normalizedAddress = normalizeWalletAddress(walletAddress);
+      const userRoomsRef = ref(
+        db,
+        `${DB_INDEXES.userRooms}/${normalizedAddress}`,
+      );
       const unsubscribe = onValue(userRoomsRef, async (snapshot) => {
         try {
           const snapshotVal = snapshot.val();

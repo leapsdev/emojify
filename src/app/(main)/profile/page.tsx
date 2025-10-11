@@ -2,6 +2,7 @@
 
 import { ProfilePage } from '@/components/pages/ProfilePage';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import type { User } from '@/repository/db/database';
 import { getUser } from '@/repository/db/user/clientAction';
 import { useRouter } from 'next/navigation';
@@ -21,8 +22,8 @@ export default function Page() {
     if (walletAddress && previousWalletAddressRef.current) {
       // ウォレットアドレスが変更された場合
       if (
-        walletAddress.toLowerCase() !==
-        previousWalletAddressRef.current.toLowerCase()
+        normalizeWalletAddress(walletAddress) !==
+        normalizeWalletAddress(previousWalletAddressRef.current)
       ) {
         console.log('🔄 Wallet address changed, clearing user data:', {
           previous: previousWalletAddressRef.current,

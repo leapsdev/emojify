@@ -1,31 +1,16 @@
-import { adminDb } from '@/repository/db/config/server';
-import type { User } from '@/repository/db/database';
-import { DB_PATHS } from '@/repository/db/database';
-
 /**
  * ウォレットアドレス関連のユーティリティ関数
- * @description サーバーサイドとクライアントサイド両方で使用可能
+ * @description クライアントサイドとサーバーサイド両方で使用可能
  */
 
 /**
- * ウォレットアドレスからユーザー情報を取得する（サーバーサイド専用）
+ * ウォレットアドレスを正規化する（小文字に統一）
  * @param walletAddress ウォレットアドレス
- * @returns ユーザー情報（見つからない場合はnull）
- * @throws {Error} データベースエラー時（エラーはログに記録され、nullを返す）
- * @description 新しいスキーマではウォレットアドレスがユーザーIDと同じ
+ * @returns 小文字に正規化されたウォレットアドレス
+ * @description Ethereumアドレスは大文字小文字を区別しないため、常に小文字で統一する
  */
-export async function getUserFromWalletAddress(
-  walletAddress: string,
-): Promise<User | null> {
-  try {
-    const userSnapshot = await adminDb
-      .ref(`${DB_PATHS.users}/${walletAddress}`)
-      .get();
-    return userSnapshot.val() as User | null;
-  } catch (error) {
-    console.error('Failed to get user from wallet address:', error);
-    return null;
-  }
+export function normalizeWalletAddress(walletAddress: string): string {
+  return walletAddress.toLowerCase();
 }
 
 /**

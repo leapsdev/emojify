@@ -1,5 +1,6 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
@@ -37,12 +38,14 @@ export function useUnreadStatus(roomId: string, currentWalletAddress: string) {
         }
 
         // 新しいスキーマでは、currentWalletAddressがウォレットアドレスを表す
-        const currentUserWalletAddress = currentWalletAddress;
+        const normalizedCurrentAddress =
+          normalizeWalletAddress(currentWalletAddress);
 
         // 未読状態の更新
         const newUnreadStatus = room.lastMessage
-          ? room.lastMessage.senderWalletAddress !== currentUserWalletAddress &&
-            room.members[currentUserWalletAddress]?.lastReadAt <
+          ? normalizeWalletAddress(room.lastMessage.senderWalletAddress) !==
+              normalizedCurrentAddress &&
+            room.members[normalizedCurrentAddress]?.lastReadAt <
               room.lastMessage.createdAt
           : false;
 

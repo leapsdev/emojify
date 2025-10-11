@@ -1,5 +1,6 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { User } from '@/repository/db/database';
 import { get, onValue, ref, update } from 'firebase/database';
@@ -21,7 +22,8 @@ const USERS_PATH = 'users';
  * @throws {Error} データベースエラー時
  */
 export const getUser = async (walletAddress: string): Promise<User | null> => {
-  const userRef = ref(db, `${USERS_PATH}/${walletAddress}`);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const userRef = ref(db, `${USERS_PATH}/${normalizedAddress}`);
   const snapshot = await get(userRef);
   return snapshot.val();
 };
@@ -36,7 +38,8 @@ export const updateUser = async (
   walletAddress: string,
   data: Partial<Omit<User, 'createdAt'>>,
 ): Promise<void> => {
-  const userRef = ref(db, `${USERS_PATH}/${walletAddress}`);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const userRef = ref(db, `${USERS_PATH}/${normalizedAddress}`);
   await update(userRef, data);
 };
 
@@ -52,15 +55,17 @@ export const addFriend = async (
   friendId: string,
 ): Promise<void> => {
   const timestamp = Date.now();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
   const updates = {
-    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: {
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: {
       createdAt: timestamp,
     },
-    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: {
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: {
       createdAt: timestamp,
     },
-    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
   await update(ref(db), updates);
 };
@@ -77,11 +82,13 @@ export const removeFriend = async (
   friendId: string,
 ): Promise<void> => {
   const timestamp = Date.now();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
   const updates = {
-    [`${USERS_PATH}/${walletAddress}/friends/${friendId}`]: null,
-    [`${USERS_PATH}/${friendId}/friends/${walletAddress}`]: null,
-    [`${USERS_PATH}/${walletAddress}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: null,
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: null,
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
   await update(ref(db), updates);
 };

@@ -3,6 +3,7 @@
 import type { NFTData } from '@/components/features/explore/types';
 
 import { formatDateToYYYYMMDD } from '@/lib/utils';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import type { Message } from '@/repository/db/database';
 import Image from 'next/image';
 import React, { useEffect, useRef } from 'react';
@@ -166,7 +167,8 @@ function MessageListContent({
           <div className="space-y-4">
             {messagesForDate.map((message) => {
               const isSentByCurrentUser =
-                message.senderWalletAddress === currentWalletAddress;
+                normalizeWalletAddress(message.senderWalletAddress) ===
+                normalizeWalletAddress(currentWalletAddress);
 
               return (
                 <div

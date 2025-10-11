@@ -1,5 +1,6 @@
 'use server';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { adminDb } from '@/repository/db/config/server';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
@@ -24,7 +25,8 @@ export async function createChatRoom(members: string[]): Promise<string> {
   const now = Date.now();
 
   // メンバーの情報を直接設定（ユーザー存在確認は不要）
-  members.forEach((walletAddress) => {
+  const normalizedMembers = members.map(normalizeWalletAddress);
+  normalizedMembers.forEach((walletAddress) => {
     membersRecord[walletAddress] = {
       joinedAt: now,
       lastReadAt: now,
@@ -42,7 +44,7 @@ export async function createChatRoom(members: string[]): Promise<string> {
 
   // ユーザーのルームインデックスを更新
   const updates: Record<string, boolean> = {};
-  members.forEach((memberId) => {
+  normalizedMembers.forEach((memberId) => {
     updates[`${DB_INDEXES.userRooms}/${memberId}/${roomId}`] = true;
   });
 
@@ -58,8 +60,9 @@ export async function createChatRoom(members: string[]): Promise<string> {
  */
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
   try {
+    const normalizedAddress = normalizeWalletAddress(walletAddress);
     const userRoomsSnapshot = await adminDb
-      .ref(`${DB_INDEXES.userRooms}/${walletAddress}`)
+      .ref(`${DB_INDEXES.userRooms}/${normalizedAddress}`)
       .get();
     const userRooms = userRoomsSnapshot.val() || {};
     const roomIds = Object.keys(userRooms);
@@ -99,19 +102,20 @@ export async function addRoomMember(
   roomId: string,
   walletAddress: string,
 ): Promise<void> {
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
   const updates: Record<
     string,
     { joinedAt: number; lastReadAt: number } | boolean
   > = {};
   const now = Date.now();
 
-  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = {
+  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${normalizedAddress}`] = {
     joinedAt: now,
     lastReadAt: now,
   };
 
   // ユーザーのルームインデックスを更新
-  updates[`${DB_INDEXES.userRooms}/${walletAddress}/${roomId}`] = true;
+  updates[`${DB_INDEXES.userRooms}/${normalizedAddress}/${roomId}`] = true;
 
   await adminDb.ref().update(updates);
 }
@@ -126,13 +130,15 @@ export async function removeRoomMember(
   roomId: string,
   walletAddress: string,
 ): Promise<void> {
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
   const updates: Record<string, null> = {};
 
   // ルームのメンバーリストから削除
-  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`] = null;
+  updates[`${DB_PATHS.chatRooms}/${roomId}/members/${normalizedAddress}`] =
+    null;
 
   // ユーザーのルームインデックスから削除
-  updates[`${DB_INDEXES.userRooms}/${walletAddress}/${roomId}`] = null;
+  updates[`${DB_INDEXES.userRooms}/${normalizedAddress}/${roomId}`] = null;
 
   await adminDb.ref().update(updates);
 }
@@ -179,10 +185,11 @@ export async function findChatRoomByMembers(
   members: string[],
 ): Promise<ChatRoom | null> {
   // 新しいスキーマでは、membersがウォレットアドレスを表す
-  const memberSet = new Set(members);
+  const normalizedMembers = members.map(normalizeWalletAddress);
+  const memberSet = new Set(normalizedMembers);
 
   // 最初のメンバーのチャットルーム一覧を取得
-  const firstMemberRooms = await getUserRooms(members[0]);
+  const firstMemberRooms = await getUserRooms(normalizedMembers[0]);
 
   // メンバーが完全一致するルームを検索
   return (

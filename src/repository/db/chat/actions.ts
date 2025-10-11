@@ -1,5 +1,6 @@
 'use server';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { adminDb } from '@/repository/db/config/server';
 import type { ChatRoom, Message } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
@@ -71,6 +72,8 @@ export async function sendMessage(
     throw new Error('Sender wallet address is required');
   if (!content) throw new Error('Message content is required');
 
+  const normalizedAddress = normalizeWalletAddress(senderWalletAddress);
+
   // ルームの存在確認
   const roomSnapshot = await adminDb
     .ref(`${DB_PATHS.chatRooms}/${roomId}`)
@@ -89,7 +92,7 @@ export async function sendMessage(
   const message: Message = {
     id: messageId,
     content,
-    senderWalletAddress,
+    senderWalletAddress: normalizedAddress,
     roomId,
     createdAt: now,
     sent: true,
@@ -101,11 +104,11 @@ export async function sendMessage(
   const roomUpdate: Partial<ChatRoom> = {
     lastMessage: {
       content,
-      senderWalletAddress,
+      senderWalletAddress: normalizedAddress,
       createdAt: now,
     },
     updatedAt: now,
-    [`members/${senderWalletAddress}/lastReadAt`]: now,
+    [`members/${normalizedAddress}/lastReadAt`]: now,
   };
 
   await adminDb.ref(`${DB_PATHS.chatRooms}/${roomId}`).update(roomUpdate);
@@ -132,6 +135,7 @@ export async function updateLastReadAction(
   if (!roomId) throw new Error('Room ID is required');
   if (!walletAddress) throw new Error('Wallet address is required');
 
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
   const now = Date.now();
 
   // ルームとユーザーの存在確認
@@ -143,10 +147,12 @@ export async function updateLastReadAction(
   }
 
   const room = roomSnapshot.val() as ChatRoom;
-  if (!room.members[walletAddress]) {
-    throw new Error(`User ${walletAddress} is not a member of room ${roomId}`);
+  if (!room.members[normalizedAddress]) {
+    throw new Error(
+      `User ${normalizedAddress} is not a member of room ${roomId}`,
+    );
   }
 
   // 最終既読時刻を更新
-  await roomRef.child(`members/${walletAddress}/lastReadAt`).set(now);
+  await roomRef.child(`members/${normalizedAddress}/lastReadAt`).set(now);
 }

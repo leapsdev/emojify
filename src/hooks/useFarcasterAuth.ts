@@ -5,6 +5,7 @@ import {
   getFarcasterSDK,
   initializeFarcasterMiniApp,
 } from '@/lib/farcaster';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { auth } from '@/repository/db/config/client';
 import {
   type User,
@@ -330,8 +331,8 @@ export function useFarcasterAuth() {
         if (
           currentAddress &&
           lastAuthenticatedWalletRef.current &&
-          currentAddress.toLowerCase() !==
-            lastAuthenticatedWalletRef.current.toLowerCase()
+          normalizeWalletAddress(currentAddress) !==
+            normalizeWalletAddress(lastAuthenticatedWalletRef.current)
         ) {
           console.log('🔄 Wallet address changed, re-authenticating...', {
             old: lastAuthenticatedWalletRef.current,

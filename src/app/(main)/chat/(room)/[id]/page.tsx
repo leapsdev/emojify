@@ -3,6 +3,7 @@
 import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
 import type { ChatRoom, Message, User } from '@/repository/db/database';
 import { getUser } from '@/repository/db/user/actions';
@@ -33,8 +34,9 @@ export default function Page() {
           setMessages(roomMessages);
 
           // 他のメンバーのユーザー情報を取得（エラーが発生してもページは表示）
+          const normalizedWalletAddress = normalizeWalletAddress(walletAddress);
           const otherMemberWalletAddresses = Object.keys(room.members).filter(
-            (memberAddress) => memberAddress !== walletAddress,
+            (memberAddress) => memberAddress !== normalizedWalletAddress,
           );
 
           try {
@@ -89,10 +91,11 @@ export default function Page() {
       // ユーザー名が取得できた場合
       return otherUsers.map((user) => user.username).join(', ');
     }
-    if (roomData) {
+    if (roomData && walletAddress) {
       // ユーザー名が取得できない場合は、ウォレットアドレスを表示
+      const normalizedWalletAddress = normalizeWalletAddress(walletAddress);
       const otherMemberAddresses = Object.keys(roomData.members).filter(
-        (address) => address !== walletAddress,
+        (address) => address !== normalizedWalletAddress,
       );
       return otherMemberAddresses
         .map((address) => `${address.slice(0, 6)}...${address.slice(-4)}`)

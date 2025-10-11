@@ -1,5 +1,6 @@
 'use server';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { adminDbRef } from '@/repository/db/config/server';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
@@ -10,7 +11,10 @@ import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
 export async function getUserRooms(walletAddress: string): Promise<ChatRoom[]> {
   if (!walletAddress) return [];
 
-  const userRoomsRef = adminDbRef(`${DB_INDEXES.userRooms}/${walletAddress}`);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const userRoomsRef = adminDbRef(
+    `${DB_INDEXES.userRooms}/${normalizedAddress}`,
+  );
   const indexSnapshot = await userRoomsRef.get();
   const snapshotVal = indexSnapshot.val();
 

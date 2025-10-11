@@ -1,5 +1,6 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_INDEXES, DB_PATHS } from '@/repository/db/database';
@@ -25,7 +26,8 @@ export const subscribeToUserRooms = (
   userId: string,
   callback: (rooms: ChatRoom[]) => void,
 ): (() => void) => {
-  const userRoomsRef = ref(db, `${DB_INDEXES.userRooms}/${userId}`);
+  const normalizedId = normalizeWalletAddress(userId);
+  const userRoomsRef = ref(db, `${DB_INDEXES.userRooms}/${normalizedId}`);
   return onValue(userRoomsRef, async (snapshot) => {
     try {
       const snapshotVal = snapshot.val();
@@ -123,11 +125,13 @@ export const addUserToRoom = async (
   const timestamp = Date.now();
 
   // 新しいスキーマでは、userIdがウォレットアドレスを表す
-  const walletAddress = userId;
+  const normalizedAddress = normalizeWalletAddress(userId);
 
   const updates = {
-    [`${DB_INDEXES.userRooms}/${userId}/${roomId}`]: { joinedAt: timestamp },
-    [`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`]: {
+    [`${DB_INDEXES.userRooms}/${normalizedAddress}/${roomId}`]: {
+      joinedAt: timestamp,
+    },
+    [`${DB_PATHS.chatRooms}/${roomId}/members/${normalizedAddress}`]: {
       joinedAt: timestamp,
       lastReadAt: timestamp,
     },
@@ -150,11 +154,11 @@ export const removeUserFromRoom = async (
   const timestamp = Date.now();
 
   // 新しいスキーマでは、userIdがウォレットアドレスを表す
-  const walletAddress = userId;
+  const normalizedAddress = normalizeWalletAddress(userId);
 
   const updates = {
-    [`${DB_INDEXES.userRooms}/${userId}/${roomId}`]: null,
-    [`${DB_PATHS.chatRooms}/${roomId}/members/${walletAddress}`]: null,
+    [`${DB_INDEXES.userRooms}/${normalizedAddress}/${roomId}`]: null,
+    [`${DB_PATHS.chatRooms}/${roomId}/members/${normalizedAddress}`]: null,
     [`${DB_PATHS.chatRooms}/${roomId}/updatedAt`]: timestamp,
   };
   await update(ref(db), updates);

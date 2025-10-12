@@ -108,7 +108,7 @@ export const GetStartedPage = () => {
   if (isLoading || !ready || isRedirecting) {
     return (
       <main className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center">
-        <Loading size="lg" text="Loading..." />
+        <Loading size="md" text="Loading..." />
       </main>
     );
   }

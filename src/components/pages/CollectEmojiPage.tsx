@@ -23,7 +23,7 @@ function CollectEmojiPageContent() {
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
-        <Loading size="xl" className="mb-4" />
+        <Loading size="md" text="Loading..." className="mb-4" />
       </div>
     );
   }

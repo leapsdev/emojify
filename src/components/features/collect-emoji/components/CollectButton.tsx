@@ -195,7 +195,7 @@ export function CollectButton({ tokenId }: Props) {
           disabled={isLoading || !walletClient}
         >
           {isLoading ? (
-            <Loading size="sm" className="text-white" />
+            <Loading size="md" text="Loading..." className="text-white" />
           ) : (
             <>
               <Plus className="w-5 h-5 mr-2" />

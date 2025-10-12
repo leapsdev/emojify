@@ -16,7 +16,7 @@ export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
   if (!isMiniApp && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loading size="lg" />
+        <Loading size="md" text="Loading..." />
       </div>
     );
   }

@@ -1,86 +1,109 @@
 # Emoji Chat 🎨💬
 
-A Web3 chat application that uses only emojis. Users can create and sell their own emojis, and purchase and use emojis from other users.
+A Web3 chat application where communication happens exclusively through emojis. Users can create their own custom emojis, mint them as NFTs, and trade them on the marketplace.
 
 ## Features 🚀
 
-### Authentication
-- Web3 authentication system using Privy
-- Support for email, wallet, and social login
+### Authentication System
+- **Privy Web3 Authentication**: Support for wallet, email, and social login
+- **Multi-Wallet Management**: Connect and switch between multiple wallets
+- **Farcaster Integration**: Automatic authentication in Farcaster Mini App environment
 
 ### Chat Features
-- Real-time chat (Firebase Realtime Database)
-- Group chat support
-- Communication using only emojis
+- **Real-time Chat**: Instant messaging powered by Firebase Realtime Database
+- **Group Chat**: Multi-user group chat support
+- **Emoji-Only Communication**: Text-free conversation using only emojis
 
-### Emoji System
-- Original emoji creation
-- Image upload using Cloudinary
-- NFT conversion using Thirdweb
-- Marketplace for buying and selling
-- Emoji search functionality
+### Emoji & NFT System
+- **Custom Emoji Creation**: Image upload via Cloudinary
+- **NFT Minting**: ERC-1155 standard NFTs on Base Sepolia
+- **Marketplace**: Buy and sell emoji NFTs
+- **Search & Filter**: Browse owned and created emojis
+- **Profile Display**: Manage emojis with Created/Collected tabs
 
 ### Farcaster Integration
-- **Farcaster Mini App** - Native integration with Farcaster ecosystem
-- **Frame Support** - Compatible with Farcaster Frames
-- **Account Association** - Verified domain ownership on Farcaster
-- **Webhook Support** - Real-time notifications and events
+- **Farcaster Mini App**: Native integration with Farcaster ecosystem
+- **Frame Support**: Compatible with Farcaster Frames
+- **Account Association**: Verified domain ownership on Farcaster
+- **Webhook Support**: Real-time notifications and event handling
 
 ## Tech Stack 🛠
 
 ### Frontend
-- [Next.js 15](https://nextjs.org/) - React framework
-- [React 19](https://react.dev/) - UI library
-- [shadcn/ui](https://ui.shadcn.com/) - UI components
-- [Conform](https://conform.guide/) - Form validation
-- [Zod](https://zod.dev/) - Schema validation
-- [Tailwind CSS](https://tailwindcss.com/) - Styling
+- **[Next.js 15](https://nextjs.org/)** - React framework with App Router
+- **[React 19](https://react.dev/)** - UI library
+- **[TypeScript](https://www.typescriptlang.org/)** - Static typing
+- **[Tailwind CSS](https://tailwindcss.com/)** - CSS framework
+- **[shadcn/ui](https://ui.shadcn.com/)** - UI component library
+- **[TanStack Query](https://tanstack.com/query)** - Data fetching and caching
+- **[Conform](https://conform.guide/) + [Zod](https://zod.dev/)** - Form validation
 
-### Backend
-- [Firebase](https://firebase.google.com/) - Realtime database
-- [Cloudinary](https://cloudinary.com/) - Image storage
-- [Thirdweb](https://thirdweb.com/) - Web3 infrastructure
+### Backend & Infrastructure
+- **[Firebase](https://firebase.google.com/)** - Realtime Database + Authentication
+- **[Cloudinary](https://cloudinary.com/)** - Image storage and management
+- **[Pinata](https://pinata.cloud/)** - IPFS image storage
 
 ### Web3 Integration
-- [Privy](https://docs.privy.io/) - Web3 authentication & wallet management
-- [Wagmi](https://wagmi.sh/) - React Hooks for Ethereum
-- [Viem](https://viem.sh/) - TypeScript Ethereum client
+- **[Privy](https://docs.privy.io/)** - Web3 authentication & wallet management
+- **[Wagmi v2](https://wagmi.sh/)** - React Hooks for Ethereum
+- **[Viem](https://viem.sh/)** - TypeScript Ethereum client
+- **[Coinbase Onchainkit](https://onchainkit.xyz/)** - Base chain integration
 
 ### Farcaster Integration
-- [Farcaster Mini Apps](https://miniapps.farcaster.xyz/) - Native Farcaster integration
-- [Farcaster Frame SDK](https://docs-farcaster-xyz.vercel.app/developers/frames/) - Frame development tools
-- [Neynar](https://neynar.com/) - Farcaster API and development tools
+- **[Farcaster Mini Apps](https://miniapps.farcaster.xyz/)** - Native Farcaster integration
+- **[Farcaster Frame SDK](https://docs.farcaster.xyz/developers/frames/)** - Frame development tools
+- **[Neynar SDK](https://neynar.com/)** - Farcaster API and development tools
 
 ### Development Tools
-- [pnpm](https://pnpm.io/) - Package manager
-- [Biome](https://biomejs.dev/) - Code formatter & linter
+- **[pnpm](https://pnpm.io/)** - Package manager
+- **[Biome](https://biomejs.dev/)** - Code formatter and linter
+- **[ESLint](https://eslint.org/)** - Additional linter
 
 ## Project Structure 📁
 
-### Directory Structure
 ```
+emoji-chat/
 ├── src/
-│ ├── app/ # Next.js App Router
-│ │ ├── (main)/ # Main application
-│ │ ├── (auth)/ # Authentication related
-│ │ └── refresh/ # Refresh token
-│ ├── components/
-│ │ ├── ui/ # Basic UI components
-│ │ ├── providers/ # Provider components
-│ │ ├── shared/ # Shared components
-│ │ ├── features/ # Feature-specific components
-│ │ └── pages/ # Page components
-│ ├── lib/ # Utility functions
-│ ├── repository/ # Data access layer
-│ ├── types/ # Type definitions
-│ ├── utils/ # Helper functions
-│ ├── styles/ # Global styles
-│ └── middleware.ts # Next.js middleware
-├── public/ # Static files
-│ └── .well-known/ # Farcaster manifest and verification files
-│   └── farcaster.json # Farcaster Mini App manifest
-├── contract/ # Smart contracts
-└── README.md        
+│   ├── app/                      # Next.js App Router
+│   │   ├── (main)/              # Main application routes
+│   │   │   ├── chat/            # Chat features
+│   │   │   ├── profile/         # Profile management
+│   │   │   ├── choose-friends/  # Friend selection
+│   │   │   ├── create-emoji/    # Emoji creation
+│   │   │   └── explore/         # Explore & search
+│   │   ├── api/                 # API Routes
+│   │   │   ├── auth/            # Authentication endpoints
+│   │   │   └── pinata-upload/   # Image upload
+│   │   └── refresh/             # Token refresh
+│   ├── components/
+│   │   ├── features/            # Feature-specific components
+│   │   │   ├── auth/            # Authentication
+│   │   │   ├── chat/            # Chat functionality
+│   │   │   ├── profile/         # Profile management
+│   │   │   └── create-emoji/    # Emoji creation
+│   │   ├── shared/              # Shared components
+│   │   │   ├── layout/          # Layout components
+│   │   │   └── navigation/      # Navigation
+│   │   ├── pages/               # Page components
+│   │   ├── providers/           # Provider components
+│   │   └── ui/                  # Base UI components
+│   ├── hooks/                   # Custom React Hooks
+│   ├── lib/                     # Library configurations
+│   │   ├── basename/            # Base chain setup
+│   │   └── contracts/           # Smart contract definitions
+│   ├── repository/              # Data access layer
+│   │   └── db/                  # Firebase operations
+│   ├── types/                   # TypeScript type definitions
+│   ├── utils/                   # Utility functions
+│   └── middleware.ts            # Next.js middleware
+├── public/
+│   ├── .well-known/             # Farcaster verification files
+│   │   └── farcaster.json       # Mini App manifest
+│   ├── icons/                   # App icons
+│   └── sw.js                    # Service Worker (PWA)
+├── contract/                    # Smart contracts
+├── docs/                        # Documentation
+└── .claude/                     # Claude AI configuration
 ```
 
 ## Farcaster Mini App Setup 🚀
@@ -169,18 +192,50 @@ NEXT_PUBLIC_GATEWAY_URL=
 # Start development server
 pnpm dev
 
-# Build
+# Build for production
 pnpm build
 
-# Format code
+# Start production server
+pnpm start
+
+# Format code (Biome)
 pnpm format
 
-# Run linter
+# Check format without writing
+pnpm format:check
+
+# Run linter (Next.js)
 pnpm lint
 
-# Biome check
+# Run Biome linter
+pnpm lint:biome
+
+# Format and lint with auto-fix (Biome)
 pnpm check
+
+# CI check (Biome, no write)
+pnpm check:ci
 ```
+
+## Key Features Explained 📖
+
+### Authentication Flow
+1. **Initial Access**: Users land on the Get Started page (`/`)
+2. **Wallet Connection**: Connect via Privy (wallet/email/social)
+3. **Auto-redirect**: Authenticated users automatically redirected to appropriate page
+4. **Profile Creation**: New users directed to profile creation (`/profile/create`)
+5. **Farcaster Mini App**: Automatic authentication with Farcaster credentials
+
+### NFT Management
+- **ERC-1155 Standard**: Multi-token standard for efficient emoji NFTs
+- **Metadata Storage**: IPFS via Pinata for decentralized image storage
+- **Contract Integration**: Wagmi hooks for blockchain interactions
+- **Real-time Updates**: Streaming NFT fetching with duplicate prevention
+
+### Multi-Wallet Support
+- **Wallet Switching**: Switch between connected wallets seamlessly
+- **Address Normalization**: Lowercase address handling for consistency
+- **Privy Integration**: Embedded and external wallet support
 
 ## License 📄
 

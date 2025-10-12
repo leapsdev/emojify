@@ -101,7 +101,13 @@ export function useProfileNFTs(address?: string) {
               };
 
               // 取得次第、即座にstateに追加
-              setNFTs((prev) => [...prev, nft]);
+              setNFTs((prev) => {
+                // 重複チェック: 既に同じtokenIdが存在する場合は追加しない
+                if (prev.some((item) => item.tokenId === nft.tokenId)) {
+                  return prev;
+                }
+                return [...prev, nft];
+              });
             } catch (err) {
               console.error(`Error processing NFT ${tokenId}:`, err);
             }

@@ -1,6 +1,7 @@
 'use client';
 
 import { ProfilePage } from '@/components/pages/ProfilePage';
+import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import type { User } from '@/repository/db/database';
@@ -104,8 +105,7 @@ export default function Page() {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading...</p>
+          <Loading size="md" text="Loading..." />
           {isLoading && (
             <p className="text-sm text-gray-500 mt-2">Authenticating...</p>
           )}
@@ -121,10 +121,7 @@ export default function Page() {
   if (!userData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading profile...</p>
-        </div>
+        <Loading size="md" text="Loading profile..." />
       </div>
     );
   }

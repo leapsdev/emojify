@@ -5,6 +5,7 @@ import { DynamicFloatingEmojis } from '@/components/features/getStarted/Floating
 import { GetStartedButton } from '@/components/features/getStarted/GetStartedButton';
 import MainContent from '@/components/features/getStarted/MainContent';
 import { useIsMiniApp } from '@/components/providers/AuthProvider';
+import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { autoCreateUserFromFarcaster } from '@/repository/db/user/actions';
 import { useRouter } from 'next/navigation';
@@ -107,9 +108,7 @@ export const GetStartedPage = () => {
   if (isLoading || !ready || isRedirecting) {
     return (
       <main className="min-h-screen bg-white relative overflow-hidden flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-2xl font-bold text-gray-700">Loading...</div>
-        </div>
+        <Loading size="lg" text="Loading..." />
       </main>
     );
   }

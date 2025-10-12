@@ -2,6 +2,7 @@
 import { AuthRedirect } from '@/components/features/auth/AuthRedirect';
 import { ProfileForm } from '@/components/features/create-profile/ProfileForm';
 import { ProfileImage } from '@/components/features/create-profile/ProfileImage';
+import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -23,10 +24,7 @@ export function CreateProfilePage() {
   if (isLoading || !isAuthenticated) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading...</p>
-        </div>
+        <Loading size="md" text="Loading..." />
       </div>
     );
   }

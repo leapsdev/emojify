@@ -10,6 +10,7 @@ import { UserProfile } from '@/components/features/profile/UserProfile';
 import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { Header } from '@/components/shared/layout/Header';
 import { FooterNavigation } from '@/components/shared/navigation/FooterNavigation';
+import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 
 import { config } from '@/lib/basename/wagmi';
@@ -135,10 +136,7 @@ function ProfilePageContent({
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading...</p>
-        </div>
+        <Loading size="md" text="Loading..." />
       </div>
     );
   }
@@ -159,10 +157,7 @@ function ProfilePageContent({
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading profile...</p>
-        </div>
+        <Loading size="md" text="Loading profile..." />
       </div>
     );
   }

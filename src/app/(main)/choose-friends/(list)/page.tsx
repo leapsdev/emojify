@@ -1,6 +1,7 @@
 'use client';
 
 import { ClientChooseFriendsPage } from '@/components/pages/ChooseFriendsPage';
+import { Loading } from '@/components/ui/Loading';
 import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { getUsersWithFriendship } from '@/repository/db/user/actions';
@@ -33,10 +34,7 @@ export default function ChooseFriendsPage() {
   if (isLoading || isDataLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4" />
-          <p>Loading...</p>
-        </div>
+        <Loading size="md" text="Loading..." />
       </div>
     );
   }

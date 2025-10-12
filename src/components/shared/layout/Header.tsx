@@ -7,6 +7,7 @@ import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
 import { useAccount, useSwitchChain } from 'wagmi';
 import { base, baseSepolia } from 'wagmi/chains';
+import { WalletManagementButton } from './WalletManagementButton';
 
 /**
  * 共通ヘッダーコンポーネント
@@ -95,6 +96,7 @@ export const Header = ({
 
       {/* 右エリア - 絶対位置で配置 */}
       <div className="absolute right-4 h-full flex items-center space-x-2">
+        <WalletManagementButton />
         {isShowChainSwitch && <ChainSwitchButton />}
         {rightContent}
       </div>

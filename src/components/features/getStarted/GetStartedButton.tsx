@@ -26,8 +26,13 @@ export const GetStartedButton = () => {
       return;
     }
 
+    // 認証済みの場合、Firebaseユーザーが存在するまで待つ
+    if (isAuthenticated && !user) {
+      return;
+    }
+
     // 認証状態とウォレットアドレスとFirebaseユーザーの詳細チェック
-    if (isAuthenticated && walletAddress && user) {
+    if (walletAddress) {
       try {
         // DBでユーザーの存在を確実にチェック
         const exists = await checkUserExists(walletAddress);
@@ -73,17 +78,10 @@ export const GetStartedButton = () => {
         router.push('/profile/create');
       }
     } else {
-      // ❌ 未認証の場合
+      // ❌ ウォレットアドレスがない場合
       if (!isMiniApp) {
         // Webアプリ環境の場合はサインアップページへ
         router.push('/signup');
-      } else {
-        // Mini App環境の場合は認証ページへ（Firebase認証完了待ち）
-        // Firebase認証未完了の場合は何もしない（待機）
-        if (!user) {
-          return;
-        }
-        router.push('/');
       }
     }
   }, [
@@ -98,14 +96,24 @@ export const GetStartedButton = () => {
     farcasterPfpUrl,
   ]);
 
+  // ボタンを無効化する条件
+  // 認証処理中（isLoadingがtrue）または準備未完了（readyがfalse）の場合のみ無効化
+  // 認証済みの場合は、userが存在するまで待つ
+  const isButtonDisabled = isLoading || !ready || (isAuthenticated && !user);
+
   return (
     <div className="mt-auto">
       <button
         type="button"
         onClick={handleClick}
-        className="w-full bg-blue-500 hover:bg-blue-600 text-white rounded-full py-2.5 text-xl font-black flex justify-center items-center"
+        disabled={isButtonDisabled}
+        className={`w-full rounded-full py-2.5 text-xl font-black flex justify-center items-center transition-colors ${
+          isButtonDisabled
+            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+            : 'bg-blue-500 hover:bg-blue-600 text-white'
+        }`}
       >
-        Get started
+        {isLoading ? 'Loading...' : 'Get started'}
       </button>
     </div>
   );

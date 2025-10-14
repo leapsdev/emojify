@@ -26,6 +26,13 @@ const isPrivyWallet = (
   );
 };
 
+// 環境に応じた適切なチェーンIDを取得
+const getTargetChainId = (): string => {
+  const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
+  // Base: 8453, Base Sepolia: 84532
+  return isProd ? '0x2105' : '0x14a34'; // 16進数表記
+};
+
 // Privy環境でCollectトランザクションを送信
 const sendCollectTransactionViaPrivy = async (
   walletClient: WalletClient,
@@ -80,6 +87,7 @@ const sendCollectTransactionViaFarcaster = async (
         to: emojiContract.address,
         value: `0x${valueToSend.toString(16)}`,
         data,
+        chainId: getTargetChainId(),
       },
     ],
   })) as string;

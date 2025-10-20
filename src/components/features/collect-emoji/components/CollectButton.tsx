@@ -1,6 +1,5 @@
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
-import { Loading } from '@/components/ui/Loading';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { useUnifiedWallet } from '@/hooks/useUnifiedWallet';
 import { config } from '@/lib/basename/wagmi';
@@ -190,12 +189,12 @@ export function CollectButton({ tokenId }: Props) {
         />
       ) : (
         <Button
-          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold "
+          className="w-full bg-gray-900 hover:bg-gray-800 text-white rounded-full py-6 text-lg font-bold disabled:bg-gray-400"
           onClick={handleCollect}
           disabled={isLoading || !walletClient}
         >
           {isLoading ? (
-            <Loading size="md" text="Loading..." className="text-white" />
+            'Collecting...'
           ) : (
             <>
               <Plus className="w-5 h-5 mr-2" />

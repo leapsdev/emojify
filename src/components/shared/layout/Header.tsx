@@ -188,9 +188,9 @@ const ChainSwitchButton = () => {
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
-          aria-label="チェーンメニューを開く"
+          aria-label="Open chain menu"
         >
-          <title>チェーンメニューを開く</title>
+          <title>Open chain menu</title>
           <path
             strokeLinecap="round"
             strokeLinejoin="round"
@@ -204,7 +204,7 @@ const ChainSwitchButton = () => {
         <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
           <div className="py-1">
             <div className="px-4 py-2 text-xs text-gray-500 border-b">
-              <div className="font-medium">チェーンを選択</div>
+              <div className="font-medium">Select Chain</div>
             </div>
 
             {availableChains.map((chain) => (
@@ -225,9 +225,9 @@ const ChainSwitchButton = () => {
                       className="w-4 h-4"
                       fill="currentColor"
                       viewBox="0 0 20 20"
-                      aria-label="現在選択中のチェーン"
+                      aria-label="Currently selected chain"
                     >
-                      <title>現在選択中のチェーン</title>
+                      <title>Currently selected chain</title>
                       <path
                         fillRule="evenodd"
                         d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"

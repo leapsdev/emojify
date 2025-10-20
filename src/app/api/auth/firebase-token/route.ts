@@ -6,19 +6,28 @@ export async function POST(request: Request) {
     // AuthorizationヘッダーからPrivyトークンを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      );
     }
 
     const privyToken = authHeader.replace('Bearer ', '');
     if (!privyToken) {
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      );
     }
 
     // Firebaseカスタムトークンを取得
     const customToken = await getFirebaseCustomTokenFromPrivy(privyToken);
 
     if (!customToken) {
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      );
     }
 
     return NextResponse.json({ token: customToken }, { status: 200 });
@@ -26,8 +35,8 @@ export async function POST(request: Request) {
     console.error('[API] ❌ Privy Firebase token API error:', error);
     return NextResponse.json(
       {
-        error: 'Firebaseトークンの取得に失敗しました',
-        details: error instanceof Error ? error.message : '不明なエラー',
+        error: 'Failed to get Firebase token',
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     );

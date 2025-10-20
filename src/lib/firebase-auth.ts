@@ -25,7 +25,7 @@ export async function createFirebaseCustomToken(
 ): Promise<string> {
   try {
     if (!userId) {
-      throw new Error('ユーザーIDが必要です');
+      throw new Error('User ID is required');
     }
 
     // Firebase Admin SDKを使用してカスタムトークンを生成
@@ -45,7 +45,7 @@ export async function createFirebaseCustomToken(
     if (error instanceof Error) {
     }
 
-    throw new Error('Firebase認証トークンの生成に失敗しました');
+    throw new Error('Failed to generate Firebase authentication token');
   }
 }
 
@@ -62,6 +62,6 @@ export async function verifyFirebaseCustomToken(
     return decodedToken.uid;
   } catch (error) {
     console.error('Firebase token verification error:', error);
-    throw new Error('Firebase認証トークンの検証に失敗しました');
+    throw new Error('Failed to verify Firebase authentication token');
   }
 }

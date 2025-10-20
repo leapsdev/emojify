@@ -87,7 +87,7 @@ export const UserProfile = ({
           <div className="relative w-24 h-24">
             <Image
               src={avatar}
-              alt={'ユーザーのプロフィール画像'}
+              alt={'User profile image'}
               fill
               sizes="(max-width: 768px) 96px, 96px"
               priority

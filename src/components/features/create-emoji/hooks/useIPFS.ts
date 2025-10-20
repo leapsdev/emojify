@@ -7,7 +7,7 @@ export const useIPFS = () => {
       method: 'POST',
       body: formData,
     });
-    if (!res.ok) throw new Error('ファイルのアップロードに失敗しました');
+    if (!res.ok) throw new Error('Failed to upload file');
     const data = await res.json();
     return `ipfs://${data.cid}`;
   };
@@ -39,7 +39,7 @@ export const useIPFS = () => {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(metadata),
     });
-    if (!res.ok) throw new Error('メタデータのアップロードに失敗しました');
+    if (!res.ok) throw new Error('Failed to upload metadata');
     const data = await res.json();
     return `ipfs://${data.cid}`;
   };

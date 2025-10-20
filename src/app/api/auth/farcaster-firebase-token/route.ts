@@ -10,12 +10,18 @@ export async function POST(request: Request) {
     // AuthorizationヘッダーからFarcaster JWTを取得
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      );
     }
 
     const farcasterToken = authHeader.replace('Bearer ', '');
     if (!farcasterToken) {
-      return NextResponse.json({ error: '認証が必要です' }, { status: 401 });
+      return NextResponse.json(
+        { error: 'Authentication required' },
+        { status: 401 },
+      );
     }
 
     // Firebaseカスタムトークンを取得
@@ -26,7 +32,7 @@ export async function POST(request: Request) {
 
     if (!customToken) {
       return NextResponse.json(
-        { error: 'Farcaster認証に失敗しました' },
+        { error: 'Farcaster authentication failed' },
         { status: 401 },
       );
     }
@@ -36,8 +42,8 @@ export async function POST(request: Request) {
     console.error('[API] ❌ Farcaster Firebase token API error:', error);
     return NextResponse.json(
       {
-        error: 'Farcaster Firebase認証トークンの取得に失敗しました',
-        details: error instanceof Error ? error.message : '不明なエラー',
+        error: 'Failed to get Farcaster Firebase authentication token',
+        details: error instanceof Error ? error.message : 'Unknown error',
       },
       { status: 500 },
     );

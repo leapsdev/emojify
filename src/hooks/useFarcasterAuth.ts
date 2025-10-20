@@ -90,17 +90,19 @@ export function useFarcasterAuth() {
 
       // Mini App環境でない場合はエラー
       if (!state.isMiniApp) {
-        throw new Error('この機能はFarcaster Mini App環境でのみ利用可能です');
+        throw new Error(
+          'This feature is only available in Farcaster Mini App environment',
+        );
       }
 
       // SDKが準備完了していない場合はエラー
       if (!state.isSDKLoaded || !state.isReady) {
-        throw new Error('Farcaster SDKが準備完了していません');
+        throw new Error('Farcaster SDK is not ready');
       }
 
       const sdk = getFarcasterSDK();
       if (!sdk) {
-        throw new Error('Farcaster SDKが初期化されていません');
+        throw new Error('Farcaster SDK is not initialized');
       }
 
       let token: string;
@@ -110,7 +112,7 @@ export function useFarcasterAuth() {
         token = result.token;
 
         if (!token) {
-          throw new Error('Farcasterトークンの取得に失敗しました');
+          throw new Error('Failed to get Farcaster token');
         }
 
         // SDKからユーザー情報を取得してログ出力
@@ -140,7 +142,7 @@ export function useFarcasterAuth() {
             tokenError.message.includes('net::ERR_FAILED')
           ) {
             throw new Error(
-              'Farcaster認証でネットワークエラーが発生しました。しばらく待ってから再試行してください。',
+              'Network error occurred during Farcaster authentication. Please wait and try again.',
             );
           }
           if (
@@ -148,13 +150,13 @@ export function useFarcasterAuth() {
             tokenError.message.includes('Bad Request')
           ) {
             throw new Error(
-              'Farcaster認証リクエストに問題があります。アプリを再読み込みして再試行してください。',
+              'There is an issue with the Farcaster authentication request. Please reload the app and try again.',
             );
           }
         }
 
         throw new Error(
-          `Farcasterトークンの取得に失敗しました: ${tokenError instanceof Error ? tokenError.message : '不明なエラー'}`,
+          `Failed to get Farcaster token: ${tokenError instanceof Error ? tokenError.message : 'Unknown error'}`,
         );
       }
 
@@ -211,9 +213,7 @@ export function useFarcasterAuth() {
           statusText: response.statusText,
           errorData,
         });
-        throw new Error(
-          errorData.error || 'Firebaseトークンの取得に失敗しました',
-        );
+        throw new Error(errorData.error || 'Failed to get Firebase token');
       }
 
       const { customToken } = await response.json();
@@ -235,7 +235,9 @@ export function useFarcasterAuth() {
         ...prev,
         isLoading: false,
         error:
-          error instanceof Error ? error.message : '認証エラーが発生しました',
+          error instanceof Error
+            ? error.message
+            : 'Authentication error occurred',
         isFarcasterAuthenticated: false,
         farcasterToken: null,
       }));

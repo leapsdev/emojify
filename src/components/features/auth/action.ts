@@ -11,7 +11,7 @@ export async function checkUserExists(id: string): Promise<boolean> {
     const exists = await isIdExists(id);
     return exists;
   } catch (error) {
-    console.error('[checkUserExists] エラー:', {
+    console.error('[checkUserExists] Error:', {
       error,
       id,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',

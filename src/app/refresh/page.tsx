@@ -36,7 +36,7 @@ export default function RefreshPage() {
       <div className="text-center">
         {/* biome-ignore lint/style/useSelfClosingElements: <explanation> */}
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto mb-4"></div>
-        <p>認証中...</p>
+        <p>Authenticating...</p>
       </div>
     </div>
   );

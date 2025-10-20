@@ -50,7 +50,7 @@ export function usePrivyAuth() {
         // Privyアクセストークンを取得
         const accessToken = await getAccessToken();
         if (!accessToken) {
-          throw new Error('Privyアクセストークンの取得に失敗しました');
+          throw new Error('Failed to get Privy access token');
         }
 
         // Firebaseカスタムトークンを取得
@@ -64,9 +64,7 @@ export function usePrivyAuth() {
 
         if (!response.ok) {
           const errorData = await response.json().catch(() => ({}));
-          throw new Error(
-            errorData.error || 'Firebaseトークンの取得に失敗しました',
-          );
+          throw new Error(errorData.error || 'Failed to get Firebase token');
         }
 
         const { token } = await response.json();
@@ -79,7 +77,9 @@ export function usePrivyAuth() {
           ...prev,
           isLoading: false,
           error:
-            error instanceof Error ? error.message : '認証エラーが発生しました',
+            error instanceof Error
+              ? error.message
+              : 'Authentication error occurred',
         }));
       }
     };

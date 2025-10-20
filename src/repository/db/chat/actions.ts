@@ -43,7 +43,7 @@ export async function getChatRoomAction(
 
     return { room, messages };
   } catch (error) {
-    console.error('[getChatRoomAction] エラー発生:', {
+    console.error('[getChatRoomAction] Error occurred:', {
       error,
       roomId,
       errorMessage: error instanceof Error ? error.message : 'Unknown error',

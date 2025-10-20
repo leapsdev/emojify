@@ -23,7 +23,7 @@ export async function handleProfileFormAction(
 
   if (!userId) {
     return {
-      message: '認証情報が不足しています',
+      message: 'Authentication information is missing',
       status: 'error' as const,
     };
   }

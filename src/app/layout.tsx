@@ -28,12 +28,12 @@ export const metadata: Metadata = {
   },
   other: {
     'fc:miniapp': JSON.stringify({
-      version: '1',
+      version: 'next',
       imageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
       button: {
         title: 'Open Emoji Chat',
         action: {
-          type: 'launch_frame',
+          type: 'launch_miniapp',
           name: 'Emoji Chat',
           url: 'https://emoji-chat-develop.vercel.app',
           splashImageUrl:

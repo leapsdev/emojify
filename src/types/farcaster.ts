@@ -36,13 +36,16 @@ export interface FarcasterContext {
 }
 
 export interface MiniAppEmbed {
-  version: '1';
+  version: '1' | 'next';
   imageUrl: string;
   button: {
     title: string;
     action: {
-      type: 'launch_mini_app';
+      type: 'launch_miniapp';
+      name: string;
       url: string;
+      splashImageUrl?: string;
+      splashBackgroundColor?: string;
     };
   };
 }

@@ -1,20 +1,25 @@
 {
-  "frame": {
-    "name": "Test Emoji-Chat",
-    "version": "1",
-    "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
-    "homeUrl": "https://emoji-chat-develop.vercel.app/",
-    "imageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
-    "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
-    "splashBackgroundColor": "#FFFFFF",
-    "webhookUrl": "https://emoji-chat-develop.vercel.app/api/webhook",
-    "subtitle": "test",
-    "description": "test",
-    "primaryCategory": "social"
-  },
   "accountAssociation": {
     "header": "eyJmaWQiOjI0NTI2MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQ5RmY2QTQxMDU5ZTc3NENmMTlhRTEzNDZDMkZkQjAwYmE5OUFmZDQifQ",
     "payload": "eyJkb21haW4iOiJlbW9qaS1jaGF0LWRldmVsb3AudmVyY2VsLmFwcCJ9",
     "signature": "jXbtf0UsUklKYzbuULSUxWPnwF368lzUht9H3/cU4zUaHp4MTczygbMLV4RBUVZ94Stm1YKpB6CIRk/N7Vz/3xs="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Emoji Chat",
+    "homeUrl": "https://emoji-chat-develop.vercel.app",
+    "iconUrl": "https://emoji-chat-develop.vercel.app/icons/icon-512x512.png",
+    "splashImageUrl": "https://emoji-chat-develop.vercel.app/icons/icon-512x512.png",
+    "splashBackgroundColor": "#FFFFFF",
+    "subtitle": "Web3 emoji-only chat app",
+    "description": "A Web3 chat application where communication happens exclusively through emojis. Create custom emojis, mint them as NFTs, and trade them on the marketplace.",
+    "primaryCategory": "social",
+    "tags": ["chat", "emoji", "nft", "web3", "social"],
+    "heroImageUrl": "https://emoji-chat-develop.vercel.app/icons/icon-512x512.png",
+    "tagline": "Chat with emojis, mint as NFTs",
+    "ogTitle": "Emoji Chat - Web3 Emoji Chat App",
+    "ogDescription": "Create, collect, and chat with emoji NFTs on Base",
+    "ogImageUrl": "https://emoji-chat-develop.vercel.app/icons/icon-512x512.png",
+    "noindex": false
   }
 }

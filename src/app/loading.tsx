@@ -14,9 +14,7 @@ import { Loading } from '@/components/ui/Loading';
 export default function AppLoading() {
   return (
     <div className="flex items-center justify-center min-h-screen bg-white">
-      <div className="text-center">
-        <Loading size="xl" className="mb-4" />
-      </div>
+      <Loading size="md" text="Loading..." />
     </div>
   );
 }

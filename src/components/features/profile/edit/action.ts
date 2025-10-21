@@ -1,11 +1,7 @@
 'use server';
 
-import { getPrivyId } from '@/lib/auth';
 import { updateUser } from '@/repository/db/user/actions';
-import {
-  type ProfileForm,
-  profileFormSchema,
-} from '@/repository/db/user/schema';
+import { profileFormSchema } from '@/repository/db/user/schema';
 import { parseWithZod } from '@conform-to/zod';
 import { redirect } from 'next/navigation';
 
@@ -19,6 +15,16 @@ export async function handleProfileFormAction(
   formData?: FormData,
 ): Promise<ProfileFormState> {
   if (!formData) return null;
+
+  // walletAddress を formData から取得（統合認証対応）
+  const walletAddress = formData.get('walletAddress') as string;
+  if (!walletAddress) {
+    return {
+      message: 'Failed to get authentication information',
+      status: 'error' as const,
+    };
+  }
+
   const submission = parseWithZod(formData, {
     schema: profileFormSchema,
   });
@@ -41,25 +47,16 @@ export async function handleProfileFormAction(
     };
   }
 
-  const profileData: ProfileForm = {
+  const profileData = {
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
-    email: submission.payload.email ? String(submission.payload.email) : null,
     imageUrl: submission.payload.imageUrl
       ? String(submission.payload.imageUrl)
       : null,
   };
 
   try {
-    const privyId = await getPrivyId();
-    if (!privyId) {
-      return {
-        message: 'Failed to get authentication information',
-        status: 'error' as const,
-      };
-    }
-
-    await updateUser(privyId, profileData);
+    await updateUser(walletAddress, profileData);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'An error occurred',

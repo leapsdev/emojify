@@ -16,7 +16,11 @@ export const BASENAME_L2_RESOLVER_ADDRESS =
 
 const baseClient = createPublicClient({
   chain: base,
-  transport: http('https://mainnet.base.org'),
+  transport: http('https://mainnet.base.org', {
+    timeout: 5_000,
+    retryCount: 2,
+    retryDelay: 1000,
+  }),
 });
 
 /**
@@ -64,6 +68,8 @@ export async function getBasename(address: Address) {
       return basename as Basename;
     }
   } catch (error) {
-    console.error(error);
+    // Silently handle errors to prevent ENS timeout issues from affecting UX
+    console.warn('Basename resolution failed:', error);
+    return null;
   }
 }

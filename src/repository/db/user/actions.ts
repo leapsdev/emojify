@@ -1,166 +1,208 @@
 'use server';
 
 import { getCurrentTimestamp } from '@/lib/utils';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { adminDbRef } from '@/repository/db/config/server';
-import { PrivyClient } from '@privy-io/server-auth';
-import { updateUserInChatRooms } from '../chat/actions';
-
 import type { User } from '@/repository/db/database';
-import type { LinkedAccountWithMetadata } from '@privy-io/server-auth';
 import type { ProfileForm } from './schema';
 
 const USERS_PATH = 'users';
 
-export async function createUser(data: ProfileForm, privyId: string) {
+/**
+ * 新しいユーザーを作成する
+ * @param data プロフィール情報（username, bio, imageUrl）
+ * @param walletAddress ウォレットアドレス
+ * @returns 作成されたユーザー情報
+ * @throws {Error} データベースエラー時
+ */
+export async function createUser(data: ProfileForm, walletAddress: string) {
   const timestamp = getCurrentTimestamp();
-  const userRef = adminDbRef(`${USERS_PATH}/${privyId}`);
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const userRef = adminDbRef(`${USERS_PATH}/${normalizedAddress}`);
 
   const user: User = {
-    id: privyId,
     username: data.username,
     bio: data.bio || null,
     imageUrl: data.imageUrl || null,
     createdAt: timestamp,
     updatedAt: timestamp,
-    email: data.email || null,
   };
 
   await userRef.set(user);
   return user;
 }
 
-export async function getUser(userId: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${userId}`).get();
+/**
+ * 指定されたユーザーIDのユーザー情報を取得する
+ * @param walletAddress ウォレットアドレス
+ * @returns ユーザー情報（存在しない場合はnull）
+ * @throws {Error} データベースエラー時
+ */
+export async function getUser(walletAddress: string) {
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const snapshot = await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).get();
   return snapshot.val() as User | null;
 }
 
+/**
+ * ユーザー情報を更新する
+ * @param walletAddress ウォレットアドレス
+ * @param data 更新するデータ（idとcreatedAtは除く）
+ * @returns 更新されたデータ
+ * @throws {Error} データベースエラー時
+ * @description usernameまたはimageUrlが更新された場合、チャットルーム内の情報も自動更新される
+ */
 export async function updateUser(
-  userId: string,
+  walletAddress: string,
   data: Partial<Omit<User, 'id' | 'createdAt'>>,
 ) {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
   const updates = {
     ...data,
     updatedAt: timestamp,
   };
 
   // ユーザー情報を更新
-  await adminDbRef(`${USERS_PATH}/${userId}`).update(updates);
+  await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).update(updates);
 
-  // ユーザー名またはimageUrlが更新された場合、チャットルーム内の情報も更新
-  if (data.username || data.imageUrl !== undefined) {
-    const chatRoomUpdates: Partial<Pick<User, 'username' | 'imageUrl'>> = {
-      ...(data.username && { username: data.username }),
-      ...(data.imageUrl !== undefined && { imageUrl: data.imageUrl }),
-    };
-    await updateUserInChatRooms(
-      userId,
-      chatRoomUpdates as Pick<User, 'username' | 'imageUrl'>,
-    );
-  }
+  // 新しいスキーマでは、チャットルームのメンバー情報は最小限（joinedAt, lastReadAt）のみ
+  // usernameやimageUrlはUserテーブルから取得するため、チャットルームの更新は不要
 
   return updates;
 }
 
-export async function deleteUser(userId: string) {
-  await adminDbRef(`${USERS_PATH}/${userId}`).remove();
+/**
+ * ユーザーを削除する
+ * @param walletAddress ウォレットアドレス
+ * @throws {Error} データベースエラー時
+ */
+export async function deleteUser(walletAddress: string) {
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  await adminDbRef(`${USERS_PATH}/${normalizedAddress}`).remove();
 }
 
-export async function getAllUsers() {
+/**
+ * すべてのユーザー情報を取得する
+ * @returns 全ユーザーの配列
+ * @throws {Error} データベースエラー時
+ */
+export async function getAllUsers(): Promise<
+  Array<User & { walletAddress: string }>
+> {
   const snapshot = await adminDbRef(USERS_PATH).get();
   const users: Record<string, User> = snapshot.val() || {};
-  return Object.values(users);
+  // ウォレットアドレス（キー）とユーザーデータを組み合わせて返す
+  return Object.entries(users).map(([walletAddress, user]) => ({
+    ...user,
+    walletAddress, // ユーザーのidフィールドを優先使用
+  }));
 }
 
-export async function getUserById(id: string) {
-  const snapshot = await adminDbRef(`${USERS_PATH}/${id}`).get();
-  return snapshot.val() as User | null;
-}
-
+/**
+ * 指定されたIDのユーザーが存在するかチェックする
+ * @param id ウォレットアドレス
+ * @returns 存在する場合はtrue、存在しない場合はfalse
+ * @throws {Error} データベースエラー時
+ */
 export async function isIdExists(id: string): Promise<boolean> {
-  const user = await getUserById(id);
+  const user = await getUser(id);
   return user !== null;
 }
 
 /**
- * フレンドを追加
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を追加する（双方向）
+ * @param walletAddress ウォレットアドレス
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、既にフレンドの場合、データベースエラー時
  */
 export async function addFriend(
-  userId: string,
+  walletAddress: string,
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(userId),
-    getUserById(friendId),
+    getUser(normalizedAddress),
+    getUser(normalizedFriendId),
   ]);
 
   if (!user || !friend) {
     throw new Error('User not found');
   }
 
-  if (user.friends?.[friendId]) {
+  if (user.friends?.[normalizedFriendId]) {
     throw new Error('Already friends');
   }
 
   // 双方向のフレンド関係を更新
   const updates = {
-    [`${USERS_PATH}/${userId}/friends/${friendId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${friendId}/friends/${userId}`]: { createdAt: timestamp },
-    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: {
+      createdAt: timestamp,
+    },
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: {
+      createdAt: timestamp,
+    },
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);
 }
 
 /**
- * フレンドを削除
- * @param userId ユーザーID
- * @param friendId フレンドのID
+ * フレンド関係を削除する（双方向）
+ * @param walletAddress ウォレットアドレス
+ * @param friendId フレンドのID（ウォレットアドレス）
+ * @throws {Error} ユーザーが存在しない場合、フレンド関係が存在しない場合、データベースエラー時
  */
 export async function removeFriend(
-  userId: string,
+  walletAddress: string,
   friendId: string,
 ): Promise<void> {
   const timestamp = getCurrentTimestamp();
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const normalizedFriendId = normalizeWalletAddress(friendId);
 
   // バリデーション
   const [user, friend] = await Promise.all([
-    getUserById(userId),
-    getUserById(friendId),
+    getUser(normalizedAddress),
+    getUser(normalizedFriendId),
   ]);
 
   if (!user || !friend) {
     throw new Error('User not found');
   }
 
-  if (!user.friends?.[friendId]) {
+  if (!user.friends?.[normalizedFriendId]) {
     throw new Error('Not friends');
   }
 
   // 双方向のフレンド関係を削除
   const updates = {
-    [`${USERS_PATH}/${userId}/friends/${friendId}`]: null,
-    [`${USERS_PATH}/${friendId}/friends/${userId}`]: null,
-    [`${USERS_PATH}/${userId}/updatedAt`]: timestamp,
-    [`${USERS_PATH}/${friendId}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedAddress}/friends/${normalizedFriendId}`]: null,
+    [`${USERS_PATH}/${normalizedFriendId}/friends/${normalizedAddress}`]: null,
+    [`${USERS_PATH}/${normalizedAddress}/updatedAt`]: timestamp,
+    [`${USERS_PATH}/${normalizedFriendId}/updatedAt`]: timestamp,
   };
 
   await adminDbRef('/').update(updates);
 }
 
 /**
- * ユーザーのフレンド一覧を取得
- * @param userId ユーザーID
- * @returns フレンド一覧
+ * ユーザーのフレンド一覧を取得する
+ * @param walletAddress ウォレットアドレス
+ * @returns フレンド一覧（更新日時降順でソート）
+ * @throws {Error} ユーザーが存在しない場合、データベースエラー時
  */
-export async function getUserFriends(userId: string): Promise<User[]> {
-  const user = await getUserById(userId);
+export async function getUserFriends(
+  walletAddress: string,
+): Promise<Array<User & { walletAddress: string }>> {
+  const normalizedAddress = normalizeWalletAddress(walletAddress);
+  const user = await getUser(normalizedAddress);
   if (!user) {
     throw new Error('User not found');
   }
@@ -171,79 +213,108 @@ export async function getUserFriends(userId: string): Promise<User[]> {
 
   const friendIds = Object.keys(user.friends);
   const friends = await Promise.all(
-    friendIds.map((friendId) => getUserById(friendId)),
+    friendIds.map(async (friendId) => {
+      const friend = await getUser(friendId);
+      return friend ? { ...friend, walletAddress: friendId } : null;
+    }),
   );
 
   return friends
-    .filter((friend): friend is User => friend !== null)
+    .filter(
+      (friend): friend is User & { walletAddress: string } => friend !== null,
+    )
     .sort((a, b) => b.updatedAt - a.updatedAt);
 }
 
 /**
- * 自分以外のユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
+ * 自分以外のユーザー一覧を取得する
+ * @param currentWalletAddress 現在のウォレットアドレス
  * @returns 自分以外のユーザー一覧
+ * @throws {Error} データベースエラー時
  */
-export async function getOtherUsers(currentUserId: string): Promise<User[]> {
+export async function getOtherUsers(
+  currentWalletAddress: string,
+): Promise<Array<User & { walletAddress: string }>> {
+  const normalizedAddress = normalizeWalletAddress(currentWalletAddress);
   const allUsers = await getAllUsers();
-  return allUsers.filter((user) => user.id !== currentUserId);
+  return allUsers.filter((user) => user.walletAddress !== normalizedAddress);
 }
 
 /**
- * 友達状態を含むユーザー一覧を取得
- * @param currentUserId 現在のユーザーID
- * @returns フレンドとその他のユーザー一覧
+ * フレンド状態を含むユーザー一覧を取得する
+ * @param currentWalletAddress 現在のウォレットアドレス
+ * @returns フレンドとその他のユーザー一覧（更新日時降順でソート）
+ * @throws {Error} データベースエラー時
  */
-export async function getUsersWithFriendship(currentUserId: string): Promise<{
-  friends: User[];
-  others: User[];
+export async function getUsersWithFriendship(
+  currentWalletAddress: string,
+): Promise<{
+  friends: Array<User & { walletAddress: string }>;
+  others: Array<User & { walletAddress: string }>;
 }> {
-  const [currentUser, otherUsers] = await Promise.all([
-    getUserById(currentUserId),
-    getOtherUsers(currentUserId),
-  ]);
+  try {
+    const normalizedAddress = normalizeWalletAddress(currentWalletAddress);
+    const [currentUser, otherUsers] = await Promise.all([
+      getUser(normalizedAddress),
+      getOtherUsers(normalizedAddress),
+    ]);
 
-  if (!currentUser) return { friends: [], others: [] };
-
-  const friends: User[] = [];
-  const others: User[] = [];
-
-  // 友達かどうかで振り分け
-  otherUsers.forEach((user) => {
-    if (currentUser.friends?.[user.id]) {
-      friends.push(user);
-    } else {
-      others.push(user);
+    if (!currentUser) {
+      return { friends: [], others: [] };
     }
-  });
 
-  return {
-    friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
-    others: others.sort((a, b) => b.updatedAt - a.updatedAt),
-  };
+    const friends: Array<User & { walletAddress: string }> = [];
+    const others: Array<User & { walletAddress: string }> = [];
+
+    // 友達かどうかで振り分け
+    otherUsers.forEach((user) => {
+      if (currentUser.friends?.[user.walletAddress]) {
+        friends.push(user);
+      } else {
+        others.push(user);
+      }
+    });
+
+    const result = {
+      friends: friends.sort((a, b) => b.updatedAt - a.updatedAt),
+      others: others.sort((a, b) => b.updatedAt - a.updatedAt),
+    };
+
+    return result;
+  } catch (error) {
+    console.error('[getUsersWithFriendship] Error occurred:', {
+      error,
+      currentWalletAddress,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+    });
+    throw error; // エラーを再スローして呼び出し元でキャッチできるようにする
+  }
 }
 
 /**
- * ユーザーのウォレットアドレスを取得する
- * @param userId ユーザーID
- * @returns ウォレットアドレスの配列
+ * Farcaster情報から自動的にユーザーを作成する
+ * @param userData ユーザー情報（id + ProfileForm）
+ * @throws {Error} ユーザー作成に失敗した場合
  */
-export async function getWalletAddresses(userId: string): Promise<string[]> {
-  const privy = new PrivyClient(
-    process.env.NEXT_PUBLIC_PRIVY_APP_ID || '',
-    process.env.PRIVY_APP_SECRET || '',
-  );
+export async function autoCreateUserFromFarcaster(
+  userData: ProfileForm,
+  walletAddress: string,
+): Promise<void> {
+  if (!walletAddress) {
+    throw new Error('Wallet address is required');
+  }
 
   try {
-    const user = await privy.getUser(userId);
-    return user.linkedAccounts
-      .filter(
-        (account): account is LinkedAccountWithMetadata & { type: 'wallet' } =>
-          account.type === 'wallet',
-      )
-      .map((account) => account.address);
+    await createUser(userData, walletAddress);
   } catch (error) {
-    console.error('Error fetching user wallet addresses:', error);
-    return [];
+    console.error('[autoCreateUserFromFarcaster] Error:', {
+      error,
+      walletAddress,
+      errorMessage: error instanceof Error ? error.message : 'Unknown error',
+    });
+    throw new Error(
+      `Failed to create user: ${error instanceof Error ? error.message : 'Unknown error'}`,
+    );
   }
 }

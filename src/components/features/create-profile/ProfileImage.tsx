@@ -2,6 +2,7 @@
 
 import { Plus, User2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
+import Image from 'next/image';
 import { useRef, useState } from 'react';
 import { uploadImage } from '../profile/edit/uploadImage';
 
@@ -56,13 +57,23 @@ export function ProfileImage({ onImageUpload }: ProfileImageProps) {
         />
         <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border overflow-hidden">
           {imageUrl ? (
-            <CldImage
-              width={128}
-              height={128}
-              src={imageUrl}
-              alt="Profile Image"
-              className="w-full h-full object-cover"
-            />
+            imageUrl.includes('cloudinary.com') ? (
+              <CldImage
+                width={128}
+                height={128}
+                src={imageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={imageUrl}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+              />
+            )
           ) : (
             <User2 className="w-16 h-16 text-gray-400" />
           )}

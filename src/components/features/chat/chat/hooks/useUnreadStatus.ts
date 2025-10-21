@@ -1,14 +1,17 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { ChatRoom } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
-export function useUnreadStatus(roomId: string, currentUserId: string) {
+export function useUnreadStatus(roomId: string, currentWalletAddress: string) {
   const unreadStatusRef = useRef<boolean>(false);
-  const membersRef = useRef<Record<string, { imageUrl?: string | null }>>({});
+  const membersRef = useRef<
+    Record<string, { joinedAt: number; lastReadAt: number }>
+  >({});
 
   const getSnapshot = useCallback(() => {
     return unreadStatusRef.current;
@@ -34,10 +37,16 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
           membersRef.current = room.members;
         }
 
+        // 新しいスキーマでは、currentWalletAddressがウォレットアドレスを表す
+        const normalizedCurrentAddress =
+          normalizeWalletAddress(currentWalletAddress);
+
         // 未読状態の更新
         const newUnreadStatus = room.lastMessage
-          ? room.lastMessage.senderId !== currentUserId &&
-            room.members[currentUserId].lastReadAt < room.lastMessage.createdAt
+          ? normalizeWalletAddress(room.lastMessage.senderWalletAddress) !==
+              normalizedCurrentAddress &&
+            room.members[normalizedCurrentAddress]?.lastReadAt <
+              room.lastMessage.createdAt
           : false;
 
         // 未読状態またはメンバー情報が変更された場合のみコールバックを呼び出す
@@ -53,7 +62,7 @@ export function useUnreadStatus(roomId: string, currentUserId: string) {
         membersRef.current = {};
       };
     },
-    [roomId, currentUserId],
+    [roomId, currentWalletAddress],
   );
 
   const getServerSnapshot = useCallback(() => {

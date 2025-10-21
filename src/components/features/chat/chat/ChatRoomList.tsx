@@ -1,5 +1,6 @@
 import { DotBadge } from '@/components/ui/DotBadge';
 import { formatRelativeTime } from '@/lib/utils';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import type { ChatRoom as ChatRoomType } from '@/repository/db/database';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -8,23 +9,27 @@ import { useUnreadStatus } from './hooks/useUnreadStatus';
 
 type ChatRoomProps = {
   room: ChatRoomType;
-  currentUserId: string;
+  currentWalletAddress: string;
 };
 
 type Member = {
   joinedAt: number;
-  username: string;
+  username?: string;
   lastReadAt: number;
   imageUrl?: string | null;
+  walletAddress: string;
 };
 
-const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
-  const hasUnread = useUnreadStatus(room.id, currentUserId);
+const ChatRoom = ({ room, currentWalletAddress }: ChatRoomProps) => {
+  const hasUnread = useUnreadStatus(room.id, currentWalletAddress);
   const members = useRoomMembers(room.id);
 
   // メンバー情報を取得（自分以外）
+  const normalizedCurrentAddress = normalizeWalletAddress(currentWalletAddress);
   const otherMembers = Object.entries(members).filter(
-    ([memberId]) => memberId !== currentUserId,
+    ([, member]) =>
+      normalizeWalletAddress((member as Member).walletAddress) !==
+      normalizedCurrentAddress,
   ) as [string, Member][];
 
   // アバター画像のURLを決定
@@ -52,7 +57,13 @@ const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between">
             <h3 className="font-semibold truncate">
-              {otherMembers.map(([, member]) => member.username).join(', ')}
+              {otherMembers
+                .map(
+                  ([, member]) =>
+                    member.username ||
+                    `${member.walletAddress.slice(0, 6)}...${member.walletAddress.slice(-4)}`,
+                )
+                .join(', ')}
             </h3>
             <div className="flex items-center gap-2">
               {hasUnread && <DotBadge />}
@@ -71,15 +82,19 @@ const ChatRoom = ({ room, currentUserId }: ChatRoomProps) => {
 
 export const ChatRoomList = ({
   rooms,
-  currentUserId,
+  currentWalletAddress,
 }: {
   rooms: ChatRoomType[];
-  currentUserId: string;
+  currentWalletAddress: string;
 }) => {
   return (
     <div className="pb-14">
       {rooms.map((room) => (
-        <ChatRoom key={room.id} room={room} currentUserId={currentUserId} />
+        <ChatRoom
+          key={room.id}
+          room={room}
+          currentWalletAddress={currentWalletAddress}
+        />
       ))}
     </div>
   );

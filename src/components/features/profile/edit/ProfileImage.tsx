@@ -2,7 +2,8 @@
 
 import { Plus, User2 } from 'lucide-react';
 import { CldImage } from 'next-cloudinary';
-import { useRef, useState } from 'react';
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 import { uploadImage } from './uploadImage';
 
 interface ProfileImageProps {
@@ -17,6 +18,20 @@ export function ProfileImage({
   const [isPending, setIsPending] = useState(false);
   const [imageUrl, setImageUrl] = useState(currentImageUrl);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // currentImageUrlプロップの変更を監視してimageUrlステートを同期
+  useEffect(() => {
+    console.log(
+      '📸 [ProfileImage] currentImageUrl prop changed:',
+      currentImageUrl,
+    );
+    setImageUrl(currentImageUrl);
+  }, [currentImageUrl]);
+
+  // imageUrlステートの変更を監視
+  useEffect(() => {
+    console.log('📸 [ProfileImage] imageUrl state updated:', imageUrl);
+  }, [imageUrl]);
 
   const handleImageUpload = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -60,13 +75,23 @@ export function ProfileImage({
         />
         <div className="w-32 h-32 rounded-full bg-gray-100 flex items-center justify-center border overflow-hidden">
           {imageUrl ? (
-            <CldImage
-              width={128}
-              height={128}
-              src={imageUrl}
-              alt="Profile Image"
-              className="w-full h-full object-cover"
-            />
+            imageUrl.includes('cloudinary.com') ? (
+              <CldImage
+                width={128}
+                height={128}
+                src={imageUrl}
+                alt="Profile"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={imageUrl}
+                alt="Profile"
+                width={128}
+                height={128}
+                className="w-full h-full object-cover"
+              />
+            )
           ) : (
             <User2 className="w-16 h-16 text-gray-400" />
           )}

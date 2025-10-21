@@ -1,4 +1,3 @@
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import type { User } from '@/repository/db/database';
 import { Name } from '@coinbase/onchainkit/identity';
 import { MessageCircle, UserPlus } from 'lucide-react';
@@ -7,9 +6,10 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
-  userId: string;
+  walletAddress: string;
   avatar: string;
   section: 'friend' | 'other';
 }
@@ -29,12 +29,10 @@ export function UserItem({
 }: UserItemProps) {
   const [addresses, setAddresses] = useState<string[]>([]);
   useEffect(() => {
-    const fetchAddresses = async () => {
-      if (!user?.id) return;
-      const addresses = await getWalletAddressesByUserId(user.id);
-      setAddresses(addresses);
-    };
-    fetchAddresses();
+    // 新しいスキーマでは、ユーザーIDがウォレットアドレスを表す
+    if (user?.id) {
+      setAddresses([user.id]);
+    }
   }, [user?.id]);
 
   const RightButton = () => {

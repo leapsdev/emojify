@@ -1,6 +1,5 @@
 'use server';
 
-import { getPrivyId } from '@/lib/auth';
 import { createUser } from '@/repository/db/user/actions';
 import {
   type ProfileForm,
@@ -19,6 +18,16 @@ export async function handleProfileFormAction(
   formData?: FormData,
 ): Promise<ProfileFormState> {
   if (!formData) return null;
+
+  const userId = formData.get('userId') as string;
+
+  if (!userId) {
+    return {
+      message: 'Authentication information is missing',
+      status: 'error' as const,
+    };
+  }
+
   const submission = parseWithZod(formData, {
     schema: profileFormSchema,
   });
@@ -44,22 +53,14 @@ export async function handleProfileFormAction(
   const profileData: ProfileForm = {
     username: String(submission.payload.username),
     bio: submission.payload.bio ? String(submission.payload.bio) : null,
-    email: submission.payload.email ? String(submission.payload.email) : null,
     imageUrl: submission.payload.imageUrl
       ? String(submission.payload.imageUrl)
       : null,
   };
 
   try {
-    const privyId = await getPrivyId();
-    if (!privyId) {
-      return {
-        message: 'Failed to get authentication information',
-        status: 'error' as const,
-      };
-    }
-
-    await createUser(profileData, privyId);
+    // 新しいスキーマでは、認証プロバイダーに関係なくウォレットアドレスをユーザーIDとして使用
+    await createUser(profileData, userId);
   } catch (error) {
     return {
       message: error instanceof Error ? error.message : 'An error has occurred',

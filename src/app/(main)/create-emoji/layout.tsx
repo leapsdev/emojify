@@ -7,7 +7,7 @@ export default function CreateEmojiLayout({
 }) {
   return (
     <>
-      <Header backHref="/chat" className="mb-6" />
+      <Header backHref="/chat" className="mb-6" isShowChainSwitch />
       {children}
     </>
   );

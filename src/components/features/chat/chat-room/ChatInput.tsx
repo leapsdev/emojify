@@ -2,7 +2,7 @@
 
 import { useWallet } from '@/components/features/create-emoji/hooks/useWallet';
 import { useProfileNFTs } from '@/components/features/profile/hooks/useProfileNFTs';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
+
 import { Categories } from 'emoji-picker-react';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -21,14 +21,14 @@ interface NFT {
 
 type ChatRoomInputProps = {
   roomId: string;
-  userId: string;
+  walletAddress: string;
 };
 
-function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
+function ChatRoomInputContent({ roomId, walletAddress }: ChatRoomInputProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { selectedWalletAddress } = useWallet();
-  const { nfts } = useProfileNFTs(selectedWalletAddress);
+  const { address } = useWallet();
+  const { nfts } = useProfileNFTs(address);
 
   // NFTをカスタム絵文字として変換
   const customEmojis = nfts
@@ -56,16 +56,10 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
     const trimmedMessage = message.trim();
     if (!trimmedMessage || isLoading) return;
 
-    console.log('Sending message with:', {
-      roomId,
-      userId,
-      message: trimmedMessage,
-    });
-
     try {
       setIsLoading(true);
       setError(null);
-      await sendMessageAction(roomId, userId, trimmedMessage);
+      await sendMessageAction(roomId, walletAddress, trimmedMessage);
       clearMessage();
     } catch (error) {
       console.error('Failed to send message:', error);
@@ -125,9 +119,5 @@ function ChatRoomInputContent({ roomId, userId }: ChatRoomInputProps) {
 }
 
 export function ChatRoomInput(props: ChatRoomInputProps) {
-  return (
-    <EthereumProviders>
-      <ChatRoomInputContent {...props} />
-    </EthereumProviders>
-  );
+  return <ChatRoomInputContent {...props} />;
 }

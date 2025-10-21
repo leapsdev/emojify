@@ -1,13 +1,22 @@
 'use client';
 
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
-import type { ChatRoom } from '@/repository/db/database';
+import type { ChatRoom, User } from '@/repository/db/database';
 import { DB_PATHS } from '@/repository/db/database';
-import { onValue, ref } from 'firebase/database';
+import { get, onValue, ref } from 'firebase/database';
 import { useCallback, useRef, useSyncExternalStore } from 'react';
 
+type MemberWithUserInfo = {
+  joinedAt: number;
+  lastReadAt: number;
+  username?: string;
+  imageUrl?: string | null;
+  walletAddress: string;
+};
+
 export function useRoomMembers(roomId: string) {
-  const membersRef = useRef<ChatRoom['members']>({});
+  const membersRef = useRef<Record<string, MemberWithUserInfo>>({});
 
   const getSnapshot = useCallback(() => {
     return membersRef.current;
@@ -17,7 +26,7 @@ export function useRoomMembers(roomId: string) {
     (callback: () => void) => {
       const roomRef = ref(db, `${DB_PATHS.chatRooms}/${roomId}`);
 
-      const unsubscribe = onValue(roomRef, (snapshot) => {
+      const unsubscribe = onValue(roomRef, async (snapshot) => {
         const room = snapshot.val() as ChatRoom;
         if (!room) {
           membersRef.current = {};
@@ -25,7 +34,45 @@ export function useRoomMembers(roomId: string) {
           return;
         }
 
-        membersRef.current = room.members;
+        // メンバー情報とユーザー情報を結合
+        const membersWithUserInfo: Record<string, MemberWithUserInfo> = {};
+
+        for (const [walletAddress, memberInfo] of Object.entries(
+          room.members,
+        )) {
+          try {
+            const normalizedAddress = normalizeWalletAddress(walletAddress);
+            // ユーザー情報を取得
+            const userSnapshot = await get(
+              ref(db, `${DB_PATHS.users}/${normalizedAddress}`),
+            );
+            const user = userSnapshot.val() as User | null;
+
+            membersWithUserInfo[normalizedAddress] = {
+              ...memberInfo,
+              walletAddress: normalizedAddress,
+              username:
+                user?.username ||
+                `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`,
+              imageUrl: user?.imageUrl || null,
+            };
+          } catch (error) {
+            console.warn(
+              `Failed to fetch user data for ${walletAddress}:`,
+              error,
+            );
+            const normalizedAddress = normalizeWalletAddress(walletAddress);
+            // ユーザー情報が取得できない場合は、ウォレットアドレスを使用
+            membersWithUserInfo[normalizedAddress] = {
+              ...memberInfo,
+              walletAddress: normalizedAddress,
+              username: `${normalizedAddress.slice(0, 6)}...${normalizedAddress.slice(-4)}`,
+              imageUrl: null,
+            };
+          }
+        }
+
+        membersRef.current = membersWithUserInfo;
         callback();
       });
 

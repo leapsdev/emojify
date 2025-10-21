@@ -1,6 +1,7 @@
 'use client';
 
 import { getUsersWithFriendshipAction } from '@/components/features/choose-friends/actions';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { db } from '@/repository/db/config/client';
 import type { User } from '@/repository/db/database';
 import { onValue, ref } from 'firebase/database';
@@ -12,29 +13,31 @@ import {
   useSyncExternalStore,
 } from 'react';
 
-interface DisplayUser extends Pick<User, 'id' | 'username'> {
+interface DisplayUser extends Pick<User, 'username'> {
+  id: string; // ウォレットアドレス (UIのkey用)
   displayName: string;
-  userId: string;
+  walletAddress: string;
   avatar: string;
   section: 'friend' | 'other';
 }
 
 interface UseUserSelectionProps {
-  currentUserId: string;
-  initialFriends?: User[];
-  initialOthers?: User[];
+  currentWalletAddress: string;
+  initialFriends?: Array<User & { walletAddress: string }>;
+  initialOthers?: Array<User & { walletAddress: string }>;
 }
 
 // ユーザー情報をDisplayUser形式に変換
 function convertToDisplayUser(
   user: User,
+  walletAddress: string,
   section: 'friend' | 'other',
 ): DisplayUser {
   return {
-    id: user.id,
+    id: walletAddress,
     username: user.username,
     displayName: user.username,
-    userId: user.id,
+    walletAddress: walletAddress,
     avatar: user.imageUrl || '/icons/faceIcon-192x192.png',
     section,
   };
@@ -49,21 +52,29 @@ interface UserList {
 
 // 初期ユーザーリストを作成
 function createUserList(
-  initialFriends: User[],
-  initialOthers: User[],
+  initialFriends: Array<User & { walletAddress: string }>,
+  initialOthers: Array<User & { walletAddress: string }>,
 ): UserList {
   return {
     users: [
-      ...initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
-      ...initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+      ...initialFriends.map((user) =>
+        convertToDisplayUser(user, user.walletAddress, 'friend'),
+      ),
+      ...initialOthers.map((user) =>
+        convertToDisplayUser(user, user.walletAddress, 'other'),
+      ),
     ],
-    friends: initialFriends.map((user) => convertToDisplayUser(user, 'friend')),
-    others: initialOthers.map((user) => convertToDisplayUser(user, 'other')),
+    friends: initialFriends.map((user) =>
+      convertToDisplayUser(user, user.walletAddress, 'friend'),
+    ),
+    others: initialOthers.map((user) =>
+      convertToDisplayUser(user, user.walletAddress, 'other'),
+    ),
   };
 }
 
 export const useUserSelection = ({
-  currentUserId,
+  currentWalletAddress,
   initialFriends = [],
   initialOthers = [],
 }: UseUserSelectionProps) => {
@@ -82,7 +93,7 @@ export const useUserSelection = ({
   // ユーザーリストの購読
   const subscribe = useCallback(
     (callback: () => void) => {
-      if (!currentUserId) {
+      if (!currentWalletAddress) {
         userListRef.current = createUserList([], []);
         callback();
         return () => {};
@@ -93,15 +104,21 @@ export const useUserSelection = ({
       const unsubscribe = onValue(dbRef, async () => {
         try {
           const { friends, others } =
-            await getUsersWithFriendshipAction(currentUserId);
+            await getUsersWithFriendshipAction(currentWalletAddress);
           userListRef.current = {
             friends: friends.map((user) =>
-              convertToDisplayUser(user, 'friend'),
+              convertToDisplayUser(user, user.walletAddress, 'friend'),
             ),
-            others: others.map((user) => convertToDisplayUser(user, 'other')),
+            others: others.map((user) =>
+              convertToDisplayUser(user, user.walletAddress, 'other'),
+            ),
             users: [
-              ...friends.map((user) => convertToDisplayUser(user, 'friend')),
-              ...others.map((user) => convertToDisplayUser(user, 'other')),
+              ...friends.map((user) =>
+                convertToDisplayUser(user, user.walletAddress, 'friend'),
+              ),
+              ...others.map((user) =>
+                convertToDisplayUser(user, user.walletAddress, 'other'),
+              ),
             ],
           };
           callback();
@@ -115,7 +132,7 @@ export const useUserSelection = ({
         userListRef.current = initialUserList;
       };
     },
-    [currentUserId, initialUserList],
+    [currentWalletAddress, initialUserList],
   );
 
   // 現在のユーザーリストを返す
@@ -135,7 +152,9 @@ export const useUserSelection = ({
   const filteredUsers = users.filter(
     (user) =>
       user.displayName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      user.userId.toLowerCase().includes(searchQuery.toLowerCase()),
+      normalizeWalletAddress(user.walletAddress).includes(
+        normalizeWalletAddress(searchQuery),
+      ),
   );
 
   // フィルタリングされたユーザーを友達とその他に分類
@@ -143,11 +162,11 @@ export const useUserSelection = ({
   const others = filteredUsers.filter((user) => user.section === 'other');
 
   // ユーザーの選択状態を切り替え
-  const handleUserSelect = useCallback((userId: string) => {
+  const handleUserSelect = useCallback((walletAddress: string) => {
     setSelectedUsers((prev) =>
-      prev.includes(userId)
-        ? prev.filter((id) => id !== userId)
-        : [...prev, userId],
+      prev.includes(walletAddress)
+        ? prev.filter((id) => id !== walletAddress)
+        : [...prev, walletAddress],
     );
   }, []);
 

@@ -2,8 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
-import { OnchainProvider } from '@/components/providers/OnchainKitProvider';
-import { PrivyProvider } from '@/components/providers/PrivyProvider';
+import { Providers } from '@/components/providers/Providers';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -17,9 +16,33 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://emoji-chat-develop.vercel.app'),
   title: 'Emoji-Chat',
-  description: 'Emoji-Chat',
+  description:
+    'A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.',
   manifest: '/manifest.json',
+  openGraph: {
+    title: 'Emoji Chat',
+    description: 'Web3 emoji-only chat app',
+    images: ['/icons/icon-512x512.png'],
+  },
+  other: {
+    'fc:miniapp': JSON.stringify({
+      version: 'next',
+      imageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
+      button: {
+        title: 'Open Emoji Chat',
+        action: {
+          type: 'launch_miniapp',
+          name: 'Emoji Chat',
+          url: 'https://emoji-chat-develop.vercel.app',
+          splashImageUrl:
+            'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
+          splashBackgroundColor: '#FFFFFF',
+        },
+      },
+    }),
+  },
 };
 
 export const viewport: Viewport = {
@@ -36,12 +59,10 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <PrivyProvider>
-          <OnchainProvider>
-            {children}
-            <Toaster />
-          </OnchainProvider>
-        </PrivyProvider>
+        <Providers>
+          {children}
+          <Toaster />
+        </Providers>
       </body>
     </html>
   );

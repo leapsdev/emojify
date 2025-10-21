@@ -2,13 +2,10 @@
 
 import { Button } from '@/components/ui/Button';
 import { LinkButton } from '@/components/ui/LinkButton';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { addFriend, removeFriend } from '@/repository/db/user/actions';
 import { Name } from '@coinbase/onchainkit/identity';
-import { useUser } from '@privy-io/react-auth';
 import { UserMinus, UserPlus } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
 import { base } from 'viem/chains';
 import { useIsFriend } from './hooks/useIsFriend';
 
@@ -16,9 +13,9 @@ interface UserProfileProps {
   username: string;
   bio: string;
   avatar: string;
-  userId: string;
+  walletAddress: string;
   isOwnProfile?: boolean;
-  currentUserId?: string;
+  currentWalletAddress?: string;
   initialIsFriend?: boolean;
 }
 
@@ -26,32 +23,26 @@ export const UserProfile = ({
   username,
   bio,
   avatar,
-  userId,
+  walletAddress,
   isOwnProfile = true,
-  currentUserId,
+  currentWalletAddress,
   initialIsFriend = false,
 }: UserProfileProps) => {
-  const { user } = useUser();
-  const [addresses, setAddresses] = useState<string[]>([]);
-  useEffect(() => {
-    const fetchAddresses = async () => {
-      if (!user?.id) return;
-      const addresses = await getWalletAddressesByUserId(user.id);
-      setAddresses(addresses);
-    };
-    fetchAddresses();
-  }, [user?.id]);
-
-  const isFriend = useIsFriend(currentUserId || '', userId, initialIsFriend);
+  console.log('UserProfile received avatar:', avatar);
+  const isFriend = useIsFriend(
+    currentWalletAddress || '',
+    walletAddress,
+    initialIsFriend,
+  );
 
   const handleAddFriend = async () => {
-    if (!currentUserId) return;
-    await addFriend(currentUserId, userId);
+    if (!currentWalletAddress) return;
+    await addFriend(currentWalletAddress, walletAddress);
   };
 
   const handleRemoveFriend = async () => {
-    if (!currentUserId) return;
-    await removeFriend(currentUserId, userId);
+    if (!currentWalletAddress) return;
+    await removeFriend(currentWalletAddress, walletAddress);
   };
 
   const FriendButton = () => {
@@ -96,24 +87,21 @@ export const UserProfile = ({
           <div className="relative w-24 h-24">
             <Image
               src={avatar}
-              alt={username}
+              alt={'User profile image'}
               fill
               sizes="(max-width: 768px) 96px, 96px"
               priority
               className="rounded-full object-cover"
+              onLoad={() => console.log('Image loaded successfully:', avatar)}
+              onError={() => console.error('Image failed to load:', avatar)}
             />
           </div>
           <div className="flex flex-1 min-w-0 items-start justify-between ml-4">
             <div className="pt-3 min-w-0">
               <h2 className="text-2xl font-black truncate">{username}</h2>
               <div className="text-[13px] text-gray-600 font-bold truncate">
-                {addresses[0] && (
-                  <Name
-                    address={
-                      `0x${addresses[0].replace('0x', '')}` as `0x${string}`
-                    }
-                    chain={base}
-                  />
+                {walletAddress && (
+                  <Name address={walletAddress as `0x${string}`} chain={base} />
                 )}
               </div>
             </div>

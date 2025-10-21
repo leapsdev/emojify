@@ -30,41 +30,62 @@ export const useExploreNFTs = () => {
       try {
         setLoading(true);
         setError(null);
+        setNFTs([]); // Reset NFTs on fetch start
+
         const totalSupply = (await readContract(config, {
           ...emojiContract,
           functionName: 'totalSupply',
         })) as bigint;
-        const nftResults: NFT[] = [];
+
+        // ストリーミング方式: 取得したNFTから順次表示
+        const fetchPromises: Promise<void>[] = [];
+
         for (let i = 0; i < Number(totalSupply); i++) {
           const tokenId = i + 1;
-          try {
-            const uri = (await readContract(config, {
-              ...emojiContract,
-              functionName: 'uri',
-              args: [BigInt(tokenId)],
-            })) as string;
-            if (!uri) continue;
-            const metadata = await fetchMetadata(uri);
-            const imageUrl = metadata.image
-              ? ipfsToHttp(metadata.image)
-              : '/placeholder.svg';
-            nftResults.push({
-              tokenId: tokenId.toString(),
-              owner: '',
-              uri: ipfsToHttp(uri),
-              imageUrl,
-              name: metadata.name || `NFT #${tokenId}`,
-              description: metadata.description || '',
-            });
-          } catch {
-            // skip broken token
-          }
+          const promise = (async () => {
+            try {
+              const uri = (await readContract(config, {
+                ...emojiContract,
+                functionName: 'uri',
+                args: [BigInt(tokenId)],
+              })) as string;
+              if (!uri) return;
+
+              const metadata = await fetchMetadata(uri);
+              const imageUrl = metadata.image
+                ? ipfsToHttp(metadata.image)
+                : '/placeholder.svg';
+
+              const nft: NFT = {
+                tokenId: tokenId.toString(),
+                owner: '',
+                uri: ipfsToHttp(uri),
+                imageUrl,
+                name: metadata.name || `NFT #${tokenId}`,
+                description: metadata.description || '',
+              };
+
+              // 取得次第、即座にstateに追加（新しい順にソート）
+              setNFTs((prev) => {
+                // 重複チェック: 既に同じtokenIdが存在する場合は追加しない
+                if (prev.some((item) => item.tokenId === nft.tokenId)) {
+                  return prev;
+                }
+                const updated = [...prev, nft];
+                updated.sort((a, b) => Number(b.tokenId) - Number(a.tokenId));
+                return updated;
+              });
+            } catch {
+              // skip broken token
+            }
+          })();
+          fetchPromises.push(promise);
         }
-        // 新しい順にソート
-        nftResults.sort((a, b) => Number(b.tokenId) - Number(a.tokenId));
-        setNFTs(nftResults);
+
+        // すべてのNFT取得完了を待つ
+        await Promise.all(fetchPromises);
       } catch (err) {
-        console.error('NFT取得エラー:', err);
+        console.error('NFT fetch error:', err);
         setError('NFTの取得に失敗しました');
         setNFTs([]);
       } finally {

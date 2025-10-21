@@ -1,6 +1,13 @@
+'use client';
+
 import { LinkButton } from '@/components/ui/LinkButton';
 import { cn } from '@/lib/utils';
+import { usePrivy } from '@privy-io/react-auth';
+import { useEffect, useState } from 'react';
 import { HiOutlineChevronLeft } from 'react-icons/hi2';
+import { useAccount, useSwitchChain } from 'wagmi';
+import { base, baseSepolia } from 'wagmi/chains';
+import { WalletManagementButton } from './WalletManagementButton';
 
 /**
  * 共通ヘッダーコンポーネント
@@ -42,6 +49,8 @@ type HeaderProps = {
   onBack?: () => void;
   /** 追加のスタイルクラス */
   className?: string;
+  /** チェーン切替ボタンを表示するかどうか */
+  isShowChainSwitch?: boolean;
 };
 
 export const Header = ({
@@ -51,6 +60,7 @@ export const Header = ({
   backHref,
   onBack,
   className,
+  isShowChainSwitch = false,
 }: HeaderProps) => {
   const backButton =
     (backHref || onBack) &&
@@ -85,9 +95,152 @@ export const Header = ({
       </div>
 
       {/* 右エリア - 絶対位置で配置 */}
-      <div className="absolute right-4 h-full flex items-center">
+      <div className="absolute right-4 h-full flex items-center space-x-2">
+        <WalletManagementButton />
+        {isShowChainSwitch && <ChainSwitchButton />}
         {rightContent}
       </div>
+    </div>
+  );
+};
+
+/**
+ * チェーン切替ボタンコンポーネント（ウォレットの状態を反映）
+ */
+const ChainSwitchButton = () => {
+  const { user } = usePrivy();
+  const { chain, isConnected } = useAccount();
+  const { switchChain } = useSwitchChain();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+
+  // Privyの接続状態も考慮
+  const isPrivyConnected = !!user?.wallet?.address;
+  const actualIsConnected = isConnected || isPrivyConnected;
+  const isProd = process.env.NEXT_PUBLIC_ENVIRONMENT === 'production';
+  const defaultChain = isProd ? base : baseSepolia;
+  const availableChains = isProd
+    ? [{ id: base.id, name: 'Base', symbol: 'ETH' }]
+    : [{ id: baseSepolia.id, name: 'Base Sepolia', symbol: 'ETH' }];
+
+  // チェーン情報が取得できない場合はデフォルトチェーンを使用
+  const currentChain = chain
+    ? availableChains.find((c) => c.id === chain.id)
+    : availableChains.find((c) => c.id === defaultChain.id) ||
+      availableChains[0];
+
+  const currentChainName = currentChain?.name || 'Unknown';
+
+  // 自動チェーン切り替え機能
+  useEffect(() => {
+    const autoSwitchChain = async () => {
+      // ウォレットが接続されていない場合は何もしない
+      if (!actualIsConnected) return;
+
+      // チェーン情報が取得できない場合は、デフォルトチェーンに切り替え
+      if (!chain) {
+        try {
+          await switchChain({ chainId: defaultChain.id });
+        } catch (error) {
+          console.error('Failed to switch to default chain:', error);
+        }
+        return;
+      }
+
+      // 現在のチェーンが環境に適したチェーンでない場合、自動切り替え
+      const targetChain = isProd ? base : baseSepolia;
+      if (chain.id !== targetChain.id) {
+        try {
+          await switchChain({ chainId: targetChain.id });
+        } catch (error) {
+          console.error('Failed to switch chain automatically:', error);
+        }
+      }
+    };
+
+    autoSwitchChain();
+  }, [actualIsConnected, chain, isProd, switchChain, defaultChain]);
+
+  // チェーン切替処理
+  const handleChainSwitch = async (chainId: 8453 | 84532) => {
+    try {
+      await switchChain({ chainId });
+      setIsDropdownOpen(false);
+    } catch (error) {
+      console.error('Failed to switch chain:', error);
+    }
+  };
+
+  // ウォレットが接続されていない場合は何も表示しない
+  if (!actualIsConnected) {
+    return null;
+  }
+
+  return (
+    <div className="relative">
+      <button
+        type="button"
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        className="flex items-center space-x-2 px-3 py-1.5 text-sm font-medium text-gray-700 bg-gray-100 rounded-lg hover:bg-gray-200 transition-colors"
+      >
+        <span>{currentChainName}</span>
+        <svg
+          className={`w-4 h-4 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`}
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+          aria-label="Open chain menu"
+        >
+          <title>Open chain menu</title>
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M19 9l-7 7-7-7"
+          />
+        </svg>
+      </button>
+
+      {isDropdownOpen && (
+        <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 z-50">
+          <div className="py-1">
+            <div className="px-4 py-2 text-xs text-gray-500 border-b">
+              <div className="font-medium">Select Chain</div>
+            </div>
+
+            {availableChains.map((chain) => (
+              <button
+                key={chain.id}
+                type="button"
+                onClick={() => handleChainSwitch(chain.id)}
+                className={`w-full text-left px-4 py-2 text-sm transition-colors ${
+                  chain.id === currentChain?.id
+                    ? 'bg-blue-50 text-blue-600 font-medium'
+                    : 'text-gray-700 hover:bg-gray-100'
+                }`}
+              >
+                <div className="flex items-center justify-between">
+                  <span>{chain.name}</span>
+                  {chain.id === currentChain?.id && (
+                    <svg
+                      className="w-4 h-4"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                      aria-label="Currently selected chain"
+                    >
+                      <title>Currently selected chain</title>
+                      <path
+                        fillRule="evenodd"
+                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

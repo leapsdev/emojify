@@ -4,13 +4,12 @@ import { WalletConnectButton } from '@/components/shared/WalletConnectButton';
 import { LinkButton } from '@/components/ui/LinkButton';
 import { TransactionResult } from '@/components/ui/TransactionResult';
 import { useCollectWallet } from '@/hooks/useCollectWallet';
-import { EMOJI_CONTRACT_ADDRESS } from '@/lib/contracts';
 import { useState } from 'react';
 import { CreateButton } from './components/CreateButton';
 import { FileUpload } from './components/FileUpload';
+import { useEmojiMint } from './hooks/useEmojiMint';
 import { useFileUpload } from './hooks/useFileUpload';
 import { useIPFS } from './hooks/useIPFS';
-import { useWagmiMint } from './hooks/useThirdwebMint';
 import { useWallet } from './hooks/useWallet';
 
 type MintResult = {
@@ -22,9 +21,9 @@ export function CreateEmojiForm() {
   const { selectedFile, preview, handleFileSelect } = useFileUpload();
   const [loading, setLoading] = useState(false);
   const [mintResult, setMintResult] = useState<MintResult>(null);
-  const { selectedWalletAddress, getSelectedWallet } = useWallet();
-  const { uploadToIPFS, ipfsToHttp, uploadMetadataToIPFS } = useIPFS();
-  const { mintNFT } = useWagmiMint();
+  const { address } = useWallet();
+  const { uploadToIPFS, uploadMetadataToIPFS } = useIPFS();
+  const { mintNFT } = useEmojiMint();
   const { isConnected } = useCollectWallet();
 
   if (!isConnected) {
@@ -32,10 +31,7 @@ export function CreateEmojiForm() {
   }
 
   const handleCreate = async () => {
-    if (!selectedFile || !selectedWalletAddress) return;
-
-    const selectedWallet = getSelectedWallet();
-    if (!selectedWallet) return;
+    if (!selectedFile || !address) return;
 
     try {
       setLoading(true);
@@ -43,34 +39,12 @@ export function CreateEmojiForm() {
 
       // Step 1: 画像をIPFSにアップロード
       const imageUrl = await uploadToIPFS(selectedFile);
-      const imageHttpUrl = ipfsToHttp(imageUrl);
-      console.log(
-        `Image upload completed.\nYou can check it at:\n${imageHttpUrl}\n${imageUrl}`,
-      );
 
       // Step 2: メタデータを作成してIPFSにアップロード
-      const metadataUrl = await uploadMetadataToIPFS(
-        imageUrl,
-        selectedWalletAddress,
-      );
-      console.log(`metadataUrl: ${metadataUrl}`);
-      const metadataHttpUrl = ipfsToHttp(metadataUrl);
-      console.log(
-        `Metadata upload completed.\nYou can check it at:\n${metadataHttpUrl}`,
-      );
+      const metadataUrl = await uploadMetadataToIPFS(imageUrl, address);
 
-      // Step 3: NFTのミント
-      const { transactionHash } = await mintNFT(
-        selectedWalletAddress,
-        selectedWallet.getEthereumProvider.bind(selectedWallet),
-        metadataUrl,
-      );
-      console.log('NFT minted successfully!');
-      console.log('Transaction Hash:', transactionHash);
-      console.log(
-        'View on OpenSea:',
-        `https://testnets.opensea.io/ja/${EMOJI_CONTRACT_ADDRESS}/${selectedWalletAddress}`,
-      );
+      // Step 3: NFTのミント（Wagmiを使用）
+      const { transactionHash } = await mintNFT(metadataUrl);
       setMintResult({
         result: 'success',
         transactionHash,

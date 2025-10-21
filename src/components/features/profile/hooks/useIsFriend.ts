@@ -7,14 +7,14 @@ import { useSyncExternalStore } from 'react';
 
 /**
  * ユーザー間のフレンド状態を監視するカスタムフック
- * @param currentUserId 現在のユーザーID
- * @param targetUserId 対象のユーザーID
+ * @param currentWalletAddress 現在のユーザーID
+ * @param targetWalletAddress 対象のユーザーID
  * @param initialState サーバーから取得した初期フレンド状態
  * @returns フレンド状態（boolean）
  */
 export const useIsFriend = (
-  currentUserId: string,
-  targetUserId: string,
+  currentWalletAddress: string,
+  targetWalletAddress: string,
   initialState = false,
 ) => {
   // 現在のフレンド状態を保持するref
@@ -22,12 +22,15 @@ export const useIsFriend = (
 
   const subscribe = useCallback(
     (callback: (value: boolean) => void) => {
-      if (!currentUserId || !targetUserId) {
+      if (!currentWalletAddress || !targetWalletAddress) {
         callback(false);
         return () => {};
       }
 
-      const ref = dbRef(db, `users/${currentUserId}/friends/${targetUserId}`);
+      const ref = dbRef(
+        db,
+        `users/${currentWalletAddress}/friends/${targetWalletAddress}`,
+      );
       const unsubscribe = onValue(
         ref,
         (snapshot) => {
@@ -44,7 +47,7 @@ export const useIsFriend = (
 
       return () => unsubscribe();
     },
-    [currentUserId, targetUserId],
+    [currentWalletAddress, targetWalletAddress],
   );
 
   // 現在のフレンド状態を返す

@@ -7,8 +7,8 @@ import { sendMessage } from '@/repository/db/chat/actions';
  */
 export async function sendMessageAction(
   roomId: string,
-  userId: string,
+  walletAddress: string,
   content: string,
 ): Promise<string> {
-  return sendMessage(roomId, userId, content);
+  return sendMessage(roomId, walletAddress, content);
 }

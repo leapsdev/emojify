@@ -78,7 +78,7 @@ export const useCollectNFT = (tokenId: string) => {
 
         setEmojiData(emojiData);
       } catch (err) {
-        console.error('NFT取得エラー:', err);
+        console.error('NFT fetch error:', err);
         setError('NFTの取得に失敗しました');
         setEmojiData(null);
       } finally {

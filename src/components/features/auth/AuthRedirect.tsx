@@ -1,44 +1,16 @@
 'use client';
 
-import { usePrivy } from '@privy-io/react-auth';
-import { usePathname, useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { checkUserExists } from './action';
-
 type Props = {
   mode: 'auth' | 'profile';
 };
 
 export const AuthRedirect = ({ mode }: Props) => {
-  const { authenticated, user } = usePrivy();
-  const router = useRouter();
-  const pathname = usePathname();
+  // authモードでは何も処理しない
+  if (mode === 'auth') {
+    return null;
+  }
 
-  useEffect(() => {
-    const handleAuthRedirect = async () => {
-      // プロフィール作成ページの場合
-      if (mode === 'profile') {
-        const exists = await checkUserExists();
-        if (exists) {
-          router.push('/chat');
-        }
-        return;
-      }
-
-      // 認証関連のページの場合
-      if (mode === 'auth') {
-        if (pathname === '/' || pathname === '/profile/create') return;
-        if (!authenticated || !user) return;
-
-        const exists = await checkUserExists();
-        if (!exists) {
-          router.push('/profile/create');
-        }
-      }
-    };
-
-    handleAuthRedirect();
-  }, [authenticated, user, router, pathname, mode]);
-
+  // profileモードの場合も何も処理しない
+  // profile作成後のリダイレクトはCreateProfilePageで処理
   return null;
 };

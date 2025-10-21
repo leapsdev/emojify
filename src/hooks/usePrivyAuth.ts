@@ -10,16 +10,20 @@ import {
 } from 'firebase/auth';
 import { useEffect, useState } from 'react';
 
-interface FirebaseAuthState {
+interface PrivyAuthState {
   isFirebaseAuthenticated: boolean;
   isLoading: boolean;
   error: string | null;
   user: User | null;
 }
 
-export function useFirebaseAuth() {
-  const { authenticated: isPrivyAuthenticated, user: privyUser } = usePrivy();
-  const [state, setState] = useState<FirebaseAuthState>({
+export function usePrivyAuth() {
+  const {
+    authenticated: isPrivyAuthenticated,
+    user: privyUser,
+    getAccessToken,
+  } = usePrivy();
+  const [state, setState] = useState<PrivyAuthState>({
     isFirebaseAuthenticated: false,
     isLoading: true,
     error: null,
@@ -43,16 +47,24 @@ export function useFirebaseAuth() {
           return;
         }
 
+        // Privyアクセストークンを取得
+        const accessToken = await getAccessToken();
+        if (!accessToken) {
+          throw new Error('Failed to get Privy access token');
+        }
+
         // Firebaseカスタムトークンを取得
         const response = await fetch('/api/auth/firebase-token', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
         if (!response.ok) {
-          throw new Error('Firebaseトークンの取得に失敗しました');
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(errorData.error || 'Failed to get Firebase token');
         }
 
         const { token } = await response.json();
@@ -60,12 +72,14 @@ export function useFirebaseAuth() {
         // Firebaseにカスタムトークンでサインイン
         await signInWithCustomToken(auth, token);
       } catch (error) {
-        console.error('Firebase認証同期エラー:', error);
+        console.error('Firebase authentication sync error:', error);
         setState((prev) => ({
           ...prev,
           isLoading: false,
           error:
-            error instanceof Error ? error.message : '認証エラーが発生しました',
+            error instanceof Error
+              ? error.message
+              : 'Authentication error occurred',
         }));
       }
     };
@@ -86,13 +100,13 @@ export function useFirebaseAuth() {
     return () => {
       unsubscribe();
     };
-  }, [isPrivyAuthenticated, privyUser?.id]);
+  }, [isPrivyAuthenticated, privyUser?.id, getAccessToken]);
 
   const signOutFromFirebase = async () => {
     try {
       await signOut(auth);
     } catch (error) {
-      console.error('Firebaseサインアウトエラー:', error);
+      console.error('Firebase sign out error:', error);
     }
   };
 

@@ -3,7 +3,7 @@
 import {
   createChatRoom,
   findChatRoomByMembers,
-} from '@/repository/db/chat/actions';
+} from '@/repository/db/chatroom/actions';
 import {
   addFriend,
   getUsersWithFriendship,
@@ -12,9 +12,9 @@ import {
 /**
  * フレンドを追加
  */
-export async function addFriendAction(userId: string, friendId: string) {
+export async function addFriendAction(walletAddress: string, friendId: string) {
   try {
-    await addFriend(userId, friendId);
+    await addFriend(walletAddress, friendId);
     return { success: true };
   } catch (error) {
     console.error('Failed to add friend:', error);
@@ -48,9 +48,11 @@ export async function createChatRoomAction(members: string[]) {
 /**
  * ユーザー一覧を取得
  */
-export async function getUsersWithFriendshipAction(currentUserId: string) {
+export async function getUsersWithFriendshipAction(
+  currentWalletAddress: string,
+) {
   try {
-    return await getUsersWithFriendship(currentUserId);
+    return await getUsersWithFriendship(currentWalletAddress);
   } catch (error) {
     console.error('Failed to get users:', error);
     return { friends: [], others: [] };

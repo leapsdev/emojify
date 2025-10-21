@@ -1,52 +1,46 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Loading } from '@/components/ui/Loading';
-import { useFirebaseAuth } from '@/hooks/useFirebaseAuth';
-import dynamic from 'next/dynamic';
+import { usePrivyAuth } from '@/hooks/usePrivyAuth';
+import { PrivyProvider } from '@privy-io/react-auth';
 
-const PrivyProviderClient = dynamic(
-  () => import('@privy-io/react-auth').then((mod) => mod.PrivyProvider),
-  { ssr: false },
-);
+interface PrivyAuthProviderProps {
+  children: React.ReactNode;
+}
 
-function FirebaseAuthSync({ children }: { children: React.ReactNode }) {
-  const { isLoading, error } = useFirebaseAuth();
+export function PrivyAuthProvider({ children }: PrivyAuthProviderProps) {
+  const { isMiniApp } = useIsMiniApp();
+  const { isLoading } = usePrivyAuth();
 
-  // ローディング中の表示
-  if (isLoading) {
+  if (!isMiniApp && isLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <Loading size="lg" />
+        <Loading size="md" text="Loading..." />
       </div>
     );
   }
 
-  // エラー時の表示
-  if (error) {
-    console.error('Firebase認証エラー:', error);
-    // エラーがあってもアプリは継続して動作させる
-  }
-
-  return <>{children}</>;
-}
-
-export function PrivyProvider({ children }: { children: React.ReactNode }) {
   return (
-    <PrivyProviderClient
+    <PrivyProvider
       appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ''}
       config={{
-        loginMethods: ['wallet', 'farcaster', 'email'],
+        // Mini App環境ではウォレット機能を無効化
+        loginMethods: isMiniApp
+          ? ['farcaster', 'email']
+          : ['wallet', 'farcaster', 'email'],
         appearance: {
           theme: 'light',
           accentColor: '#676FFF',
-          showWalletLoginFirst: true,
+          showWalletLoginFirst: !isMiniApp, // Mini App環境ではウォレットログインを無効化
         },
         embeddedWallets: {
           createOnLogin: 'users-without-wallets',
+          showWalletUIs: !isMiniApp, // Mini App環境ではウォレットUIを表示しない
         },
       }}
     >
-      <FirebaseAuthSync>{children}</FirebaseAuthSync>
-    </PrivyProviderClient>
+      {children}
+    </PrivyProvider>
   );
 }

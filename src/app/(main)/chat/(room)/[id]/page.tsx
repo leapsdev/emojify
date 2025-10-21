@@ -1,34 +1,106 @@
+'use client';
+
 import { ChatRoomPage } from '@/components/pages/ChatRoomPage';
 import { Header } from '@/components/shared/layout/Header';
-import { getUserId } from '@/lib/auth';
+import { Loading } from '@/components/ui/Loading';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import { normalizeWalletAddress } from '@/lib/wallet-utils';
 import { getChatRoomAction } from '@/repository/db/chat/actions';
+import type { ChatRoom, Message, User } from '@/repository/db/database';
+import { getUser } from '@/repository/db/user/actions';
 import { notFound } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-type Props = {
-  params: Promise<{
-    id: string;
-  }>;
-};
+export default function Page() {
+  const { isAuthenticated, isLoading, walletAddress, user } = useUnifiedAuth();
+  const [roomData, setRoomData] = useState<ChatRoom | null>(null);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const [otherUsers, setOtherUsers] = useState<User[]>([]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const params = useParams();
+  const roomId = params.id as string;
 
-export default async function Page({ params }: Props) {
-  const roomId = (await params).id;
+  useEffect(() => {
+    const fetchRoomData = async () => {
+      if (isAuthenticated && walletAddress && roomId && user) {
+        try {
+          const { room, messages: roomMessages } =
+            await getChatRoomAction(roomId);
+          if (!room) {
+            setIsDataLoading(false);
+            notFound();
+          }
+          setRoomData(room);
+          setMessages(roomMessages);
 
-  const userId = await getUserId();
-  if (!userId) throw new Error('Authentication required');
+          // 他のメンバーのユーザー情報を取得（エラーが発生してもページは表示）
+          const normalizedWalletAddress = normalizeWalletAddress(walletAddress);
+          const otherMemberWalletAddresses = Object.keys(room.members).filter(
+            (memberAddress) => memberAddress !== normalizedWalletAddress,
+          );
 
-  // チャットルームの情報とメッセージを取得
-  const { room, messages } = await getChatRoomAction(roomId);
-  if (!room) notFound();
+          try {
+            const otherUsersData = await Promise.all(
+              otherMemberWalletAddresses.map((memberAddress) =>
+                getUser(memberAddress),
+              ),
+            );
 
-  // 相手のユーザー情報を取得
-  const otherMembers = Object.entries(room.members)
-    .filter(([id]) => id !== userId)
-    .map(([, member]) => member);
+            setOtherUsers(
+              otherUsersData.filter((user): user is User => user !== null),
+            );
+          } catch (userError) {
+            console.warn('Failed to fetch user data:', userError);
+            // ユーザー情報の取得に失敗してもページは表示
+            setOtherUsers([]);
+          }
 
-  if (otherMembers.length === 0) notFound();
+          // データ取得成功時のみローディング終了
+          setIsDataLoading(false);
+        } catch (error) {
+          console.error('[ChatRoomPage] Error fetching room data:', error);
+          // エラー時もローディング終了
+          setIsDataLoading(false);
+        }
+      }
+      // Firebase認証完了を待つため、ローディング継続（setIsDataLoading(false)を呼ばない）
+    };
+
+    fetchRoomData();
+  }, [isAuthenticated, walletAddress, roomId, user]);
+
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading size="md" text="Loading..." />
+      </div>
+    );
+  }
+
+  // ルームが存在しない場合のみ404エラー
+  if (!roomData) {
+    notFound();
+  }
 
   // ヘッダーに表示するユーザー名を生成
-  const headerTitle = otherMembers.map((member) => member.username).join(', ');
+  const headerTitle = (() => {
+    if (otherUsers.length > 0) {
+      // ユーザー名が取得できた場合
+      return otherUsers.map((user) => user.username).join(', ');
+    }
+    if (roomData && walletAddress) {
+      // ユーザー名が取得できない場合は、ウォレットアドレスを表示
+      const normalizedWalletAddress = normalizeWalletAddress(walletAddress);
+      const otherMemberAddresses = Object.keys(roomData.members).filter(
+        (address) => address !== normalizedWalletAddress,
+      );
+      return otherMemberAddresses
+        .map((address) => `${address.slice(0, 6)}...${address.slice(-4)}`)
+        .join(', ');
+    }
+    return '';
+  })();
 
   return (
     <>
@@ -42,7 +114,7 @@ export default async function Page({ params }: Props) {
       />
       <ChatRoomPage
         roomId={roomId}
-        userId={userId}
+        walletAddress={walletAddress || ''}
         initialMessages={messages}
       />
     </>

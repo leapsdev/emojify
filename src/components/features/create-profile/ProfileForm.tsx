@@ -1,14 +1,16 @@
 'use client';
 
+import { useIsMiniApp } from '@/components/providers/AuthProvider';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { Textarea } from '@/components/ui/Textarea';
+
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { getBasename } from '@/lib/basename/basename';
-import { getWalletAddressesByUserId } from '@/lib/usePrivy';
 import { profileFormSchema } from '@/repository/db/user/schema';
 import { useForm } from '@conform-to/react';
 import { parseWithZod } from '@conform-to/zod';
-import { usePrivy } from '@privy-io/react-auth';
+
 import { forwardRef, useCallback, useEffect, useState } from 'react';
 import { useActionState } from 'react';
 import { handleProfileFormAction } from './action';
@@ -18,28 +20,28 @@ const initialState: ProfileFormState = null;
 
 export const ProfileForm = forwardRef<HTMLFormElement>(
   function ProfileForm(_, ref) {
-    const { user } = usePrivy();
+    const { isMiniApp } = useIsMiniApp();
+    const { walletAddress } = useUnifiedAuth();
     const [basename, setBasename] = useState<string>('');
 
     const getAddress = useCallback(async () => {
-      const addresses = await getWalletAddressesByUserId(user?.id || '');
-      if (!addresses || addresses.length === 0) {
+      if (!walletAddress) {
         return;
       }
-      const result = await getBasename(
-        `0x${addresses[0].replace('0x', '')}` as `0x${string}`,
-      );
+      const result = await getBasename(walletAddress as `0x${string}`);
       if (result) {
         setBasename(result);
       }
       return result;
-    }, [user?.id]);
+    }, [walletAddress]);
 
     useEffect(() => {
-      if (user?.id) {
+      if (walletAddress) {
         getAddress();
       }
-    }, [getAddress, user?.id]);
+    }, [getAddress, walletAddress]);
+    // 送信されるuserIdを計算（統合認証から取得したウォレットアドレス）
+    const userId = walletAddress || '';
 
     const [state, formAction, isPending] = useActionState(
       handleProfileFormAction,
@@ -63,12 +65,13 @@ export const ProfileForm = forwardRef<HTMLFormElement>(
         onSubmit={form.onSubmit}
         action={formAction}
       >
+        <input type="hidden" name={fields.imageUrl.name} />
+        <input type="hidden" name="userId" value={userId} />
         <input
           type="hidden"
-          name={fields.email.name}
-          value={user?.email?.address || ''}
+          name="isMiniApp"
+          value={isMiniApp ? 'true' : 'false'}
         />
-        <input type="hidden" name={fields.imageUrl.name} />
 
         {state?.message && (
           <div

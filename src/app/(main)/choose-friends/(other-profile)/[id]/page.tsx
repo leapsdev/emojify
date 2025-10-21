@@ -1,8 +1,12 @@
+'use client';
+
 import { ProfilePage } from '@/components/pages/ProfilePage';
-export const dynamic = 'force-dynamic';
-import { getPrivyId } from '@/lib/auth';
-import { getUserById } from '@/repository/db/user/actions';
-import { redirect } from 'next/navigation';
+import { Loading } from '@/components/ui/Loading';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
+import type { User } from '@/repository/db/database';
+import { getUser } from '@/repository/db/user/actions';
+// import { useParams } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
 interface PageProps {
   params: Promise<{
@@ -10,24 +14,49 @@ interface PageProps {
   }>;
 }
 
-export default async function Page({ params }: PageProps) {
-  const decodedParams = await params;
-  const targetUserId = decodeURIComponent(decodedParams.id);
+export default function Page({ params }: PageProps) {
+  const { isAuthenticated, isLoading, walletAddress } = useUnifiedAuth();
+  const [targetUser, setTargetUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [targetUserId, setTargetUserId] = useState<string>('');
 
-  // 現在のユーザーの取得
-  const currentUserId = await getPrivyId();
-  if (!currentUserId) {
-    redirect('/');
-  }
+  useEffect(() => {
+    const initializePage = async () => {
+      const decodedParams = await params;
+      const id = decodeURIComponent(decodedParams.id);
+      setTargetUserId(id);
+    };
 
-  // 表示対象のユーザーとログインユーザーの取得
-  const [targetUser, currentUser] = await Promise.all([
-    getUserById(targetUserId),
-    getUserById(currentUserId),
-  ]);
+    initializePage();
+  }, [params]);
 
-  if (!targetUser) {
-    redirect('/choose-friends');
+  useEffect(() => {
+    const fetchUserData = async () => {
+      if (isAuthenticated && walletAddress && targetUserId) {
+        try {
+          const [target, current] = await Promise.all([
+            getUser(targetUserId),
+            getUser(walletAddress),
+          ]);
+          setTargetUser(target);
+          setCurrentUser(current);
+        } catch (error) {
+          console.error('Failed to fetch user data:', error);
+        }
+      }
+      setIsDataLoading(false);
+    };
+
+    fetchUserData();
+  }, [isAuthenticated, walletAddress, targetUserId]);
+
+  if (isLoading || isDataLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Loading size="md" text="Loading..." />
+      </div>
+    );
   }
 
   // フレンド状態の初期値を取得
@@ -36,8 +65,9 @@ export default async function Page({ params }: PageProps) {
   return (
     <ProfilePage
       user={targetUser}
+      walletAddress={targetUserId}
       isOwnProfile={false}
-      currentUserId={currentUserId}
+      currentWalletAddress={walletAddress || ''}
       initialIsFriend={initialIsFriend}
     />
   );

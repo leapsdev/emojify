@@ -1,6 +1,7 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import { useLogin, usePrivy } from '@privy-io/react-auth';
 import { LogIn } from 'lucide-react';
 
@@ -13,10 +14,17 @@ export const WalletConnectButton = ({
   className = '',
   showIcon = true,
 }: WalletConnectButtonProps) => {
-  const { ready, authenticated } = usePrivy();
+  const { ready } = usePrivy();
   const { login } = useLogin();
+  const { isAuthenticated, isLoading } = useUnifiedAuth();
 
-  if (authenticated) {
+  // 認証状態の初期化中は何も表示しない
+  if (isLoading) {
+    return null;
+  }
+
+  // 統合認証状態をチェック（Mini App環境ではFarcaster認証、Web環境ではPrivy認証）
+  if (isAuthenticated) {
     return null;
   }
 

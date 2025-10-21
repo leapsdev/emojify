@@ -2,31 +2,36 @@
 
 import type { EmojiProps } from '@/components/features/profile/types';
 import { cn } from '@/lib/utils';
-import * as TabsPrimitive from '@radix-ui/react-tabs';
-import * as React from 'react';
+import { Content, List, Root, Trigger } from '@radix-ui/react-tabs';
+import { useState } from 'react';
 import { EmojiGrid } from './EmojiGrid';
+import { EmojiGridSkeleton } from './EmojiGridSkeleton';
 
 interface ProfileTabsProps {
   createdEmojis: EmojiProps[];
   collectedEmojis: EmojiProps[];
+  isLoadingCreated?: boolean;
+  isLoadingCollected?: boolean;
 }
 
 export const ProfileTabs = ({
   createdEmojis,
   collectedEmojis,
+  isLoadingCreated = false,
+  isLoadingCollected = false,
 }: ProfileTabsProps) => {
-  const [activeTab, setActiveTab] = React.useState('created');
+  const [activeTab, setActiveTab] = useState('created');
 
   return (
-    <TabsPrimitive.Root
+    <Root
       defaultValue="created"
       value={activeTab}
       onValueChange={setActiveTab}
       className="w-full"
     >
       <div className="border-b">
-        <TabsPrimitive.List className="flex w-full h-auto p-0 bg-transparent">
-          <TabsPrimitive.Trigger
+        <List className="flex w-full h-auto p-0 bg-transparent">
+          <Trigger
             value="created"
             className={cn(
               'flex-1 py-3 rounded-none border-b-2 data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:text-black font-black text-lg',
@@ -34,8 +39,8 @@ export const ProfileTabs = ({
             )}
           >
             Created
-          </TabsPrimitive.Trigger>
-          <TabsPrimitive.Trigger
+          </Trigger>
+          <Trigger
             value="collected"
             className={cn(
               'flex-1 py-3 rounded-none border-b-2 data-[state=active]:border-black data-[state=active]:bg-transparent data-[state=active]:text-black font-black text-lg',
@@ -43,17 +48,25 @@ export const ProfileTabs = ({
             )}
           >
             Collected
-          </TabsPrimitive.Trigger>
-        </TabsPrimitive.List>
+          </Trigger>
+        </List>
       </div>
 
-      <TabsPrimitive.Content value="created" className="p-2">
-        <EmojiGrid emojis={createdEmojis} />
-      </TabsPrimitive.Content>
+      <Content value="created" className="p-2">
+        {isLoadingCreated && createdEmojis.length === 0 ? (
+          <EmojiGridSkeleton count={6} />
+        ) : (
+          <EmojiGrid emojis={createdEmojis} />
+        )}
+      </Content>
 
-      <TabsPrimitive.Content value="collected" className="p-2">
-        <EmojiGrid emojis={collectedEmojis} />
-      </TabsPrimitive.Content>
-    </TabsPrimitive.Root>
+      <Content value="collected" className="p-2">
+        {isLoadingCollected && collectedEmojis.length === 0 ? (
+          <EmojiGridSkeleton count={6} />
+        ) : (
+          <EmojiGrid emojis={collectedEmojis} />
+        )}
+      </Content>
+    </Root>
   );
 };

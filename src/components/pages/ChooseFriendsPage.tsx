@@ -8,21 +8,21 @@ import {
   createChatRoomAction,
 } from '@/components/features/choose-friends/actions';
 import { useUserSelection } from '@/components/features/choose-friends/hooks/useUserSelection';
-import EthereumProviders from '@/lib/basename/EthereumProviders';
-import { usePrivyId } from '@/lib/usePrivy';
+
+import { useUnifiedAuth } from '@/hooks/useUnifiedAuth';
 import type { User } from '@/repository/db/database';
 import { useRouter } from 'next/navigation';
 
 interface ClientChooseFriendsPageProps {
-  initialFriends?: User[];
-  initialOthers?: User[];
+  initialFriends?: Array<User & { walletAddress: string }>;
+  initialOthers?: Array<User & { walletAddress: string }>;
 }
 
 export function ClientChooseFriendsPage({
   initialFriends = [],
   initialOthers = [],
 }: ClientChooseFriendsPageProps) {
-  const userId = usePrivyId();
+  const { walletAddress } = useUnifiedAuth();
   const router = useRouter();
   const {
     selectedUsers,
@@ -32,18 +32,18 @@ export function ClientChooseFriendsPage({
     others,
     handleUserSelect,
   } = useUserSelection({
-    currentUserId: userId ?? '',
+    currentWalletAddress: walletAddress ?? '',
     initialFriends,
     initialOthers,
   });
 
   const handleAddFriend = async (friendId: string) => {
-    if (!userId) {
+    if (!walletAddress) {
       return;
     }
 
     try {
-      const result = await addFriendAction(userId, friendId);
+      const result = await addFriendAction(walletAddress, friendId);
       if (!result.success) {
         router.refresh();
       }
@@ -53,11 +53,14 @@ export function ClientChooseFriendsPage({
   };
 
   const handleCreateRoom = async () => {
-    if (!userId) {
+    if (!walletAddress) {
       return;
     }
 
-    const result = await createChatRoomAction([userId, ...selectedUsers]);
+    const result = await createChatRoomAction([
+      walletAddress,
+      ...selectedUsers,
+    ]);
     if (!result.success) {
       return;
     }
@@ -66,32 +69,30 @@ export function ClientChooseFriendsPage({
   };
 
   return (
-    <EthereumProviders>
-      <main className="flex flex-col">
-        <SearchBar value={searchQuery} onChange={setSearchQuery} />
+    <main className="flex flex-col">
+      <SearchBar value={searchQuery} onChange={setSearchQuery} />
 
-        <div className="px-4 space-y-6 flex-1 overflow-auto">
-          <UserSection
-            title="Friends"
-            users={friends}
-            selectedUsers={selectedUsers}
-            onUserSelect={handleUserSelect}
-          />
-
-          <UserSection
-            title="Others"
-            users={others}
-            selectedUsers={selectedUsers}
-            onUserSelect={handleUserSelect}
-            onAddFriend={handleAddFriend}
-          />
-        </div>
-
-        <ChatButton
-          visible={selectedUsers.length > 0}
-          onClick={handleCreateRoom}
+      <div className="px-4 space-y-6 flex-1 overflow-auto">
+        <UserSection
+          title="Friends"
+          users={friends}
+          selectedUsers={selectedUsers}
+          onUserSelect={handleUserSelect}
         />
-      </main>
-    </EthereumProviders>
+
+        <UserSection
+          title="Others"
+          users={others}
+          selectedUsers={selectedUsers}
+          onUserSelect={handleUserSelect}
+          onAddFriend={handleAddFriend}
+        />
+      </div>
+
+      <ChatButton
+        visible={selectedUsers.length > 0}
+        onClick={handleCreateRoom}
+      />
+    </main>
   );
 }

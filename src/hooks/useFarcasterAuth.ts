@@ -105,6 +105,29 @@ export function useFarcasterAuth() {
         throw new Error('Farcaster SDK is not initialized');
       }
 
+      // FIDを事前に取得してBase app環境を検出
+      let fid: number | undefined;
+      try {
+        const context = await sdk.context;
+        const userContext = context.user;
+        fid = userContext?.fid;
+
+        console.log('Farcaster context:', {
+          hasFid: !!fid,
+          fid,
+          username: userContext?.username,
+        });
+      } catch (contextError) {
+        console.error('Failed to get Farcaster context:', contextError);
+      }
+
+      // FIDが存在しない場合はエラー（Base app環境の可能性）
+      if (!fid) {
+        throw new Error(
+          'Farcaster user information (FID) is not available. This might be a Base app environment. Please use the app in Farcaster or use the web version with Privy authentication.',
+        );
+      }
+
       let token: string;
       try {
         // Farcaster Quick Authトークンを取得

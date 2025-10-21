@@ -121,10 +121,86 @@ export function useFarcasterAuth() {
         console.error('Failed to get Farcaster context:', contextError);
       }
 
-      // FIDが存在しない場合はエラー（Base app環境の可能性）
-      if (!fid) {
+      // FID: -1（ダミーアカウント）の場合の特別処理
+      if (fid === -1) {
+        console.log(
+          '🔍 Detected dummy Farcaster account (FID: -1). Using wallet-based authentication.',
+        );
+
+        // ウォレットアドレスを取得
+        let walletAddress: string | null = null;
+        try {
+          const provider = await sdk.wallet.getEthereumProvider();
+          if (provider) {
+            const accounts = (await provider.request({
+              method: 'eth_accounts',
+            })) as string[];
+            walletAddress = accounts?.[0] || null;
+          }
+        } catch (walletError) {
+          console.error('Failed to get wallet address:', walletError);
+        }
+
+        if (!walletAddress) {
+          throw new Error(
+            'Wallet address is required for authentication in Base app environment.',
+          );
+        }
+
+        // Farcasterユーザー情報を設定（ダミー値）
+        try {
+          const context = await sdk.context;
+          const userContext = context.user;
+
+          setState((prev) => ({
+            ...prev,
+            farcasterUserId: '-1',
+            farcasterUsername: userContext?.username || 'baseuser',
+            farcasterDisplayName: 'Base User',
+            farcasterPfpUrl: null,
+          }));
+        } catch {}
+
+        // ダミーアカウント用のFirebase認証
+        const response = await fetch('/api/auth/farcaster-firebase-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            walletAddress,
+            isDummyAccount: true,
+            fid: -1,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorData = await response.json().catch(() => ({}));
+          throw new Error(
+            errorData.error || 'Failed to authenticate with wallet',
+          );
+        }
+
+        const { customToken } = await response.json();
+
+        // Firebaseにカスタムトークンでサインイン
+        await signInWithCustomToken(auth, customToken);
+
+        // 認証成功
+        setState((prev) => ({
+          ...prev,
+          isFarcasterAuthenticated: true,
+          farcasterToken: null, // ダミーアカウントはトークンなし
+          isLoading: false,
+        }));
+
+        return; // ダミーアカウントの処理を終了
+      }
+
+      // FIDが無効な値の場合はエラー
+      if (!fid || fid < 0) {
         throw new Error(
-          'Farcaster user information (FID) is not available. This might be a Base app environment. Please use the app in Farcaster or use the web version with Privy authentication.',
+          `Invalid Farcaster user information (FID: ${fid ?? 'undefined'}). Please use the web version at ${window.location.origin} with Privy authentication.`,
         );
       }
 

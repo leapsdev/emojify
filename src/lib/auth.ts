@@ -84,8 +84,27 @@ export async function getFirebaseCustomTokenFromPrivy(
 export async function getFirebaseCustomTokenFromFarcaster(
   farcasterToken: string,
   walletAddress?: string,
+  isDummyAccount?: boolean,
 ): Promise<string | null> {
   try {
+    // ダミーアカウント（FID: -1）の場合、JWT検証をスキップ
+    if (isDummyAccount && walletAddress) {
+      console.log(
+        '[Farcaster Auth] 🔍 Processing dummy account with wallet:',
+        walletAddress,
+      );
+
+      const { createFirebaseCustomToken } = await import('./firebase-auth');
+      const customToken = await createFirebaseCustomToken(walletAddress, {
+        farcasterFid: -1,
+        authProvider: 'farcaster',
+        walletAddress,
+        isDummyAccount: true,
+      });
+
+      return customToken;
+    }
+
     if (!farcasterToken) {
       return null;
     }

@@ -148,18 +148,13 @@ export function useFarcasterAuth() {
         }
 
         // Farcasterユーザー情報を設定（ダミー値）
-        try {
-          const context = await sdk.context;
-          const userContext = context.user;
-
-          setState((prev) => ({
-            ...prev,
-            farcasterUserId: '-1',
-            farcasterUsername: userContext?.username || 'baseuser',
-            farcasterDisplayName: 'Base User',
-            farcasterPfpUrl: null,
-          }));
-        } catch {}
+        setState((prev) => ({
+          ...prev,
+          farcasterUserId: '-1',
+          farcasterUsername: `BaseUser-${walletAddress}`,
+          farcasterDisplayName: 'Base User',
+          farcasterPfpUrl: null,
+        }));
 
         // ダミーアカウント用のFirebase認証
         const response = await fetch('/api/auth/farcaster-firebase-token', {

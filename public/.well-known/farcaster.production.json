@@ -1,0 +1,34 @@
+{
+  "accountAssociation": {
+    "header": "eyJmaWQiOjI0NTI2MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQ5RmY2QTQxMDU5ZTc3NENmMTlhRTEzNDZDMkZkQjAwYmE5OUFmZDQifQ",
+    "payload": "eyJkb21haW4iOiIifQ",
+    "signature": "/+C8OYNOl1QUjOycInGZr8AV6Pt+yDUmda9V+MPjRyNKiQQDyJkukjy7c9jl+PcZHagLQVYQWlntObs9tNTHwRs="
+  },
+  "miniapp": {
+    "version": "1",
+    "name": "Emojify",
+    "homeUrl": "https://emojiify.club/",
+    "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "splashBackgroundColor": "#FFFFFF",
+    "subtitle": "No Words, Just Emojis",
+    "description": "Emoji-only chat app",
+    "primaryCategory": "social",
+    "tags": [
+      "social",
+      "chat",
+      "nft",
+      "emoji"
+    ],
+    "heroImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "tagline": "No Words, Just Emojis",
+    "ogTitle": "No Words, Just Emojis",
+    "ogDescription": "Emoji-only chat app",
+    "ogImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "buttonTitle": "Open",
+    "noindex": false
+  },
+  "baseBuilder": {
+    "ownerAddress": "0x184611C6337FAf3A9e823b554930c1B69A4026b9"
+  }
+}

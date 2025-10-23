@@ -26,5 +26,8 @@
     "ogDescription": "Emoji-only chat app",
     "ogImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "noindex": false
+  },
+  "baseBuilder": {
+    "ownerAddress": "0x184611C6337FAf3A9e823b554930c1B69A4026b9"
   }
 }

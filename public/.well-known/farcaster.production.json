@@ -1,13 +1,13 @@
 {
   "accountAssociation": {
     "header": "eyJmaWQiOjI0NTI2MywidHlwZSI6ImF1dGgiLCJrZXkiOiIweDQ5RmY2QTQxMDU5ZTc3NENmMTlhRTEzNDZDMkZkQjAwYmE5OUFmZDQifQ",
-    "payload": "eyJkb21haW4iOiJlbW9qaS1jaGF0LWRldmVsb3AudmVyY2VsLmFwcCJ9",
-    "signature": "jXbtf0UsUklKYzbuULSUxWPnwF368lzUht9H3/cU4zUaHp4MTczygbMLV4RBUVZ94Stm1YKpB6CIRk/N7Vz/3xs="
+    "payload": "eyJkb21haW4iOiIifQ",
+    "signature": "/+C8OYNOl1QUjOycInGZr8AV6Pt+yDUmda9V+MPjRyNKiQQDyJkukjy7c9jl+PcZHagLQVYQWlntObs9tNTHwRs="
   },
   "miniapp": {
     "version": "1",
-    "name": "Emoji Chat",
-    "homeUrl": "https://emoji-chat-leaps.vercel.app",
+    "name": "Emojify",
+    "homeUrl": "https://emojiify.club/",
     "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "splashBackgroundColor": "#FFFFFF",
@@ -25,6 +25,7 @@
     "ogTitle": "No Words, Just Emojis",
     "ogDescription": "Emoji-only chat app",
     "ogImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "buttonTitle": "Open",
     "noindex": false
   },
   "baseBuilder": {

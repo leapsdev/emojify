@@ -11,14 +11,19 @@
     "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "splashBackgroundColor": "#FFFFFF",
-    "subtitle": "Web3 emoji-only chat app",
-    "description": "A Web3 chat application where communication happens exclusively through emojis. Create custom emojis, mint them as NFTs, and trade them on the marketplace.",
+    "subtitle": "No Words, Just Emojis",
+    "description": "Emoji-only chat app",
     "primaryCategory": "social",
-    "tags": ["chat", "emoji", "nft", "web3", "social"],
+    "tags": [
+      "social",
+      "chat",
+      "nft",
+      "emoji"
+    ],
     "heroImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
-    "tagline": "Chat with emojis, mint as NFTs",
-    "ogTitle": "Emoji Chat - Web3 Emoji Chat App",
-    "ogDescription": "Create, collect, and chat with emoji NFTs on Base",
+    "tagline": "No Words, Just Emojis",
+    "ogTitle": "No Words, Just Emojis",
+    "ogDescription": "Emoji-only chat app",
     "ogImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
     "noindex": false
   }

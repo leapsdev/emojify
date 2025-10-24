@@ -1,4 +1,4 @@
-# Emoji Chat 🎨💬
+# Emojify 🎨💬
 
 A Web3 chat application where communication happens exclusively through emojis. Users can create their own custom emojis, mint them as NFTs, and trade them on the marketplace.
 

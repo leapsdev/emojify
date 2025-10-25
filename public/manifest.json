@@ -1,7 +1,7 @@
 {
-  "name": "Emoji-Chat",
-  "short_name": "Emoji-Chat",
-  "description": "Emoji-Chat is a Progressive Web App built with Next.js",
+  "name": "Emojify",
+  "short_name": "Emojify",
+  "description": "Emojify is a Progressive Web App built with Next.js",
   "icons": [
     {
       "src": "/icons/icon-192x192.png",

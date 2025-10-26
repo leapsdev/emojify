@@ -2,6 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
 import { Providers } from '@/components/providers/Providers';
 
 import { Toaster } from 'sonner';
@@ -15,30 +17,57 @@ const geistMono = Geist_Mono({
   subsets: ['latin'],
 });
 
+// 環境に応じたfarcaster マニュフェストの読み込み
+function getFarcasterConfig() {
+  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || 'development';
+  const configFile = `farcaster.${environment}.json`;
+  const configPath = join(process.cwd(), 'public', '.well-known', configFile);
+
+  try {
+    const configContent = readFileSync(configPath, 'utf-8');
+    return JSON.parse(configContent);
+  } catch (error) {
+    console.error(`Failed to load ${configFile}:`, error);
+    // フォールバック: development設定を使用
+    if (environment !== 'development') {
+      const fallbackPath = join(
+        process.cwd(),
+        'public',
+        '.well-known',
+        'farcaster.development.json',
+      );
+      const fallbackContent = readFileSync(fallbackPath, 'utf-8');
+      return JSON.parse(fallbackContent);
+    }
+    throw error;
+  }
+}
+
+const farcasterConfig = getFarcasterConfig();
+const miniapp = farcasterConfig.miniapp;
+
 export const metadata: Metadata = {
-  metadataBase: new URL('https://emoji-chat-develop.vercel.app'),
-  title: 'Emoji-Chat',
-  description:
-    'A Web3 chat application that uses only emojis. Create, buy and sell custom emojis while chatting with friends.',
+  metadataBase: new URL(miniapp.homeUrl),
+  title: miniapp.name,
+  description: miniapp.description,
   manifest: '/manifest.json',
   openGraph: {
-    title: 'Emoji Chat',
-    description: 'Web3 emoji-only chat app',
-    images: ['/icons/icon-512x512.png'],
+    title: miniapp.ogTitle || miniapp.name,
+    description: miniapp.ogDescription || miniapp.description,
+    images: [miniapp.ogImageUrl || miniapp.iconUrl],
   },
   other: {
     'fc:miniapp': JSON.stringify({
-      version: 'next',
-      imageUrl: 'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
+      version: miniapp.version,
+      imageUrl: miniapp.iconUrl,
       button: {
-        title: 'Open Emoji Chat',
+        title: miniapp.buttonTitle || 'Open',
         action: {
           type: 'launch_miniapp',
-          name: 'Emoji Chat',
-          url: 'https://emoji-chat-develop.vercel.app',
-          splashImageUrl:
-            'https://emoji-chat-develop.vercel.app/icons/icon-512x512.png',
-          splashBackgroundColor: '#FFFFFF',
+          name: miniapp.name,
+          url: miniapp.homeUrl,
+          splashImageUrl: miniapp.splashImageUrl,
+          splashBackgroundColor: miniapp.splashBackgroundColor,
         },
       },
     }),

@@ -6,10 +6,10 @@
   },
   "miniapp": {
     "version": "1",
-    "name": "Emoji Chat",
-    "homeUrl": "https://emoji-chat-leaps.vercel.app",
-    "iconUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
-    "splashImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "name": "Emojify",
+    "homeUrl": "https://emojify-develop.vercel.app",
+    "iconUrl": "https://emojify-develop.vercel.app/icons/icon-512x512.png",
+    "splashImageUrl": "https://emojify-develop.vercel.app/icons/icon-512x512.png",
     "splashBackgroundColor": "#FFFFFF",
     "subtitle": "No Words, Just Emojis",
     "description": "Emoji-only chat app",
@@ -20,11 +20,11 @@
       "nft",
       "emoji"
     ],
-    "heroImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "heroImageUrl": "https://emojify-develop.vercel.app/icons/icon-512x512.png",
     "tagline": "No Words, Just Emojis",
     "ogTitle": "No Words, Just Emojis",
     "ogDescription": "Emoji-only chat app",
-    "ogImageUrl": "https://emoji-chat-leaps.vercel.app/icons/icon-512x512.png",
+    "ogImageUrl": "https://emojify-develop.vercel.app/icons/icon-512x512.png",
     "noindex": false
   },
   "baseBuilder": {

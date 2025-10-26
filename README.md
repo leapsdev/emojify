@@ -3,7 +3,7 @@
 A Web3 chat application where communication happens exclusively through emojis. Users can create their own custom emojis, mint them as NFTs, and trade them on the marketplace.
 
 **Production URL**: [https://emoji-chat-leaps.vercel.app](https://emoji-chat-leaps.vercel.app) / [https://emojify.club](https://emojify.club)  
-**Development URL**: [https://emoji-chat-develop.vercel.app](https://emoji-chat-develop.vercel.app)
+**Development URL**: [https://emojify-develop.vercel.app](https://emojify-develop.vercel.app)
 
 ## Features 🚀
 
@@ -224,7 +224,7 @@ The Farcaster manifest files contain Mini App configuration with:
 
 ### Endpoints
 - **Production URL**: `https://emoji-chat-leaps.vercel.app` and `https://emojify.club`
-- **Development URL**: `https://emoji-chat-develop.vercel.app`
+- **Development URL**: `https://emojify-develop.vercel.app`
 - **Manifest**: `/.well-known/farcaster.json`
 - **Auth Endpoint**: `/api/auth/farcaster-firebase-token`
 - **CORS Proxy**: `/api/proxy/privy-farcaster` for Farcaster SDK analytics

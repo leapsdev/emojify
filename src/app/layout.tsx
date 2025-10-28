@@ -19,27 +19,14 @@ const geistMono = Geist_Mono({
 
 // 環境に応じたfarcaster マニュフェストの読み込み
 function getFarcasterConfig() {
-  const environment = process.env.NEXT_PUBLIC_ENVIRONMENT || 'development';
-  const configFile = `farcaster.${environment}.json`;
-  const configPath = join(process.cwd(), 'public', '.well-known', configFile);
+  const configPath = join(process.cwd(), 'public', '.well-known', 'farcaster.json');
 
   try {
     const configContent = readFileSync(configPath, 'utf-8');
     return JSON.parse(configContent);
   } catch (error) {
-    console.error(`Failed to load ${configFile}:`, error);
-    // フォールバック: development設定を使用
-    if (environment !== 'development') {
-      const fallbackPath = join(
-        process.cwd(),
-        'public',
-        '.well-known',
-        'farcaster.development.json',
-      );
-      const fallbackContent = readFileSync(fallbackPath, 'utf-8');
-      return JSON.parse(fallbackContent);
-    }
-    throw error;
+    console.error('Failed to load farcaster.json:', error);
+    throw new Error('Farcaster manifest file not found. Make sure to run "pnpm generate:manifest" before building.');
   }
 }
 

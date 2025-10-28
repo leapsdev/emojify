@@ -1,7 +1,10 @@
-import { writeFileSync, mkdirSync } from 'node:fs';
+import { mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { config } from 'dotenv';
-import { developmentConfig, productionConfig } from '../src/config/farcaster.config';
+import {
+  developmentConfig,
+  productionConfig,
+} from '../src/config/farcaster.config';
 
 // Load environment variables from .env file
 config();
@@ -24,7 +27,8 @@ function main() {
     process.exit(1);
   }
 
-  const config = ENVIRONMENT === 'production' ? productionConfig : developmentConfig;
+  const config =
+    ENVIRONMENT === 'production' ? productionConfig : developmentConfig;
 
   try {
     // .well-knownディレクトリを作成（存在しない場合）

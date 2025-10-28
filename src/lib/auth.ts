@@ -113,31 +113,12 @@ export async function getFirebaseCustomTokenFromFarcaster(
     const { createClient } = await import('@farcaster/quick-auth');
     const client = createClient();
 
-    // JWTトークンからドメインをデコード（検証に使用）
-    let tokenDomain: string | null = null;
-    try {
-      const parts = farcasterToken.split('.');
-      if (parts.length > 1) {
-        const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
-        tokenDomain = payload.domain;
-        console.log('[Farcaster Auth] 🔍 JWT domain:', tokenDomain);
-      }
-    } catch (e) {
-      console.error('[Farcaster Auth] ❌ Failed to decode JWT domain:', e);
-    }
-
-    // 設定されたドメインからwww.を除去
+    // www付きとwww無しの両方に対応するため、www.を除去
     const baseDomain = (process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000').replace(/^www\./, '');
-    
-    // トークンにドメインが含まれている場合はそれを使用、なければ設定値を使用
-    // www.の有無に関わらず、トークンに含まれるドメインが正である
-    const verifyDomain = tokenDomain || baseDomain;
-
-    console.log('[Farcaster Auth] 🔍 Verifying with domain:', verifyDomain);
 
     const payload = await client.verifyJwt({
       token: farcasterToken,
-      domain: verifyDomain,
+      domain: baseDomain,
     });
 
     if (!payload || !payload.sub) {

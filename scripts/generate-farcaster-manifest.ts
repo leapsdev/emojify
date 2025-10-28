@@ -1,6 +1,7 @@
-import { copyFileSync, existsSync } from 'node:fs';
+import { writeFileSync, mkdirSync } from 'node:fs';
 import { join } from 'node:path';
 import { config } from 'dotenv';
+import { developmentConfig, productionConfig } from '../src/config/farcaster.config';
 
 // Load environment variables from .env file
 config();
@@ -23,19 +24,19 @@ function main() {
     process.exit(1);
   }
 
-  const sourceFile = join(PUBLIC_DIR, `farcaster.${ENVIRONMENT}.json`);
-
-  if (!existsSync(sourceFile)) {
-    console.error(`❌ Error: Source file not found: ${sourceFile}`);
-    process.exit(1);
-  }
+  const config = ENVIRONMENT === 'production' ? productionConfig : developmentConfig;
 
   try {
-    copyFileSync(sourceFile, TARGET_FILE);
+    // .well-knownディレクトリを作成（存在しない場合）
+    mkdirSync(PUBLIC_DIR, { recursive: true });
+
+    // JSON形式で書き出し
+    writeFileSync(TARGET_FILE, JSON.stringify(config, null, 2), 'utf-8');
+
     console.log(
       `✅ Generated Farcaster manifest for ${ENVIRONMENT} environment`,
     );
-    console.log(`   Source: farcaster.${ENVIRONMENT}.json`);
+    console.log(`   Source: TypeScript config (${ENVIRONMENT}Config)`);
     console.log('   Target: farcaster.json');
     console.log(
       `   (Using ${ENVIRONMENT} based on ${
@@ -45,7 +46,7 @@ function main() {
       })`,
     );
   } catch (error) {
-    console.error('❌ Error copying manifest file:', error);
+    console.error('❌ Error generating manifest file:', error);
     process.exit(1);
   }
 }

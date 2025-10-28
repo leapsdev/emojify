@@ -2,9 +2,8 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import '@coinbase/onchainkit/styles.css';
 import '@/styles/globals.css';
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
 import { Providers } from '@/components/providers/Providers';
+import { getFarcasterConfig } from '@/config/farcaster.config';
 
 import { Toaster } from 'sonner';
 const geistSans = Geist({
@@ -18,18 +17,6 @@ const geistMono = Geist_Mono({
 });
 
 // 環境に応じたfarcaster マニュフェストの読み込み
-function getFarcasterConfig() {
-  const configPath = join(process.cwd(), 'public', '.well-known', 'farcaster.json');
-
-  try {
-    const configContent = readFileSync(configPath, 'utf-8');
-    return JSON.parse(configContent);
-  } catch (error) {
-    console.error('Failed to load farcaster.json:', error);
-    throw new Error('Farcaster manifest file not found. Make sure to run "pnpm generate:manifest" before building.');
-  }
-}
-
 const farcasterConfig = getFarcasterConfig();
 const miniapp = farcasterConfig.miniapp;
 

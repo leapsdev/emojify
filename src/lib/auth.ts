@@ -113,7 +113,18 @@ export async function getFirebaseCustomTokenFromFarcaster(
     const { createClient } = await import('@farcaster/quick-auth');
     const client = createClient();
 
-    const expectedDomain = process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
+    // Farcaster configから設定されたドメインを取得
+    // accountAssociation.payloadをデコードしてドメインを取得
+    const { getFarcasterConfig } = await import('@/config/farcaster.config');
+    const farcasterConfig = getFarcasterConfig();
+    const payloadJson = JSON.parse(
+      Buffer.from(
+        farcasterConfig.accountAssociation.payload,
+        'base64',
+      ).toString('utf-8'),
+    );
+    const expectedDomain =
+      payloadJson.domain || process.env.NEXT_PUBLIC_DOMAIN || 'localhost:3000';
 
     const payload = await client.verifyJwt({
       token: farcasterToken,
